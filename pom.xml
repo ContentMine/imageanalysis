@@ -1,0 +1,245 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>uk.ac.cam.ch.wwmm</groupId>
+        <artifactId>wwmm-parent</artifactId>
+        <version>4</version>
+    </parent>
+
+    <groupId>org.xml-cml</groupId>
+    <artifactId>canny</artifactId>
+    <version>0.1-SNAPSHOT</version>
+     <packaging>jar</packaging>
+
+    <name>Canny</name>
+    <description> Edge Detector - developed from package gibara</description>
+    <url>http://bitbucket.org/wwmm/canny</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://bitbucket.org/wwmm/canny/src</url>
+        <connection>scm:hg:http://bitbucket.org/wwmm/canny</connection>
+        <developerConnection>scm:hg:https://bitbucket.org/wwmm/canny</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <id>pm286</id>
+            <name>Peter Murray-Rust</name>
+        </developer>
+    </developers>
+
+    <ciManagement>
+        <system>hudson</system>
+        <url>https://hudson.ch.cam.ac.uk/job/canny</url>
+    </ciManagement>
+
+    <organization>
+        <name>Peter Murray-Rust</name>
+        <url>http://wwmm.ch.cam.ac.uk/blogs/murrayrust/ </url>
+    </organization>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <configuration>
+                    <check>
+                        <haltOnFailure>false</haltOnFailure>
+                        <regexes>
+                            <regex>
+                                <pattern>org.xmlcml.*</pattern>
+                                <branchRate>80</branchRate>
+                                <lineRate>80</lineRate>
+                            </regex>
+                        </regexes>
+                    </check>
+                    <instrumentation>
+                        <includes>
+                            <include>org/xmlcml/**/*.class</include>
+                        </includes>
+                    </instrumentation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>instrument</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>instrument</goal>
+                            <goal>cobertura</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <header>src/main/resources/header.txt</header>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+<!-- remove <repositories> for releases to central -->
+    <repositories>
+        <repository>
+            <id>ucc-repo</id>
+            <name>UCC Repository</name>
+            <url>https://maven.ch.cam.ac.uk/m2repo</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+		    <groupId>org.xml-cml</groupId>
+		    <artifactId>euclid-dev</artifactId>
+		    <version>1.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+		    <groupId>org.xml-cml</groupId>
+		    <artifactId>html-dev</artifactId>
+		    <version>0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+		    <groupId>org.xml-cml</groupId>
+		    <artifactId>svg-dev</artifactId>
+		    <version>0.1-SNAPSHOT</version>
+        </dependency>
+        
+		<dependency>
+		  <groupId>org.boofcv</groupId>
+		  <artifactId>boofcv</artifactId>
+		  <version>0.15</version>
+		</dependency>
+		
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>src</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>summary</report>
+                            <report>dependencies</report>
+                            <report>project-team</report>
+                            <report>license</report>
+                            <report>cim</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <targetJdk>1.5</targetJdk>
+                    <linkXRef>true</linkXRef>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>src/test/resources/checkstyle.xml
+          </configLocation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>apt-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+
+
+</project>
