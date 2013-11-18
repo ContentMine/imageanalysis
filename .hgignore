@@ -1,0 +1,11 @@
+^.project$
+^.settings/
+^.classpath$
+^.hgignore~$
+^target/.*
+/target/
+^\.idea/
+/lib/
+/output/
+/Tess4J-*
+/tesseract-ocr-*
