@@ -42,4 +42,10 @@ public class ColorUtilities {
             }
         }
     }
+	
+	public static int getValue(int[] pix) {
+		return pix[0] + pix[1] + pix[2];
+	}
+
+
 }

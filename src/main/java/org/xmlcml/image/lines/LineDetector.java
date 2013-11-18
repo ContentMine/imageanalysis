@@ -7,6 +7,7 @@ import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.processing.ColorUtilities;
 
 /**heuristic linedetector from PMR.
  * 
@@ -61,7 +62,7 @@ public class LineDetector extends AbstractDetector {
 				SVGLine line = null;
 				for (int j = 0; j < rasterSize; j++) {
 					pix = dir.equals(Direction.HORIZ) ? raster.getPixel(j, i, pix) : raster.getPixel(i, j, pix);
-					int value = getValue(pix);
+					int value = ColorUtilities.getValue(pix);
 					if (value  < CUTOFF) {
 						if (line == null) { // new line
 							line = new SVGLine();
@@ -92,7 +93,7 @@ public class LineDetector extends AbstractDetector {
 			for (int jcol = 0; jcol < cols; jcol++) {
 				int[] pix = new int[numData];
 				pix = raster.getPixel(jcol, irow, pix);
-				int value = getValue(pix);
+				int value = ColorUtilities.getValue(pix);
 				if (value < CUTOFF) { // black
 					colArray.incrementElementAt(jcol);
 					rowArray.incrementElementAt(irow);
@@ -101,10 +102,6 @@ public class LineDetector extends AbstractDetector {
 		}
 		LOG.debug(colArray);
 		LOG.debug(rowArray);
-	}
-
-	private int getValue(int[] pix) {
-		return pix[0] + pix[1] + pix[2];
 	}
 
 	private void getRasterParameters() {
