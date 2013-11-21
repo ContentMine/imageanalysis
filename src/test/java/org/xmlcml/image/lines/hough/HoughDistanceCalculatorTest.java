@@ -28,7 +28,7 @@ public class HoughDistanceCalculatorTest {
 		distanceCalculator.setStepSize(new Angle(Math.PI/6.0, Units.RADIANS));
 		distanceCalculator.setAngleCount(6);
 		RealArray distArray = distanceCalculator.calculateDistanceArray();
-		LOG.debug(distArray);
+		LOG.trace(distArray);
 		Assert.assertEquals("distances", "(-70.0,-40.6,-0.4,40.0,69.6,80.6)", distArray.toString());
 	}
 

@@ -28,6 +28,21 @@ public class EdgeDetectorTest {
 	}
 	
 	@Test
+	public void testMoleculeCanny() throws IOException {
+		AbstractDetector detector = new EdgeDetector();
+		detector.readImageFile(Fixtures.MOLECULE_20131119_JPG);
+		detector.writeFile(new File("target/moleculeCanny.png"));
+	}
+	
+	@Test
+	public void testMoleculeBinary() throws IOException {
+		AbstractDetector detector = new EdgeDetector();
+		detector.readImageFile(Fixtures.MOLECULE_BINARY_CANNY_1_BMP);
+//		detector.readImageFile(Fixtures.MOLECULE_BINARY_CANNY_1_PNG);
+		detector.writeFile(new File("target/moleculeBinaryCanny1Hough.png"));
+	}
+	
+	@Test
 	public void testCannyOld() throws IOException {
 		CannyEdgeDetector detector = new CannyEdgeDetector();
 		detector.setLowThreshold(0.5f);

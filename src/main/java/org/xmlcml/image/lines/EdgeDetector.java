@@ -27,7 +27,7 @@ public class EdgeDetector extends AbstractDetector {
 		try {
 			detector.process();
 		} catch (Exception e) {
-			throw new RuntimeException("Cannot process: "+file+" e");
+			throw new RuntimeException("Cannot process: "+file, e);
 		}
 		outputImage = detector.getEdgesImage();
 	}

@@ -16,4 +16,13 @@ public class HistogramEQTest {
         histogramEQ.writeImage("target/histogram.png");
 
 	}
+	@Test
+	public void testMolecule() throws IOException {
+    	HistogramEqualization histogramEQ = new HistogramEqualization();
+        histogramEQ.readImage(Fixtures.MOLECULE_20131119_JPG);
+        histogramEQ.histogramEqualization();
+        histogramEQ.writeImage("target/molecule.png");
+
+	}
+
 }
