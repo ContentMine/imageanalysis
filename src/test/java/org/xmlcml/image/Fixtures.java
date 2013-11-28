@@ -26,6 +26,7 @@ public class Fixtures {
 	public static final File MOLECULE_20131119_BINARY_PNG = new File(LINES_DIR, "molecule20131119Binary.png");
 	public static final File MOLECULE_BINARY_CANNY_1_PNG = new File(LINES_DIR, "moleculeBinaryCanny1.png");
 	public static final File MOLECULE_BINARY_CANNY_1_BMP = new File(LINES_DIR, "moleculeBinaryCanny1.bmp");
+	public static final File MALTORYZINE_THINNED_PNG = new File(LINES_DIR, "thinnedMaltoryzine.png");
 	
 	public final static File PROCESSING_DIR = new File(IMAGE_DIR, "processing");
 	public static final File HISTOGRAM_JPG = new File(PROCESSING_DIR, "300px-Unequalized_Hawkes_Bay_NZ.jpg");

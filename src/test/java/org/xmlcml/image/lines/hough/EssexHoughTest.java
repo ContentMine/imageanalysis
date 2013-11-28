@@ -12,6 +12,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.processing.ColorUtilities;
 
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
@@ -96,6 +97,25 @@ public class EssexHoughTest {
 	    } 
 	    ImageIO.write(image, "png", new File("target/ethane.png"));
 	}
+
+	@Test
+	public void testMaltoryzineThinnedFlipped() throws IOException {
+	    BufferedImage image = javax.imageio.ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG); 
+		ColorUtilities.flipWhiteBlack(image);
+//	    binarizeImage(image, 1,255);
+	    HoughTransform h = new HoughTransform(image.getWidth(), image.getHeight()); 
+	    h.addPoints(image); 
+	    // this seems fairly critical
+	    Vector<HoughLine> lines = h.getLines(25); 
+	    Assert.assertEquals(15, lines.size());
+	    // draw the lines back onto the image 
+	    for (int j = 0; j < lines.size(); j++) { 
+	        HoughLine line = lines.elementAt(j); 
+	        line.draw(image, Color.RED.getRGB()); 
+	    } 
+	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHough.png"));
+	}
+
 
 	// =======================================
 
