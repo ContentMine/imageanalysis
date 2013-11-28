@@ -7,5 +7,4 @@
 ^\.idea/
 /lib/
 /output/
-Tess4J.*
-tesseract.*
+/tesseract/
