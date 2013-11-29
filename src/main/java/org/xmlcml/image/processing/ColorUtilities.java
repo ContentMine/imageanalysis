@@ -95,7 +95,6 @@ public class ColorUtilities {
 			for (int i = 0; i <image.getWidth(); i++) {
 				for (int j = 0; j <image.getHeight(); j++) {
 					pix = raster.getPixel(i, j, pix);
-					System.out.println(pix[0]);
 					for (int k = 0;k <pix.length; k++) {
 						int rgb = RGB_BLACK;
 						if (pix[0]+pix[1]+pix[2] == 0) {

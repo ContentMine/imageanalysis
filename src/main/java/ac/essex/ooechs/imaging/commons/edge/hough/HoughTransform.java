@@ -47,90 +47,60 @@ import java.io.File;
  
 public class HoughTransform extends Thread { 
  
-    public static void main(String[] args) throws Exception { 
-        String filename = "/home/ooechs/Desktop/vase.png"; 
- 
-        // load the file using Java's imageIO library 
-        BufferedImage image = javax.imageio.ImageIO.read(new File(filename)); 
- 
-        // create a hough transform object with the right dimensions 
-        HoughTransform h = new HoughTransform(image.getWidth(), image.getHeight()); 
- 
-        // add the points from the image (or call the addPoint method separately if your points are not in an image 
-        h.addPoints(image); 
- 
-        // get the lines out 
-        Vector<HoughLine> lines = h.getLines(30); 
- 
-        // draw the lines back onto the image 
-        for (int j = 0; j < lines.size(); j++) { 
-            HoughLine line = lines.elementAt(j); 
-            line.draw(image, Color.RED.getRGB()); 
-        } 
-    } 
- 
     // The size of the neighbourhood in which to search for other local maxima 
     final int neighbourhoodSize = 4; 
- 
-    // How many discrete values of theta shall we check? 
     final int maxTheta = 180; 
- 
-    // Using maxTheta, work out the step 
     final double thetaStep = Math.PI / maxTheta; 
- 
-    // the width and height of the image 
     protected int width, height; 
- 
-    // the hough array 
     protected int[][] houghArray; 
- 
-    // the coordinates of the centre of the image 
     protected float centerX, centerY; 
- 
-    // the height of the hough array 
-    protected int houghHeight; 
- 
-    // double the hough height (allows for negative numbers) 
-    protected int doubleHeight; 
- 
-    // the number of points that have been added 
+    protected int houghSize; 
+    protected int doubleSize; 
     protected int numPoints; 
- 
-    // cache of values of sin and cos for different theta values. Has a significant performance improvement. 
+    
     private double[] sinCache; 
-    private double[] cosCache; 
+    private double[] cosCache;
+	private BufferedImage image; 
  
-    /** 
-     * Initialises the hough transform. The dimensions of the input image are needed 
-     * in order to initialise the hough array. 
-     * 
-     * @param width  The width of the input image 
-     * @param height The height of the input image 
-     */ 
-    public HoughTransform(int width, int height) { 
- 
-        this.width = width; 
-        this.height = height; 
- 
+//    /** 
+//     * Initialises the hough transform. The dimensions of the input image are needed 
+//     * in order to initialise the hough array. 
+//     * 
+//     * @param width  The width of the input image 
+//     * @param height The height of the input image 
+//     */ 
+//    public HoughTransform(int width, int height) { 
+// 
+//        this.width = width; 
+//        this.height = height; 
+// 
+//        initialise(); 
+// 
+//    } 
+// 
+    public HoughTransform(BufferedImage image) {
+    	this.image = image;
+    	this.width = image.getWidth();
+    	this.height = image.getHeight();
         initialise(); 
- 
-    } 
- 
-    /** 
+        
+    }
+
+	/** 
      * Initialises the hough array. Called by the constructor so you don't need to call it 
      * yourself, however you can use it to reset the transform if you want to plug in another 
      * image (although that image must have the same width and height) 
      */ 
     public void initialise() { 
  
-        // Calculate the maximum height the hough array needs to have 
-        houghHeight = (int) (Math.sqrt(2) * Math.max(height, width)) / 2; 
+        // Calculate the maximum size the hough array needs to have 
+        houghSize = (int) (Math.sqrt(2) * Math.max(height, width)) / 2; 
  
         // Double the height of the hough array to cope with negative r values 
-        doubleHeight = 2 * houghHeight; 
+        doubleSize = 2 * houghSize; 
  
         // Create the hough array 
-        houghArray = new int[maxTheta][doubleHeight]; 
+        houghArray = new int[maxTheta][doubleSize]; 
  
         // Find edge points and vote in array 
         centerX = width / 2; 
@@ -153,11 +123,11 @@ public class HoughTransform extends Thread {
      * Adds points from an image. The image is assumed to be greyscale black and white, so all pixels that are 
      * not black are counted as edges. The image should have the same dimensions as the one passed to the constructor. 
      */ 
-    public void addPoints(BufferedImage image) { 
+    public void addPoints() { 
  
         // Now find edge points and update the hough array 
-        for (int x = 0; x < image.getWidth(); x++) { 
-            for (int y = 0; y < image.getHeight(); y++) { 
+        for (int x = 0; x < width; x++) { 
+            for (int y = 0; y < height; y++) { 
                 // Find non-black pixels 
                 if ((image.getRGB(x, y) & 0x000000ff) != 0) { 
                     addPoint(x, y); 
@@ -172,20 +142,13 @@ public class HoughTransform extends Thread {
      */ 
     public void addPoint(int x, int y) { 
  
-        // Go through each value of theta 
         for (int t = 0; t < maxTheta; t++) { 
- 
-            //Work out the r values for each theta step 
             int r = (int) (((x - centerX) * cosCache[t]) + ((y - centerY) * sinCache[t])); 
- 
             // this copes with negative values of r 
-            r += houghHeight; 
+            r += houghSize; 
  
-            if (r < 0 || r >= doubleHeight) continue; 
- 
-            // Increment the hough array 
+            if (r < 0 || r >= doubleSize) continue; 
             houghArray[t][r]++; 
- 
         } 
  
         numPoints++; 
@@ -198,21 +161,14 @@ public class HoughTransform extends Thread {
      * @param percentageThreshold The percentage threshold above which lines are determined from the hough array 
      */ 
     public Vector<HoughLine> getLines(int threshold) { 
- 
-        // Initialise the vector of lines that we'll return 
         Vector<HoughLine> lines = new Vector<HoughLine>(20); 
- 
-        // Only proceed if the hough array is not empty 
         if (numPoints == 0) return lines; 
  
         // Search for local peaks above threshold to draw 
         for (int t = 0; t < maxTheta; t++) { 
             loop: 
-            for (int r = neighbourhoodSize; r < doubleHeight - neighbourhoodSize; r++) { 
- 
-                // Only consider points above threshold 
+            for (int r = neighbourhoodSize; r < doubleSize - neighbourhoodSize; r++) { 
                 if (houghArray[t][r] > threshold) { 
- 
                     int peak = houghArray[t][r]; 
  
                     // Check that this peak is indeed the local maxima 
@@ -228,13 +184,8 @@ public class HoughTransform extends Thread {
                             } 
                         } 
                     } 
- 
-                    // calculate the true value of theta 
                     double theta = t * thetaStep; 
- 
-                    // add the line to the vector 
                     lines.add(new HoughLine(theta, r)); 
- 
                 } 
             } 
         } 
@@ -248,7 +199,7 @@ public class HoughTransform extends Thread {
     public int getHighestValue() { 
         int max = 0; 
         for (int t = 0; t < maxTheta; t++) { 
-            for (int r = 0; r < doubleHeight; r++) { 
+            for (int r = 0; r < doubleSize; r++) { 
                 if (houghArray[t][r] > max) { 
                     max = houghArray[t][r]; 
                 } 
@@ -262,9 +213,9 @@ public class HoughTransform extends Thread {
      */ 
     public BufferedImage getHoughArrayImage() { 
         int max = getHighestValue(); 
-        BufferedImage image = new BufferedImage(maxTheta, doubleHeight, BufferedImage.TYPE_INT_ARGB); 
+        BufferedImage image = new BufferedImage(maxTheta, doubleSize, BufferedImage.TYPE_INT_ARGB); 
         for (int t = 0; t < maxTheta; t++) { 
-            for (int r = 0; r < doubleHeight; r++) { 
+            for (int r = 0; r < doubleSize; r++) { 
                 double value = 255 * ((double) houghArray[t][r]) / max; 
                 int v = 255 - (int) value; 
                 int c = new Color(v, v, v).getRGB(); 
@@ -272,6 +223,29 @@ public class HoughTransform extends Thread {
             } 
         } 
         return image; 
+    }
+
+	public void resetToBlack(int colorToReplace) {
+        for (int x = 0; x < width; x++) { 
+            for (int y = 0; y < height; y++) { 
+            	if (image.getRGB(x, y) == colorToReplace) {
+            		image.setRGB(x, y, Color.BLACK.getRGB());
+            	}
+            }
+        }
+	} 
+ 
+    public static void main(String[] args) throws Exception { 
+        String filename = "/home/ooechs/Desktop/vase.png"; 
+        BufferedImage image = javax.imageio.ImageIO.read(new File(filename)); 
+        HoughTransform h = new HoughTransform(image); 
+        h.addPoints(); 
+        Vector<HoughLine> lines = h.getLines(30); 
+        for (int j = 0; j < lines.size(); j++) { 
+            HoughLine line = lines.elementAt(j); 
+            line.draw(image, Color.RED.getRGB(), -1); 
+        } 
     } 
  
+
 } 
