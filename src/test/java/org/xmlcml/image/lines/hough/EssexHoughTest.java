@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -137,6 +138,8 @@ public class EssexHoughTest {
 	    for (int j = 0; j < lines.size(); j++) { 
 	        HoughLine line = lines.elementAt(j); 
 	        line.draw(image, Color.RED.getRGB(), Color.YELLOW.getRGB()); 
+	        List<SVGLine> segmentList = line.getSegments();
+	        LOG.debug(segmentList.size());
 	        Int2 min = line.getMinPoint();
 	        Int2 max = line.getMaxPoint();
 	        SVGLine svgLine = new SVGLine(
@@ -144,7 +147,11 @@ public class EssexHoughTest {
 	        		new Real2(max.getX(), max.getY())
 	        		);
 	        svgLine.setStrokeWidth(1.4);
+	        svgLine.setStroke("red");
 	        g.appendChild(svgLine);
+	        for (SVGLine segment : segmentList) {
+	        	g.appendChild(segment);
+	        }
 	    } 
 	    SVGSVG.wrapAndWriteAsSVG(g, new File("target/maltoryzineLines.svg"));
 	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHough.png"));

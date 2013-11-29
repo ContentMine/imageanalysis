@@ -3,11 +3,14 @@ package ac.essex.ooechs.imaging.commons.edge.hough;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGLine;
  
 /** 
  * Represents a linear line as detected by the hough transform. 
@@ -43,6 +46,9 @@ public class HoughLine {
 	private int newColour;
 	private Real2Array pointArray;
 	private double maxSeparation;
+	private List<SVGLine> segmentList;
+	private SVGLine segment;
+	private Double minSegmentLength;
 
     /** 
      * Initialises the hough line 
@@ -63,6 +69,7 @@ public class HoughLine {
         height = image.getHeight(); 
         width = image.getWidth(); 
         maxSeparation = 2.0;
+        minSegmentLength = 5.0;
  
         houghSize = (int) (Math.sqrt(2) * Math.max(height, width)) / 2; 
  
@@ -81,14 +88,44 @@ public class HoughLine {
 
 	private void createSegments() {
 		Real2 lastPoint = null;
+		LOG.debug("segments: "+pointArray);
 		for (Real2 point : pointArray) {
-			if (lastPoint == null || point.getDistance(lastPoint) < maxSeparation ) {
-				lastPoint = point;
-//				addPointToSegment();
+			double dist = point.getDistance(lastPoint);
+//			System.out.println("D "+dist);
+			if (lastPoint == null || Double.isNaN(dist) || dist < maxSeparation ) {
+				addPointToSegment(point);
 			} else {
-//				endSegment();
+				LOG.debug("end: "+dist);
+				endSegment();
+			}
+			lastPoint = point;
+		}
+		endSegment();
+	}
+
+	private void endSegment() {
+		ensureSegmentList();
+		if (segment != null) {
+//			System.out.println("SSS "+segment.toXML());
+			Double length = segment.getXY(0).getDistance(segment.getXY(1));
+//			System.out.println("L "+length);
+			if (length > minSegmentLength) {
+				segmentList.add(segment);
+			} else {
+				LOG.debug("L "+length);
 			}
 		}
+		segment = null;
+	}
+
+	private void addPointToSegment(Real2 point) {
+		if (segment == null) {
+			segment = new SVGLine(point, point);
+			segment.setStrokeWidth(1.0);
+		} else {
+			segment.setXY(point, 1);
+		}
+//		System.out.println("SEG "+segment.toXML());
 	}
 
 	private void drawHorizontal() {
@@ -158,5 +195,16 @@ public class HoughLine {
 	
 	public Int2 getMinPoint() {return minPoint;}
 	public Int2 getMaxPoint() {return maxPoint;}
+
+	public List<SVGLine> getSegments() {
+		ensureSegmentList();
+		return segmentList;
+	}
+
+	private void ensureSegmentList() {
+		if (segmentList == null) {
+			segmentList = new ArrayList<SVGLine>();
+		}
+	}
 
 } 
