@@ -1,9 +1,13 @@
 package ac.essex.ooechs.imaging.commons.edge.hough;
 	 
-import java.awt.image.BufferedImage; 
-import java.awt.*; 
-import java.util.Vector; 
-import java.io.File; 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
 	 
 /** 
  * <p/> 
@@ -47,7 +51,6 @@ import java.io.File;
  
 public class HoughTransform extends Thread { 
  
-    // The size of the neighbourhood in which to search for other local maxima 
     final int neighbourhoodSize = 4; 
     final int maxTheta = 180; 
     final double thetaStep = Math.PI / maxTheta; 
@@ -62,22 +65,6 @@ public class HoughTransform extends Thread {
     private double[] cosCache;
 	private BufferedImage image; 
  
-//    /** 
-//     * Initialises the hough transform. The dimensions of the input image are needed 
-//     * in order to initialise the hough array. 
-//     * 
-//     * @param width  The width of the input image 
-//     * @param height The height of the input image 
-//     */ 
-//    public HoughTransform(int width, int height) { 
-// 
-//        this.width = width; 
-//        this.height = height; 
-// 
-//        initialise(); 
-// 
-//    } 
-// 
     public HoughTransform(BufferedImage image) {
     	this.image = image;
     	this.width = image.getWidth();
@@ -93,23 +80,14 @@ public class HoughTransform extends Thread {
      */ 
     public void initialise() { 
  
-        // Calculate the maximum size the hough array needs to have 
         houghSize = (int) (Math.sqrt(2) * Math.max(height, width)) / 2; 
- 
         // Double the height of the hough array to cope with negative r values 
         doubleSize = 2 * houghSize; 
- 
-        // Create the hough array 
         houghArray = new int[maxTheta][doubleSize]; 
- 
-        // Find edge points and vote in array 
         centerX = width / 2; 
         centerY = height / 2; 
- 
-        // Count how many points there are 
         numPoints = 0; 
  
-        // cache the values of sin and cos for faster processing 
         sinCache = new double[maxTheta]; 
         cosCache = sinCache.clone(); 
         for (int t = 0; t < maxTheta; t++) { 
@@ -155,13 +133,12 @@ public class HoughTransform extends Thread {
     } 
  
     /** 
-     * Once points have been added in some way this method extracts the lines and returns them as a Vector 
-     * of HoughLine objects, which can be used to draw on the 
+     * extracts the lines
      * 
      * @param percentageThreshold The percentage threshold above which lines are determined from the hough array 
      */ 
-    public Vector<HoughLine> getLines(int threshold) { 
-        Vector<HoughLine> lines = new Vector<HoughLine>(20); 
+    public List<HoughLine> getLines(int threshold) { 
+        List<HoughLine> lines = new ArrayList<HoughLine>(20); 
         if (numPoints == 0) return lines; 
  
         // Search for local peaks above threshold to draw 
@@ -236,16 +213,21 @@ public class HoughTransform extends Thread {
 	} 
  
     public static void main(String[] args) throws Exception { 
-        String filename = "/home/ooechs/Desktop/vase.png"; 
-        BufferedImage image = javax.imageio.ImageIO.read(new File(filename)); 
+		String filename = "/home/ooechs/Desktop/vase.png"; 
+        testExample(filename); 
+    }
+
+	private static void testExample(String filename) throws IOException {
+        BufferedImage image = ImageIO.read(new File(filename)); 
         HoughTransform h = new HoughTransform(image); 
         h.addPoints(); 
-        Vector<HoughLine> lines = h.getLines(30); 
+        int threshold = 30;
+        List<HoughLine> lines = h.getLines(threshold); 
         for (int j = 0; j < lines.size(); j++) { 
-            HoughLine line = lines.elementAt(j); 
+            HoughLine line = lines.get(j); 
             line.draw(image, Color.RED.getRGB(), -1); 
-        } 
-    } 
+        }
+	} 
  
 
 } 

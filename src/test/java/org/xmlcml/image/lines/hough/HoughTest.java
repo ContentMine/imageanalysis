@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -24,22 +24,22 @@ import org.xmlcml.image.processing.ColorUtilities;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 
-public class EssexHoughTest {
+public class HoughTest {
 
 
-	private static final Logger LOG = Logger.getLogger(EssexHoughTest.class);
+	private static final Logger LOG = Logger.getLogger(HoughTest.class);
 
 	@Test
 	public void testMaltoryzineBinary() throws IOException {
-	    BufferedImage image = javax.imageio.ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG); 
+	    BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG); 
 //	    binarizeImage(image, 1,255);
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 
-	    Vector<HoughLine> lines = h.getLines(30); 
+	    List<HoughLine> lines = h.getLines(30); 
 	    Assert.assertEquals(211, lines.size());
 	    // draw the lines back onto the image 
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), -1); 
 	    } 
 	    ImageIO.write(image, "png", new File("target/maltoryzineBinaryHough.png"));
@@ -50,11 +50,11 @@ public class EssexHoughTest {
 	    BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_FLIPPED_PNG); 
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 
-	    Vector<HoughLine> lines = h.getLines(30); 
+	    List<HoughLine> lines = h.getLines(30); 
 	    Assert.assertEquals(41, lines.size());
 	    // draw the lines back onto the image 
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
 	    ImageIO.write(image, "png", new File("target/maltoryzineBinaryHough.png"));
@@ -67,11 +67,11 @@ public class EssexHoughTest {
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 
 	    int threshold = 30;
-	    Vector<HoughLine> lines = h.getLines(threshold); 
+	    List<HoughLine> lines = h.getLines(threshold); 
 	    Assert.assertEquals(650, lines.size());
 	    // draw the lines back onto the image 
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
 	    ImageIO.write(image, "png", new File("target/moleculeCanny1.png"));
@@ -83,42 +83,37 @@ public class EssexHoughTest {
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 
 	    int threshold = 80;
-	    Vector<HoughLine> lines = h.getLines(threshold); 
+	    List<HoughLine> lines = h.getLines(threshold); 
 //	    Assert.assertEquals(49, lines.size());
 	    // draw the lines back onto the image 
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
 	    ImageIO.write(image, "png", new File("target/moleculeBinaryCannyHough80.png"));
 	}
 	@Test
 	public void testEthane() throws IOException {
-	    BufferedImage image = javax.imageio.ImageIO.read(Fixtures.ETHANE_PNG); 
+	    BufferedImage image = ImageIO.read(Fixtures.ETHANE_PNG); 
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 
-	    Vector<HoughLine> lines = h.getLines(30); 
+	    List<HoughLine> lines = h.getLines(30); 
 	    Assert.assertEquals(58, lines.size());
 	    // draw the lines back onto the image 
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
 	    ImageIO.write(image, "png", new File("target/ethane.png"));
 	}
 
 	@Test
-	public void testMaltoryzineThinnedFlipped() throws IOException {
+	public void testMaltoryzineThinnedFlipped() throws Exception {
 	    BufferedImage image = javax.imageio.ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG); 
-		ColorUtilities.flipWhiteBlack(image);
-	    HoughTransform h = new HoughTransform(image); 
-	    h.addPoints(); 
-	    // this seems fairly critical
-	    Vector<HoughLine> lines = h.getLines(25); 
-	    Assert.assertEquals(15, lines.size());
+		List<HoughLine> lines = getLines(image);
 	    // draw the lines back onto the image 
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
 	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHough.png"));
@@ -131,12 +126,12 @@ public class EssexHoughTest {
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 
 	    // this seems fairly critical
-	    Vector<HoughLine> lines = h.getLines(25); 
+	    List<HoughLine> lines = h.getLines(25); 
 	    Assert.assertEquals(15, lines.size());
 	    // draw the lines back onto the image and outline where overlap
 	    SVGG g = new SVGG();
 	    for (int j = 0; j < lines.size(); j++) { 
-	        HoughLine line = lines.elementAt(j); 
+	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), Color.YELLOW.getRGB()); 
 	        List<SVGLine> segmentList = line.getSegments();
 	        LOG.debug(segmentList.size());
@@ -148,7 +143,7 @@ public class EssexHoughTest {
 	        		);
 	        svgLine.setStrokeWidth(1.4);
 	        svgLine.setStroke("red");
-	        g.appendChild(svgLine);
+//	        g.appendChild(svgLine);
 	        for (SVGLine segment : segmentList) {
 	        	g.appendChild(segment);
 	        }
@@ -160,8 +155,28 @@ public class EssexHoughTest {
 	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHoughNew.png"));
 	}
 
+	public void testSegment1() throws Exception {
+	    BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG); 
+		ColorUtilities.flipWhiteBlack(image);
+	    HoughTransform h = new HoughTransform(image); 
+	    h.addPoints(); 
+	    List<HoughLine> lines = h.getLines(25); 
+	    Assert.assertEquals(15, lines.size());
+        HoughLine line = lines.get(1); 
+        line.draw(image, Color.RED.getRGB(), Color.YELLOW.getRGB()); 
+        List<SVGLine> segmentList = line.getSegments();
+        LOG.debug(segmentList.size());
+	}
 
 	// =======================================
 
+	public List<HoughLine> getLines(BufferedImage image) throws Exception {
+		ColorUtilities.flipWhiteBlack(image);
+	    HoughTransform h = new HoughTransform(image); 
+	    h.addPoints(); 
+	    List<HoughLine> lines = h.getLines(25); 
+	    Assert.assertEquals(15, lines.size());
+	    return lines;
+	}
 
 }

@@ -78,17 +78,21 @@ public class HoughLine {
  
 		pointArray = new Real2Array();
 
+		int xy = -1;
         if (theta < Math.PI * 0.25 || theta > Math.PI * 0.75) { 
             drawVertical(); 
+            xy = 1;
         } else { 
             drawHorizontal(); 
+            xy = 0;
         } 
-        createSegments();
+        createSegments(xy);
     }
 
-	private void createSegments() {
+	private void createSegments(int xy) {
 		Real2 lastPoint = null;
 		LOG.debug("segments: "+pointArray);
+		pointArray.sortAscending(xy);
 		for (Real2 point : pointArray) {
 			double dist = point.getDistance(lastPoint);
 //			System.out.println("D "+dist);
@@ -106,15 +110,14 @@ public class HoughLine {
 	private void endSegment() {
 		ensureSegmentList();
 		if (segment != null) {
-//			System.out.println("SSS "+segment.toXML());
 			Double length = segment.getXY(0).getDistance(segment.getXY(1));
-//			System.out.println("L "+length);
 			if (length > minSegmentLength) {
 				segmentList.add(segment);
 			} else {
-				LOG.debug("L "+length);
+//				LOG.debug("L "+length);
 			}
 		}
+//		System.out.println("SL "+segmentList.size());
 		segment = null;
 	}
 
@@ -161,10 +164,13 @@ public class HoughLine {
 			image.setRGB(x, y, houghColour);
 		} else {
 			int currentColor = image.getRGB(x, y);
-			if (currentColor == Color.BLACK.getRGB()) {
-				newColour = houghColour;
+			if (false) {
+			} else if (currentColor == segmentColour) {
+				newColour = segmentColour;
 			} else if (currentColor == Color.WHITE.getRGB()) {
 				newColour = segmentColour;
+			} else if (currentColor == Color.BLACK.getRGB()) {
+				newColour = houghColour;
 			} else if (currentColor == houghColour) {
 			} else if (currentColor == segmentColour) {
 			} else {
