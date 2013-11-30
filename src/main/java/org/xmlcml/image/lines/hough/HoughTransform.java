@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+
+import org.apache.log4j.Logger;
 	 
 /** 
  * <p> 
@@ -18,84 +20,67 @@ import javax.imageio.ImageIO;
  * @author pm286
  */ 
  
-public class HoughTransform extends Thread { 
- 
+public class HoughTransform { 
+
+	private final static Logger LOG = Logger.getLogger(HoughTransform.class);
+	
     final int neighbourhoodSize = 4; 
     final int maxTheta = 180; 
     final double thetaStep = Math.PI / maxTheta; 
     protected int width, height; 
-    protected int[][] houghArray; 
+    protected int[][] thetaRMatrix; 
     protected float centerX, centerY; 
     protected int houghSize; 
     protected int doubleSize; 
     protected int numPoints; 
-    
-    private double[] sinCache; 
-    private double[] cosCache;
 	private BufferedImage image; 
  
     public HoughTransform(BufferedImage image) {
     	this.image = image;
-    	this.width = image.getWidth();
-    	this.height = image.getHeight();
         initialise(); 
         
     }
 
-	/** 
-     * Initialises the hough array. Called by the constructor so you don't need to call it 
-     * yourself, however you can use it to reset the transform if you want to plug in another 
-     * image (although that image must have the same width and height) 
-     */ 
-    public void initialise() { 
+    private void initialise() { 
  
+    	this.width = image.getWidth();
+    	this.height = image.getHeight();
         houghSize = (int) (Math.sqrt(2) * Math.max(height, width)) / 2; 
         // Double the height of the hough array to cope with negative r values 
         doubleSize = 2 * houghSize; 
-        houghArray = new int[maxTheta][doubleSize]; 
+        thetaRMatrix = new int[maxTheta][doubleSize]; 
         centerX = width / 2; 
         centerY = height / 2; 
         numPoints = 0; 
- 
-        sinCache = new double[maxTheta]; 
-        cosCache = sinCache.clone(); 
-        for (int t = 0; t < maxTheta; t++) { 
-            double realTheta = t * thetaStep; 
-            sinCache[t] = Math.sin(realTheta); 
-            cosCache[t] = Math.cos(realTheta); 
-        } 
     } 
  
     /** 
-     * Adds points from an image. The image is assumed to be greyscale black and white, so all pixels that are 
-     * not black are counted as edges. The image should have the same dimensions as the one passed to the constructor. 
-     */ 
+     * The image is assumed to be greyscale black and white, so all pixels that are 
+     * not black are counted as edges.*/ 
     public void addPoints() { 
  
-        // Now find edge points and update the hough array 
         for (int x = 0; x < width; x++) { 
             for (int y = 0; y < height; y++) { 
                 // Find non-black pixels 
                 if ((image.getRGB(x, y) & 0x000000ff) != 0) { 
-                    addPoint(x, y); 
+                    addPointToAccumulator(x, y); 
                 } 
             } 
         } 
     } 
  
     /** 
-     * Adds a single point to the hough transform. You can use this method directly 
-     * if your data isn't represented as a buffered image. 
+     * Increments accumulator. 
      */ 
-    public void addPoint(int x, int y) { 
+    public void addPointToAccumulator(int x, int y) { 
  
         for (int t = 0; t < maxTheta; t++) { 
-            int r = (int) (((x - centerX) * cosCache[t]) + ((y - centerY) * sinCache[t])); 
+            int r = (int) (((x - centerX) * Math.cos(thetaStep * t)) + ((y - centerY) * Math.sin(thetaStep * t)) ); 
             // this copes with negative values of r 
             r += houghSize; 
  
             if (r < 0 || r >= doubleSize) continue; 
-            houghArray[t][r]++; 
+            thetaRMatrix[t][r]++; 
         } 
  
         numPoints++; 
@@ -111,60 +96,52 @@ public class HoughTransform extends Thread {
         if (numPoints == 0) return lines; 
  
         // Search for local peaks above threshold to draw 
-        boolean foundPeak = false;
         for (int t = 0; t < maxTheta; t++) { 
-            loop: 
             for (int r = neighbourhoodSize; r < doubleSize - neighbourhoodSize; r++) { 
-                if (houghArray[t][r] > threshold) { 
-                    int peak = houghArray[t][r]; 
- 
-                    foundPeak = findPeak(t, r, peak); 
-                    if (foundPeak) {
-                    	continue;
+                if (thetaRMatrix[t][r] > threshold) { 
+                    if (!findBiggerNeighbouringPeak(t, r)) {
+	                    lines.add(new HoughLine(t * thetaStep, r)); 
                     }
-//                	if (foundPeak) {
-//                		continue loop;
-//                	}
-                    
-                    double theta = t * thetaStep; 
-                    lines.add(new HoughLine(theta, r)); 
                 } 
             } 
-//        	if (foundPeak) continue loop;
         } 
  
         return lines; 
     }
 
-	private boolean findPeak(int t, int r, int peak) {
-		boolean breakout = false;
-		// Check that this peak is indeed the local maxima 
+	private boolean findBiggerNeighbouringPeak(int theta0, int r0) {
+		boolean foundBiggerPeak = false;
 		for (int dx = -neighbourhoodSize; dx <= neighbourhoodSize; dx++) { 
 		    for (int dy = -neighbourhoodSize; dy <= neighbourhoodSize; dy++) { 
-		        int dt = t + dx; 
-		        int dr = r + dy; 
-		        if (dt < 0) dt = dt + maxTheta; 
-		        else if (dt >= maxTheta) dt = dt - maxTheta; 
-		        if (houghArray[dt][dr] > peak) { 
-		            // found a bigger point nearby, skip 
-//                                continue loop; 
-		        	breakout = true;
+		        int r = r0 + dy; 
+		        int t = normalizeTheta(theta0 + dx);
+		        if (thetaRMatrix[t][r] > thetaRMatrix[theta0][r0]) { 
+		        	foundBiggerPeak = true;
 		        } 
 		    } 
-		    if (breakout) break;
+		    if (foundBiggerPeak) break;
 		}
-		return breakout;
+		return foundBiggerPeak;
+	}
+
+	private int normalizeTheta(int t) {
+		if (t < 0) {
+			t = t + maxTheta; 
+		} else if (t >= maxTheta) {
+			t = t - maxTheta; 
+		}
+		return t;
 	} 
  
     /** 
      * Gets the highest value in the hough array 
      */ 
-    public int getHighestValue() { 
+    public int getHighestValueInAccumulator() { 
         int max = 0; 
         for (int t = 0; t < maxTheta; t++) { 
             for (int r = 0; r < doubleSize; r++) { 
-                if (houghArray[t][r] > max) { 
-                    max = houghArray[t][r]; 
+                if (thetaRMatrix[t][r] > max) { 
+                    max = thetaRMatrix[t][r]; 
                 } 
             } 
         } 
@@ -173,12 +150,12 @@ public class HoughTransform extends Thread {
  
     /** 
      */ 
-    public BufferedImage getHoughArrayImage() { 
-        int max = getHighestValue(); 
+    public BufferedImage createBufferedImageFromAccumulator() { 
+        int max = getHighestValueInAccumulator(); 
         BufferedImage image = new BufferedImage(maxTheta, doubleSize, BufferedImage.TYPE_INT_ARGB); 
         for (int t = 0; t < maxTheta; t++) { 
             for (int r = 0; r < doubleSize; r++) { 
-                double value = 255 * ((double) houghArray[t][r]) / max; 
+                double value = 255 * ((double) thetaRMatrix[t][r]) / max; 
                 int v = 255 - (int) value; 
                 int c = new Color(v, v, v).getRGB(); 
                 image.setRGB(t, r, c); 
@@ -197,22 +174,4 @@ public class HoughTransform extends Thread {
         }
 	} 
  
-    public static void main(String[] args) throws Exception { 
-		String filename = "foo.png"; 
-        testExample(filename); 
-    }
-
-	private static void testExample(String filename) throws IOException {
-        BufferedImage image = ImageIO.read(new File(filename)); 
-        HoughTransform h = new HoughTransform(image); 
-        h.addPoints(); 
-        int threshold = 30;
-        List<HoughLine> lines = h.getLines(threshold); 
-        for (int j = 0; j < lines.size(); j++) { 
-            HoughLine line = lines.get(j); 
-            line.draw(image, Color.RED.getRGB(), -1); 
-        }
-	} 
- 
-
 } 
