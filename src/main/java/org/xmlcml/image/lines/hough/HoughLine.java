@@ -1,4 +1,4 @@
-package ac.essex.ooechs.imaging.commons.edge.hough;
+package org.xmlcml.image.lines.hough;
 
 
 import java.awt.Color;
@@ -13,10 +13,9 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGLine;
  
 /** 
- * Represents a linear line as detected by the hough transform. 
- * This line is represented by an angle theta and a radius from the centre. 
  * 
- * @author Olly Oechsle, University of Essex, Date: 13-Mar-2008 
+ * Informed in part by code from Olly Oechsle, University of Essex, Date: 13-Mar-2008 
+ * @author pm286
  * @version 1.0 
  */ 
 public class HoughLine { 
@@ -38,7 +37,6 @@ public class HoughLine {
 	private int houghSize;
 	private int houghColour;
 	private int segmentColour;
-
 	private BufferedImage image;
 
 	private Int2 minPoint;
@@ -49,6 +47,7 @@ public class HoughLine {
 	private List<SVGLine> segmentList;
 	private SVGLine segment;
 	private Double minSegmentLength;
+	private int lineSpread;
 
     /** 
      * Initialises the hough line 
@@ -56,8 +55,15 @@ public class HoughLine {
     public HoughLine(double theta, double r) { 
         this.theta = theta; 
         this.r = r; 
+        initialize();
     } 
  
+	private void initialize() {
+		maxSeparation = 2.0;
+        minSegmentLength = 5.0;
+		lineSpread = 2;
+	}
+
     /** 
      * Draws the line on the image of your choice with the RGB colour of your choice. 
      */ 
@@ -68,8 +74,6 @@ public class HoughLine {
         this.segmentColour = segmentColour;
         height = image.getHeight(); 
         width = image.getWidth(); 
-        maxSeparation = 2.0;
-        minSegmentLength = 5.0;
  
         houghSize = (int) (Math.sqrt(2) * Math.max(height, width)) / 2; 
  
@@ -91,15 +95,12 @@ public class HoughLine {
 
 	private void createSegments(int xy) {
 		Real2 lastPoint = null;
-		LOG.debug("segments: "+pointArray);
 		pointArray.sortAscending(xy);
 		for (Real2 point : pointArray) {
 			double dist = point.getDistance(lastPoint);
-//			System.out.println("D "+dist);
 			if (lastPoint == null || Double.isNaN(dist) || dist < maxSeparation ) {
 				addPointToSegment(point);
 			} else {
-				LOG.debug("end: "+dist);
 				endSegment();
 			}
 			lastPoint = point;
@@ -114,10 +115,8 @@ public class HoughLine {
 			if (length > minSegmentLength) {
 				segmentList.add(segment);
 			} else {
-//				LOG.debug("L "+length);
 			}
 		}
-//		System.out.println("SL "+segmentList.size());
 		segment = null;
 	}
 
@@ -128,11 +127,10 @@ public class HoughLine {
 		} else {
 			segment.setXY(point, 1);
 		}
-//		System.out.println("SEG "+segment.toXML());
 	}
 
 	private void drawHorizontal() {
-		for (int dy = -2; dy <= 2; dy++){
+		for (int dy = -lineSpread; dy <= lineSpread; dy++){
 			for (int x = 0; x < width; x++) { 
 			    int y = (int) ((((r - houghSize) - ((x - centerX) * Math.cos(theta))) / Math.sin(theta)) + centerY) + dy; 
 			    if (y < height && y >= 0) { 
@@ -143,7 +141,7 @@ public class HoughLine {
 	}
 
 	private void drawVertical() {
-		for (int dx = -2; dx <= 2; dx++){
+		for (int dx = -lineSpread; dx <= lineSpread; dx++){
 			for (int y = 0; y < height; y++) { 
 			    int x = (int) ((((r - houghSize) - ((y - centerY) * Math.sin(theta))) / Math.cos(theta)) + centerX) + dx; 
 			    if (x < width && x >= 0) { 

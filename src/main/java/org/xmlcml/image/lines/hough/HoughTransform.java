@@ -1,4 +1,4 @@
-package ac.essex.ooechs.imaging.commons.edge.hough;
+package org.xmlcml.image.lines.hough;
 	 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -10,43 +10,12 @@ import java.util.List;
 import javax.imageio.ImageIO;
 	 
 /** 
- * <p/> 
- * Java Implementation of the Hough Transform.<br /> 
- * Used for finding straight lines in an image.<br /> 
- * by Olly Oechsle 
- * </p> 
- * <p/> 
- * Note: This class is based on original code from:<br /> 
+ * <p> 
+ * Informed in part by code from Olly Oechsle, University of Essex, Date: 13-Mar-2008 
  * <a href="http://homepages.inf.ed.ac.uk/rbf/HIPR2/hough.htm">http://homepages.inf.ed.ac.uk/rbf/HIPR2/hough.htm</a> 
  * </p> 
- * <p/> 
- * If you represent a line as:<br /> 
- * x cos(theta) + y sin (theta) = r 
- * </p> 
- * <p/> 
- * ... and you know values of x and y, you can calculate all the values of r by going through 
- * all the possible values of theta. If you plot the values of r on a graph for every value of 
- * theta you get a sinusoidal curve. This is the Hough transformation. 
- * </p> 
- * <p/> 
- * The hough tranform works by looking at a number of such x,y coordinates, which are usually 
- * found by some kind of edge detection. Each of these coordinates is transformed into 
- * an r, theta curve. This curve is discretised so we actually only look at a certain discrete 
- * number of theta values. "Accumulator" cells in a hough array along this curve are incremented 
- * for X and Y coordinate. 
- * </p> 
- * <p/> 
- * The accumulator space is plotted rectangularly with theta on one axis and r on the other. 
- * Each point in the array represents an (r, theta) value which can be used to represent a line 
- * using the formula above. 
- * </p> 
- * <p/> 
- * Once all the points have been added should be full of curves. The algorithm then searches for 
- * local peaks in the array. The higher the peak the more values of x and y crossed along that curve, 
- * so high peaks give good indications of a line. 
- * </p> 
  * 
- * @author Olly Oechsle, University of Essex 
+ * @author pm286
  */ 
  
 public class HoughTransform extends Thread { 
@@ -142,33 +111,50 @@ public class HoughTransform extends Thread {
         if (numPoints == 0) return lines; 
  
         // Search for local peaks above threshold to draw 
+        boolean foundPeak = false;
         for (int t = 0; t < maxTheta; t++) { 
             loop: 
             for (int r = neighbourhoodSize; r < doubleSize - neighbourhoodSize; r++) { 
                 if (houghArray[t][r] > threshold) { 
                     int peak = houghArray[t][r]; 
  
-                    // Check that this peak is indeed the local maxima 
-                    for (int dx = -neighbourhoodSize; dx <= neighbourhoodSize; dx++) { 
-                        for (int dy = -neighbourhoodSize; dy <= neighbourhoodSize; dy++) { 
-                            int dt = t + dx; 
-                            int dr = r + dy; 
-                            if (dt < 0) dt = dt + maxTheta; 
-                            else if (dt >= maxTheta) dt = dt - maxTheta; 
-                            if (houghArray[dt][dr] > peak) { 
-                                // found a bigger point nearby, skip 
-                                continue loop; 
-                            } 
-                        } 
-                    } 
+                    foundPeak = findPeak(t, r, peak); 
+                    if (foundPeak) {
+                    	continue;
+                    }
+//                	if (foundPeak) {
+//                		continue loop;
+//                	}
+                    
                     double theta = t * thetaStep; 
                     lines.add(new HoughLine(theta, r)); 
                 } 
             } 
+//        	if (foundPeak) continue loop;
         } 
  
         return lines; 
-    } 
+    }
+
+	private boolean findPeak(int t, int r, int peak) {
+		boolean breakout = false;
+		// Check that this peak is indeed the local maxima 
+		for (int dx = -neighbourhoodSize; dx <= neighbourhoodSize; dx++) { 
+		    for (int dy = -neighbourhoodSize; dy <= neighbourhoodSize; dy++) { 
+		        int dt = t + dx; 
+		        int dr = r + dy; 
+		        if (dt < 0) dt = dt + maxTheta; 
+		        else if (dt >= maxTheta) dt = dt - maxTheta; 
+		        if (houghArray[dt][dr] > peak) { 
+		            // found a bigger point nearby, skip 
+//                                continue loop; 
+		        	breakout = true;
+		        } 
+		    } 
+		    if (breakout) break;
+		}
+		return breakout;
+	} 
  
     /** 
      * Gets the highest value in the hough array 
@@ -186,7 +172,6 @@ public class HoughTransform extends Thread {
     } 
  
     /** 
-     * Gets the hough array as an image, in case you want to have a look at it. 
      */ 
     public BufferedImage getHoughArrayImage() { 
         int max = getHighestValue(); 
@@ -213,7 +198,7 @@ public class HoughTransform extends Thread {
 	} 
  
     public static void main(String[] args) throws Exception { 
-		String filename = "/home/ooechs/Desktop/vase.png"; 
+		String filename = "foo.png"; 
         testExample(filename); 
     }
 

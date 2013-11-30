@@ -21,9 +21,6 @@ import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.processing.ColorUtilities;
 
-import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
-import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
-
 public class HoughTest {
 
 
