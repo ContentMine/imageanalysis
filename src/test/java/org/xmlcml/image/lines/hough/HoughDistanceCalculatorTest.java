@@ -9,6 +9,7 @@ import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealArray;
+import org.xmlcml.image.lines.old.HoughDistanceCalculator;
 
 public class HoughDistanceCalculatorTest {
 

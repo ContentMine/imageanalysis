@@ -130,7 +130,7 @@ public class HoughTest {
 	    for (int j = 0; j < lines.size(); j++) { 
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), Color.YELLOW.getRGB()); 
-	        List<SVGLine> segmentList = line.getSegments();
+	        List<Segment> segmentList = line.getSegments();
 	        LOG.debug(segmentList.size());
 	        Int2 min = line.getMinPoint();
 	        Int2 max = line.getMaxPoint();
@@ -141,8 +141,8 @@ public class HoughTest {
 	        svgLine.setStrokeWidth(1.4);
 	        svgLine.setStroke("red");
 //	        g.appendChild(svgLine);
-	        for (SVGLine segment : segmentList) {
-	        	g.appendChild(segment);
+	        for (Segment segment : segmentList) {
+	        	g.appendChild(segment.getSVGLine());
 	        }
 	    } 
 	    SVGSVG.wrapAndWriteAsSVG(g, new File("target/maltoryzineLines.svg"));
@@ -161,7 +161,7 @@ public class HoughTest {
 	    Assert.assertEquals(15, lines.size());
         HoughLine line = lines.get(1); 
         line.draw(image, Color.RED.getRGB(), Color.YELLOW.getRGB()); 
-        List<SVGLine> segmentList = line.getSegments();
+        List<Segment> segmentList = line.getSegments();
         LOG.debug(segmentList.size());
 	}
 

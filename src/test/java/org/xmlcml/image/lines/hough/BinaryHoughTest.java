@@ -7,13 +7,13 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Real;
+import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.RealMatrix;
-import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.lines.hough.BinaryHough;
+import org.xmlcml.image.lines.old.BinaryHough;
+import org.xmlcml.image.lines.old.HoughDistanceCalculator;
 
 public class BinaryHoughTest {
 

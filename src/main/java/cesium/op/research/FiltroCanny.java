@@ -80,7 +80,7 @@ public class FiltroCanny extends JFrame {
             String msgb = "\n   dp => standard deviation.";
             String msgc = "\n   inf => LOW threshold.";
             String msgd = "\n   sup => HIGH threshold.";
-            System.out.println(msga + msgb + msgc + msgd);
+            System.err.println(msga + msgb + msgc + msgd);
             System.exit(0);
         }
 
@@ -102,7 +102,7 @@ public class FiltroCanny extends JFrame {
         try {
             dp = Double.parseDouble(args[1]);
         } catch (NumberFormatException e) {
-            System.out.println("Valor do parametro <dp> invalido");
+            System.err.println("Valor do parametro <dp> invalido");
             System.exit(0);
         }
 

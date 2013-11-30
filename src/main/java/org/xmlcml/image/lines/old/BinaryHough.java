@@ -1,4 +1,4 @@
-package org.xmlcml.image.lines.hough;
+package org.xmlcml.image.lines.old;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealMatrix;
-import org.xmlcml.image.lines.Accumulator;
 import org.xmlcml.image.processing.ColorUtilities;
 
 public class BinaryHough {

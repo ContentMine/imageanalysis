@@ -1,4 +1,4 @@
-package org.xmlcml.image.lines.hough;
+package org.xmlcml.image.lines.old;
 
 import org.xmlcml.euclid.Angle;
 

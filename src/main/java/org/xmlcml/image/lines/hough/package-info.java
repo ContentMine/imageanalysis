@@ -1,5 +1,5 @@
 /**
- * 
+ * Hough transform and Segmenter.
  */
 /**
  * @author pm286

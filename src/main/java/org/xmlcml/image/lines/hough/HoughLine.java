@@ -44,8 +44,8 @@ public class HoughLine {
 	private int newColour;
 	private Real2Array pointArray;
 	private double maxSeparation;
-	private List<SVGLine> segmentList;
-	private SVGLine segment;
+	private List<Segment> segmentList;
+	private Segment segment;
 	private Double minSegmentLength;
 	private int lineSpread;
 
@@ -111,10 +111,10 @@ public class HoughLine {
 	private void endSegment() {
 		ensureSegmentList();
 		if (segment != null) {
-			Double length = segment.getXY(0).getDistance(segment.getXY(1));
-			if (length > minSegmentLength) {
+			Double length = segment.getLength();
+			if (length != null && length > minSegmentLength) {
+				segment.normalize();
 				segmentList.add(segment);
-			} else {
 			}
 		}
 		segment = null;
@@ -122,11 +122,9 @@ public class HoughLine {
 
 	private void addPointToSegment(Real2 point) {
 		if (segment == null) {
-			segment = new SVGLine(point, point);
-			segment.setStrokeWidth(1.0);
-		} else {
-			segment.setXY(point, 1);
+			segment = new Segment();
 		}
+		segment.addPoint(point);
 	}
 
 	private void drawHorizontal() {
@@ -200,14 +198,14 @@ public class HoughLine {
 	public Int2 getMinPoint() {return minPoint;}
 	public Int2 getMaxPoint() {return maxPoint;}
 
-	public List<SVGLine> getSegments() {
+	public List<Segment> getSegments() {
 		ensureSegmentList();
 		return segmentList;
 	}
 
 	private void ensureSegmentList() {
 		if (segmentList == null) {
-			segmentList = new ArrayList<SVGLine>();
+			segmentList = new ArrayList<Segment>();
 		}
 	}
 

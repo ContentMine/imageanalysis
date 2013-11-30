@@ -1,4 +1,4 @@
-package org.xmlcml.image.lines;
+package org.xmlcml.image.lines.old;
 
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealMatrix;
