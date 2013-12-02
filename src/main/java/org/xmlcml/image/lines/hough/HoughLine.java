@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGLine;
  
 /** 
@@ -113,8 +114,14 @@ public class HoughLine {
 		if (segment != null) {
 			Double length = segment.getLength();
 			if (length != null && length > minSegmentLength) {
+				LOG.debug("Seg " + Util.format(segment.getLength(), 2));
 				segment.normalize();
-				segmentList.add(segment);
+				if (Math.abs(segment.getBivariate().getCorrelationCoefficient()) < 0.8) {
+					segment.getSVGLine().setStroke("red");
+				} else {
+					segment.getSVGLine().setStrokeWidth(3.0);
+				}
+ 				segmentList.add(segment);
 			}
 		}
 		segment = null;
