@@ -3,6 +3,7 @@ package org.xmlcml.image.processing;
 import java.util.List;
 
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.image.processing.Pixel.Marked;
 
 /** spanning tree based on contiguous pixels.
  * 
@@ -17,10 +18,17 @@ public class SpanningTree {
 
 	public SpanningTree(PixelIsland island) {
 		this.island = island;
+		markIsland(Pixel.Marked.UNUSED);
 	}
 
-	public void start(Int2 coord) {
-		Pixel currentPixel = island.pixelByCoordMap.get(coord);
+	private void markIsland(Marked unused) {
+		for (Pixel pixel : island.getPixelList()) {
+			
+		}
+	}
+
+	public void start(Pixel pixel) {
+		Pixel currentPixel = pixel;
 		List<Pixel> unusedNeighbours = currentPixel.getNeighbours(Pixel.Marked.UNUSED);
 	}
 }

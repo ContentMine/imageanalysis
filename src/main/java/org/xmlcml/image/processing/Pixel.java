@@ -24,11 +24,11 @@ public class Pixel {
 	}
 
 	public Int2 getInt2() {
-		new Int2(point.x, point.y);
-		return null;
+		return point == null ? null : new Int2(point.x, point.y);
 	}
 
-	public List<Pixel> getNeighbours() {
+	public List<Pixel> getNeighbours(PixelIsland island) {
+		this.island = island;
 		ensureNeighbours();
 		return neighbourList;
 	}
@@ -57,7 +57,7 @@ public class Pixel {
 			neighbourList = new ArrayList<Pixel>();
 			List<Int2> coordList = calculateNeighbourCoordList();
 			for (Int2 coord : coordList) {
-				Pixel pixel = island.pixelByCoordMap.get(coord);
+				Pixel pixel = island.getPixelByCoordMap().get(coord);
 				if (pixel != null) {
 					neighbourList.add(pixel);
 				}

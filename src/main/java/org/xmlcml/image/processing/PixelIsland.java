@@ -26,11 +26,10 @@ public class PixelIsland {
 	Map<Int2, Pixel> pixelByCoordMap;
 	
 	public PixelIsland() {
-		this.pixelList = new ArrayList<Pixel>();
 	}
 	
 	public PixelIsland(List<Pixel> pixelList) {
-		this.pixelList = pixelList;
+		this(pixelList, false);
 	}
 
 	/** 
@@ -39,9 +38,9 @@ public class PixelIsland {
 	 * @param diagonal wer diagnal neighbours allowed in creating the pixelList?
 	 */
 	public PixelIsland(List<Pixel> pixelList, boolean diagonal) {
-		this(pixelList);
+		this.pixelList = pixelList;
 		this.allowDiagonal = diagonal;
-		indexPixelsByCoordinate();
+		indexPixelsAndUpdateMetadata();
 	}
 	
 	public void addPixel(Pixel pixel) {
@@ -50,18 +49,17 @@ public class PixelIsland {
 	}
 	
 
-	private void indexPixelsByCoordinate() {
-		pixelByCoordMap = new HashMap<Int2, Pixel>();
-		int2range = new Int2Range();
-		leftmostCoord = null;
+	private void indexPixelsAndUpdateMetadata() {
 		for (Pixel pixel : pixelList) {
 			addPixelMetadata(pixel);
 		}
 	}
 
 	private void addPixelMetadata(Pixel pixel) {
+		ensureInt2Range();
+		ensurePixelByCoordMap();
 		Int2 int2 = pixel.getInt2();
-		pixelByCoordMap.put(pixel.getInt2(), pixel);
+		pixelByCoordMap.put(int2, pixel);
 		int2range.add(int2);
 		if (leftmostCoord == null || leftmostCoord.getX() < int2.getX()) {
 			leftmostCoord = int2;
@@ -69,14 +67,52 @@ public class PixelIsland {
 		pixel.setIsland(this);
 	}
 
+	private void ensureInt2Range() {
+		if (this.int2range == null) {
+			int2range = new Int2Range();
+		}
+	}
+
 	public int size() {
 		return this.pixelList.size();
 	}
 
-	public SpanningTree createSpanningTree() {
+	public SpanningTree createSpanningTree(Pixel pixel) {
 		SpanningTree spanningTree = new SpanningTree(this);
-		spanningTree.start(leftmostCoord);
+		spanningTree.start(pixel);
 		return spanningTree;
 	}
+
+	public void createSpanningTree() {
+		this.getTerminalPixels();
+	}
+	
+	public Map<Int2, Pixel> getPixelByCoordMap() {
+		ensurePixelByCoordMap();
+		return pixelByCoordMap;
+	}
+
+	private void ensurePixelByCoordMap() {
+		if (pixelByCoordMap == null) {
+			pixelByCoordMap = new HashMap<Int2, Pixel>();
+		}
+	}
+
+	public List<Pixel> getPixelList() {
+		return pixelList;
+	}
+
+	public List<Pixel> getTerminalPixels() {
+		List<Pixel> terminalPixels = new ArrayList<Pixel>();
+		for (Pixel pixel : pixelList) {
+			int neighbourCount = pixel.getNeighbours(this).size();
+			System.out.println(neighbourCount);
+			if (neighbourCount == 1) {
+				terminalPixels.add(pixel);
+			}
+		}
+		return terminalPixels;
+	}
+
 	
 }
