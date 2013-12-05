@@ -6,6 +6,8 @@ import java.awt.image.ColorConvertOp;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
+import org.apache.log4j.Logger;
+
 /** not yet working
  * 
  * @author pm286
@@ -13,6 +15,8 @@ import java.awt.image.WritableRaster;
  */
 public class ColorUtilities {
 
+	private final static Logger LOG = Logger.getLogger(ColorUtilities.class);
+	
     private static final int RGB_WHITE = 255 + 255*256 + 255*256*256;
 	private static final int RGB_BLACK = 0;
 	private BufferedImage colorFrame;
@@ -57,7 +61,7 @@ public class ColorUtilities {
 	//		System.out.println(width+" "+height+" "+values.length);
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
-					System.out.println(i+" "+j);
+					LOG.debug(i+" "+j);
 					values = raster.getPixel(i, j, values);
 					int value = ColorUtilities.getValue(values);
 					if (value >= minBlack && value <= maxBlack) {

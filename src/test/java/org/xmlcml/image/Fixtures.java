@@ -1,6 +1,11 @@
 package org.xmlcml.image;
 
+import java.awt.Point;
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+import org.xmlcml.image.processing.Pixel;
 
 public class Fixtures {
 
@@ -35,5 +40,69 @@ public class Fixtures {
 	public static final File MOLECULE_CANNY_PNG = new File(PROCESSING_DIR, "moleculeCanny.png");
 	public static final File MALTORYZINE_BINARY_PNG = new File(PROCESSING_DIR, "maltoryzineBinary.png");
 	public static final File MALTORYZINE_FLIPPED_PNG = new File(PROCESSING_DIR, "maltoryzineFlipped.png");
+	
+	public static List<Pixel> LINE_LIST = Arrays.asList(new Pixel[] {
+			new Pixel(new Point(1, 1)), 
+			new Pixel(new Point(1, 2)),
+			new Pixel(new Point(1, 3)), 
+			new Pixel(new Point(1, 4)), 
+			new Pixel(new Point(1, 5)), 
+			});
+	
+	public static List<Pixel> DIAG_LIST = Arrays.asList(new Pixel[] {
+			new Pixel(new Point(1, 1)), 
+			new Pixel(new Point(2, 2)),
+			new Pixel(new Point(3, 3)), 
+			new Pixel(new Point(4, 4)), 
+			new Pixel(new Point(5, 5)), 
+			});
+	
+
+	/**
+	 * Tests the pixels below.
+	 * 
+	 * X is right Y is down 
+	 * 
+	 * +
+	 * +
+	 * +++
+	 * +
+	 * +
+	 */
+	public static List<Pixel> T_LIST = Arrays.asList(new Pixel[] {
+			new Pixel(new Point(1, 1)), 
+			new Pixel(new Point(1, 2)),
+			new Pixel(new Point(1, 3)), 
+			new Pixel(new Point(1, 4)), 
+			new Pixel(new Point(1, 5)), 
+			new Pixel(new Point(2, 3)), 
+			new Pixel(new Point(3, 3)), 
+			});
+		
+	public static List<Pixel> L_LIST = Arrays.asList(new Pixel[] {
+			new Pixel(new Point(1, 1)), 
+			new Pixel(new Point(1, 2)),
+			new Pixel(new Point(1, 3)), 
+			new Pixel(new Point(2, 3)), 
+			new Pixel(new Point(3, 3)), 
+			});
+
+	/**
+	 * 
+	 * X is right Y is down 
+	 * 
+	 * +
+	 * +
+	 * ++
+	 * +
+	 */
+	public static List<Pixel> LONG_T_LIST = Arrays.asList(new Pixel[] {
+			new Pixel(new Point(1, 1)), 
+			new Pixel(new Point(1, 2)),
+			new Pixel(new Point(1, 3)), 
+			new Pixel(new Point(1, 4)), 
+			new Pixel(new Point(2, 3)), 
+			});
+
 	
 }

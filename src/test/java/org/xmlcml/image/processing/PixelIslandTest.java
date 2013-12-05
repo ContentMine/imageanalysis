@@ -1,12 +1,6 @@
 package org.xmlcml.image.processing;
 
-import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,33 +8,9 @@ import org.xmlcml.image.Fixtures;
 
 public class PixelIslandTest {
 
-	List<Pixel> lineList = Arrays.asList(new Pixel[] {
-			new Pixel(new Point(1, 1)), 
-			new Pixel(new Point(1, 2)),
-			new Pixel(new Point(1, 3)), 
-			new Pixel(new Point(1, 4)), 
-			new Pixel(new Point(1, 5)), 
-			});
-
-	/**
-	 * 
-	 * X is right Y is down 
-	 * 
-	 * +
-	 * +
-	 * ++
-	 * +
-	 */
-	List<Pixel> longTList = Arrays.asList(new Pixel[] {
-			new Pixel(new Point(1, 1)), 
-			new Pixel(new Point(1, 2)),
-			new Pixel(new Point(1, 3)), 
-			new Pixel(new Point(1, 4)), 
-			new Pixel(new Point(2, 3)), 
-			});
-
 	@Test
 	public void testAddPixel() {
+		List<Pixel> longTList = Fixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList);
 		List<Pixel> n0 = longTList.get(0).getNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
@@ -67,6 +37,7 @@ public class PixelIslandTest {
 	@Test
 	public void testAddPixelWithDiagonal() {
 		boolean diagonal = true;
+		List<Pixel> longTList = Fixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList, diagonal);
 		List<Pixel> n0 = longTList.get(0).getNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
@@ -77,13 +48,34 @@ public class PixelIslandTest {
 		List<Pixel> n3 = longTList.get(3).getNeighbours(island);
 		Assert.assertEquals("3", 2, n3.size());
 		List<Pixel> n4 = longTList.get(4).getNeighbours(island);
-		Assert.assertEquals("3", 3, n4.size());
+		Assert.assertEquals("4", 3, n4.size());
 	}
 	
 	@Test
 	public void testgetTerminalPixels() {
+		List<Pixel> lineList = Fixtures.LINE_LIST;
 		PixelIsland island = new PixelIsland(lineList);
 		List<Pixel> terminalPixels = island.getTerminalPixels();
+		Assert.assertEquals("terminal", 2, terminalPixels.size());
+	}
+	
+	@Test
+	public void testgetTerminalPixelsL() {
+		List<Pixel> lList = Fixtures.L_LIST;
+		PixelIsland island = new PixelIsland(lList);
+		List<Pixel> terminalPixels = island.getTerminalPixels();
+		Assert.assertEquals("terminal", 2, terminalPixels.size());
+	}
+	
+	@Test
+	public void testgetTerminalPixelsT() {
+		List<Pixel> tList = Fixtures.T_LIST;
+		PixelIsland island = new PixelIsland(tList);
+		List<Pixel> terminalPixels = island.getTerminalPixels();
+		Assert.assertEquals("terminal", 3, terminalPixels.size());
+		Assert.assertEquals("0", "(1,1)",  terminalPixels.get(0).getInt2().toString());
+		Assert.assertEquals("0", "(1,5)",  terminalPixels.get(1).getInt2().toString());
+		Assert.assertEquals("0", "(3,3)",  terminalPixels.get(2).getInt2().toString());
 	}
 	
 }

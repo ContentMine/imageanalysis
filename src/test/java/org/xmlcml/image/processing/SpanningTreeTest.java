@@ -14,42 +14,20 @@ import org.xmlcml.image.Fixtures;
 
 public class SpanningTreeTest {
 
-	List<Pixel> lineList = Arrays.asList(new Pixel[] {
-			new Pixel(new Point(1, 1)), 
-			new Pixel(new Point(1, 2)),
-			new Pixel(new Point(1, 3)), 
-			new Pixel(new Point(1, 4)), 
-			new Pixel(new Point(1, 5)), 
-			});
-	
-
-	/**
-	 * Tests the pixels below.
-	 * 
-	 * X is right Y is down 
-	 * 
-	 * +
-	 * +
-	 * +++
-	 * +
-	 * +
-	 */
-	List<Pixel> tList = Arrays.asList(new Pixel[] {
-			new Pixel(new Point(1, 1)), 
-			new Pixel(new Point(1, 2)),
-			new Pixel(new Point(1, 3)), 
-			new Pixel(new Point(1, 4)), 
-			new Pixel(new Point(1, 5)), 
-			new Pixel(new Point(2, 3)), 
-			new Pixel(new Point(3, 3)), 
-			});
-		
 
 	@Test
 	public void testLineEnd() {
+		List<Pixel> lineList = Fixtures.LINE_LIST;
 		PixelIsland island = new PixelIsland(lineList);
 		Pixel startPixel = lineList.get(0);
-		System.out.println(startPixel);
+		island.createSpanningTree(startPixel);
+	}
+	
+	@Test
+	public void testTList() {
+		List<Pixel> lineList = Fixtures.T_LIST;
+		PixelIsland island = new PixelIsland(lineList);
+		Pixel startPixel = lineList.get(0);
 		island.createSpanningTree(startPixel);
 	}
 	

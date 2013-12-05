@@ -57,7 +57,7 @@ public class Segment {
 	private Real2Array trimWigglyEnds(Real2Array pointArray, RealArray normalizedResiduals) {
 		int lowLimit = getLowlimit(pointArray, normalizedResiduals);
 		int hiLimit = getHighLimit(pointArray, normalizedResiduals);
-		System.out.println(lowLimit+":"+hiLimit);
+		LOG.debug(lowLimit+":"+hiLimit);
 		svgLine = null;
 		RealArray xarr = pointArray.getXArray();
 		RealArray yarr = pointArray.getYArray();

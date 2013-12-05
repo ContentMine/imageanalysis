@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 
@@ -19,6 +20,8 @@ import org.xmlcml.euclid.Int2Range;
  */
 public class PixelIsland {
 
+	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
+	
 	private List<Pixel> pixelList;
 	boolean allowDiagonal = false;
 	private Int2Range int2range;
@@ -106,13 +109,22 @@ public class PixelIsland {
 		List<Pixel> terminalPixels = new ArrayList<Pixel>();
 		for (Pixel pixel : pixelList) {
 			int neighbourCount = pixel.getNeighbours(this).size();
-			System.out.println(neighbourCount);
+			LOG.trace(neighbourCount);
 			if (neighbourCount == 1) {
 				terminalPixels.add(pixel);
 			}
 		}
 		return terminalPixels;
 	}
-
 	
+	public Pixel getStartPixel() {
+		Pixel start = null;
+		List<Pixel> terminalList = getTerminalPixels();
+		if (terminalList.size() > 0) {
+			start = terminalList.get(0);
+		} else if (pixelList.size() > 0) {
+			start = pixelList.get(0);
+		}
+		return start;
+	}
 }

@@ -5,13 +5,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
@@ -59,7 +59,9 @@ public class HoughTest {
 
 
 	@Test
+	@Ignore // file missing
 	public void testMoleculeCanny1() throws IOException {
+		Assert.assertTrue("canny1 exists", Fixtures.MOLECULE_CANNY_1_PNG.exists());
 	    BufferedImage image = ImageIO.read(Fixtures.MOLECULE_CANNY_1_PNG); 
 	    HoughTransform h = new HoughTransform(image); 
 	    h.addPoints(); 

@@ -53,7 +53,7 @@ public class LineDetector extends AbstractDetector {
 	
 	private void drawGrid(IntArray array, Direction dir) {
 		int rasterSize = dir.equals(Direction.HORIZ) ? raster.getWidth() : raster.getHeight();
-		System.out.println(rasterSize+" "+array.size());
+		LOG.debug(rasterSize+" "+array.size());
 		int[] pix = new int[numData];
 		Real2 start = null;
 		Real2 end = null;
