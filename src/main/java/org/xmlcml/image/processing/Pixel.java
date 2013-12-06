@@ -4,10 +4,13 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 
 public class Pixel {
 
+	private final static Logger LOG = Logger.getLogger(Pixel.class);
+	
 	enum Marked {
 		ALL,
 		UNUSED,
@@ -35,6 +38,7 @@ public class Pixel {
 
 	public List<Pixel> getNeighbours(Marked marked) {
 		ensureNeighbours();
+		LOG.debug("neighbours "+neighbourList.size());
 		List<Pixel> markedList = new ArrayList<Pixel>();
 		for (Pixel pixel : neighbourList) {
 			if (pixel.isMarked(marked)) {
@@ -86,4 +90,30 @@ public class Pixel {
 		this.island = island;
 	}
 
+	/**
+	Point point;
+	private List<Pixel> neighbourList;
+	PixelIsland island;
+	private Marked marked = null;
+	 */
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("point: "+((point == null) ? "null" : this.getInt2())+"\n");
+		sb.append("neighbours: ");
+		if (neighbourList == null) {
+			sb.append("null");
+		} else {
+			for (Pixel neighbour : neighbourList) {
+				sb.append(" "+neighbour.getInt2()+" "+neighbour.getMarked());
+			}
+		}
+		sb.append("\n");
+		sb.append("island: "+island+"\n");
+		sb.append("marked: "+marked+"\n");
+		return sb.toString();
+	}
+
+	private Marked getMarked() {
+		return marked;
+	}
 }
