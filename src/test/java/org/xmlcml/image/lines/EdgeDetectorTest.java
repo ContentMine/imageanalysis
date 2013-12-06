@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 
@@ -28,6 +29,7 @@ public class EdgeDetectorTest {
 	}
 	
 	@Test
+	@Ignore //takes rather long
 	public void testMoleculeCanny() throws IOException {
 		AbstractDetector detector = new EdgeDetector();
 		detector.readImageFile(Fixtures.MOLECULE_20131119_JPG);

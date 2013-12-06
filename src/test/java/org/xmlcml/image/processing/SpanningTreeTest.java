@@ -39,7 +39,7 @@ public class SpanningTreeTest {
 		PixelIsland island = floodFill.getPixelIslandList().get(1);
 		LOG.debug(island.size());
 		for (Pixel pixel : island.getPixelList()) {
-			LOG.debug(pixel.toString());
+			LOG.debug(pixel.getInt2());
 		}
 		island.createSpanningTree(island.getPixelList().get(32));
 
