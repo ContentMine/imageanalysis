@@ -1,14 +1,21 @@
 package org.xmlcml.image.processing;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.processing.Pixel.Marked;
 
 public class PixelIslandTest {
 
+	private final static Logger LOG = Logger.getLogger(PixelIslandTest.class);
+	
 	@Test
 	@Ignore // non-deterministic?
 
@@ -80,6 +87,30 @@ public class PixelIslandTest {
 		Assert.assertEquals("0", "(1,1)",  terminalPixels.get(0).getInt2().toString());
 		Assert.assertEquals("0", "(1,5)",  terminalPixels.get(1).getInt2().toString());
 		Assert.assertEquals("0", "(3,3)",  terminalPixels.get(2).getInt2().toString());
+	}
+	
+	@Test
+	public void testgetTerminalMaltoryzine1() throws Exception {
+		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
+		FloodFill floodFill = new FloodFill(image);
+		floodFill.setDiagonal(true);
+		floodFill.fill();
+		PixelIsland island = floodFill.getPixelIslandList().get(1);
+		Assert.assertEquals("size", 33, island.size());
+		island.cleanChains();
+		Assert.assertEquals("size", 28, island.size());
+	}
+	
+	@Test
+	public void testgetTerminalMaltoryzine0() throws Exception {
+		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
+		FloodFill floodFill = new FloodFill(image);
+		floodFill.setDiagonal(true);
+		floodFill.fill();
+		PixelIsland island = floodFill.getPixelIslandList().get(0);
+		Assert.assertEquals("size", 492, island.size());
+		island.cleanChains();
+		Assert.assertEquals("size", 478, island.size());
 	}
 	
 }

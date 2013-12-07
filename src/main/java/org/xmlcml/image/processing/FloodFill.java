@@ -89,6 +89,9 @@ public class FloodFill {
 	
 	public List<PixelIsland> getPixelIslandList() {
 		ensurePixelIslandList();
+		for (PixelIsland pixelIsland : pixelIslandList) {
+			pixelIsland.setDiagonal(diagonal);
+		}
 		return pixelIslandList;
 	}
 

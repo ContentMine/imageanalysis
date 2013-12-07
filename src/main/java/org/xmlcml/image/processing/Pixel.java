@@ -38,10 +38,10 @@ public class Pixel {
 
 	public List<Pixel> getNeighbours(Marked marked) {
 		ensureNeighbours();
-		LOG.debug("neighbours "+neighbourList.size());
+//		LOG.debug("neighbours "+neighbourList.size());
 		List<Pixel> markedList = new ArrayList<Pixel>();
 		for (Pixel pixel : neighbourList) {
-			if (pixel.isMarked(marked)) {
+			if (pixel.isMarked(marked) || Marked.ALL.equals(marked)) {
 				markedList.add(pixel);
 			}
 		}
@@ -116,4 +116,33 @@ public class Pixel {
 	private Marked getMarked() {
 		return marked;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((marked == null) ? 0 : marked.hashCode());
+		result = prime * result + ((point == null) ? 0 : point.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Pixel other = (Pixel) obj;
+		if (marked != other.marked)
+			return false;
+		if (point == null) {
+			if (other.point != null)
+				return false;
+		} else if (!point.equals(other.point))
+			return false;
+		return true;
+	}
+	
 }
