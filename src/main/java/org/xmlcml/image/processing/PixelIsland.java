@@ -219,6 +219,7 @@ public class PixelIsland {
 		}
 		LOG.debug("Lozenge");
 		Pixel toRemove = lastIntersection.iterator().next();
+		LOG.debug(toRemove);
 		removeList.add(toRemove);
 	}
 
