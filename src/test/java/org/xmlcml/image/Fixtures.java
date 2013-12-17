@@ -41,6 +41,10 @@ public class Fixtures {
 	public static final File MALTORYZINE_BINARY_PNG = new File(PROCESSING_DIR, "maltoryzineBinary.png");
 	public static final File MALTORYZINE_FLIPPED_PNG = new File(PROCESSING_DIR, "maltoryzineFlipped.png");
 	
+	public final static File TEXT_DIR = new File(IMAGE_DIR, "text");
+	public static final File NRRL_PNG = new File(TEXT_DIR, "NRRL.png");
+	public static final File NO2 = new File(TEXT_DIR, "NO2.png");
+	
 	public static List<Pixel> LINE_LIST = Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(1, 2)),

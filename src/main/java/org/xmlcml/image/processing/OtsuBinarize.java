@@ -180,6 +180,10 @@ public class OtsuBinarize {
  
     }
 
+	public BufferedImage getBinarizedImage() {
+		return binarized;
+	}
+
  
 }
 
