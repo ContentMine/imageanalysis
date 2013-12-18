@@ -15,10 +15,11 @@ package org.xmlcml.image.processing;
 	 
 public class OtsuBinarize {
  
-    private BufferedImage original, grayscale, binarized;
+    private BufferedImage original, grayscale, binarized, current;
 	private int[] histograms;
-	private BufferedImage lum;
+	private BufferedImage gray;
 	private int threshold;
+	private BufferedImage sharp;
 
     public OtsuBinarize() {
     }
@@ -39,12 +40,13 @@ public class OtsuBinarize {
 
 	public void read(File file) throws IOException {
 		original = ImageIO.read(file);
+		current = original;
 	}
 
     public void writeImage(File file) throws IOException {
     	String filename = file.getAbsolutePath();
     	String type = filename.substring(filename.length()-3, filename.length());
-        ImageIO.write(binarized, type, file);
+        ImageIO.write(current, type, file);
     }
  
     // Return histogram of grayscale image
@@ -71,7 +73,7 @@ public class OtsuBinarize {
         int alpha, red, green, blue;
         int newPixel;
  
-        lum = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+        gray = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
  
         for(int i=0; i<original.getWidth(); i++) {
             for(int j=0; j<original.getHeight(); j++) {
@@ -87,13 +89,37 @@ public class OtsuBinarize {
                 newPixel = colorToRGB(alpha, red, red, red);
  
                 // Write pixels into image
-                lum.setRGB(i, j, newPixel);
+                gray.setRGB(i, j, newPixel);
  
             }
         }
  
-        return lum;
+        current = gray;
+        return gray;
  
+    }
+    
+    public void sharpenGray() {
+        sharp = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+        for(int i=1; i<gray.getWidth()-1; i++) {
+            for(int j=0; j<gray.getHeight(); j++) {
+            	Color col0 = new Color(gray.getRGB(i-1, j));
+            	int gray0 = col0.getRed();
+            	Color col1 = new Color(gray.getRGB(i, j));
+            	int gray1 = col1.getRed();
+            	Color col2 = new Color(gray.getRGB(i+1, j));
+            	int gray2 = col2.getRed();
+            	int grayNew =  -gray0 + 3*gray1 -gray2;
+            	if (grayNew < 0 ) {
+            		grayNew = 0;
+            	} else if (grayNew > 255) {
+            		grayNew = 255;
+            	}
+            	int col = colorToRGB(col0.getAlpha(), grayNew, grayNew, grayNew);
+            	sharp.setRGB(i,  j,  col); 
+            }
+        }
+        current = sharp;
     }
  
     // Get binary treshold using Otsu's method
@@ -142,14 +168,15 @@ public class OtsuBinarize {
  
         int threshold = otsuTreshold();
  
-        binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+//        binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+        binarized = new BufferedImage(current.getWidth(), current.getHeight(), current.getType());
  
-        for(int i=0; i<original.getWidth(); i++) {
-            for(int j=0; j<original.getHeight(); j++) {
+        for(int i=0; i<current.getWidth(); i++) {
+            for(int j=0; j<current.getHeight(); j++) {
  
                 // Get pixels
-                red = new Color(original.getRGB(i, j)).getRed();
-                int alpha = new Color(original.getRGB(i, j)).getAlpha();
+                red = new Color(current.getRGB(i, j)).getRed();
+                int alpha = new Color(current.getRGB(i, j)).getAlpha();
                 if(red > threshold) {
                     newPixel = 255;
                 }
@@ -162,6 +189,7 @@ public class OtsuBinarize {
             }
         }
  
+        current = binarized;
         return binarized;
  
     }
@@ -182,6 +210,11 @@ public class OtsuBinarize {
 
 	public BufferedImage getBinarizedImage() {
 		return binarized;
+	}
+
+	public void setImage(BufferedImage bImage) {
+		this.original = bImage;
+		current = original;
 	}
 
  
