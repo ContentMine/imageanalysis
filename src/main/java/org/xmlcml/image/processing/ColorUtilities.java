@@ -50,6 +50,11 @@ public class ColorUtilities {
         }
     }
 	
+	static final public double Y0 = 100;
+	static final public double gamma = 3;
+	static final public double Al = 1.4456;
+	static final public double Ach_inc = 0.16;
+
 	// =======================================
 		
 		private void binarizeImage(BufferedImage image, int minBlack, int maxBlack) {

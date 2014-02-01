@@ -98,8 +98,8 @@ public class Pixel {
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("point: "+((point == null) ? "null" : this.getInt2())+"\n");
-		sb.append("neighbours: ");
+		sb.append("point: "+((point == null) ? "null" : this.getInt2()));
+		sb.append("; neighbours: ");
 		if (neighbourList == null) {
 			sb.append("null");
 		} else {
@@ -107,9 +107,8 @@ public class Pixel {
 				sb.append(" "+neighbour.getInt2()+" "+neighbour.getMarked());
 			}
 		}
-		sb.append("\n");
-		sb.append("island: "+island+"\n");
-		sb.append("marked: "+marked+"\n");
+//		sb.append("island: "+island+"\n");
+		sb.append("; marked: "+marked);
 		return sb.toString();
 	}
 
@@ -143,6 +142,10 @@ public class Pixel {
 		} else if (!point.equals(other.point))
 			return false;
 		return true;
+	}
+
+	public void remove() {
+		throw new RuntimeException("NYI");
 	}
 	
 }

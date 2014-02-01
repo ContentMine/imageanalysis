@@ -40,10 +40,23 @@ public class Fixtures {
 	public static final File MOLECULE_CANNY_PNG = new File(PROCESSING_DIR, "moleculeCanny.png");
 	public static final File MALTORYZINE_BINARY_PNG = new File(PROCESSING_DIR, "maltoryzineBinary.png");
 	public static final File MALTORYZINE_FLIPPED_PNG = new File(PROCESSING_DIR, "maltoryzineFlipped.png");
-	
+	public static final File BRANCH0_PNG = new File(PROCESSING_DIR, "branch0.png");
+	public static final File BRANCH_PNG = new File(PROCESSING_DIR, "branch.png");
+	public static final File HEXAGON_PNG = new File(PROCESSING_DIR, "hexagon.png");
+	public static final File LINE_PNG = new File(PROCESSING_DIR, "line.png");
+	public static final File ZIGZAG_PNG = new File(PROCESSING_DIR, "zigzag.png");
+
+
 	public final static File TEXT_DIR = new File(IMAGE_DIR, "text");
 	public static final File NRRL_PNG = new File(TEXT_DIR, "NRRL.png");
 	public static final File NO2 = new File(TEXT_DIR, "NO2.png");
+	public static final File GIBBONS_PNG = new File(TEXT_DIR, "gibbons.png");
+	public static final File HELVETICA_PNG = new File(TEXT_DIR, "helvetica.png");
+	public static final File HELVETICA_BOLD_PNG = new File(TEXT_DIR, "helveticaBold.png");
+	public static final File LUCIDA_PNG = new File(TEXT_DIR, "lucida.png");
+	public static final File MONOSPACE_PNG = new File(TEXT_DIR, "monospace.PNG");
+	public static final File TIMESROMAN_JPG = new File(TEXT_DIR, "timesroman.jpg");
+	public static final File TIMES_GIF = new File(TEXT_DIR, "times.gif");
 	
 	public static List<Pixel> LINE_LIST = Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 

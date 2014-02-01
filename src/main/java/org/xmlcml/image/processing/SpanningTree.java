@@ -32,7 +32,7 @@ public class SpanningTree {
 	private void markIsland(Marked unused) {
 		for (Pixel pixel : island.getPixelList()) {
 			pixel.getNeighbours(island);
-			LOG.debug("Neigh: "+pixel.getNeighbours(island));
+			LOG.trace("Neigh: "+pixel.getNeighbours(island));
 		}
 		for (Pixel pixel : island.getPixelList()) {
 			pixel.setMarked(Marked.UNUSED);
@@ -61,12 +61,12 @@ public class SpanningTree {
 				// continue down list
 				continueDownListTillNode(neighbours.get(0));
 			} else {
-				createNodeAndAddNeighboursToStack(neighbours);
+				addNeighboursToStack(neighbours);
 			}
 		}
 	}
 
-	private void createNodeAndAddNeighboursToStack(List<Pixel> neighbours) {
+	private void addNeighboursToStack(List<Pixel> neighbours) {
 		for (Pixel neighbour : neighbours) {
 			addPixelToStack(neighbour);
 		}
@@ -84,16 +84,16 @@ public class SpanningTree {
 			}
 			pixel = neighbours.get(0);
 		}
-		createNodeAndAddNeighboursToStack(neighbours);
+		addNeighboursToStack(neighbours);
 	}
 
 	private void processTerminalNode(Pixel pixel) {
-		LOG.debug("terminal: "+pixel.getInt2());
+		LOG.debug("terminal NYI: "+pixel.getInt2());
 	}
 
 	private void addPixelToStack(Pixel pixel) {
 		stack.add(pixel);
-		List list = new ArrayList<Pixel>();
+		List<Pixel> list = new ArrayList<Pixel>();
 		listByPixelMap.put(pixel, list);
 	}
 }

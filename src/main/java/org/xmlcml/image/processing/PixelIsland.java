@@ -2,13 +2,17 @@ package org.xmlcml.image.processing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.image.lines.PixelPath;
 import org.xmlcml.image.processing.Pixel.Marked;
 
 /** connected list of pixels.
@@ -16,6 +20,15 @@ import org.xmlcml.image.processing.Pixel.Marked;
  * It is possible to traverse all pixels without encountering "gaps". May contain "holes"
  * (e.g letter "O").If there are objects within the hole (e.g. "copyright" 0x00A9 which has "C" inside a circle)
  * they may be initially be in a separate island - we may coordinate this later
+ * 
+ * Islands can consist of:
+ * <ul> 
+ * <li>A single pixel</li<
+ * <li>A connected chain of pixels (with 2 terminal pixels</li<
+ * <li>A tree of pixels with braching nodes (3-8 connected, but likely 3)</li<
+ * <li>The above with nuclei (ganglia) in chains or nodes. The nuclei arise from incomplete thinning and 
+ * are to be reduced to single pixels or chains while retaining connectivity</li<
+ * </ul>
  * 
  * @author pm286
  *
@@ -41,8 +54,16 @@ public class PixelIsland {
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap;
-
 	private List<Pixel> removeList;
+	private List<Nucleus> nucleusList;
+	private List<Pixel> terminalPixels;
+	private Map<Pixel, Nucleus> nucleusMap;
+
+	private Set<Pixel> usedPixels;
+
+	private Set<Nucleus> usedNuclei;
+
+	private List<PixelPath> pixelPaths;
 	
 	public PixelIsland() {
 	}
@@ -54,7 +75,7 @@ public class PixelIsland {
 	/** 
 	 * 
 	 * @param pixelList
-	 * @param diagonal wer diagnal neighbours allowed in creating the pixelList?
+	 * @param diagonal were diagonal neighbours allowed in creating the pixelList?
 	 */
 	public PixelIsland(List<Pixel> pixelList, boolean diagonal) {
 		this.pixelList = pixelList;
@@ -104,6 +125,7 @@ public class PixelIsland {
 
 	public void createSpanningTree() {
 		this.getTerminalPixels();
+		throw new RuntimeException("NYI");
 	}
 	
 	public Map<Int2, Pixel> getPixelByCoordMap() {
@@ -122,17 +144,33 @@ public class PixelIsland {
 	}
 
 	public List<Pixel> getTerminalPixels() {
-		List<Pixel> terminalPixels = new ArrayList<Pixel>();
-		for (Pixel pixel : pixelList) {
-			int neighbourCount = pixel.getNeighbours(this).size();
-			LOG.trace(neighbourCount);
-			if (neighbourCount == 1) {
-				terminalPixels.add(pixel);
-			}
-		}
+		terminalPixels = getNodesWithNeighbours(1);
+		
 		return terminalPixels;
 	}
+
+	public List<Pixel> getNodesWithNeighbours(int neighbourCount) {
+		List<Pixel> nodePixels = new ArrayList<Pixel>();
+		for (Pixel pixel : pixelList) {
+			int nCount = getNeighbourCount(pixel);
+			if (neighbourCount == nCount) {
+				nodePixels.add(pixel);
+			}
+		}
+		return nodePixels;
+	}
+
+	private int getNeighbourCount(Pixel pixel) {
+		return pixel.getNeighbours(this).size();
+	}
 	
+	/** for start of spanningTree or other traversals.
+	 * 
+	 * If there are terminal pixels get the first one.
+	 * else get the first pixel. This may not be reproducible.
+	 * 
+	 * @return first pixel or null for empty island (which shouldn't happen)
+	 */
 	public Pixel getStartPixel() {
 		Pixel start = null;
 		List<Pixel> terminalList = getTerminalPixels();
@@ -148,6 +186,11 @@ public class PixelIsland {
 		this.allowDiagonal = diagonal;
 	}
 
+	/** 
+	 * this may be obsolete.
+	 * 
+	 * @param removePixels
+	 */
 	public void findNucleiAndMarkToRemove(boolean removePixels) {
 		List<Triangle> lastTriangleList = null;
 		Type type = null;
@@ -301,5 +344,185 @@ public class PixelIsland {
 	public void cleanChains() {
 		this.findNucleiAndMarkToRemove(true);
 		this.findNucleiAndMarkToRemove(false);
+	}
+
+	public List<Nucleus> getNucleusList() {
+		nucleusList = new ArrayList<Nucleus>();
+		nucleusMap = new HashMap<Pixel, Nucleus>();
+		Set<Pixel> multiplyConnectedPixels = new HashSet<Pixel>();
+		for (int i = 3; i <= 8; i++) {
+			multiplyConnectedPixels.addAll(getNodesWithNeighbours(i));
+		}
+		while (multiplyConnectedPixels.size() > 0) {
+			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
+			nucleusList.add(nucleus);
+			LOG.debug("nucl size: "+nucleus.size()+" spikes: "+nucleus.getSpikeSet());
+		}
+		return nucleusList;
+	}
+
+	private Nucleus makeNucleus(Set<Pixel> multiplyConnectedPixels) {
+		Nucleus nucleus = new Nucleus(this);
+		Stack<Pixel> pixelStack = new Stack<Pixel>();
+		Pixel pixel = multiplyConnectedPixels.iterator().next();
+		removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, pixel);
+		while(!pixelStack.isEmpty()) {
+			pixel = pixelStack.pop();
+			nucleus.add(pixel);
+			nucleusMap.put(pixel, nucleus);
+			List<Pixel> neighbours = pixel.getNeighbours(this);
+			for (Pixel neighbour : neighbours) {
+				if (!nucleus.contains(neighbour) && multiplyConnectedPixels.contains(neighbour)) {
+					removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, neighbour);
+				}
+			}
+		}
+		return nucleus;
+	}
+
+	private void removeFromSetAndPushOnStack(Set<Pixel> multiplyConnectedPixels,
+			Stack<Pixel> pixelStack, Pixel pixel) {
+		pixelStack.push(pixel);
+		multiplyConnectedPixels.remove(pixel);
+	}
+
+	public void flattenNuclei() {
+		List<Nucleus> nucleusList = this.getNucleusList();
+		for (Nucleus nucleus : nucleusList) {
+			nucleus.ensureFlattened(3);
+		}
+	}
+
+	public void debug(int nucleusCount) {
+		List<Nucleus> nucleusList = getNucleusList();
+		Assert.assertEquals("nucleusList",  nucleusCount, nucleusList.size());
+		for (Nucleus nucleus : nucleusList) {
+			int spikeSize = nucleus.getSpikeSet().size();
+			if (spikeSize == 1) {
+				SpanningTreeTest.LOG.debug("terminus nucleus "+nucleus.size());
+			} else if (spikeSize == 1) {
+				SpanningTreeTest.LOG.debug("branch nucleus "+nucleus.size()+" spikes "+spikeSize);
+			}
+		}
+	}
+
+	public void processAndDebugNuclei(int count) {
+		debug(count);
+		flattenNuclei();
+	}
+
+	public List<PixelPath> createPixelPathList() {
+		pixelPaths = new ArrayList<PixelPath>();
+		getNucleusList();
+		LOG.debug("nucleus list "+nucleusList.size());
+		processTerminals();
+		return pixelPaths;
+	}
+
+	private void processTerminals() {
+		getTerminalPixels();
+		Set<Pixel> usedTerminalPixels = new HashSet<Pixel>();
+		for (int i = 0; i < terminalPixels.size(); i++) {
+			Pixel terminal = terminalPixels.get(i);
+			if (usedTerminalPixels.contains(terminal)) {
+				continue;
+			}
+			usedTerminalPixels.add(terminal);
+			PixelPath pixelPath = findTerminalOrBranch(terminal);
+			usedTerminalPixels.add(pixelPath.getLastPixel());
+			pixelPaths.add(pixelPath);
+		}
+	}
+
+	private PixelPath findTerminalOrBranch(Pixel terminalPixel) {
+		PixelPath pixelPath = new PixelPath();
+		usedPixels = new HashSet<Pixel>();
+		usedNuclei = new HashSet<Nucleus>();
+		Pixel currentPixel = terminalPixel;
+		while (true) {
+			usedPixels.add(currentPixel);
+			pixelPath.add(currentPixel);
+			Pixel nextPixel = null;
+			Nucleus nucleus = nucleusMap.get(currentPixel);
+			if (nucleus != null) {
+				nextPixel = processNucleusAndGetNextPixel(nucleus, currentPixel);
+			} else {
+				nextPixel = getNextPixel(currentPixel);
+			}
+			if (nextPixel == null) {
+				LOG.debug("end terminalOrBranch");
+				break;
+			} else {
+				currentPixel = nextPixel;
+				LOG.debug("next: "+nextPixel.getInt2());
+			}
+		}
+		return pixelPath;
+	}
+
+	private Pixel getNextPixel(Pixel pixel) {
+		LOG.trace(pixel);
+		List<Pixel> neighbours = pixel.getNeighbours(this);
+		List<Pixel> unusedPixels = new ArrayList<Pixel>();
+		for (Pixel neighbour : neighbours) {
+			if (!usedPixels.contains(neighbour)) {
+				unusedPixels.add(neighbour);
+			}
+		}
+		int size = unusedPixels.size();
+		if (size == 0) {
+//			LOG.debug(neighbours);
+			LOG.debug("Found terminal"); // temp
+		} else if (size > 1) {
+			throw new RuntimeException("Cannot find unique next pixel: "+size);
+		}
+		return size == 0 ? null : unusedPixels.get(0);
+	}
+
+	/** "jumps over" 2-spike nucleus to "other side"
+	 * 
+	 * 
+	 * marks as used previous neighbour of nextPixel
+	 * 
+	 * @param nucleus
+	 * @param currentPixel
+	 * @return nextPixel far side of nucleus
+	 */
+	private Pixel processNucleusAndGetNextPixel(Nucleus nucleus, Pixel currentPixel) {
+		Pixel nextPixel = null;
+		Set<Pixel> spikeSetCopy = new HashSet<Pixel>(nucleus.getSpikeSet());
+		if (spikeSetCopy.size() <= 1) {
+			throw new RuntimeException("Spike set cannot have < 2 ");
+		} else if (spikeSetCopy.size() == 2) {
+			spikeSetCopy.removeAll(getUsedNeighbours(currentPixel));
+			if (spikeSetCopy.size() != 1) {
+				throw new RuntimeException("BUG: should have removed pixel");
+			}
+			nextPixel = spikeSetCopy.iterator().next();
+			for (Pixel neighbour : nextPixel.getNeighbours(this)) {
+				if (nucleus.contains(neighbour)) {
+					usedPixels.add(neighbour);
+				}
+			}
+			LOG.debug("Skipped 2-spike Nucleus from "+currentPixel.getInt2()+" to "+nextPixel.getInt2());
+		} else {
+			// treat as terminal
+			if (!nucleus.getSpikeSet().removeAll(currentPixel.getNeighbours(this))) {
+				throw new RuntimeException("Failed to remove");
+			}
+			nextPixel = null;
+		}
+		return nextPixel;
+	}
+
+	private Set<Pixel> getUsedNeighbours(Pixel currentPixel) {
+		Set<Pixel> usedNeighbours = new HashSet<Pixel>();
+		List<Pixel> neighbours = currentPixel.getNeighbours(this);
+		for (Pixel neighbour : neighbours) {
+			if (usedPixels.contains(neighbour)) {
+				usedNeighbours.add(neighbour);
+			}
+		}
+		return usedNeighbours;
 	}
 }
