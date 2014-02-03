@@ -3,9 +3,12 @@ package org.xmlcml.image.lines;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.image.processing.Nucleus;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIsland;
 
@@ -18,9 +21,14 @@ import org.xmlcml.image.processing.PixelIsland;
  */
 public class PixelPath {
 
+	private final static Logger LOG = Logger.getLogger(PixelPath.class);
+	
 	private Object island;
-	private List<Real2> points;
+	private List<Real2> rawPoints;
 	private List<Pixel> pixelList;
+	private List<Real2> segmentPoints;
+	private Nucleus finalNucleus;
+	private Nucleus startNucleus;
 
 	public PixelPath() {
 		pixelList = new ArrayList<Pixel>();
@@ -61,18 +69,52 @@ public class PixelPath {
 	}
 
 	public Pixel getLastPixel() {
-		return pixelList.size() == 0 ? null : pixelList.get(pixelList.size() - 1);
+		return (pixelList.size() == 0) ? null : pixelList.get(pixelList.size() - 1);
 	}
 	
 	public List<Real2> getPoints() {
-		if (points == null) {
-			points = new ArrayList<Real2>();
+		if (rawPoints == null) {
+			rawPoints = new ArrayList<Real2>();
 			for (Pixel pixel : pixelList) {
 				Int2 int2 = pixel.getInt2();
-				points.add(new Real2(int2.getX(), int2.getY()));
+				rawPoints.add(new Real2(int2.getX(), int2.getY()));
+			}
+			if (finalNucleus != null) {
+				Real2 centre = finalNucleus.getCentre();
+				// don't add as causes instability; needs further work
+//				rawPoints.add(centre);
+				LOG.trace("CC "+centre+" "+rawPoints);
 			}
 		}
-		return points;
+		return rawPoints;
+	}
+
+	public SVGG createSVGG() {
+		SVGG g = new SVGG();
+		List<Real2> pointsToDraw = (segmentPoints != null) ? segmentPoints : rawPoints;
+		if (pointsToDraw != null) {
+			for (int i = 1; i < pointsToDraw.size(); i++) {
+				SVGLine line = new SVGLine(pointsToDraw.get(i - 1), pointsToDraw.get(i));
+				g.appendChild(line);
+			}
+		}
+		return g;
+	}
+
+	public List<Real2> createDouglasPeucker(double tolerance) {
+		if (segmentPoints == null) {
+			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
+			segmentPoints = douglasPeucker.reduce(getPoints());
+		}
+		return segmentPoints;
+	}
+
+	public void addFinalNucleus(Nucleus nucleus) {
+		this.finalNucleus = nucleus;
+	}
+
+	public void addStartNucleus(Nucleus nucleus) {
+		this.startNucleus = nucleus;
 	}
 
 	

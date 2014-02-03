@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 
 
 /** a group of 3- or more- connected pixels.
@@ -23,7 +26,7 @@ public class Nucleus {
 	private PixelIsland island;
 	private Set<Pixel> thinnedSet;
 	private List<Pixel> centrePixelList;
-	private Pixel centre;
+	private Real2 centre;
 	private List<Shell> shellList;
 	
 	public Nucleus(PixelIsland island) {
@@ -69,7 +72,7 @@ public class Nucleus {
 	 * @param maxIterations
 	 * @return
 	 */
-	public int ensureFlattened(int maxIterations) {
+	int ensureFlattened(int maxIterations) {
 		int iteration = 0;
 		getSpikeSet();
 		if (spikeSet.size() != pixelSet.size() && spikeSet.size() > 0) {
@@ -87,7 +90,7 @@ public class Nucleus {
 					thinnedSet.retainAll(shell.getExpandedSet());
 					if (thinnedSet.size() != 0) {
 						LOG.debug("all shells overlap on iteration "+iteration+ "; size "+thinnedSet.size()+" spikes "+spikeSet.size());
-						extractCentre();
+						getCentre(thinnedSet);
 						anded = true;
 						break;
 					}
@@ -101,67 +104,15 @@ public class Nucleus {
 		return iteration;
 	}
 
-	private void extractCentre() {
-		centre = null;
-		centrePixelList = new ArrayList<Pixel>(thinnedSet);
-		if (centrePixelList.size() == 1) {
-			// probably a terminal
-			if (shellList.size() == 1) {
-				centre = centrePixelList.get(0);
-			} else {
-				throw new RuntimeException("cannot interpret single pixel centre");
+	public Real2 getCentre(Set<Pixel> pixels) {
+		if (centre == null) {
+			Real2Array coords = new Real2Array();
+			for (Pixel pixel : pixels) {
+				coords.add(new Real2(pixel.getInt2()));
 			}
-		} else if (centrePixelList.size() == 2) {
-			if (shellList.size() == 2) {
-				if (areNeighbours(0, 1)) {
-					centre = centrePixelList.get(0);
-				} else {
-					throw new RuntimeException("two thinned pixels are not neighbours");
-				}
-			}
-		} else if (centrePixelList.size() == 3) {
-			if (shellList.size() == 3) {
-				if (areNeighbours(0, 1) && areNeighbours(0, 2) && areNeighbours(1,2)) {
-					centre = centrePixelList.get(0); // as good as any
-				} else {
-					throw new RuntimeException("3 thinned pixels are not a triangle");
-				}
-			} else {
-				throw new RuntimeException("3 thinned pixels from shellList "+shellList.size());
-			}
-		} else if (centrePixelList.size() == 4) {
-			if (shellList.size() == 2) {
-				// * *
-				//   * *   pattern
-				centrePixelList.remove(shellList.get(0));
-				centrePixelList.remove(shellList.get(1));
-				// remove one of remaining actual pixels
-				centrePixelList.get(0).remove();
-				LOG.debug("thinned centre: "+centrePixelList.size()+" too complex, taking first");
-				centre = centrePixelList.get(0); // as good as any
-			} else if (shellList.size() == 3) {
-				centrePixelList.remove(shellList.get(0));
-				centrePixelList.remove(shellList.get(1));
-				centrePixelList.remove(shellList.get(3));
-				// remove one of remaining actual pixels
-				centrePixelList.get(0).remove();
-				throw new RuntimeException("3 thinned pixels from shellList "+shellList.size());
-			} else if (shellList.size() == 4) {
-				centre = centrePixelList.get(0); // as good as any
-			} else {
-				throw new RuntimeException("cannot interpret 4 nucleus");
-			}
-		} else if (centrePixelList.size() == 4) {
+			centre = coords.getMean();
 		}
-		int size = centrePixelList.size() ;
-		for (int i = 0; i < size - 1; i++) {
-			Pixel pixeli = centrePixelList.get(i);
-			for (int j = i + 1; j < size; j++) {
-				Pixel pixelj = centrePixelList.get(j);
-				System.out.println(i + " " + j + " "+pixeli.getInt2()+"; "+pixelj.getInt2()+" "+areNeighbours(i, j));
-			}
-		}
-
+		return centre;
 	}
 
 	boolean areNeighbours(int i, int j) {
@@ -176,4 +127,10 @@ public class Nucleus {
 		}
 		return shellList;
 	}
+
+	public Real2 getCentre() {
+//		LOG.debug(pixelSet);
+		return getCentre(pixelSet);
+	}
+
 }

@@ -1,5 +1,9 @@
 package org.xmlcml.image.processing;
 
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,11 +13,14 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.image.lines.PixelPath;
-import org.xmlcml.image.processing.Pixel.Marked;
 
 /** connected list of pixels.
  * 
@@ -58,12 +65,12 @@ public class PixelIsland {
 	private List<Nucleus> nucleusList;
 	private List<Pixel> terminalPixels;
 	private Map<Pixel, Nucleus> nucleusMap;
-
 	private Set<Pixel> usedPixels;
-
 	private Set<Nucleus> usedNuclei;
-
 	private List<PixelPath> pixelPaths;
+	private double tolerance = 3.0;
+
+	private List<Real2Array> segmentArrayList;
 	
 	public PixelIsland() {
 	}
@@ -83,6 +90,23 @@ public class PixelIsland {
 		indexPixelsAndUpdateMetadata();
 	}
 	
+	/** find all separated islands.
+	 *  
+	 * creates a FloodFill and extracts Islands from it.
+	 * diagonal set to true
+	 * @param image
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<PixelIsland> createPixelIsland(BufferedImage image) throws IOException {
+		FloodFill floodFill = new FloodFill(image);
+		floodFill.setDiagonal(true);
+		floodFill.fill();
+		List<PixelIsland> islandList = floodFill.getPixelIslandList();
+		return islandList;
+	}
+	
+
 	public void addPixel(Pixel pixel) {
 		this.pixelList.add(pixel);
 		addPixelMetadata(pixel);
@@ -145,8 +169,57 @@ public class PixelIsland {
 
 	public List<Pixel> getTerminalPixels() {
 		terminalPixels = getNodesWithNeighbours(1);
-		
+		List<Pixel> terminalSpikedList = getTerminalSpikes();
+		if (terminalSpikedList.size() > 0) {
+			terminalPixels.addAll(terminalSpikedList);
+			LOG.debug("adding pseudo-terminals: "+terminalSpikedList);
+		}
 		return terminalPixels;
+	}
+
+	/** finds spikes on nuclei that are actually terminals.
+	 * 
+	 * Example:
+	 * 1 2
+	 *   3 4
+	 *      5 6
+	 *         7
+	 *         
+	 * 1234 should be a nucleus but it may be a 3-nucleus (2,3,4) with a pseudo-spike 1
+	 * return it to the nucleus and remove it from the spike set and label it as
+	 * a terminal.
+	 * 
+	 * Believe the algorithm is (a) find nuclei (b) find spikeset (c) see if any spikes have
+	 * 2-neighbours, both in nucleus
+	 * 
+	 * @return
+	 */
+	private List<Pixel> getTerminalSpikes() {
+		List<Pixel> terminalList = new ArrayList<Pixel>();
+//		Pixel terminalSpike = null;
+		for (Nucleus nucleus : nucleusList) {
+			Set<Pixel> spikeSet = nucleus.getSpikeSet();
+			for (Pixel spike : spikeSet) {
+				List<Pixel> spikeNeighbours = spike.getNeighbours(this);
+				if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
+					terminalList.add(spike);
+				}
+			}
+		}
+		return terminalList;
+	}
+
+	private boolean has2NeighboursInNucleus(Nucleus nucleus, List<Pixel> spikeNeighbours) {
+		boolean terminal = false;
+		if (spikeNeighbours.size() == 2) {
+			terminal = true;
+			for (Pixel neighbour : spikeNeighbours) {
+				if (!nucleus.contains(neighbour)) {
+					terminal = false;
+				}
+			}
+		}
+		return terminal;
 	}
 
 	public List<Pixel> getNodesWithNeighbours(int neighbourCount) {
@@ -191,80 +264,80 @@ public class PixelIsland {
 	 * 
 	 * @param removePixels
 	 */
-	public void findNucleiAndMarkToRemove(boolean removePixels) {
-		List<Triangle> lastTriangleList = null;
-		Type type = null;
-		Type lastType = null;
-		removeList = new ArrayList<Pixel>();
-		for (Pixel pixel : pixelList) {
-			type = Type.NULL;
-			List<Pixel> neighbourList = pixel.getNeighbours(Marked.ALL);
-			List<Triangle> triangleList = scanTriangles(pixel, neighbourList);
-			if (neighbourList.size() == 1) {
-				type = Type.TERMINAL;
-			} else if (neighbourList.size() == 2) {
-				type = Type.CHAIN2;
-				if (triangleList.size() == 1) {
-					type = Type.BEND2;
-				}
-			} else if (neighbourList.size() == 3) {
-				if (triangleList.size() == 1) {
-					type = Type.CHAIN3;
-				} else if (triangleList.size() == 2) {
-					type = Type.DEMILOZENGE;
-					if (lastType.equals(Type.DEMILOZENGE)) {
-						tidyLozenge(lastTriangleList, triangleList);
-					}
-			} else if (triangleList.size() == 3) {
-					type = Type.IMPOSSIBLE;
-				}
-			} else if (neighbourList.size() == 4) {
-				if (triangleList.size() == 1) {
-					type = Type.NODE4;
-				} else if (triangleList.size() == 2) {
-					type = Type.BILOZENGE;
-				} else if (triangleList.size() == 3) {
-					type = Type.IMPOSSIBLE;
-				} else if (triangleList.size() == 4) {
-					type = Type.NODE4;
-				} else if (triangleList.size() >= 5) {
-					type = Type.IMPOSSIBLE;
-				}
-			} else if (neighbourList.size() >= 5) {
-				type = Type.NODE5;
-			}
-			LOG.trace(type);
-			lastType = type;
-			lastTriangleList = triangleList;
-		}
-		if (removePixels) {
-			this.removePixels();
-		}
+//	private void findNucleiAndMarkToRemove(boolean removePixels) {
+//		List<Triangle> lastTriangleList = null;
+//		Type type = null;
+//		Type lastType = null;
+//		removeList = new ArrayList<Pixel>();
+//		for (Pixel pixel : pixelList) {
+//			type = Type.NULL;
+//			List<Pixel> neighbourList = pixel.getNeighbours(Marked.ALL);
+//			List<Triangle> triangleList = scanTriangles(pixel, neighbourList);
+//			if (neighbourList.size() == 1) {
+//				type = Type.TERMINAL;
+//			} else if (neighbourList.size() == 2) {
+//				type = Type.CHAIN2;
+//				if (triangleList.size() == 1) {
+//					type = Type.BEND2;
+//				}
+//			} else if (neighbourList.size() == 3) {
+//				if (triangleList.size() == 1) {
+//					type = Type.CHAIN3;
+//				} else if (triangleList.size() == 2) {
+//					type = Type.DEMILOZENGE;
+//					if (lastType.equals(Type.DEMILOZENGE)) {
+//						tidyLozenge(lastTriangleList, triangleList);
+//					}
+//			} else if (triangleList.size() == 3) {
+//					type = Type.IMPOSSIBLE;
+//				}
+//			} else if (neighbourList.size() == 4) {
+//				if (triangleList.size() == 1) {
+//					type = Type.NODE4;
+//				} else if (triangleList.size() == 2) {
+//					type = Type.BILOZENGE;
+//				} else if (triangleList.size() == 3) {
+//					type = Type.IMPOSSIBLE;
+//				} else if (triangleList.size() == 4) {
+//					type = Type.NODE4;
+//				} else if (triangleList.size() >= 5) {
+//					type = Type.IMPOSSIBLE;
+//				}
+//			} else if (neighbourList.size() >= 5) {
+//				type = Type.NODE5;
+//			}
+//			LOG.trace(type);
+//			lastType = type;
+//			lastTriangleList = triangleList;
+//		}
+//		if (removePixels) {
+//			this.removePixels();
+//		}
+//
+//	}
 
-	}
-
-	private void tidyLozenge(List<Triangle> lastTriangleList, List<Triangle> triangleList) {
-		Set<Pixel> lastUnion = getUnion(lastTriangleList);
-		Set<Pixel> thisUnion = getUnion(triangleList);
-		if (!lastUnion.equals(thisUnion)) {
-			throw new RuntimeException("mismatched union");
-		}
-		if (lastUnion.size() != 4) {
-			throw new RuntimeException("bad union size: "+lastUnion.size());
-		}
-		Set<Pixel> lastIntersection = getIntersection(lastTriangleList);
-		Set<Pixel> thisIntersection = getIntersection(triangleList);
-		if (!lastIntersection.equals(thisIntersection)) {
-			throw new RuntimeException("mismatched intersection");
-		}
-		if (lastIntersection.size() != 2) {
-			throw new RuntimeException("bad intersection size: "+lastIntersection.size());
-		}
-		LOG.debug("Lozenge");
-		Pixel toRemove = lastIntersection.iterator().next();
-		LOG.debug(toRemove);
-		removeList.add(toRemove);
-	}
+//	private void tidyLozenge(List<Triangle> lastTriangleList, List<Triangle> triangleList) {
+//		Set<Pixel> lastUnion = getUnion(lastTriangleList);
+//		Set<Pixel> thisUnion = getUnion(triangleList);
+//		if (!lastUnion.equals(thisUnion)) {
+//			throw new RuntimeException("mismatched union");
+//		}
+//		if (lastUnion.size() != 4) {
+//			throw new RuntimeException("bad union size: "+lastUnion.size());
+//		}
+//		Set<Pixel> lastIntersection = getIntersection(lastTriangleList);
+//		Set<Pixel> thisIntersection = getIntersection(triangleList);
+//		if (!lastIntersection.equals(thisIntersection)) {
+//			throw new RuntimeException("mismatched intersection");
+//		}
+//		if (lastIntersection.size() != 2) {
+//			throw new RuntimeException("bad intersection size: "+lastIntersection.size());
+//		}
+//		LOG.debug("Lozenge");
+//		Pixel toRemove = lastIntersection.iterator().next();
+//		LOG.debug(toRemove);
+//		removeList.add(toRemove);
+//	}
 
 	/**
 	private List<Pixel> pixelList;
@@ -291,28 +364,28 @@ public class PixelIsland {
 		}
 	}
 
-	private Set<Pixel> getUnion(List<Triangle> triangleList) {
-		Set<Pixel> unionSet = triangleList.get(0).addAll(triangleList.get(1));
-		return unionSet;
-	}
+//	private Set<Pixel> getUnion(List<Triangle> triangleList) {
+//		Set<Pixel> unionSet = triangleList.get(0).addAll(triangleList.get(1));
+//		return unionSet;
+//	}
+//
+//	private Set<Pixel> getIntersection(List<Triangle> triangleList) {
+//		Set<Pixel> intersectionSet = triangleList.get(0).retainAll(triangleList.get(1));
+//		return intersectionSet;
+//	}
 
-	private Set<Pixel> getIntersection(List<Triangle> triangleList) {
-		Set<Pixel> intersectionSet = triangleList.get(0).retainAll(triangleList.get(1));
-		return intersectionSet;
-	}
-
-	private List<Triangle> scanTriangles(Pixel pixel, List<Pixel> neighbourList) {
-		List<Triangle> triangleList = new ArrayList<Triangle>();
-		int count = neighbourList.size();
-		for (int i = 0; i < count - 1; i++) {
-			for (int j = i+1; j < count; j++ ) {
-				if (scanTriangle(neighbourList, i, j)) {
-					triangleList.add(new Triangle(pixel, neighbourList.get(i), neighbourList.get(j)));
-				}
-			}
-		}
-		return triangleList;
-	}
+//	private List<Triangle> scanTriangles(Pixel pixel, List<Pixel> neighbourList) {
+//		List<Triangle> triangleList = new ArrayList<Triangle>();
+//		int count = neighbourList.size();
+//		for (int i = 0; i < count - 1; i++) {
+//			for (int j = i+1; j < count; j++ ) {
+//				if (scanTriangle(neighbourList, i, j)) {
+//					triangleList.add(new Triangle(pixel, neighbourList.get(i), neighbourList.get(j)));
+//				}
+//			}
+//		}
+//		return triangleList;
+//	}
 
 	/** look for two neighbours that form a triangle.
 	 * 
@@ -321,30 +394,30 @@ public class PixelIsland {
 	 * @param j second neighbour pixel
 	 * @return Int2(i,j) if they form a triangle, else null
 	 */
-	private boolean scanTriangle(List<Pixel> neighbourList, int i, int j) {
-		if (i >= 0 && i < neighbourList.size() && 
-			j >= 0 && j < neighbourList.size() &&
-			i != j) {
-			Pixel pixeli = neighbourList.get(i);
-			Pixel pixelj = neighbourList.get(j);
-			if (pixeli.getNeighbours(Marked.ALL).contains(pixelj)) {
-				return true;
-			}
-		} 
-		return false;
-	}
+//	private boolean scanTriangle(List<Pixel> neighbourList, int i, int j) {
+//		if (i >= 0 && i < neighbourList.size() && 
+//			j >= 0 && j < neighbourList.size() &&
+//			i != j) {
+//			Pixel pixeli = neighbourList.get(i);
+//			Pixel pixelj = neighbourList.get(j);
+//			if (pixeli.getNeighbours(Marked.ALL).contains(pixelj)) {
+//				return true;
+//			}
+//		} 
+//		return false;
+//	}
 
-	public void removePixels() {
-		for (Pixel pixel : removeList) {
-			LOG.debug("remove: "+pixel.getInt2());
-			remove(pixel);
-		}
-	}
+//	private void removePixels() {
+//		for (Pixel pixel : removeList) {
+//			LOG.debug("remove: "+pixel.getInt2());
+//			remove(pixel);
+//		}
+//	}
 
-	public void cleanChains() {
-		this.findNucleiAndMarkToRemove(true);
-		this.findNucleiAndMarkToRemove(false);
-	}
+//	private void cleanChains() {
+//		this.findNucleiAndMarkToRemove(true);
+//		this.findNucleiAndMarkToRemove(false);
+//	}
 
 	public List<Nucleus> getNucleusList() {
 		nucleusList = new ArrayList<Nucleus>();
@@ -386,16 +459,15 @@ public class PixelIsland {
 		multiplyConnectedPixels.remove(pixel);
 	}
 
-	public void flattenNuclei() {
+	void flattenNuclei() {
 		List<Nucleus> nucleusList = this.getNucleusList();
 		for (Nucleus nucleus : nucleusList) {
 			nucleus.ensureFlattened(3);
 		}
 	}
 
-	public void debug(int nucleusCount) {
+	void debug() {
 		List<Nucleus> nucleusList = getNucleusList();
-		Assert.assertEquals("nucleusList",  nucleusCount, nucleusList.size());
 		for (Nucleus nucleus : nucleusList) {
 			int spikeSize = nucleus.getSpikeSet().size();
 			if (spikeSize == 1) {
@@ -406,21 +478,18 @@ public class PixelIsland {
 		}
 	}
 
-	public void processAndDebugNuclei(int count) {
-		debug(count);
-		flattenNuclei();
-	}
-
 	public List<PixelPath> createPixelPathList() {
-		pixelPaths = new ArrayList<PixelPath>();
-		getNucleusList();
-		LOG.debug("nucleus list "+nucleusList.size());
-		processTerminals();
+		if (pixelPaths == null) {
+			pixelPaths = new ArrayList<PixelPath>();
+			getNucleusList();
+			LOG.debug("nucleus list "+nucleusList.size());
+			getTerminalPixels();
+			createPixelPathsStartingAtTerminals();
+		}
 		return pixelPaths;
 	}
 
-	private void processTerminals() {
-		getTerminalPixels();
+	private void createPixelPathsStartingAtTerminals() {
 		Set<Pixel> usedTerminalPixels = new HashSet<Pixel>();
 		for (int i = 0; i < terminalPixels.size(); i++) {
 			Pixel terminal = terminalPixels.get(i);
@@ -451,6 +520,9 @@ public class PixelIsland {
 			}
 			if (nextPixel == null) {
 				LOG.debug("end terminalOrBranch");
+				if (nucleus != null) {
+					pixelPath.addFinalNucleus(nucleus);
+				}
 				break;
 			} else {
 				currentPixel = nextPixel;
@@ -474,7 +546,7 @@ public class PixelIsland {
 //			LOG.debug(neighbours);
 			LOG.debug("Found terminal"); // temp
 		} else if (size > 1) {
-			throw new RuntimeException("Cannot find unique next pixel: "+size);
+			LOG.debug("Cannot find unique next pixel: "+size); // could be terminal in nucleus
 		}
 		return size == 0 ? null : unusedPixels.get(0);
 	}
@@ -524,5 +596,36 @@ public class PixelIsland {
 			}
 		}
 		return usedNeighbours;
+	}
+
+	public SVGSVG createSVG() {
+		createPixelPathList();
+		SVGSVG svg = new SVGSVG();
+		for (PixelPath pixelPath : pixelPaths) {
+			SVGG g = pixelPath.createSVGG();
+			g.setStrokeWidth(0.5);
+			svg.appendChild(g);
+		}
+		return svg;
+	}
+
+	public List<Real2Array> createSegments() {
+		createPixelPathList();
+		segmentArrayList = new ArrayList<Real2Array>();
+		for (PixelPath pixelPath : pixelPaths) {
+			Real2Array segmentArray = new Real2Array(pixelPath.createDouglasPeucker(tolerance));
+			segmentArrayList.add(segmentArray);
+		}
+		return segmentArrayList;
+	}
+
+	public SVGSVG debugSVG(String filename) {
+		SVGSVG svg = createSVG();
+		try {
+			SVGUtil.debug(svg, new FileOutputStream(filename), 1);
+		} catch (IOException e) {
+			throw new RuntimeException("cannot write file", e);
+		}
+		return svg;
 	}
 }

@@ -31,7 +31,6 @@ public class Fixtures {
 	public static final File MOLECULE_20131119_BINARY_PNG = new File(LINES_DIR, "molecule20131119Binary.png");
 	public static final File MOLECULE_BINARY_CANNY_1_PNG = new File(LINES_DIR, "moleculeBinaryCanny1.png");
 	public static final File MOLECULE_BINARY_CANNY_1_BMP = new File(LINES_DIR, "moleculeBinaryCanny1.bmp");
-	public static final File MALTORYZINE_THINNED_PNG = new File(LINES_DIR, "thinnedMaltoryzine.png");
 	
 	public final static File PROCESSING_DIR = new File(IMAGE_DIR, "processing");
 	public static final File HISTOGRAM_JPG = new File(PROCESSING_DIR, "300px-Unequalized_Hawkes_Bay_NZ.jpg");
@@ -40,10 +39,14 @@ public class Fixtures {
 	public static final File MOLECULE_CANNY_PNG = new File(PROCESSING_DIR, "moleculeCanny.png");
 	public static final File MALTORYZINE_BINARY_PNG = new File(PROCESSING_DIR, "maltoryzineBinary.png");
 	public static final File MALTORYZINE_FLIPPED_PNG = new File(PROCESSING_DIR, "maltoryzineFlipped.png");
+	public static final File MALTORYZINE_THINNED_PNG = new File(PROCESSING_DIR, "thinnedMaltoryzine.png");
 	public static final File BRANCH0_PNG = new File(PROCESSING_DIR, "branch0.png");
 	public static final File BRANCH_PNG = new File(PROCESSING_DIR, "branch.png");
 	public static final File HEXAGON_PNG = new File(PROCESSING_DIR, "hexagon.png");
 	public static final File LINE_PNG = new File(PROCESSING_DIR, "line.png");
+	public static final File MALTORYZINE0_PNG = new File(PROCESSING_DIR, "maltoryzine0.png");
+	public static final File TERMINAL_PNG = new File(PROCESSING_DIR, "terminalnode.png");
+	public static final File TERMINALS_PNG = new File(PROCESSING_DIR, "terminalnodes.png");
 	public static final File ZIGZAG_PNG = new File(PROCESSING_DIR, "zigzag.png");
 
 
