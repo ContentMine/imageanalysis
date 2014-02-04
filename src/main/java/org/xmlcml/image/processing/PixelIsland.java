@@ -68,11 +68,12 @@ public class PixelIsland {
 	private Set<Pixel> usedPixels;
 	private Set<Nucleus> usedNuclei;
 	private List<PixelPath> pixelPaths;
-	private double tolerance = 3.0;
+	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
 	
 	public PixelIsland() {
+		this.pixelList = new ArrayList<Pixel>();
 	}
 	
 	public PixelIsland(List<Pixel> pixelList) {
@@ -481,12 +482,38 @@ public class PixelIsland {
 	public List<PixelPath> createPixelPathList() {
 		if (pixelPaths == null) {
 			pixelPaths = new ArrayList<PixelPath>();
+			removeHypotenuses();
 			getNucleusList();
 			LOG.debug("nucleus list "+nucleusList.size());
 			getTerminalPixels();
 			createPixelPathsStartingAtTerminals();
 		}
 		return pixelPaths;
+	}
+
+	/** remove any diagonal neighbours where other connecting pixels exist.
+	 * 
+	 * In 1.2
+	 *    ..3
+	 *      
+	 * the neighbours might be 1-2 2-3 1-3, remove the 1-3
+	 * 
+	 * in 1.2
+	 *    ....3
+	 *        
+	 * the enighbours are 1-2 and 2-3 - leave them
+	 * 
+	 */
+	private void removeHypotenuses() {
+		createTriangleSet();
+	}
+
+	private void createTriangleSet() {
+		Set<Triangle> triangleSet = new HashSet<Triangle>();
+		for (Pixel pixel : pixelList) {
+			Set<Triangle> triangleSet0 = pixel.getTriangles(this);
+			triangleSet.addAll(triangleSet0);
+		}
 	}
 
 	private void createPixelPathsStartingAtTerminals() {

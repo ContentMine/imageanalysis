@@ -2,7 +2,9 @@ package org.xmlcml.image.processing;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
@@ -147,5 +149,20 @@ public class Pixel {
 	public void remove() {
 		throw new RuntimeException("NYI");
 	}
-	
+
+	public void setInt2(Int2 int2) {
+		point = new Point(int2.getX(), int2.getY());
+	}
+
+	public Set<Triangle> getTriangles(PixelIsland island) {
+		Set<Triangle> triangleSet = new HashSet<Triangle>();
+		List<Pixel> neighbours = this.getNeighbours(island);
+		for (int i = 0; i < neighbours.size() - 1; i++) {
+			for (int j = i+1; j < neighbours.size(); j++) {
+				Triangle triangle = Triangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
+			}
+		}
+		return triangleSet;
+	}
+
 }
