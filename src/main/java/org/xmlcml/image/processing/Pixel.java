@@ -101,6 +101,14 @@ public class Pixel {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("point: "+((point == null) ? "null" : this.getInt2()));
+//		sb.append(neighboursString());
+//		sb.append("island: "+island+"\n");
+//		sb.append("; marked: "+marked);
+		return sb.toString();
+	}
+
+	private String neighboursString() {
+		StringBuilder sb = new StringBuilder();
 		sb.append("; neighbours: ");
 		if (neighbourList == null) {
 			sb.append("null");
@@ -109,8 +117,6 @@ public class Pixel {
 				sb.append(" "+neighbour.getInt2()+" "+neighbour.getMarked());
 			}
 		}
-//		sb.append("island: "+island+"\n");
-		sb.append("; marked: "+marked);
 		return sb.toString();
 	}
 
@@ -163,6 +169,10 @@ public class Pixel {
 			}
 		}
 		return triangleSet;
+	}
+
+	public void clearNeighbours() {
+		this.neighbourList = null;
 	}
 
 }

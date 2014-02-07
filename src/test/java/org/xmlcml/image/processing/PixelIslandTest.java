@@ -2,7 +2,6 @@ package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,8 +14,8 @@ import org.junit.Test;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.lines.DouglasPeucker;
 import org.xmlcml.image.lines.PixelPath;
@@ -263,6 +262,25 @@ public class PixelIslandTest {
 		SVGSVG svg = island.debugSVG("target/branch.svg");
 	}
 
+	/** this one has a terminal nucleus
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testDehypotenuse() throws IOException {
+		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINAL_PNG);
+		island.removeHypotenuses();
+		List<Nucleus> nucleusList = island.getNucleusList();
+		LOG.debug("NUC "+nucleusList);
+	}
+
+	@Test
+	public void testBoundingBox2() throws IOException {
+		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE0_PNG);
+		Real2Range bbox = island.getBoundingBox();
+		LOG.debug(bbox);;
+	}
+	
 	// =====================================================
 	
 	private void debug(List<Real2Array> segmentArrayList) {

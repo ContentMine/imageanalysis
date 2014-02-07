@@ -1,7 +1,6 @@
 package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGUtil;
@@ -71,6 +71,8 @@ public class PixelIsland {
 	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
+
+	private Set<Triangle> triangleSet;
 	
 	public PixelIsland() {
 		this.pixelList = new ArrayList<Pixel>();
@@ -107,6 +109,13 @@ public class PixelIsland {
 		return islandList;
 	}
 	
+	public Real2Range getBoundingBox() {
+		Real2Range r2r = new Real2Range();
+		for (Pixel pixel : pixelList) {
+			r2r.add(new Real2(pixel.getInt2()));
+		}
+		return r2r;
+	}
 
 	public void addPixel(Pixel pixel) {
 		this.pixelList.add(pixel);
@@ -430,7 +439,7 @@ public class PixelIsland {
 		while (multiplyConnectedPixels.size() > 0) {
 			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
 			nucleusList.add(nucleus);
-			LOG.debug("nucl size: "+nucleus.size()+" spikes: "+nucleus.getSpikeSet());
+			LOG.debug("nucl "+nucleus.toString());
 		}
 		return nucleusList;
 	}
@@ -504,12 +513,13 @@ public class PixelIsland {
 	 * the enighbours are 1-2 and 2-3 - leave them
 	 * 
 	 */
-	private void removeHypotenuses() {
+	void removeHypotenuses() {
 		createTriangleSet();
+		LOG.debug("triangle "+triangleSet);
 	}
 
 	private void createTriangleSet() {
-		Set<Triangle> triangleSet = new HashSet<Triangle>();
+		triangleSet = new HashSet<Triangle>();
 		for (Pixel pixel : pixelList) {
 			Set<Triangle> triangleSet0 = pixel.getTriangles(this);
 			triangleSet.addAll(triangleSet0);

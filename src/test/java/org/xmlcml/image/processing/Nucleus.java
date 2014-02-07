@@ -132,5 +132,12 @@ public class Nucleus {
 //		LOG.debug(pixelSet);
 		return getCentre(pixelSet);
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("pixels: "+this.pixelSet+" spikes: "+this.getSpikeSet());
+		return sb.toString();
+	}
 
 }
