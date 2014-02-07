@@ -481,9 +481,9 @@ public class PixelIsland {
 		for (Nucleus nucleus : nucleusList) {
 			int spikeSize = nucleus.getSpikeSet().size();
 			if (spikeSize == 1) {
-				SpanningTreeTest.LOG.debug("terminus nucleus "+nucleus.size());
+				LOG.debug("terminus nucleus "+nucleus.size());
 			} else if (spikeSize == 1) {
-				SpanningTreeTest.LOG.debug("branch nucleus "+nucleus.size()+" spikes "+spikeSize);
+				LOG.debug("branch nucleus "+nucleus.size()+" spikes "+spikeSize);
 			}
 		}
 	}
