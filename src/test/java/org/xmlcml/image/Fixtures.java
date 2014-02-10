@@ -57,7 +57,7 @@ public class Fixtures {
 	public static final File HELVETICA_PNG = new File(TEXT_DIR, "helvetica.png");
 	public static final File HELVETICA_BOLD_PNG = new File(TEXT_DIR, "helveticaBold.png");
 	public static final File LUCIDA_PNG = new File(TEXT_DIR, "lucida.png");
-	public static final File MONOSPACE_PNG = new File(TEXT_DIR, "monospace.PNG");
+	public static final File MONOSPACE_PNG = new File(TEXT_DIR, "monospace.png");
 	public static final File TIMESROMAN_JPG = new File(TEXT_DIR, "timesroman.jpg");
 	public static final File TIMES_GIF = new File(TEXT_DIR, "times.gif");
 	
