@@ -97,6 +97,8 @@ public class PixelPath {
 				SVGLine line = new SVGLine(pointsToDraw.get(i - 1), pointsToDraw.get(i));
 				g.appendChild(line);
 			}
+		} else {
+			g = PixelIsland.plotPixels(pixelList);
 		}
 		return g;
 	}

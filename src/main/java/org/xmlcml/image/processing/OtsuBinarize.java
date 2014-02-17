@@ -39,8 +39,7 @@ public class OtsuBinarize {
     }
 
 	public void read(File file) throws IOException {
-		original = ImageIO.read(file);
-		current = original;
+		setImage(ImageIO.read(file));
 	}
 
     public void writeImage(File file) throws IOException {
@@ -122,7 +121,7 @@ public class OtsuBinarize {
         current = sharp;
     }
  
-    // Get binary treshold using Otsu's method
+    // Get binary threshold using Otsu's method
     private int otsuTreshold() {
  
         int[] histogram = imageHistogram();

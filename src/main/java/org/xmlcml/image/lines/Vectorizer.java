@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.processing.FloodFill;
 import org.xmlcml.image.processing.PixelIsland;
+import org.xmlcml.image.processing.PixelIslandList;
 
 /** vectorizes pixel maps
  * 
@@ -26,11 +27,11 @@ public class Vectorizer {
 	private double dpTolerance = 0.5;
 	private DouglasPeucker douglasPeucker;
 
-	public List<PixelIsland> createIslands() throws IOException {
+	public PixelIslandList createIslands() throws IOException {
 		FloodFill floodFill = new FloodFill(inputImage);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
-		List<PixelIsland> islandList = floodFill.getPixelIslandList();
+		PixelIslandList islandList = floodFill.getPixelIslandList();
 		return islandList;
 	}
 

@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGRect;
 
 public class Pixel {
 
@@ -173,6 +175,15 @@ public class Pixel {
 
 	public void clearNeighbours() {
 		this.neighbourList = null;
+	}
+
+	public SVGRect getSVGRect() {
+		SVGRect rect = new SVGRect(
+				new Real2(this.point.getX(), this.point.getY()),
+				new Real2(this.point.getX()+1, this.point.getY()+1));
+		rect.setFill("red");
+		rect.setStroke(null);
+		return rect;
 	}
 
 }

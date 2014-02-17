@@ -1,7 +1,7 @@
 package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,9 +17,10 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.graphics.svg.SVGUtil;
 import org.xmlcml.image.lines.PixelPath;
 
 /** connected list of pixels.
@@ -101,11 +102,11 @@ public class PixelIsland {
 	 * @return
 	 * @throws IOException
 	 */
-	public static List<PixelIsland> createPixelIsland(BufferedImage image) throws IOException {
+	public static PixelIslandList createPixelIslandList(BufferedImage image) throws IOException {
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
-		List<PixelIsland> islandList = floodFill.getPixelIslandList();
+		PixelIslandList islandList = floodFill.getPixelIslandList();
 		return islandList;
 	}
 	
@@ -115,6 +116,14 @@ public class PixelIsland {
 			r2r.add(new Real2(pixel.getInt2()));
 		}
 		return r2r;
+	}
+
+	public Int2Range getIntBoundingBox() {
+		Int2Range i2r = new Int2Range();
+		for (Pixel pixel : pixelList) {
+			i2r.add(pixel.getInt2());
+		}
+		return i2r;
 	}
 
 	public void addPixel(Pixel pixel) {
@@ -207,12 +216,14 @@ public class PixelIsland {
 	private List<Pixel> getTerminalSpikes() {
 		List<Pixel> terminalList = new ArrayList<Pixel>();
 //		Pixel terminalSpike = null;
-		for (Nucleus nucleus : nucleusList) {
-			Set<Pixel> spikeSet = nucleus.getSpikeSet();
-			for (Pixel spike : spikeSet) {
-				List<Pixel> spikeNeighbours = spike.getNeighbours(this);
-				if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
-					terminalList.add(spike);
+		if (nucleusList != null) {
+			for (Nucleus nucleus : nucleusList) {
+				Set<Pixel> spikeSet = nucleus.getSpikeSet();
+				for (Pixel spike : spikeSet) {
+					List<Pixel> spikeNeighbours = spike.getNeighbours(this);
+					if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
+						terminalList.add(spike);
+					}
 				}
 			}
 		}
@@ -563,7 +574,7 @@ public class PixelIsland {
 				break;
 			} else {
 				currentPixel = nextPixel;
-				LOG.debug("next: "+nextPixel.getInt2());
+				LOG.trace("next: "+nextPixel.getInt2());
 			}
 		}
 		return pixelPath;
@@ -601,11 +612,12 @@ public class PixelIsland {
 		Pixel nextPixel = null;
 		Set<Pixel> spikeSetCopy = new HashSet<Pixel>(nucleus.getSpikeSet());
 		if (spikeSetCopy.size() <= 1) {
-			throw new RuntimeException("Spike set cannot have < 2 ");
+			LOG.error("Spike set cannot have < 2 ");
+			return null;
 		} else if (spikeSetCopy.size() == 2) {
 			spikeSetCopy.removeAll(getUsedNeighbours(currentPixel));
 			if (spikeSetCopy.size() != 1) {
-				throw new RuntimeException("BUG: should have removed pixel");
+				LOG.error("BUG: should have removed pixel");
 			}
 			nextPixel = spikeSetCopy.iterator().next();
 			for (Pixel neighbour : nextPixel.getNeighbours(this)) {
@@ -617,7 +629,7 @@ public class PixelIsland {
 		} else {
 			// treat as terminal
 			if (!nucleus.getSpikeSet().removeAll(currentPixel.getNeighbours(this))) {
-				throw new RuntimeException("Failed to remove");
+				LOG.error("Failed to remove");
 			}
 			nextPixel = null;
 		}
@@ -635,15 +647,28 @@ public class PixelIsland {
 		return usedNeighbours;
 	}
 
-	public SVGSVG createSVG() {
+	public SVGG createSVG(boolean pixels) {
+		SVGG gg = new SVGG();
 		createPixelPathList();
-		SVGSVG svg = new SVGSVG();
-		for (PixelPath pixelPath : pixelPaths) {
-			SVGG g = pixelPath.createSVGG();
-			g.setStrokeWidth(0.5);
-			svg.appendChild(g);
+		if (pixelPaths.size() == 0 || pixels) {
+			gg = plotPixels(pixelList);
+		} else {
+			for (PixelPath pixelPath : pixelPaths) {
+				SVGG g = pixelPath.createSVGG();
+				g.setStrokeWidth(0.5);
+				gg.appendChild(g);
+			}
 		}
-		return svg;
+		return gg;
+	}
+
+	public static SVGG plotPixels(List<Pixel> pixelList) {
+		SVGG g = new SVGG();
+		for (Pixel pixel : pixelList) {
+			SVGRect rect = pixel.getSVGRect();
+			g.appendChild(rect);
+		}
+		return g;
 	}
 
 	public List<Real2Array> createSegments() {
@@ -656,13 +681,77 @@ public class PixelIsland {
 		return segmentArrayList;
 	}
 
-	public SVGSVG debugSVG(String filename) {
-		SVGSVG svg = createSVG();
-		try {
-			SVGUtil.debug(svg, new FileOutputStream(filename), 1);
-		} catch (IOException e) {
-			throw new RuntimeException("cannot write file", e);
-		}
-		return svg;
+	public SVGG debugSVG(String filename) {
+		SVGG g = createSVG(true);
+		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
+		return g;
 	}
+
+	public boolean fitsWithin(RealRange xSizeRange, RealRange ySizeRange) {
+		double wmax = xSizeRange.getMax();
+		double wmin = xSizeRange.getMin();
+		double hmax = ySizeRange.getMax();
+		double hmin = ySizeRange.getMin();
+		Real2Range ibox = getBoundingBox();
+		double width = ibox.getXRange().getRange();
+		double height = ibox.getYRange().getRange();
+		boolean include = ((width <= wmax && width >= wmin) &&
+			(height <= hmax && height >= hmin));
+		return include;
+	}
+
+	public double correlation(PixelIsland island2, String title) {
+		Int2Range bbox1 = this.getIntBoundingBox();
+		Int2Range bbox2 = island2.getIntBoundingBox();
+		int xRange1 = bbox1.getXRange().getRange();
+		int yRange1 = bbox1.getYRange().getRange();
+		int xMin1 = bbox1.getXRange().getMin();
+		int yMin1 = bbox1.getYRange().getMin();
+		int xRange2 = bbox2.getXRange().getRange();
+		int yRange2 = bbox2.getYRange().getRange();
+		int xMin2 = bbox2.getXRange().getMin();
+		int yMin2 = bbox2.getYRange().getMin();
+		int xrange = Math.max(xRange1, xRange2);
+		int yrange = Math.max(yRange1, yRange2);
+		LOG.debug(xrange+" "+yrange);
+		double score = 0.;
+		SVGG g = new SVGG();
+		for (int i = 0; i < xrange; i++) {
+			int x1 = xMin1 + i;
+			int x2 = xMin2 + i;
+			for (int j = 0; j < yrange; j++) {
+				int y1 = yMin1 + j;
+				int y2 = yMin2 + j;
+				Int2 i2 = new Int2(x1, y1);
+				Pixel pixel1 = pixelByCoordMap.get(i2);
+				Pixel pixel2 = island2.pixelByCoordMap.get(new Int2(x2, y2));
+				if (pixel1 != null) {
+					g.appendChild(addRect(i2, "red"));
+				}
+				if (pixel2 != null) {
+					g.appendChild(addRect(i2, "blue"));
+				}
+				if (pixel1 != null && pixel2 != null) {
+					g.appendChild(addRect(i2, "purple"));
+					score++;
+				} else if(pixel1 == null && pixel2 == null) {
+					score++;
+				} else {
+					score--;
+				}
+			}
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/pixels"+title+".svg"));
+		return score / (xrange * yrange);
+	}
+
+	private SVGRect addRect(Int2 i2, String color) {
+		double x = i2.getX();
+		double y = i2.getY();
+		SVGRect rect = new SVGRect(new Real2(x, y), new Real2(x+1, y+1));
+		rect.setStroke("none");
+		rect.setFill(color);
+		return rect;
+	}
+
 }

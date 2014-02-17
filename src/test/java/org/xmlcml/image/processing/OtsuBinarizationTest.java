@@ -1,16 +1,18 @@
 package org.xmlcml.image.processing;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 
 public class OtsuBinarizationTest {
 
 	@Test
+	@Ignore // file gone missing (maybe in earlier version)
 	public void testBinarize() throws IOException {
     	OtsuBinarize otsuBinarize = new OtsuBinarize();
         otsuBinarize.read(Fixtures.MALTORYZINE_PNG);
@@ -30,6 +32,7 @@ public class OtsuBinarizationTest {
 	
 
 	@Test
+	@Ignore // file gone missing (maybe in earlier version)
 	public void testBinarizeMolecule() throws IOException {
     	OtsuBinarize otsuBinarize = new OtsuBinarize();
         otsuBinarize.read(Fixtures.MOLECULE_20131119_A_JPG);
@@ -37,4 +40,19 @@ public class OtsuBinarizationTest {
         otsuBinarize.binarize();
         otsuBinarize.writeImage(new File("target/molecule20131119Binary.png"));        
 	}
+	
+	@Test
+	public void testBinarizeJPEG() throws IOException {
+    	OtsuBinarize otsuBinarize = new OtsuBinarize();
+        otsuBinarize.read(Fixtures.LARGE_PHYLO_JPG);
+        otsuBinarize.toGray();
+        otsuBinarize.binarize();
+        BufferedImage image = otsuBinarize.getBinarizedImage();
+        Assert.assertEquals(1705, image.getHeight());
+        Assert.assertEquals(1200, image.getWidth());
+        otsuBinarize.writeImage(new File("target/largePhylo.png"));        
+	}
+	
+	
+
 }

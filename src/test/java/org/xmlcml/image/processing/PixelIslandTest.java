@@ -3,6 +3,7 @@ package org.xmlcml.image.processing;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -15,10 +16,18 @@ import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.Util;
+import org.xmlcml.graphics.svg.SVGElement;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.lines.DouglasPeucker;
 import org.xmlcml.image.lines.PixelPath;
+import org.xmlcml.image.processing.PixelIslandList.Operation;
+
+import com.google.common.collect.Multimap;
 
 public class PixelIslandTest {
 
@@ -82,6 +91,7 @@ public class PixelIslandTest {
 	public void testgetTerminalPixelsL() {
 		List<Pixel> lList = Fixtures.L_LIST;
 		PixelIsland island = new PixelIsland(lList);
+		Assert.assertNotNull("island", island);
 		List<Pixel> terminalPixels = island.getTerminalPixels();
 		Assert.assertEquals("terminal", 2, terminalPixels.size());
 	}
@@ -127,7 +137,7 @@ public class PixelIslandTest {
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
-		List<PixelIsland> islandList = floodFill.getPixelIslandList();
+		PixelIslandList islandList = floodFill.getPixelIslandList();
 		Assert.assertEquals("islands", 5, islandList.size());
 		int[] islands =   {492, 33,  25,  29,  25};
 		int[] terminals = {6,   2,   2,   2,   2};
@@ -136,6 +146,7 @@ public class PixelIslandTest {
 		int[] count4 =    {3,   1,   0,   0,   0};
 		int[] count5 =    {0,   0,   0,   0,   0};
 		for (int i = 0; i < islandList.size(); i++) {
+			
 			PixelIsland island = islandList.get(i);
 			Assert.assertEquals("island "+i, islands[i], island.size());
 			Assert.assertEquals("terminal "+i, terminals[i], island.getTerminalPixels().size());
@@ -178,7 +189,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.ZIGZAG_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/zigzag.svg");
+		island.debugSVG("target/zigzag.svg");
 	}
 
 	@Test
@@ -186,7 +197,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.HEXAGON_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/hexagon.svg");
+		island.debugSVG("target/hexagon.svg");
 	}
 
 	@Test
@@ -194,7 +205,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.BRANCH0_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 3, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/branch0.svg");
+		island.debugSVG("target/branch0.svg");
 	}
 
 	@Test
@@ -202,7 +213,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE0_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 6, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/maltoryzine0.svg");
+		island.debugSVG("target/maltoryzine0.svg");
 	}
 
 	@Test
@@ -210,7 +221,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE_THINNED_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 6, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/maltoryzine.svg");
+		island.debugSVG("target/maltoryzine.svg");
 	}
 
 	/** this one has a terminal nucleus
@@ -233,7 +244,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINAL_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/terminalnode.svg");
+		island.debugSVG("target/terminalnode.svg");
 	}
 
 	/** this one has 2 terminal nuclei
@@ -244,8 +255,8 @@ public class PixelIslandTest {
 	public void testCreateTerminalsPixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINALS_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
-		Assert.assertEquals("segmentArray", 6, segmentArrayList.size());
-		SVGSVG svg = island.debugSVG("target/terminalnodes.svg");
+		island.debugSVG("target/terminalnodes.svg");
+		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
 	}
 
 
@@ -259,7 +270,7 @@ public class PixelIslandTest {
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 3, segmentArrayList.size());
 		debug(segmentArrayList);
-		SVGSVG svg = island.debugSVG("target/branch.svg");
+		island.debugSVG("target/branch.svg");
 	}
 
 	/** this one has a terminal nucleus
@@ -281,6 +292,145 @@ public class PixelIslandTest {
 		LOG.debug(bbox);;
 	}
 	
+	@Test
+	public void testBoundingBoxes() throws IOException {
+		PixelIslandList islands = PixelIsland.createPixelIslandList(ImageIO.read(Fixtures.MALTORYZINE_PNG));
+		for (PixelIsland island : islands) {
+			Real2Range bbox = island.getBoundingBox();
+			LOG.debug(island+" "+bbox);
+		}
+	}
+	
+	@Test
+	public void testLargePhyloJpg() throws IOException {
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
+		Collections.sort(islands.getList(), new PixelIslandComparator(PixelIslandComparator.ComparatorType.SIZE));
+		LOG.debug(islands.get(0).size());
+		Assert.assertTrue(islands.size() > 2000);
+		Assert.assertEquals(2224, islands.size());
+		debug(islands, "target/largePhyloBoxes.svg");
+	}
+
+//	@Test
+//	public void testLargePhyloJpg1() throws IOException {
+//		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG);
+//		PixelIslandList characters = islands.smallerThan(new Real2(20., 20.));
+//		Assert.assertEquals(2202, characters.size());
+//		debug(characters, "target/characters.svg");
+//	}
+
+	@Test
+	public void testLargePhyloJpgChars() throws IOException {
+		int heightCount[] = new int[] {
+				201,86,7,40,21,74,629,391,148,374, // 0-9
+				148,33,3,15,13,9,5,0,2,3,           //10-19                      
+				0,3,2,1,0,0};
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
+		Assert.assertEquals("all chars", 2206, characters.size());
+		debug(characters, "target/charsHeight.svg");
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		for (Integer height : charactersByHeight.keySet()) {
+			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
+			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
+			debug(charsi, "target/chars"+height+".svg");
+		}
+	}
+
+
+	@Test
+	public void testLargePhyloJpgSmallChars() throws IOException {
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 20.), new RealRange(0., 1.));
+		Assert.assertEquals("all chars", 287, characters.size());
+		debug(characters, "target/chars0-1.svg");
+	}
+
+	@Test
+	public void testLargePhyloJpgLargeChars() throws IOException {
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 20.), new RealRange(12., 25.));
+		Assert.assertEquals("all chars", 54, characters.size());
+		debug(characters, "target/charsHeightLarge.svg");
+	}
+
+	@Test
+	public void testLargePhyloJpgCharsBinarize() throws IOException {
+		int heightCount[] = new int[] {
+				155,152,18,43,5,9,428,619,6,391, // 0-9
+				304,10,17,31,1,4,22,15,1,0,           //10-19                      
+				0,8,0,0,0,1};
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
+		Assert.assertEquals("all chars", 2240, characters.size());
+		debug(characters, "target/charsHeight.svg");
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		for (Integer height : charactersByHeight.keySet()) {
+			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
+			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
+			LOG.debug(height+" "+charsi.size());
+			debug(charsi, "target/charsNoThin"+height+".svg");
+		}
+	}
+
+	@Test
+	public void testLargePhyloJpgCharsReconstruct() throws IOException {
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		PixelIslandList brackets = new PixelIslandList(charactersByHeight.get(21));
+		int nchar = brackets.size();
+		Assert.assertEquals("bracket", 8, nchar);
+		for (int i = 0; i < nchar; i++) {
+			for (int j = i; j < nchar; j++) {
+				double cor = Util.format(brackets.get(i).correlation(brackets.get(j), i+" "+j), 2);
+				System.out.print(cor+" ");
+			}
+			System.out.println();
+		}
+	}
+
+	@Test
+	@Ignore // it looks like a bad idea to omit binarization on antialised jpegs.
+	public void testLargePhyloJpgCharsRaw() throws IOException {
+		int heightCount[] = new int[] {
+//				155,152,18,43,5,9,428,619,6,391, // 0-9
+//				304,33,3,15,13,9,5,0,2,3,           //10-19                      
+//				0,3,2,1,0,0};
+		};
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
+		Assert.assertEquals("all chars", 4146, characters.size());
+		debug(characters, "target/charsRaw.svg");
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		for (Integer height : charactersByHeight.keySet()) {
+			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
+//			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
+			LOG.debug(height+" "+charsi.size());
+			debug(charsi, "target/charsRaw"+height+".svg");
+		}
+	}
+
+	// =============================================================
+
+	private void debug(PixelIslandList islands, String filename) {
+		SVGG g = new SVGG();
+		for (PixelIsland island : islands) {
+			Real2Range bbox = island.getBoundingBox();
+			LOG.trace(island+" "+island.size()+" "+bbox);
+			SVGRect rect = new SVGRect(bbox);
+			g.appendChild(rect);
+			SVGG gg = island.createSVG(true);
+			int n = gg.getChildCount();
+			for (int i = n - 1; i >= 0; i--) {
+				SVGElement ggg = (SVGElement) gg.getChild(i);
+				ggg.detach();
+				g.appendChild(ggg);
+			}
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
+	}
+	
 	// =====================================================
 	
 	private void debug(List<Real2Array> segmentArrayList) {
@@ -290,7 +440,7 @@ public class PixelIslandTest {
 	}
 
 	private PixelIsland createFirstPixelIsland(File file) throws IOException {
-		return PixelIsland.createPixelIsland(ImageIO.read(file)).get(0);
+		return PixelIsland.createPixelIslandList(ImageIO.read(file)).get(0);
 	}
 
 

@@ -18,7 +18,7 @@ public class FloodFill {
 	private BufferedImage image;
 	private boolean[][] painted;
 	private boolean diagonal = false;
-	private List<PixelIsland> pixelIslandList;
+	private PixelIslandList pixelIslandList;
 
 	public FloodFill(BufferedImage image) {
 		this.image = image;
@@ -83,11 +83,11 @@ public class FloodFill {
 
 	private void ensurePixelIslandList() {
 		if (pixelIslandList == null) {
-			pixelIslandList = new ArrayList<PixelIsland>();
+			pixelIslandList = new PixelIslandList();
 		}
 	}
 	
-	public List<PixelIsland> getPixelIslandList() {
+	public PixelIslandList getPixelIslandList() {
 		ensurePixelIslandList();
 		for (PixelIsland pixelIsland : pixelIslandList) {
 			pixelIsland.setDiagonal(diagonal);
