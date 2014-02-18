@@ -3,8 +3,11 @@ package org.xmlcml.image.processing;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +16,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -22,6 +27,7 @@ import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.lines.DouglasPeucker;
 import org.xmlcml.image.lines.PixelPath;
@@ -389,6 +395,118 @@ public class PixelIslandTest {
 			System.out.println();
 		}
 	}
+
+	@Test
+	/** correlates every character with every other.
+	 * very crude. Finds sets of highly correlated characters and labels first one on
+	 * diagram
+	 * @throws IOException
+	 */
+	public void testLargePhyloJpgCharsReconstruct1() throws IOException {
+		double correlation = 0.75;
+		String colors[] = {"red", "blue", "green", "yellow", "purple", "cyan", "brown", "pink", "lime", "orange"};
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		PixelIslandList chars = new PixelIslandList(charactersByHeight.get(10));
+		Collections.sort(chars.getList(), new PixelIslandComparator(
+				PixelIslandComparator.ComparatorType.TOP, PixelIslandComparator.ComparatorType.LEFT));
+		int nchar = chars.size();
+		Assert.assertEquals("10-high characters", 304, nchar);
+		List<List<Integer>> groupList = new ArrayList<List<Integer>>();
+		Set<Integer> usedSet = new HashSet<Integer>();
+		SVGG allg = new SVGG();
+		for (int i = 0; i < Math.min(2000, nchar); i++) {
+			if (usedSet.contains(i)) continue;
+			usedSet.add(i);
+			SVGG g = new SVGG();
+			List<Integer> newList = new ArrayList<Integer>();
+			newList.add(i);
+			groupList.add(newList);
+			for (int j = i+1; j < nchar; j++) {
+				if (usedSet.contains(j)) continue;
+				double cor = Util.format(chars.get(i).correlation(chars.get(j), "dummy"), 2);
+				if (cor > correlation) {
+					newList.add(j);
+					usedSet.add(j);
+					System.out.print(i+" "+j+": "+cor+" ");
+					g.appendChild(chars.get(j).createSVG(true));
+				}
+			}
+			Collections.sort(newList);
+			SVGG gk = null;
+			for (Integer k : newList) {
+				gk = chars.get(k).createSVG(true);
+				g.appendChild(gk);
+			}
+			gk = new SVGG(gk);
+			SVGText text = new SVGText(gk.getBoundingBox().getCorners()[0], String.valueOf(newList.get(0)));
+			gk.appendChild(text);
+			text.setOpacity(0.6);
+			text.setFontSize(20.0);
+			text.setFill("green");
+			allg.appendChild(gk);
+			SVGSVG.wrapAndWriteAsSVG(g, new File("target/charsCorr"+newList.get(0)+".svg"));
+			System.out.println();
+		}
+		SVGSVG.wrapAndWriteAsSVG(allg, new File("target/charsCorrAll.svg"));
+		Collections.sort(groupList, new ListComparator());
+		for (List<Integer> listi : groupList) {
+			System.out.println(listi);
+		}
+		
+	}
+
+	@Test
+	/** correlates every character with every other.
+	 * very crude. Finds sets of highly correlated characters and labels first one on
+	 * diagram
+	 * @throws IOException
+	 */
+	public void testLargePhyloJpgCharsCorrelateA() throws IOException {
+		// "A"s selected manually
+		int[] charsA = {90, 274, 
+				97, 
+				98, 133, 202, 283,
+				136, 143,
+				1,2 // dummies
+		};
+		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		ImageIO.write(rawImage, "jpg", new File("target/test.jpg"));
+		ImageIO.write(rawImage, "png", new File("target/test.png"));
+		BufferedImage subImage = org.xmlcml.image.Util.clipSubImage(rawImage, new Int2Range(new IntRange(50, 100), new IntRange(150, 300)));
+		Assert.assertEquals(50, subImage.getWidth());
+		Assert.assertEquals(150, subImage.getHeight());
+		ImageIO.write(subImage, "png", new File("target/testclip.png"));
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		PixelIslandList chars = new PixelIslandList(charactersByHeight.get(10));
+		Collections.sort(chars.getList(), new PixelIslandComparator(
+				PixelIslandComparator.ComparatorType.TOP, PixelIslandComparator.ComparatorType.LEFT));
+		PixelIslandList islandsA = new PixelIslandList();
+		for (int charA : charsA) {
+			PixelIsland island = chars.get(charA);
+			islandsA.add(island);
+			Int2Range ibbox = island.getIntBoundingBox();
+			BufferedImage subImage1 = org.xmlcml.image.Util.clipSubImage(rawImage, ibbox);
+			ImageIO.write(subImage1, "png", new File("target/clip"+charA+".png"));
+		}
+		int nchar = islandsA.size();
+		System.out.println("size: "+nchar);
+		for (int i = 0; i < nchar; i++) {
+			for (int j = i; j < nchar; j++) {
+				double cor = Util.format(islandsA.get(i).correlation(islandsA.get(j), i+"-"+j), 2);
+				System.out.print(i+"-"+j+": "+cor+" ");
+			}
+			System.out.println();
+		}
+	}
+	
+//	private void debug(PixelIsland pixelIsland, String filename) {
+//		SVGG g = pixelIsland.createSVG(true);
+//		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
+//	}
 
 	@Test
 	@Ignore // it looks like a bad idea to omit binarization on antialised jpegs.

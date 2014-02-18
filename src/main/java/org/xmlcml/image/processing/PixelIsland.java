@@ -1,6 +1,8 @@
 package org.xmlcml.image.processing;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
@@ -57,11 +60,11 @@ public class PixelIsland {
 	}
 	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
 	
-	private List<Pixel> pixelList;
+	private List<Pixel> pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
-	Map<Int2, Pixel> pixelByCoordMap;
+	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private List<Pixel> removeList;
 	private List<Nucleus> nucleusList;
 	private List<Pixel> terminalPixels;
@@ -126,6 +129,8 @@ public class PixelIsland {
 		return i2r;
 	}
 
+
+	
 	public void addPixel(Pixel pixel) {
 		this.pixelList.add(pixel);
 		addPixelMetadata(pixel);
@@ -649,8 +654,10 @@ public class PixelIsland {
 
 	public SVGG createSVG(boolean pixels) {
 		SVGG gg = new SVGG();
-		createPixelPathList();
-		if (pixelPaths.size() == 0 || pixels) {
+		if (!pixels) {
+			createPixelPathList();
+		}
+		if (pixels || pixelPaths.size() == 0) {
 			gg = plotPixels(pixelList);
 		} else {
 			for (PixelPath pixelPath : pixelPaths) {
@@ -713,7 +720,7 @@ public class PixelIsland {
 		int yMin2 = bbox2.getYRange().getMin();
 		int xrange = Math.max(xRange1, xRange2);
 		int yrange = Math.max(yRange1, yRange2);
-		LOG.debug(xrange+" "+yrange);
+		LOG.trace(xrange+" "+yrange);
 		double score = 0.;
 		SVGG g = new SVGG();
 		for (int i = 0; i < xrange; i++) {
