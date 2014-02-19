@@ -216,6 +216,10 @@ public class OtsuBinarize {
 		current = original;
 	}
 
+	public BufferedImage getGrayImage() {
+		return gray;
+	}
+
  
 }
 

@@ -402,6 +402,7 @@ public class PixelIslandTest {
 	 * diagram
 	 * @throws IOException
 	 */
+	@Ignore //in tests
 	public void testLargePhyloJpgCharsReconstruct1() throws IOException {
 		double correlation = 0.75;
 		String colors[] = {"red", "blue", "green", "yellow", "purple", "cyan", "brown", "pink", "lime", "orange"};
@@ -472,12 +473,12 @@ public class PixelIslandTest {
 				1,2 // dummies
 		};
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		ImageIO.write(rawImage, "jpg", new File("target/test.jpg"));
-		ImageIO.write(rawImage, "png", new File("target/test.png"));
-		BufferedImage subImage = org.xmlcml.image.Util.clipSubImage(rawImage, new Int2Range(new IntRange(50, 100), new IntRange(150, 300)));
-		Assert.assertEquals(50, subImage.getWidth());
-		Assert.assertEquals(150, subImage.getHeight());
-		ImageIO.write(subImage, "png", new File("target/testclip.png"));
+//		ImageIO.write(rawImage, "jpg", new File("target/test.jpg"));
+//		ImageIO.write(rawImage, "png", new File("target/test.png"));
+//		BufferedImage subImage = org.xmlcml.image.Util.clipSubImage(rawImage, new Int2Range(new IntRange(50, 100), new IntRange(150, 300)));
+//		Assert.assertEquals(50, subImage.getWidth());
+//		Assert.assertEquals(150, subImage.getHeight());
+//		ImageIO.write(subImage, "png", new File("target/testclip.png"));
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
@@ -501,6 +502,55 @@ public class PixelIslandTest {
 			}
 			System.out.println();
 		}
+	}
+
+	/** correlates a few grayscale characters.
+	 * 
+	 * uses "A"
+	 * @throws IOException
+	 */
+	@Test
+	public void testCorrelateGrayCharacters() throws IOException {
+		int[] charsA = {90, 274, 
+				97, 
+				98, 133, 202, 283,
+				136, 143,
+//				1,2 // dummies
+		};
+		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		PixelIslandList islandsA = createAs(charsA);
+		List<BufferedImage> subImageList = new ArrayList<BufferedImage>();
+		for (int i = 0; i < charsA.length; i++) {
+			Int2Range ibbox = islandsA.get(i).getIntBoundingBox();
+			BufferedImage subImage1 = org.xmlcml.image.Util.clipSubImage(rawImage, ibbox);
+			subImageList.add(subImage1);
+			ImageIO.write(subImage1, "png", new File("target/clip"+charsA[i]+".png"));
+		}
+		int nchar = islandsA.size();
+		System.out.println("size: "+nchar);
+		for (int i = 0; i < nchar; i++) {
+			for (int j = 0; j <= i; j++) {
+				double cor = Util.format(org.xmlcml.image.Util.correlateGray(subImageList.get(i), subImageList.get(j), i+"__"+j), 2);
+				System.out.print(i+"-"+j+": "+cor+" ");
+			}
+			System.out.println();
+		}
+	}
+	
+	
+	private PixelIslandList createAs(int[] charsA) throws IOException {
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));
+		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
+		PixelIslandList chars = new PixelIslandList(charactersByHeight.get(10));
+		Collections.sort(chars.getList(), new PixelIslandComparator(
+				PixelIslandComparator.ComparatorType.TOP, PixelIslandComparator.ComparatorType.LEFT));
+		PixelIslandList islandsA = new PixelIslandList();
+		for (int charA : charsA) {
+			PixelIsland island = chars.get(charA);
+			islandsA.add(island);
+		}
+		return islandsA;
 	}
 	
 //	private void debug(PixelIsland pixelIsland, String filename) {

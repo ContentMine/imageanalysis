@@ -1,15 +1,22 @@
 package org.xmlcml.image;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
+import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGRect;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.ThinningService;
 
 public class Util {
+	private final static Logger LOG = Logger.getLogger(Util.class);
 
 	public static BufferedImage thin(BufferedImage image) {
 		ThinningService thinningService = new ThinningService(image);
@@ -26,6 +33,15 @@ public class Util {
 		image = otsuBinarize.getBinarizedImage();
 		return image;
 	}
+
+	public static BufferedImage toGray(BufferedImage image) {
+		OtsuBinarize otsuBinarize = new OtsuBinarize();
+		otsuBinarize.setImage(image);
+		otsuBinarize.toGray();
+		image = otsuBinarize.getGrayImage();
+		return image;
+	}
+	
 	/** extracts a subimage translated to 0,0.
 	 * 
 	 * @param image
@@ -49,6 +65,66 @@ public class Util {
 			}
 		}
 		return subImage;
+	}
+
+	public static double correlateGray(BufferedImage image,
+			BufferedImage image2, String title) {
+		double cor = 0.0;
+		int xrange = Math.min(image.getWidth(), image2.getWidth());
+		int yrange = Math.min(image.getHeight(), image2.getHeight());
+		SVGG g = new SVGG();
+		double total = 0;
+		double sum = 0;
+		Real2 centre = new Real2(0.0, 0.0);
+		Real2 centre2 = new Real2(0.0, 0.0);
+		double sumGray = 0.0;
+		double sumGray2 = 0.0;
+		for (int i = 0; i < xrange; i++) {
+			for (int j = 0; j < yrange; j++) {
+				int gray = getGray(image.getRGB(i,j));
+				int gray2 = getGray(image2.getRGB(i,j));
+				if (gray < 0 || gray2 < 0) {
+					throw new RuntimeException("bad gray value "+Integer.toHexString(gray)+" "+Integer.toHexString(gray2));
+				}
+				int diff = Math.abs(gray - gray2);
+				int max = Math.max(gray, gray2);
+				total += max;
+				int score = max - 2 * diff;
+				sum += score;
+				SVGRect rect = new SVGRect((double)i, (double)j, 1.0, 1.0);
+				Color color = new Color(255-gray, 0, 255-gray2);
+				String colorS = "#"+Integer.toHexString(color.getRGB()).substring(2);
+				rect.setFill(colorS);
+				rect.setStroke("none");
+				g.appendChild(rect);
+				centre.plusEquals(new Real2(i * gray, j * gray));
+				sumGray += gray;
+				centre2.plusEquals(new Real2(i * gray2, j * gray2));
+				sumGray2 += gray2;
+			}
+		}
+//		double scale = 1./(double)(xrange * yrange);
+		centre.multiplyEquals(1./sumGray);
+		centre2.multiplyEquals(1./sumGray2);
+		LOG.debug(centre.format(1)+" >> "+centre2.format(1)+" "+centre.subtract(centre2).format(1));
+		if (title != null) {
+			SVGSVG.wrapAndWriteAsSVG(g, new File("target/corrGreen"+title+".svg"));
+		}
+		cor = sum / total;
+		return cor;
+		
+	}
+
+	/** gets gray value.
+	 * range 0-> ff
+	 * @param rgb assumed to be grayscale (r==g==b)
+	 * @return gray or -1 if not a gray color
+	 */
+	public static int getGray(int rgb) {
+		int r = rgb & 0x00ff0000 / (256*256);
+		int g = rgb & 0x0000ff00 / 256;
+		int b = rgb & 0x000000ff;
+		return (r == g && g == b) ? r : -1;
 	}
 
 }
