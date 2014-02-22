@@ -15,8 +15,8 @@ import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.ThinningService;
 
-public class Util {
-	private final static Logger LOG = Logger.getLogger(Util.class);
+public class ImageUtil {
+	private final static Logger LOG = Logger.getLogger(ImageUtil.class);
 
 	public static BufferedImage thin(BufferedImage image) {
 		ThinningService thinningService = new ThinningService(image);
@@ -106,9 +106,11 @@ public class Util {
 //		double scale = 1./(double)(xrange * yrange);
 		centre.multiplyEquals(1./sumGray);
 		centre2.multiplyEquals(1./sumGray2);
-		LOG.debug(centre.format(1)+" >> "+centre2.format(1)+" "+centre.subtract(centre2).format(1));
 		if (title != null) {
-			SVGSVG.wrapAndWriteAsSVG(g, new File("target/corrGreen"+title+".svg"));
+			LOG.debug(centre.format(1)+" >> "+centre2.format(1)+" "+centre.subtract(centre2).format(1));
+			File file = new File("target/corrGreen/"+title+".svg");
+			file.getParentFile().mkdirs();
+			SVGSVG.wrapAndWriteAsSVG(g, file);
 		}
 		cor = sum / total;
 		return cor;

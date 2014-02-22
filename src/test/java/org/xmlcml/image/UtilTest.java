@@ -39,7 +39,7 @@ public class UtilTest {
 	public void testClipSub() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
 		Int2Range boundingBox = new Int2Range(new IntRange(20, 80), new IntRange(50, 135));
-		BufferedImage subImage = Util.clipSubImage(image, boundingBox);
+		BufferedImage subImage = ImageUtil.clipSubImage(image, boundingBox);
 		ImageIO.write(subImage, "png", new File("target/subImage1.png"));
 	}
 
@@ -51,7 +51,7 @@ public class UtilTest {
 	public void testGray() throws IOException {
 		BufferedImage image = ImageIO.read(new File(Fixtures.PROCESSING_DIR, "colors.png"));
 		Assert.assertNotNull("not null", image);
-		BufferedImage imageg = Util.toGray(image);
+		BufferedImage imageg = ImageUtil.toGray(image);
 		Assert.assertNotNull("not nullg", imageg);
 		Assert.assertEquals(252, imageg.getRGB(10,0) & 0xff);
 		Assert.assertEquals(167, imageg.getRGB(10,140) & 0xff);

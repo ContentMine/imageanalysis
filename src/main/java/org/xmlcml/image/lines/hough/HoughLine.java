@@ -11,7 +11,6 @@ import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Util;
-import org.xmlcml.graphics.svg.SVGLine;
  
 /** 
  * 

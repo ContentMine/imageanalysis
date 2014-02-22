@@ -1,8 +1,6 @@
 package org.xmlcml.image.processing;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +22,7 @@ import org.xmlcml.euclid.RealRange;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.lines.PixelPath;
 
 /** connected list of pixels.
@@ -707,7 +706,13 @@ public class PixelIsland {
 		return include;
 	}
 
-	public double correlation(PixelIsland island2, String title) {
+	/** computes correlations and outputs images.
+	 * 
+	 * @param island2 must be binarized
+	 * @param title if not null creates title.svg
+	 * @return correlation
+	 */
+	public double binaryIslandCorrelation(PixelIsland island2, String title) {
 		Int2Range bbox1 = this.getIntBoundingBox();
 		Int2Range bbox2 = island2.getIntBoundingBox();
 		int xRange1 = bbox1.getXRange().getRange();
@@ -748,7 +753,11 @@ public class PixelIsland {
 				}
 			}
 		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/pixels"+title+".svg"));
+		if (title != null) {
+			File file = new File("target/"+title+".svg");
+			file.getParentFile().mkdirs();
+			SVGSVG.wrapAndWriteAsSVG(g, file);
+		}
 		return score / (xrange * yrange);
 	}
 
@@ -759,6 +768,23 @@ public class PixelIsland {
 		rect.setStroke("none");
 		rect.setFill(color);
 		return rect;
+	}
+
+	/** clips rectangular image from rawImage corespinding to this.
+	 * 
+	 * WARNING. still adjusting inclusive/exclusive clip
+	 * 
+	 * @param rawImage to clip from
+	 * @return image in raw image with same bounding box as this
+	 */
+	public BufferedImage clipSubimage(BufferedImage rawImage) {
+		Int2Range i2r = getIntBoundingBox();
+		// may have clipped 1 pixel too much...
+		IntRange ix = i2r.getXRange();
+		IntRange iy = i2r.getYRange();
+		i2r = new Int2Range(new IntRange(ix.getMin(), ix.getMax()+1), new IntRange(iy.getMin(), iy.getMax()+1));
+		BufferedImage subImage = ImageUtil.clipSubImage(rawImage, i2r);
+		return subImage;
 	}
 
 }

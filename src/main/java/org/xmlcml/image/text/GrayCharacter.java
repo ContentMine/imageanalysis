@@ -9,7 +9,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.Util;
+import org.xmlcml.image.ImageUtil;
 
 public class GrayCharacter {
 
@@ -24,7 +24,7 @@ public class GrayCharacter {
 	private double sum;
 
 	GrayCharacter(BufferedImage image) {
-		this.image = Util.toGray(image);
+		this.image = ImageUtil.toGray(image);
 		this.width = image.getWidth();
 		this.height = image.getHeight();
 	}
@@ -44,8 +44,8 @@ public class GrayCharacter {
 			sum = 0;
 			for (int x = 0; x < xrange; x++) {
 				for (int y = 0; y < yrange; y++) {
-					int gray = Util.getGray(this.image.getRGB(x,y));
-					int gray2 = Util.getGray(character2.image.getRGB(x,y));
+					int gray = ImageUtil.getGray(this.image.getRGB(x,y));
+					int gray2 = ImageUtil.getGray(character2.image.getRGB(x,y));
 					addGrayComponentsToTotals(character2, gray, gray2);
 					if (title != null) {
 						drawPixel(g, x, y, gray, gray2);
@@ -89,7 +89,7 @@ public class GrayCharacter {
 		double sumGray = 0.0;
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				int gray = Util.getGray(image.getRGB(x,y));
+				int gray = ImageUtil.getGray(image.getRGB(x,y));
 				if (gray < 0) {
 					throw new RuntimeException("bad gray value "+Integer.toHexString(gray));
 				}

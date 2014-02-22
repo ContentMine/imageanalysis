@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
-import org.xmlcml.image.Util;
+import org.xmlcml.image.ImageUtil;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -67,19 +67,57 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public List<PixelIsland> getList() {
 		return list;
 	}
-	
+
+	/** creates islands 
+	 * 
+	 * @param file of image
+	 * @param operations BINARIZE and THIN
+	 * @return island list
+	 * @throws IOException
+	 */
 	public static PixelIslandList createPixelIslandList(File file, Operation... operations) throws IOException {
 		BufferedImage image = ImageIO.read(file);
+		return createPixelIslandList(image, operations);
+	}
+
+	/** creates PixelIslands ffrom iamge using floodfill.
+	 * 
+	 * @param image
+	 * @param operations optionally BINARIZE and THIN (maybe better done elsewhere)
+	 * @return
+	 * @throws IOException
+	 */
+	public static PixelIslandList createPixelIslandList(BufferedImage image,
+			Operation... operations) throws IOException {
 		List<Operation> opList = Arrays.asList(operations);
+		LOG.debug("pre-bin");
 		if (opList.contains(Operation.BINARIZE)) {
-			image = Util.binarize(image);
+			image = ImageUtil.binarize(image);
 		}
 	    if (opList.contains(Operation.THIN)) {
-			image = Util.thin(image);
+			image = ImageUtil.thin(image);
 	    }
-		PixelIslandList islands = PixelIsland.createPixelIslandList(image);
+		LOG.debug("postbin ");
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
 		return islands;
 	}
+
+	/** find all separated islands.
+	 *  
+	 * creates a FloodFill and extracts Islands from it.
+	 * diagonal set to true
+	 * @param image
+	 * @return
+	 * @throws IOException
+	 */
+	public static PixelIslandList createPixelIslandList(BufferedImage image) throws IOException {
+		FloodFill floodFill = new FloodFill(image);
+		floodFill.setDiagonal(true);
+		floodFill.fill();
+		PixelIslandList islandList = floodFill.getPixelIslandList();
+		return islandList;
+	}
+	
 
 	public PixelIslandList smallerThan(Real2 box) {
 		List<PixelIsland> newList = new ArrayList<PixelIsland>();
@@ -122,7 +160,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public double correlation(int i, int j) {
-		return list.get(i).correlation(list.get(j), i+"-"+j);
+		return list.get(i).binaryIslandCorrelation(list.get(j), i+"-"+j);
 	}
 
 }

@@ -29,6 +29,7 @@ import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.lines.DouglasPeucker;
 import org.xmlcml.image.lines.PixelPath;
 import org.xmlcml.image.processing.PixelIslandList.Operation;
@@ -314,7 +315,7 @@ public class PixelIslandTest {
 		LOG.debug(islands.get(0).size());
 		Assert.assertTrue(islands.size() > 2000);
 		Assert.assertEquals(2224, islands.size());
-		debug(islands, "target/largePhyloBoxes.svg");
+		plotBoxes(islands, "target/largePhyloBoxes.svg");
 	}
 
 //	@Test
@@ -334,12 +335,12 @@ public class PixelIslandTest {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Assert.assertEquals("all chars", 2206, characters.size());
-		debug(characters, "target/charsHeight.svg");
+		plotBoxes(characters, "target/charsHeight.svg");
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
-			debug(charsi, "target/chars"+height+".svg");
+			plotBoxes(charsi, "target/chars"+height+".svg");
 		}
 	}
 
@@ -349,7 +350,7 @@ public class PixelIslandTest {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 20.), new RealRange(0., 1.));
 		Assert.assertEquals("all chars", 287, characters.size());
-		debug(characters, "target/chars0-1.svg");
+		plotBoxes(characters, "target/chars0-1.svg");
 	}
 
 	@Test
@@ -357,7 +358,7 @@ public class PixelIslandTest {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 20.), new RealRange(12., 25.));
 		Assert.assertEquals("all chars", 54, characters.size());
-		debug(characters, "target/charsHeightLarge.svg");
+		plotBoxes(characters, "target/charsHeightLarge.svg");
 	}
 
 	@Test
@@ -369,18 +370,23 @@ public class PixelIslandTest {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Assert.assertEquals("all chars", 2240, characters.size());
-		debug(characters, "target/charsHeight.svg");
+		plotBoxes(characters, "target/charsHeight.svg");
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
 			LOG.debug(height+" "+charsi.size());
-			debug(charsi, "target/charsNoThin"+height+".svg");
+			plotBoxes(charsi, "target/charsNoThin"+height+".svg");
 		}
 	}
 
 	@Test
-	public void testLargePhyloJpgCharsReconstruct() throws IOException {
+	/** finds and correlates bracket characters which are ca 21 pixels high.
+	 * 
+	 *  creates plot in target/brackets/i_j.svg
+	 * @throws IOException
+	 */
+	public void testLargeBrackets() throws IOException {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
@@ -388,8 +394,8 @@ public class PixelIslandTest {
 		int nchar = brackets.size();
 		Assert.assertEquals("bracket", 8, nchar);
 		for (int i = 0; i < nchar; i++) {
-			for (int j = i; j < nchar; j++) {
-				double cor = Util.format(brackets.get(i).correlation(brackets.get(j), i+" "+j), 2);
+			for (int j = 0; j <= i; j++) {
+				double cor = Util.format(brackets.get(i).binaryIslandCorrelation(brackets.get(j), "brackets/"+i+"_"+j), 2);
 				System.out.print(cor+" ");
 			}
 			System.out.println();
@@ -426,7 +432,7 @@ public class PixelIslandTest {
 			groupList.add(newList);
 			for (int j = i+1; j < nchar; j++) {
 				if (usedSet.contains(j)) continue;
-				double cor = Util.format(chars.get(i).correlation(chars.get(j), "dummy"), 2);
+				double cor = Util.format(chars.get(i).binaryIslandCorrelation(chars.get(j), "dummy"), 2);
 				if (cor > correlation) {
 					newList.add(j);
 					usedSet.add(j);
@@ -447,10 +453,10 @@ public class PixelIslandTest {
 			text.setFontSize(20.0);
 			text.setFill("green");
 			allg.appendChild(gk);
-			SVGSVG.wrapAndWriteAsSVG(g, new File("target/charsCorr"+newList.get(0)+".svg"));
+			SVGSVG.wrapAndWriteAsSVG(g, new File("target/charsCorr/"+newList.get(0)+".svg"));
 			System.out.println();
 		}
-		SVGSVG.wrapAndWriteAsSVG(allg, new File("target/charsCorrAll.svg"));
+		SVGSVG.wrapAndWriteAsSVG(allg, new File("target/charsCorr/All.svg"));
 		Collections.sort(groupList, new ListComparator());
 		for (List<Integer> listi : groupList) {
 			System.out.println(listi);
@@ -473,12 +479,6 @@ public class PixelIslandTest {
 				1,2 // dummies
 		};
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-//		ImageIO.write(rawImage, "jpg", new File("target/test.jpg"));
-//		ImageIO.write(rawImage, "png", new File("target/test.png"));
-//		BufferedImage subImage = org.xmlcml.image.Util.clipSubImage(rawImage, new Int2Range(new IntRange(50, 100), new IntRange(150, 300)));
-//		Assert.assertEquals(50, subImage.getWidth());
-//		Assert.assertEquals(150, subImage.getHeight());
-//		ImageIO.write(subImage, "png", new File("target/testclip.png"));
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
@@ -490,14 +490,14 @@ public class PixelIslandTest {
 			PixelIsland island = chars.get(charA);
 			islandsA.add(island);
 			Int2Range ibbox = island.getIntBoundingBox();
-			BufferedImage subImage1 = org.xmlcml.image.Util.clipSubImage(rawImage, ibbox);
-			ImageIO.write(subImage1, "png", new File("target/clip"+charA+".png"));
+			BufferedImage subImage1 = org.xmlcml.image.ImageUtil.clipSubImage(rawImage, ibbox);
+			ImageIO.write(subImage1, "png", new File("target/clip/"+charA+".png"));
 		}
 		int nchar = islandsA.size();
 		System.out.println("size: "+nchar);
 		for (int i = 0; i < nchar; i++) {
 			for (int j = i; j < nchar; j++) {
-				double cor = Util.format(islandsA.get(i).correlation(islandsA.get(j), i+"-"+j), 2);
+				double cor = Util.format(islandsA.get(i).binaryIslandCorrelation(islandsA.get(j), "/charsA_"+i+"-"+j), 2);
 				System.out.print(i+"-"+j+": "+cor+" ");
 			}
 			System.out.println();
@@ -518,26 +518,124 @@ public class PixelIslandTest {
 //				1,2 // dummies
 		};
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		Assert.assertNotNull("rawImage not null", rawImage);
 		PixelIslandList islandsA = createAs(charsA);
 		List<BufferedImage> subImageList = new ArrayList<BufferedImage>();
 		for (int i = 0; i < charsA.length; i++) {
 			Int2Range ibbox = islandsA.get(i).getIntBoundingBox();
-			BufferedImage subImage1 = org.xmlcml.image.Util.clipSubImage(rawImage, ibbox);
+			BufferedImage subImage1 = org.xmlcml.image.ImageUtil.clipSubImage(rawImage, ibbox);
+			Assert.assertNotNull("subImage1 not null", subImage1);
+			Assert.assertNotNull("charsA[i] not null", charsA[i]);
 			subImageList.add(subImage1);
-			ImageIO.write(subImage1, "png", new File("target/clip"+charsA[i]+".png"));
+			File file = new File("target/charsA/"+charsA[i]+".png");
+			file.getParentFile().mkdirs();
+			ImageIO.write(subImage1, "png", file);
 		}
 		int nchar = islandsA.size();
 		System.out.println("size: "+nchar);
 		for (int i = 0; i < nchar; i++) {
 			for (int j = 0; j <= i; j++) {
-				double cor = Util.format(org.xmlcml.image.Util.correlateGray(subImageList.get(i), subImageList.get(j), i+"__"+j), 2);
+				double cor = Util.format(org.xmlcml.image.ImageUtil.correlateGray(subImageList.get(i), subImageList.get(j), "charsA/"+i+"__"+j), 2);
 				System.out.print(i+"-"+j+": "+cor+" ");
 			}
 			System.out.println();
 		}
 	}
 	
+	@Test
+	/** find all As of size 10.
+	 * 
+	 */
+	public void testFindCharsA() throws IOException {
+		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		extractCharacters(rawImage, "A10", 0.27);
+	}
+		
+	@Test
+	/** find all As of size 10.
+	 * 
+	 */
+	public void testFindCharsAny() throws IOException {
+		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		extractCharacters(rawImage, "A10", 0.30);
+		extractCharacters(rawImage, "A10b", 0.27);
+		extractCharacters(rawImage, "a10sb", 0.27);
+		extractCharacters(rawImage, "B10", 0.70);
+		extractCharacters(rawImage, "B10b", 0.27);
+		extractCharacters(rawImage, "C10", 0.27);
+		extractCharacters(rawImage, "C10b", 0.27);
+		extractCharacters(rawImage, "D10", 0.60);
+		extractCharacters(rawImage, "D10b", 0.40);
+		extractCharacters(rawImage, "d10sb", 0.40);
+		extractCharacters(rawImage, "E10", 0.50);
+		extractCharacters(rawImage, "G10", 0.27);
+		extractCharacters(rawImage, "G10b", 0.27);
+		extractCharacters(rawImage, "g10sb", 0.27);
+		extractCharacters(rawImage, "H10", 0.52);
+		extractCharacters(rawImage, "L10b", 0.50);
+		extractCharacters(rawImage, "O10b", 0.27);
+////		extractCharacters(rawImage, "P10", 0.27); // isn't any
+		extractCharacters(rawImage, "P10b", 0.27);
+		extractCharacters(rawImage, "R10", 0.70);
+		extractCharacters(rawImage, "S10", 0.50);
+		extractCharacters(rawImage, "S10b", 0.27);
+		extractCharacters(rawImage, "T10", 0.50);
+		extractCharacters(rawImage, "T10b", 0.50);
+		extractCharacters(rawImage, "y10sb", 0.60);
+	}
 	
+	@Test
+	public void extractCharsToImages() throws IOException {
+		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		for (int h = 5; h < 10; h++) {
+			PixelIslandList characters = islands.isContainedIn(new RealRange(/*w - 1, w + 1*/ 0, 15), new RealRange(h - 1, h + 1));
+			int c = 0;
+			for (PixelIsland island : characters) {
+				Int2Range i2r = island.getIntBoundingBox();
+				IntRange ix = i2r.getXRange();
+				IntRange iy = i2r.getYRange();
+				Int2Range i2ra = new Int2Range(new IntRange(ix.getMin(), ix.getMax()+1),new IntRange(iy.getMin(), iy.getMax()+1)); 
+				BufferedImage image = ImageUtil.clipSubImage(rawImage, i2ra);
+				outputPng("target/rawChars/"+h+"/"+c+".png", image);
+				c++;
+			}
+		}
+	}
+
+	private void extractCharacters(BufferedImage rawImage, PixelIslandList islands, String charname, double correlationCutoff) throws IOException {
+		LOG.debug("charname "+charname);
+		BufferedImage image = ImageIO.read(new File("src/test/resources/org/xmlcml/image/text/chars/"+charname+".png"));
+		int w = image.getWidth();
+		int h = image.getHeight();
+		LOG.debug("charname "+w+" "+h);
+		extractCharacterImages(rawImage, charname, correlationCutoff, image, w, h, islands);
+	}
+
+	private void extractCharacterImages(BufferedImage rawImage, String charname,
+			double correlationCutoff, BufferedImage characterImage, int w, int h,
+			PixelIslandList islands) throws IOException {
+		PixelIslandList characters = islands.isContainedIn(new RealRange(w - 1, w + 1), new RealRange(h - 1, h + 1));
+		int i = 0;
+		for (PixelIsland characterIsland : characters) {
+			BufferedImage image1 = characterIsland.clipSubimage(rawImage);
+			double corr = ImageUtil.correlateGray(characterImage, image1, null /**"charACorr/"+charname+"/"+i */);
+			if (corr > correlationCutoff) {
+				System.out.println("corr "+i+" "+Util.format(corr, 2));
+				PixelIslandTest.outputPng("target/charACorr/"+charname+"/"+i+".png", image1);
+			}
+			i++;
+		}
+	}
+
+	public static void outputPng(String filename, BufferedImage image1)
+			throws IOException {
+		File file = new File(filename);
+		file.getParentFile().mkdirs();
+		ImageIO.write(image1, "png", file);
+	}
+		
 	private PixelIslandList createAs(int[] charsA) throws IOException {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));
@@ -553,35 +651,25 @@ public class PixelIslandTest {
 		return islandsA;
 	}
 	
-//	private void debug(PixelIsland pixelIsland, String filename) {
-//		SVGG g = pixelIsland.createSVG(true);
-//		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
-//	}
-
 	@Test
 	@Ignore // it looks like a bad idea to omit binarization on antialised jpegs.
 	public void testLargePhyloJpgCharsRaw() throws IOException {
-		int heightCount[] = new int[] {
-//				155,152,18,43,5,9,428,619,6,391, // 0-9
-//				304,33,3,15,13,9,5,0,2,3,           //10-19                      
-//				0,3,2,1,0,0};
-		};
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Assert.assertEquals("all chars", 4146, characters.size());
-		debug(characters, "target/charsRaw.svg");
+		plotBoxes(characters, "target/charsRaw/all.svg");
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 //			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
 			LOG.debug(height+" "+charsi.size());
-			debug(charsi, "target/charsRaw"+height+".svg");
+			plotBoxes(charsi, "target/charsRaw/"+height+".svg");
 		}
 	}
 
 	// =============================================================
 
-	private void debug(PixelIslandList islands, String filename) {
+	private void plotBoxes(PixelIslandList islands, String filename) {
 		SVGG g = new SVGG();
 		for (PixelIsland island : islands) {
 			Real2Range bbox = island.getBoundingBox();
@@ -596,7 +684,9 @@ public class PixelIslandTest {
 				g.appendChild(ggg);
 			}
 		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
+		File file = new File(filename);
+		file.getParentFile().mkdirs();
+		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
 	
 	// =====================================================

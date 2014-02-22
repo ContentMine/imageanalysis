@@ -4,14 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.processing.PixelIsland;
 
 public class DouglasPeuckerTest {
 	@Test

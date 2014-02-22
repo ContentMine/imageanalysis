@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
 
 
 	/*
