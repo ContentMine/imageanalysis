@@ -96,22 +96,6 @@ public class PixelIsland {
 		indexPixelsAndUpdateMetadata();
 	}
 	
-	/** find all separated islands.
-	 *  
-	 * creates a FloodFill and extracts Islands from it.
-	 * diagonal set to true
-	 * @param image
-	 * @return
-	 * @throws IOException
-	 */
-	public static PixelIslandList createPixelIslandList(BufferedImage image) throws IOException {
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.setDiagonal(true);
-		floodFill.fill();
-		PixelIslandList islandList = floodFill.getPixelIslandList();
-		return islandList;
-	}
-	
 	public Real2Range getBoundingBox() {
 		Real2Range r2r = new Real2Range();
 		for (Pixel pixel : pixelList) {

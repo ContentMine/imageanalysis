@@ -21,6 +21,7 @@ import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGElement;
@@ -301,7 +302,7 @@ public class PixelIslandTest {
 	
 	@Test
 	public void testBoundingBoxes() throws IOException {
-		PixelIslandList islands = PixelIsland.createPixelIslandList(ImageIO.read(Fixtures.MALTORYZINE_PNG));
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(ImageIO.read(Fixtures.MALTORYZINE_PNG));
 		for (PixelIsland island : islands) {
 			Real2Range bbox = island.getBoundingBox();
 			LOG.debug(island+" "+bbox);
@@ -491,7 +492,14 @@ public class PixelIslandTest {
 			islandsA.add(island);
 			Int2Range ibbox = island.getIntBoundingBox();
 			BufferedImage subImage1 = org.xmlcml.image.ImageUtil.clipSubImage(rawImage, ibbox);
-			ImageIO.write(subImage1, "png", new File("target/clip/"+charA+".png"));
+			if (subImage1 == null) {
+				LOG.error("null subImage");
+			} else {
+				LOG.debug(ibbox);
+				File file = new File("target/clip/"+charA+".png");
+				file.getParentFile().mkdirs();
+				ImageIO.write(subImage1, "png", file);
+			}
 		}
 		int nchar = islandsA.size();
 		System.out.println("size: "+nchar);
@@ -548,7 +556,8 @@ public class PixelIslandTest {
 	 */
 	public void testFindCharsA() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		extractCharacters(rawImage, "A10", 0.27);
+		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
+		extractCharactersAndCorrelate(rawImage, islands, "A10", 0.27);
 	}
 		
 	@Test
@@ -558,31 +567,31 @@ public class PixelIslandTest {
 	public void testFindCharsAny() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
-		extractCharacters(rawImage, "A10", 0.30);
-		extractCharacters(rawImage, "A10b", 0.27);
-		extractCharacters(rawImage, "a10sb", 0.27);
-		extractCharacters(rawImage, "B10", 0.70);
-		extractCharacters(rawImage, "B10b", 0.27);
-		extractCharacters(rawImage, "C10", 0.27);
-		extractCharacters(rawImage, "C10b", 0.27);
-		extractCharacters(rawImage, "D10", 0.60);
-		extractCharacters(rawImage, "D10b", 0.40);
-		extractCharacters(rawImage, "d10sb", 0.40);
-		extractCharacters(rawImage, "E10", 0.50);
-		extractCharacters(rawImage, "G10", 0.27);
-		extractCharacters(rawImage, "G10b", 0.27);
-		extractCharacters(rawImage, "g10sb", 0.27);
-		extractCharacters(rawImage, "H10", 0.52);
-		extractCharacters(rawImage, "L10b", 0.50);
-		extractCharacters(rawImage, "O10b", 0.27);
-////		extractCharacters(rawImage, "P10", 0.27); // isn't any
-		extractCharacters(rawImage, "P10b", 0.27);
-		extractCharacters(rawImage, "R10", 0.70);
-		extractCharacters(rawImage, "S10", 0.50);
-		extractCharacters(rawImage, "S10b", 0.27);
-		extractCharacters(rawImage, "T10", 0.50);
-		extractCharacters(rawImage, "T10b", 0.50);
-		extractCharacters(rawImage, "y10sb", 0.60);
+		extractCharactersAndCorrelate(rawImage, islands, "A10", 0.30);
+		extractCharactersAndCorrelate(rawImage, islands, "A10b", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "a10sb", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "B10", 0.70);
+		extractCharactersAndCorrelate(rawImage, islands, "B10b", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "C10", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "C10b", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "D10", 0.60);
+		extractCharactersAndCorrelate(rawImage, islands, "D10b", 0.40);
+		extractCharactersAndCorrelate(rawImage, islands, "d10sb", 0.40);
+		extractCharactersAndCorrelate(rawImage, islands, "E10", 0.50);
+		extractCharactersAndCorrelate(rawImage, islands, "G10", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "G10b", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "g10sb", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "H10", 0.52);
+		extractCharactersAndCorrelate(rawImage, islands, "L10b", 0.50);
+		extractCharactersAndCorrelate(rawImage, islands, "O10b", 0.27);
+////		extractCharacters(rawImage, islands, "P10", 0.27); // isn't any
+		extractCharactersAndCorrelate(rawImage, islands, "P10b", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "R10", 0.70);
+		extractCharactersAndCorrelate(rawImage, islands, "S10", 0.50);
+		extractCharactersAndCorrelate(rawImage, islands, "S10b", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "T10", 0.50);
+		extractCharactersAndCorrelate(rawImage, islands, "T10b", 0.50);
+		extractCharactersAndCorrelate(rawImage, islands, "y10sb", 0.60);
 	}
 	
 	@Test
@@ -604,26 +613,29 @@ public class PixelIslandTest {
 		}
 	}
 
-	private void extractCharacters(BufferedImage rawImage, PixelIslandList islands, String charname, double correlationCutoff) throws IOException {
+	private void extractCharactersAndCorrelate(BufferedImage rawImage, PixelIslandList islands, String charname, double correlationCutoff) throws IOException {
 		LOG.debug("charname "+charname);
 		BufferedImage image = ImageIO.read(new File("src/test/resources/org/xmlcml/image/text/chars/"+charname+".png"));
 		int w = image.getWidth();
 		int h = image.getHeight();
 		LOG.debug("charname "+w+" "+h);
-		extractCharacterImages(rawImage, charname, correlationCutoff, image, w, h, islands);
+		extractCharacterImagesAndCorrelate(rawImage, charname, correlationCutoff, image, w, h, islands);
 	}
 
-	private void extractCharacterImages(BufferedImage rawImage, String charname,
-			double correlationCutoff, BufferedImage characterImage, int w, int h,
+	private void extractCharacterImagesAndCorrelate(BufferedImage rawImage, String charname,
+			double correlationCutoff, BufferedImage characterImage, int selectionWidth, int selectionHeight,
 			PixelIslandList islands) throws IOException {
-		PixelIslandList characters = islands.isContainedIn(new RealRange(w - 1, w + 1), new RealRange(h - 1, h + 1));
+		PixelIslandList charactersOfCorrectSize = islands.isContainedIn(
+				new RealRange(selectionWidth - 1, selectionWidth + 1), 
+				new RealRange(selectionHeight - 1, selectionHeight + 1));
 		int i = 0;
-		for (PixelIsland characterIsland : characters) {
-			BufferedImage image1 = characterIsland.clipSubimage(rawImage);
-			double corr = ImageUtil.correlateGray(characterImage, image1, null /**"charACorr/"+charname+"/"+i */);
+		for (PixelIsland characterIsland : charactersOfCorrectSize) {
+			BufferedImage subImage = characterIsland.clipSubimage(rawImage);
+			// if charname is not null saves overlaid images (arrgh!)
+			double corr = ImageUtil.correlateGray(characterImage, subImage, null /**"charACorr/"+charname+"/"+i */);
 			if (corr > correlationCutoff) {
 				System.out.println("corr "+i+" "+Util.format(corr, 2));
-				PixelIslandTest.outputPng("target/charACorr/"+charname+"/"+i+".png", image1);
+				PixelIslandTest.outputPng("target/charACorr/"+charname+"/"+i+".png", subImage);
 			}
 			i++;
 		}
@@ -698,7 +710,7 @@ public class PixelIslandTest {
 	}
 
 	private PixelIsland createFirstPixelIsland(File file) throws IOException {
-		return PixelIsland.createPixelIslandList(ImageIO.read(file)).get(0);
+		return PixelIslandList.createPixelIslandList(ImageIO.read(file)).get(0);
 	}
 
 
