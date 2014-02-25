@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -128,5 +129,57 @@ public class ImageUtil {
 		int b = rgb & 0x000000ff;
 		return (r == g && g == b) ? r : -1;
 	}
+
+	/** extracts matrix from grayImage.
+	 * 
+	 * @param image
+	 * @return matrix (null if not a gray image)
+	 */
+	public static RealMatrix getGrayMatrix(BufferedImage image) {
+		int cols = image.getWidth();
+		int rows = image.getHeight();
+		RealMatrix matrix = new RealMatrix(rows, cols, 0.0);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				int gray = ImageUtil.getGray(image.getRGB(j, i));
+				matrix.setElementAt(i,  j, (double) gray);
+			}
+		}
+		return matrix;
+	}
+
+	/** creates image from RealMatrix..
+	 * 
+	 * @param matrix values must be 0<=val<=255
+	 * @return images values are clipped to 0<v<255 without warning 
+	 */
+	public static BufferedImage putGrayMatrix(RealMatrix matrix) {
+		int cols = matrix.getCols();
+		int rows = matrix.getRows();
+		LOG.debug("rc "+rows+" "+cols);
+		BufferedImage image = new BufferedImage(cols, rows, BufferedImage.TYPE_BYTE_GRAY);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				LOG.debug(i+" "+j);
+				int gray = (int) matrix.elementAt(i, j);
+				if (gray < 0) {
+					gray = 0;
+				} else if (gray > 255) {
+					gray = 255;
+				}
+				int grayColor = 256*256*gray + 256 * gray + gray; 
+				image.setRGB(j, i, grayColor);
+			}
+		}
+		return image;
+	}
+
+	public static BufferedImage shiftImage(BufferedImage image, double deltax, double deltay) {
+		RealMatrix matrix = ImageUtil.getGrayMatrix(image);
+		RealMatrix shiftedMatrix = matrix.createMatrixWithOriginShifted(deltax, deltay);
+		BufferedImage shiftedImage = ImageUtil.putGrayMatrix(shiftedMatrix);
+		return shiftedImage;
+	}
+	
 
 }

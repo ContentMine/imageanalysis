@@ -124,6 +124,8 @@ public class Fixtures {
 			new Pixel(new Point(1, 4)), 
 			new Pixel(new Point(2, 3)), 
 			});
+	
+	public static File CHAR_DIR = new File(Fixtures.TEXT_DIR, "chars");
 
 	
 }

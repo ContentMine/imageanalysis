@@ -23,7 +23,7 @@ public class GrayCharacter {
 
 	private double sum;
 
-	GrayCharacter(BufferedImage image) {
+	public GrayCharacter(BufferedImage image) {
 		this.image = ImageUtil.toGray(image);
 		this.width = image.getWidth();
 		this.height = image.getHeight();

@@ -21,7 +21,7 @@ import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealArray;
+import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGElement;
@@ -549,7 +549,7 @@ public class PixelIslandTest {
 			System.out.println();
 		}
 	}
-	
+
 	@Test
 	/** find all As of size 10.
 	 * 

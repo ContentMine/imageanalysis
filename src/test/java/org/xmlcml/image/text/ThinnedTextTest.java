@@ -98,7 +98,7 @@ public class ThinnedTextTest {
 	// poor
 	public void testGraph1() throws Exception {
 		binarizethin("bmcgraph.jpg");
-		binarizethin("bmcgraph1.jpg");
+//		binarizethin("bmcgraph1.jpg");
 		binarizethin("bmcgraph2.jpg"); //small
 	}
 

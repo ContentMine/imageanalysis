@@ -12,6 +12,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.RealMatrix;
+import org.xmlcml.image.text.GrayCharacter;
 
 public class UtilTest {
 
@@ -61,5 +64,39 @@ public class UtilTest {
 		Assert.assertEquals(252, imageg.getRGB(30,120) & 0xff);
 		ImageIO.write(imageg, "png", new File("target/gray.png"));
 	}
-	
+
+	@Test
+	/** shifts image by dx dy.
+	 * 
+	 */
+	public void testReadGrayImage() throws IOException {
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		RealMatrix matrix = ImageUtil.getGrayMatrix(image);
+		System.out.println(matrix);
+	}
+
+	@Test
+	/** shifts image by dx dy.
+	 * 
+	 */
+	public void testShiftGrayImage() throws IOException {
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 0.1, 0.2);
+		ImageIO.write(shiftedImage, "png", new File("target/shiftedImage.png"));
+	}
+
+	@Test
+	/** shifts image to  centre.
+	 * 
+	 */
+	public void testShiftGrayImageToCentre() throws IOException {
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		GrayCharacter character = new GrayCharacter(image);
+		Real2 centre = character.getCentre();
+//		LOG.debug(centre);
+		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 4-centre.getX(), 5-centre.getY());
+		ImageIO.write(shiftedImage, "png", new File("target/shiftedImage1.png"));
+	}
+
+
 }
