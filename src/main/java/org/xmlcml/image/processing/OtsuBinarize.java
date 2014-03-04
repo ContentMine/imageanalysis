@@ -17,7 +17,7 @@ public class OtsuBinarize {
  
     private BufferedImage original, grayscale, binarized, current;
 	private int[] histograms;
-	private BufferedImage gray;
+	private BufferedImage grayImage;
 	private int threshold;
 	private BufferedImage sharp;
 
@@ -72,7 +72,7 @@ public class OtsuBinarize {
         int alpha, red, green, blue;
         int newPixel;
  
-        gray = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+        grayImage = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
  
         for(int i=0; i<original.getWidth(); i++) {
             for(int j=0; j<original.getHeight(); j++) {
@@ -88,25 +88,25 @@ public class OtsuBinarize {
                 newPixel = colorToRGB(alpha, red, red, red);
  
                 // Write pixels into image
-                gray.setRGB(i, j, newPixel);
+                grayImage.setRGB(i, j, newPixel);
  
             }
         }
  
-        current = gray;
-        return gray;
+        current = grayImage;
+        return grayImage;
  
     }
     
     public void sharpenGray() {
         sharp = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
-        for(int i=1; i<gray.getWidth()-1; i++) {
-            for(int j=0; j<gray.getHeight(); j++) {
-            	Color col0 = new Color(gray.getRGB(i-1, j));
+        for(int i=1; i<grayImage.getWidth()-1; i++) {
+            for(int j=0; j<grayImage.getHeight(); j++) {
+            	Color col0 = new Color(grayImage.getRGB(i-1, j));
             	int gray0 = col0.getRed();
-            	Color col1 = new Color(gray.getRGB(i, j));
+            	Color col1 = new Color(grayImage.getRGB(i, j));
             	int gray1 = col1.getRed();
-            	Color col2 = new Color(gray.getRGB(i+1, j));
+            	Color col2 = new Color(grayImage.getRGB(i+1, j));
             	int gray2 = col2.getRed();
             	int grayNew =  -gray0 + 3*gray1 -gray2;
             	if (grayNew < 0 ) {
@@ -217,7 +217,7 @@ public class OtsuBinarize {
 	}
 
 	public BufferedImage getGrayImage() {
-		return gray;
+		return grayImage;
 	}
 
  

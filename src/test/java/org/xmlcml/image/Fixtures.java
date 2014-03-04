@@ -62,6 +62,7 @@ public class Fixtures {
 	public static final File TIMES_GIF = new File(TEXT_DIR, "times.gif");
 	public static final File LARGE_PHYLO_JPG = new File(Fixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
 	
+	
 	public static List<Pixel> LINE_LIST = Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(1, 2)),

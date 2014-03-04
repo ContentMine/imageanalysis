@@ -754,7 +754,7 @@ public class PixelIsland {
 		return rect;
 	}
 
-	/** clips rectangular image from rawImage corespinding to this.
+	/** clips rectangular image from rawImage corresponding to this.
 	 * 
 	 * WARNING. still adjusting inclusive/exclusive clip
 	 * 

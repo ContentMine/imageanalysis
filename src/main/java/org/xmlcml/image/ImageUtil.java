@@ -7,6 +7,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealMatrix;
@@ -35,7 +36,7 @@ public class ImageUtil {
 		return image;
 	}
 
-	public static BufferedImage toGray(BufferedImage image) {
+	public static BufferedImage binarizeToGray(BufferedImage image) {
 		OtsuBinarize otsuBinarize = new OtsuBinarize();
 		otsuBinarize.setImage(image);
 		otsuBinarize.toGray();
@@ -82,8 +83,8 @@ public class ImageUtil {
 		double sumGray2 = 0.0;
 		for (int i = 0; i < xrange; i++) {
 			for (int j = 0; j < yrange; j++) {
-				int gray = getGray(image.getRGB(i,j));
-				int gray2 = getGray(image2.getRGB(i,j));
+				int gray = getGray(image, i,j);
+				int gray2 = getGray(image2, i,j);
 				if (gray < 0 || gray2 < 0) {
 					throw new RuntimeException("bad gray value "+Integer.toHexString(gray)+" "+Integer.toHexString(gray2));
 				}
@@ -109,25 +110,50 @@ public class ImageUtil {
 		centre2.multiplyEquals(1./sumGray2);
 		if (title != null) {
 			LOG.debug(centre.format(1)+" >> "+centre2.format(1)+" "+centre.subtract(centre2).format(1));
-			File file = new File("target/corrGreen/"+title+".svg");
+			File file = new File("target/corrPixels/"+title+".svg");
 			file.getParentFile().mkdirs();
 			SVGSVG.wrapAndWriteAsSVG(g, file);
 		}
 		cor = sum / total;
 		return cor;
-		
 	}
 
 	/** gets gray value.
+	 * 
+	 * this is messier than I thought - need a formal library.
+	 * 
 	 * range 0-> ff
 	 * @param rgb assumed to be grayscale (r==g==b)
 	 * @return gray or -1 if not a gray color
 	 */
 	public static int getGray(int rgb) {
-		int r = rgb & 0x00ff0000 / (256*256);
-		int g = rgb & 0x0000ff00 / 256;
-		int b = rgb & 0x000000ff;
-		return (r == g && g == b) ? r : -1;
+		int gray = -1; // no color
+		if (rgb == 0) {
+			gray = 255; // assume transparent?
+		} else {
+			int alpha = ((rgb & 0xff000000) >> 24) & 0x000000ff;
+			int r = ((rgb & 0x00ff0000) >> 16) & 0x000000ff;
+			int g = ((rgb & 0x0000ff00) >> 8) & 0x000000ff;
+			int b = (rgb & 0x000000ff) & 0x000000ff;
+			if (r == 0 && g == 0 && b == 0) {
+				gray = 255 - alpha; // black seems to be #ff000000
+			} else if (r == g && g == b) {
+				gray = r; // omit transparent 
+			} else {
+				throw new RuntimeException("unprocessable value: "+Integer.toHexString(rgb));
+			}
+		}
+		if (gray == -1) {
+			throw new RuntimeException("unprocessed value: "+Integer.toHexString(rgb));
+		}
+		if (gray != 0) {
+//			System.out.print(gray+" ");
+		}
+		return gray;
+	}
+	
+	public static int getGray(BufferedImage image, int x, int y) {
+		return getGray(image.getRGB(x, y));
 	}
 
 	/** extracts matrix from grayImage.
@@ -135,15 +161,17 @@ public class ImageUtil {
 	 * @param image
 	 * @return matrix (null if not a gray image)
 	 */
-	public static RealMatrix getGrayMatrix(BufferedImage image) {
+	public static IntMatrix getGrayMatrix(BufferedImage image) {
 		int cols = image.getWidth();
 		int rows = image.getHeight();
-		RealMatrix matrix = new RealMatrix(rows, cols, 0.0);
+		IntMatrix matrix = new IntMatrix(rows, cols, 0);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				int gray = ImageUtil.getGray(image.getRGB(j, i));
-				matrix.setElementAt(i,  j, (double) gray);
+				int gray = ImageUtil.getGray(image, j, i);
+				//System.out.print(Integer.toHexString(gray)+" ");
+				matrix.setElementAt(i,  j, gray);
 			}
+//			System.out.println();
 		}
 		return matrix;
 	}
@@ -153,14 +181,14 @@ public class ImageUtil {
 	 * @param matrix values must be 0<=val<=255
 	 * @return images values are clipped to 0<v<255 without warning 
 	 */
-	public static BufferedImage putGrayMatrix(RealMatrix matrix) {
+	public static BufferedImage putGrayMatrix(IntMatrix matrix) {
 		int cols = matrix.getCols();
 		int rows = matrix.getRows();
-		LOG.debug("rc "+rows+" "+cols);
+		LOG.trace("rc "+rows+" "+cols);
 		BufferedImage image = new BufferedImage(cols, rows, BufferedImage.TYPE_BYTE_GRAY);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				LOG.debug(i+" "+j);
+				LOG.trace(i+" "+j);
 				int gray = (int) matrix.elementAt(i, j);
 				if (gray < 0) {
 					gray = 0;
@@ -175,9 +203,19 @@ public class ImageUtil {
 	}
 
 	public static BufferedImage shiftImage(BufferedImage image, double deltax, double deltay) {
-		RealMatrix matrix = ImageUtil.getGrayMatrix(image);
-		RealMatrix shiftedMatrix = matrix.createMatrixWithOriginShifted(deltax, deltay);
-		BufferedImage shiftedImage = ImageUtil.putGrayMatrix(shiftedMatrix);
+		IntMatrix matrix = ImageUtil.getGrayMatrix(image);
+		RealMatrix realMatrix = new RealMatrix(matrix);
+		RealMatrix shiftedMatrix = realMatrix.createMatrixWithOriginShifted(deltax, deltay);
+		IntMatrix matrix0 = new IntMatrix(shiftedMatrix);
+		BufferedImage shiftedImage = ImageUtil.putGrayMatrix(matrix0);
+		return shiftedImage;
+	}
+
+	public static BufferedImage scaleAndInterpolate(BufferedImage image,
+			int newRows, int newCols) {
+		RealMatrix matrix = new RealMatrix(ImageUtil.getGrayMatrix(image));
+		RealMatrix shiftedMatrix = matrix.scaleAndInterpolate(newRows, newCols);
+		BufferedImage shiftedImage = ImageUtil.putGrayMatrix(new IntMatrix(shiftedMatrix));
 		return shiftedImage;
 	}
 	
