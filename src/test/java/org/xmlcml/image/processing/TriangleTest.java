@@ -55,20 +55,20 @@ public class TriangleTest {
 	
 	@Test
 	public void testRemoveDiagonal() {
-		LOG.debug("p0 "+pixel[0]);
-		LOG.debug("p1 "+pixel[1]);
-		LOG.debug("p2 "+pixel[2]);
+		LOG.trace("p0 "+pixel[0]);
+		LOG.trace("p1 "+pixel[1]);
+		LOG.trace("p2 "+pixel[2]);
 		Triangle triangle = Triangle.createTriangle(pixel[0], pixel[1], pixel[2], island);
-		LOG.debug("p0 "+pixel[0]);
-		LOG.debug("p1 "+pixel[1]);
-		LOG.debug("p2 "+pixel[2]);
+		LOG.trace("p0 "+pixel[0]);
+		LOG.trace("p1 "+pixel[1]);
+		LOG.trace("p2 "+pixel[2]);
 		triangle.removeDiagonalNeighbours();
 		List<Pixel> neighbours0 = pixel[0].getNeighbours(island);
 		List<Pixel> neighbours1 = pixel[1].getNeighbours(island);
 		List<Pixel> neighbours2 = pixel[2].getNeighbours(island);
-		LOG.debug("n0 "+neighbours0);
-		LOG.debug("n1 "+neighbours1);
-		LOG.debug("n2 "+neighbours2);
+		LOG.trace("n0 "+neighbours0);
+		LOG.trace("n1 "+neighbours1);
+		LOG.trace("n2 "+neighbours2);
 		Assert.assertTrue("nn0 ", neighbours0.contains(pixel[1]) && neighbours0.contains(pixel[2]));
 		Assert.assertTrue("nn1 ", neighbours1.contains(pixel[0]) && !neighbours1.contains(pixel[2]));
 		Assert.assertTrue("nn2 ", neighbours2.contains(pixel[0]) && !neighbours2.contains(pixel[1]));
@@ -83,9 +83,9 @@ public class TriangleTest {
 		pixel[1].clearNeighbours();
 		pixel[2].getNeighbours(island);
 		Triangle triangle = Triangle.createTriangle(pixel[0], pixel[1], pixel[2], island);
-		LOG.debug("triangle: "+triangle);
+		LOG.trace("triangle: "+triangle);
 		List<Pixel> diagonal = triangle.getDiagonal();
-		LOG.debug("diag "+diagonal);
+		LOG.trace("diag "+diagonal);
 		Assert.assertNull(diagonal);
 	}
 	

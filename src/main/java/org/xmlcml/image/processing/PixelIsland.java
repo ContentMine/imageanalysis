@@ -179,7 +179,7 @@ public class PixelIsland {
 		List<Pixel> terminalSpikedList = getTerminalSpikes();
 		if (terminalSpikedList.size() > 0) {
 			terminalPixels.addAll(terminalSpikedList);
-			LOG.debug("adding pseudo-terminals: "+terminalSpikedList);
+			LOG.trace("adding pseudo-terminals: "+terminalSpikedList);
 		}
 		return terminalPixels;
 	}
@@ -342,9 +342,9 @@ public class PixelIsland {
 //		if (lastIntersection.size() != 2) {
 //			throw new RuntimeException("bad intersection size: "+lastIntersection.size());
 //		}
-//		LOG.debug("Lozenge");
+//		LOG.trace("Lozenge");
 //		Pixel toRemove = lastIntersection.iterator().next();
-//		LOG.debug(toRemove);
+//		LOG.trace(toRemove);
 //		removeList.add(toRemove);
 //	}
 
@@ -418,7 +418,7 @@ public class PixelIsland {
 
 //	private void removePixels() {
 //		for (Pixel pixel : removeList) {
-//			LOG.debug("remove: "+pixel.getInt2());
+//			LOG.trace("remove: "+pixel.getInt2());
 //			remove(pixel);
 //		}
 //	}
@@ -438,7 +438,7 @@ public class PixelIsland {
 		while (multiplyConnectedPixels.size() > 0) {
 			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
 			nucleusList.add(nucleus);
-			LOG.debug("nucl "+nucleus.toString());
+			LOG.trace("nucl "+nucleus.toString());
 		}
 		return nucleusList;
 	}
@@ -492,7 +492,7 @@ public class PixelIsland {
 			pixelPaths = new ArrayList<PixelPath>();
 			removeHypotenuses();
 			getNucleusList();
-			LOG.debug("nucleus list "+nucleusList.size());
+			LOG.trace("nucleus list "+nucleusList.size());
 			getTerminalPixels();
 			createPixelPathsStartingAtTerminals();
 		}
@@ -514,7 +514,7 @@ public class PixelIsland {
 	 */
 	void removeHypotenuses() {
 		createTriangleSet();
-		LOG.debug("triangle "+triangleSet);
+		LOG.trace("triangle "+triangleSet);
 	}
 
 	private void createTriangleSet() {
@@ -555,7 +555,7 @@ public class PixelIsland {
 				nextPixel = getNextPixel(currentPixel);
 			}
 			if (nextPixel == null) {
-				LOG.debug("end terminalOrBranch");
+				LOG.trace("end terminalOrBranch");
 				if (nucleus != null) {
 					pixelPath.addFinalNucleus(nucleus);
 				}
@@ -579,10 +579,10 @@ public class PixelIsland {
 		}
 		int size = unusedPixels.size();
 		if (size == 0) {
-//			LOG.debug(neighbours);
-			LOG.debug("Found terminal"); // temp
+//			LOG.trace(neighbours);
+			LOG.trace("Found terminal"); // temp
 		} else if (size > 1) {
-			LOG.debug("Cannot find unique next pixel: "+size); // could be terminal in nucleus
+			LOG.trace("Cannot find unique next pixel: "+size); // could be terminal in nucleus
 		}
 		return size == 0 ? null : unusedPixels.get(0);
 	}
@@ -613,7 +613,7 @@ public class PixelIsland {
 					usedPixels.add(neighbour);
 				}
 			}
-			LOG.debug("Skipped 2-spike Nucleus from "+currentPixel.getInt2()+" to "+nextPixel.getInt2());
+			LOG.trace("Skipped 2-spike Nucleus from "+currentPixel.getInt2()+" to "+nextPixel.getInt2());
 		} else {
 			// treat as terminal
 			if (!nucleus.getSpikeSet().removeAll(currentPixel.getNeighbours(this))) {

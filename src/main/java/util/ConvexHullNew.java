@@ -60,7 +60,6 @@ public class ConvexHullNew {
 	}
 
 	public void quickhull(int a, int b, ArrayList<Integer> al) {
-		// System.out.println("a:"+a+",b:"+b+" size: "+al.size());
 		if (al.size() == 0) {
 			return;
 		}
@@ -112,8 +111,6 @@ public class ConvexHullNew {
 				l = i;
 			}
 		}
-
-		// System.out.println("l: "+l+", r: "+r);
 
 		ArrayList<Integer> al1 = new ArrayList<Integer>();
 		ArrayList<Integer> al2 = new ArrayList<Integer>();

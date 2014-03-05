@@ -109,7 +109,7 @@ public class ImageUtil {
 		centre.multiplyEquals(1./sumGray);
 		centre2.multiplyEquals(1./sumGray2);
 		if (title != null) {
-			LOG.debug(centre.format(1)+" >> "+centre2.format(1)+" "+centre.subtract(centre2).format(1));
+			LOG.trace(centre.format(1)+" >> "+centre2.format(1)+" "+centre.subtract(centre2).format(1));
 			File file = new File("target/corrPixels/"+title+".svg");
 			file.getParentFile().mkdirs();
 			SVGSVG.wrapAndWriteAsSVG(g, file);
@@ -168,10 +168,8 @@ public class ImageUtil {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				int gray = ImageUtil.getGray(image, j, i);
-				//System.out.print(Integer.toHexString(gray)+" ");
 				matrix.setElementAt(i,  j, gray);
 			}
-//			System.out.println();
 		}
 		return matrix;
 	}
@@ -185,6 +183,7 @@ public class ImageUtil {
 		int cols = matrix.getCols();
 		int rows = matrix.getRows();
 		LOG.trace("rc "+rows+" "+cols);
+		if (rows <= 0 || cols <= 0) return null;
 		BufferedImage image = new BufferedImage(cols, rows, BufferedImage.TYPE_BYTE_GRAY);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {

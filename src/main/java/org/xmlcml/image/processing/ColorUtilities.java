@@ -63,7 +63,7 @@ public class ColorUtilities {
 			Raster raster = image.getRaster();
 			int numdata = raster.getNumDataElements();
 			int[] values = new int[numdata];
-	//		System.out.println(width+" "+height+" "+values.length);
+	//		LOG.debug(width+" "+height+" "+values.length);
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
 					LOG.debug(i+" "+j);

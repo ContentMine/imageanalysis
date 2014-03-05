@@ -587,7 +587,7 @@ public class CannyEdgeDetector {
 			throw new RuntimeException("need fileroot/dir as arg");
 		}
 		File file = new File(args[0]);
-		System.out.println(file.exists());
+		LOG.debug(file.exists());
 		if (!file.exists()) {
 			throw new RuntimeException("File does not exist: "+file);
 		}
@@ -604,7 +604,7 @@ public class CannyEdgeDetector {
 	}
 
 	public static void runDetector(File file) throws IOException {
-		System.out.println("Reading: "+file);
+		LOG.debug("Reading: "+file);
 		String root = file.getName();
 		//create the detector
 		CannyEdgeDetector detector = new CannyEdgeDetector();
@@ -623,7 +623,7 @@ public class CannyEdgeDetector {
 		try {
 			detector.process();
 		} catch (Exception e) {
-			System.out.println("Cannot process: "+file+" e");
+			LOG.debug("Cannot process: "+file+" e");
 			return;
 		}
 		BufferedImage edges = detector.getEdgesImage();
@@ -632,7 +632,7 @@ public class CannyEdgeDetector {
 			outdir.mkdirs();
 			File outfile = new File(outdir, root+".png");
 	//		LOG.debug("wrote: "+outfile);
-			System.out.println("wrote: "+outfile);
+			LOG.debug("wrote: "+outfile);
 			ImageIO.write(edges, "png", outfile);
 		}
 	}

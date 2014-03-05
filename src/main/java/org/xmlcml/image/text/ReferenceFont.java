@@ -32,7 +32,6 @@ public class ReferenceFont {
 	public final static File FONT_DIR = new File("src/main/resources/org/xmlcml/image/text/fonts");
 	public final static File GENERIC_DIR = new File(FONT_DIR, "generic");
 	public static ReferenceFont GENERIC = null;
-//	public final static File WP_GENERIC_PNG = new File(GENERIC_DIR, "generic.png");
 	
 	public final static File HELVETICA_DIR = new File(FONT_DIR, "helvetica");
 	public static ReferenceFont HELVETICA = null;
@@ -45,18 +44,34 @@ public class ReferenceFont {
 		HELVETICA = ReferenceFont.createFont(HELVETICA_DIR, "Helvetica");
 	}
 
-	private static void trimGeneric() {
-		List<File> files = new ArrayList<File>(FileUtils.listFiles(GENERIC_DIR, null, false));
+	/** very mucky - converts raw images to new trimmed ones in target/
+	 * this need copying by hand
+	 * this should only happen once
+	 */
+	private static void trimCharacters(File dir) {
+		List<File> files = new ArrayList<File>(FileUtils.listFiles(dir, null, false));
 		for (File file : files) {
-			if (!file.getName().endsWith("png")) continue;
+			String filename = file.getName();
+			if (!filename.endsWith("png")) continue; // DS_STORE etc.
+			if (!filename.startsWith("_")) continue; // converted file
+			String filename0 = (filename.startsWith("_") ? filename.substring(1) : null);
+			if (new File(filename0).exists()) continue; // already converted
 			try {
 				BufferedImage image = ImageIO.read(file);
 				if (image == null) {
 					throw new RuntimeException(" failed on: "+file);
 				}
 				GrayCharacter gray = GrayCharacter.readGrayImage(image);
-				BufferedImage trim = gray.trimEdgesWhite(250);
-				ImageIO.write(trim, "png", new File("target/trim/"+file.getName()));
+				BufferedImage trimmedImage = gray.trimEdgesWhite(250);
+				if (trimmedImage == null) {
+					LOG.error("cannot create image: "+file);
+				} else {
+					File trimf = new File("target/trim/");
+					trimf.mkdirs();
+					File newFile = new File(trimf, filename0);
+					ImageIO.write(trimmedImage, "png", newFile);
+					LOG.debug("wrote "+newFile); // now copy this to fonts/dir
+				}
 			} catch (Exception e) {
 				throw new RuntimeException("Failed "+file, e);
 			}
@@ -114,7 +129,7 @@ public class ReferenceFont {
 	public static ReferenceFont createFont(File directory, String name) {
 		ReferenceFont font = new ReferenceFont(name);
 		if (GENERIC_DIR.equals(directory)) {
-			trimGeneric();
+			trimCharacters(GENERIC_DIR);
 		}
 		try {
 			List<File> files = new ArrayList<File>(FileUtils.listFiles(directory, new String[]{"png"}, false));

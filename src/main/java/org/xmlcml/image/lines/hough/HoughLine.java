@@ -113,7 +113,7 @@ public class HoughLine {
 		if (segment != null) {
 			Double length = segment.getLength();
 			if (length != null && length > minSegmentLength) {
-				LOG.debug("Seg " + Util.format(segment.getLength(), 2));
+				LOG.trace("Seg " + Util.format(segment.getLength(), 2));
 				segment.normalize();
 				if (Math.abs(segment.getBivariate().getCorrelationCoefficient()) < 0.8) {
 					segment.getSVGLine().setStroke("red");

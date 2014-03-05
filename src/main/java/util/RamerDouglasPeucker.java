@@ -106,9 +106,8 @@ public class RamerDouglasPeucker {
 				1.3, 1.4
 		};
 		double[] data1 = rdp.filter(data);
-		System.out.println("L "+data1.length);
 		for (int i = 0; i < data1.length; i++) {
-			System.out.println(data1[i]);
+//			System.out.println(data1[i]);
 		}
 	}
 

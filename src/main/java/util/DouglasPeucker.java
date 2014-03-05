@@ -127,9 +127,8 @@ public class DouglasPeucker {
 		points.add(new Real2(0.95, 0.9));
 		points.add(new Real2(1.3, 1.4));
 		List<Real2> points1 = dp.properRDP(points, epsilon);
-		System.out.println("L "+points1.size());
 		for (int i = 0; i < points1.size(); i++) {
-			System.out.println(points1.get(i));
+//			System.out.println(points1.get(i));
 		}
 	}
 }

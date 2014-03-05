@@ -80,7 +80,7 @@ public class LineDetector extends AbstractDetector {
 						}
 					}
 				}
-//				System.out.println(line.toXML());
+//				LOG.debug(line.toXML());
 //				svg.appendChild(line);
 			}
 		}

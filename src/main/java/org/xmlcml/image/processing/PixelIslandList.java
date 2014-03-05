@@ -90,14 +90,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public static PixelIslandList createPixelIslandList(BufferedImage image,
 			Operation... operations) throws IOException {
 		List<Operation> opList = Arrays.asList(operations);
-		LOG.debug("pre-bin");
+		LOG.trace("pre-bin");
 		if (opList.contains(Operation.BINARIZE)) {
 			image = ImageUtil.binarize(image);
 		}
 	    if (opList.contains(Operation.THIN)) {
 			image = ImageUtil.thin(image);
 	    }
-		LOG.debug("postbin ");
+		LOG.trace("postbin ");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
 		return islands;
 	}

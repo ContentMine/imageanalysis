@@ -8,12 +8,15 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 
 public class EdgeDetectorTest {
 
+	private final static Logger LOG = Logger.getLogger(CannyEdgeDetector.class);
+	
 	@Test
 	@Ignore // ImageIO rejects image as wrong type
 	public void testEdgeDetector() throws IOException {
@@ -64,7 +67,7 @@ public class EdgeDetectorTest {
 		try {
 			detector.process();
 		} catch (Exception e) {
-			System.out.println("Cannot process: "+file+" e");
+			LOG.error("Cannot process: "+file+" e");
 			return;
 		}
 		BufferedImage edges = detector.getEdgesImage();
@@ -73,7 +76,6 @@ public class EdgeDetectorTest {
 			outdir.mkdirs();
 			File outfile = new File(outdir, file.getName()+".png");
 	//		LOG.debug("wrote: "+outfile);
-			System.out.println("wrote: "+outfile);
 			ImageIO.write(edges, "png", outfile);
 		}
 	}

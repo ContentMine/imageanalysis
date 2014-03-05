@@ -52,7 +52,7 @@ public class SpanningTree {
 		while (!stack.isEmpty()) {
 			Pixel pixel = stack.pop();
 			pixel.setMarked(Marked.USED);
-			LOG.debug("popped: "+pixel.getInt2());
+			LOG.trace("popped: "+pixel.getInt2());
 			
 			List<Pixel> neighbours = pixel.getNeighbours(Pixel.Marked.UNUSED);
 			if (neighbours.size() == 0) {
@@ -73,11 +73,11 @@ public class SpanningTree {
 	}
 
 	private void continueDownListTillNode(Pixel pixel) {
-		LOG.debug("2connected "+pixel.getInt2());
+		LOG.trace("2connected "+pixel.getInt2());
 		List<Pixel> neighbours = new ArrayList<Pixel>();
 		while (pixel != null) {
 			pixel.setMarked(Marked.USED);
-			LOG.debug("connecting: "+pixel.getInt2());
+			LOG.trace("connecting: "+pixel.getInt2());
 			neighbours = pixel.getNeighbours(Pixel.Marked.UNUSED);
 			if (neighbours.size() != 1) {
 				break;

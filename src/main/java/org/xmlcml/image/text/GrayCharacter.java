@@ -8,6 +8,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.EuclidRuntimeException;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
@@ -195,10 +196,6 @@ public class GrayCharacter {
 	}
 
 	private IntMatrix trimEdges(int maxVal, IntMatrix matrix) {
-		LOG.trace("mat "+matrix);
-		LOG.trace("col "+matrix.extractColumnData(0));
-		LOG.trace("col "+matrix.extractColumnData(50));
-		LOG.trace("col "+matrix.extractColumnData(99));
 		IntMatrix intMatrix = matrix.elementsInRange(new IntRange(0, maxVal));
 		LOG.trace("delete "+intMatrix);
 		LOG.trace(intMatrix.getRows()+" "+intMatrix.getCols());
@@ -206,22 +203,28 @@ public class GrayCharacter {
 		int hiCol = getExtreme(RowCol.C, intMatrix.getCols() - 1, intMatrix, -1) - 1;
 		int lowRow = getExtreme(RowCol.R, 0, intMatrix, 1) + 1;
 		int hiRow = getExtreme(RowCol.R, intMatrix.getRows() - 1, intMatrix, -1) - 1;
-		LOG.debug("delete edges up to: "+lowRow+" "+hiRow+" "+lowCol+" "+hiCol);
+		LOG.trace("delete edges up to: "+lowRow+" "+hiRow+" "+lowCol+" "+hiCol);
 		IntMatrix subMatrix = matrix.extractSubMatrixData(lowRow,  hiRow,  lowCol,  hiCol);
 		return subMatrix;
 	}
 
-	private int getExtreme(RowCol rc, int i, IntMatrix intMatrix, int delta) {
+	private int getExtreme(RowCol rc, int istart, IntMatrix intMatrix, int delta) {
 		int limit = (RowCol.C.equals(rc)) ? intMatrix.getRows() : intMatrix.getCols();
-		for (; i != limit; i += delta) {
-			IntArray arr = (RowCol.C.equals(rc)) ? intMatrix.extractColumnData(i) : intMatrix.extractRowData(i);
-			LOG.trace(i+" "+arr);
-			if (arr.getMax() > 0) {
-				i -= delta;
-				break;
+		int irow = istart;
+		for (; irow != limit; irow += delta) {
+			try {
+				IntArray arr = (RowCol.C.equals(rc)) ? intMatrix.extractColumnData(irow) : intMatrix.extractRowData(irow);
+				if (arr.getMax() > 0) {
+					irow -= delta;
+					break;
+				}
+			} catch (EuclidRuntimeException e) {
+				return -1;
+			} catch (ArrayIndexOutOfBoundsException e) {
+				return -1;
 			}
 		}
-		return i;
+		return irow;
 	}
 
 	private void setToWhite(int maxVal, RealMatrix matrix) {

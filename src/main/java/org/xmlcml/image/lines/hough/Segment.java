@@ -44,20 +44,20 @@ public class Segment {
 	 * remove end points if they appear to curve
 	 */
 	public void normalize() {
-		LOG.debug("P "+pointArray);
+		LOG.trace("P "+pointArray);
 		bivariate = new Bivariate(pointArray);
 		RealArray normalizedResiduals = bivariate.getNormalizedResiduals();
 		Double cc = Util.format(bivariate.getCorrelationCoefficient(), 3);
-		LOG.debug(Util.format(bivariate.getCorrelationCoefficient(), 3));
+		LOG.trace(Util.format(bivariate.getCorrelationCoefficient(), 3));
 		pointArray = trimWigglyEnds(pointArray, normalizedResiduals);
-		LOG.debug("PPP "+pointArray);
+		LOG.trace("PPP "+pointArray);
 	}
 	
 	
 	private Real2Array trimWigglyEnds(Real2Array pointArray, RealArray normalizedResiduals) {
 		int lowLimit = getLowlimit(pointArray, normalizedResiduals);
 		int hiLimit = getHighLimit(pointArray, normalizedResiduals);
-		LOG.debug(lowLimit+":"+hiLimit);
+		LOG.trace(lowLimit+":"+hiLimit);
 		svgLine = null;
 		RealArray xarr = pointArray.getXArray();
 		RealArray yarr = pointArray.getYArray();

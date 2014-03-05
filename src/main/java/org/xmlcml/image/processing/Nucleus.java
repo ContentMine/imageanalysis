@@ -89,7 +89,7 @@ public class Nucleus {
 					Shell shell = shellList.get(j);
 					thinnedSet.retainAll(shell.getExpandedSet());
 					if (thinnedSet.size() != 0) {
-						LOG.debug("all shells overlap on iteration "+iteration+ "; size "+thinnedSet.size()+" spikes "+spikeSet.size());
+						LOG.trace("all shells overlap on iteration "+iteration+ "; size "+thinnedSet.size()+" spikes "+spikeSet.size());
 						getCentre(thinnedSet);
 						anded = true;
 						break;
@@ -129,7 +129,7 @@ public class Nucleus {
 	}
 
 	public Real2 getCentre() {
-//		LOG.debug(pixelSet);
+//		LOG.trace(pixelSet);
 		return getCentre(pixelSet);
 	}
 	

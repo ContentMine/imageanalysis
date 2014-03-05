@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
@@ -13,6 +14,7 @@ import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.ThinningService;
 
 public class TextTest {
+	private final static Logger LOG = Logger.getLogger(TextTest.class);
 
 	@Test
 	public void testThin() throws Exception {
@@ -73,18 +75,18 @@ public class TextTest {
 		for (int j = 12; j < Math.min(26, bImage.getHeight()); j++) {
 			for (int i = 18; i < bImage.getWidth(); i++) {
 				anti[i] = new AntiColour(bImage, i, j);
-				System.out.print(i+"/"+j+"/"+anti[i].ared+"/"+anti[i].agreen+"/"+anti[i].ablue+"   ");
+				LOG.trace(i+"/"+j+"/"+anti[i].ared+"/"+anti[i].agreen+"/"+anti[i].ablue+"   ");
 			}
-			System.out.println();
+//			System.out.println();
 			AntiColour[] newAnti = new AntiColour[24];
 			for (int i = 19; i < bImage.getWidth()-1; i++) {
 				AntiColour left = anti[i].getLeft();
 				AntiColour right = anti[i].getRight();
-				System.out.print(i+"/"+j+" / ");
+//				System.out.print(i+"/"+j+" / ");
 //				System.out.print(left.ared+"/"+left.agreen+"/"+left.ablue+"   ");
-				System.out.print(anti[i].ared+"/"+anti[i].agreen+"/"+anti[i].ablue+"   ");
+//				System.out.print(anti[i].ared+"/"+anti[i].agreen+"/"+anti[i].ablue+"   ");
 //				System.out.print(right.ared+"/"+right.agreen+"/"+right.ablue+"   ");
-				System.out.println();
+//				System.out.println();
 			}
 		}
 	}
@@ -97,9 +99,9 @@ public class TextTest {
 		for (int j = 4; j < Math.min(18, bImage.getHeight()); j++) {
 			for (int i = 0; i < bImage.getWidth(); i++) {
 				anti[i] = new AntiColour(bImage, i, j);
-				System.out.print(i+"/"+j+" "+anti[i].ared+"/"+anti[i].agreen+"/"+anti[i].ablue+"   ");
+				LOG.debug(i+"/"+j+" "+anti[i].ared+"/"+anti[i].agreen+"/"+anti[i].ablue+"   ");
 			}
-			System.out.println();
+			LOG.debug("");
 		}
 	}
 	

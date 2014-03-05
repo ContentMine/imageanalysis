@@ -7,10 +7,12 @@ import javax.imageio.ImageIO;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 
 public class FloodFillTest {
+	private static final Logger LOG = Logger.getLogger(FloodFillTest.class);
 
 	@Test
 	public void testBinaryMaltoryzine() throws IOException {
@@ -28,7 +30,7 @@ public class FloodFillTest {
 		floodFill.fill();
 		Assert.assertEquals("pixelIslands", 5, floodFill.getPixelIslandList().size());
 		for (PixelIsland pixelIsland : floodFill.getPixelIslandList()) {
-			System.out.println(pixelIsland.size());
+			LOG.debug(pixelIsland.size());
 		}
 	}
 	

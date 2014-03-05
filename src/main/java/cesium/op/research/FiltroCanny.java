@@ -52,8 +52,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.apache.log4j.Logger;
+
 public class FiltroCanny extends JFrame {
 
+	private final static Logger LOG = Logger.getLogger(FiltroCanny.class);
+	
     // Attributes
     // Image scale and magnitude
     static double ORI_SCALE = 40.0;
@@ -102,21 +106,21 @@ public class FiltroCanny extends JFrame {
         try {
             dp = Double.parseDouble(args[1]);
         } catch (NumberFormatException e) {
-            System.err.println("Valor do parametro <dp> invalido");
+            LOG.error("Valor do parametro <dp> invalido");
             System.exit(0);
         }
 
         try {
             inf = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
-            System.out.println("Valor do parametro <inf> invalido");
+            LOG.debug("Valor do parametro <inf> invalido");
             System.exit(0);
         }
 
         try {
             sup = Integer.parseInt(args[3]);
         } catch (NumberFormatException e) {
-            System.out.println("Valor do parametro <sup> invalido");
+            LOG.debug("Valor do parametro <sup> invalido");
             System.exit(0);
         }
 
@@ -132,7 +136,7 @@ public class FiltroCanny extends JFrame {
         FiltroCanny fc = new FiltroCanny(args[0], dp, inf, sup);
         eq_time = System.currentTimeMillis() - eq_time;
         String msg = "Canny: tempo de execucao ";
-        System.out.println(msg + eq_time + " milisseg.");
+        LOG.debug(msg + eq_time + " milisseg.");
 
         // If ?X? clicked, close the application
         fc.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -151,7 +155,7 @@ public class FiltroCanny extends JFrame {
         try {
             imagem = ImageIO.read(file);
         } catch (Exception e) {
-            System.out.println("Imagem '" + aFile + "' nao existe.");
+            LOG.debug("Imagem '" + aFile + "' nao existe.");
             System.exit(0);
         }
 
@@ -159,7 +163,7 @@ public class FiltroCanny extends JFrame {
         String msgb = "==> limiar inferior " + inf + "\n";
         String msgc = "==> limiar superior " + sup + "\n";
         String msgd = "==> desvio padrao   " + s + "\n";
-        System.out.println(msga + msgb + msgc + msgd);
+        LOG.debug(msga + msgb + msgc + msgd);
 
         // Atribui nome ao frame
         setTitle("Canny: " + file.getName());
@@ -235,7 +239,7 @@ public class FiltroCanny extends JFrame {
 
         n = 2 * width + 1;
         LARGURA = (int) width / 2;
-        System.out.println("Suavizando com uma Gaussiana (largura = " +
+        LOG.debug("Suavizando com uma Gaussiana (largura = " +
                 n + ") ...\n");
 
         componenteX = new double[nc][nr];
@@ -245,7 +249,7 @@ public class FiltroCanny extends JFrame {
         convolveImagemXY(imagem, funcGauss, width, componenteX, componenteY);
 
         // Convolve smoothed image with derivative
-        System.out.println("Convolucao com a derivada da Gaussiana...\n");
+        LOG.debug("Convolucao com a derivada da Gaussiana...\n");
         derivadaX = convolveDerivadaXY(componenteX, nr, nc, derivadaGauss,
                 width, 1);
         derivadaY = convolveDerivadaXY(componenteY, nr, nc, derivadaGauss,
@@ -437,7 +441,7 @@ public class FiltroCanny extends JFrame {
         Raster imR = imagem.getRaster();
         Raster magR = imagemMag.getRaster();
 
-        System.out.println("Iniciando corte com limiares...\n");
+        LOG.debug("Iniciando corte com limiares...\n");
         for (int i = 0; i < nr; i++)
             for (int j = 0; j < nc; j++)
                 imWR.setSample(j, i, 0, 0);
@@ -445,7 +449,7 @@ public class FiltroCanny extends JFrame {
         if (sup < inf) {
             estimaLimiar(imagemMag, sup, inf);
             String str = "Limiar de corte (da imagem): SUPERIOR ";
-            System.out.println(str + sup + " INFERIOR\n" + inf);
+            LOG.debug(str + sup + " INFERIOR\n" + inf);
         }
 
         // For each edge with magnitude above HIGH threshold, draw the edge

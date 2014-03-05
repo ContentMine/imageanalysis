@@ -72,7 +72,7 @@ public class ImageUtilTest {
 	public void testReadGrayImage() throws IOException {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
 		IntMatrix matrix = ImageUtil.getGrayMatrix(image);
-		System.out.println(matrix);
+//		System.out.println(matrix);
 	}
 
 	@Test

@@ -28,14 +28,14 @@ public class ColorAnalyzerTest {
 		BufferedImage image = ImageIO.read(new File(Fixtures.TEXT_DIR, "phylo.jpg"));
 		ColourAnalyzer analyzer = new ColourAnalyzer(image);
 		analyzer.setXYRange(new Int2Range(new IntRange(0, 300), new IntRange(50, 300)));
-		LOG.debug(analyzer.getWidth()+"/"+analyzer.getHeight());
+		LOG.trace(analyzer.getWidth()+"/"+analyzer.getHeight());
 		analyzer.set4Bits(true);
 		Multiset<Integer> colorSet = analyzer.createColorMap();
 		for (Entry entry : colorSet.entrySet()) {
 			if (entry.getCount() < 10) continue;
 			int ll = (Integer)entry.getElement();
 			HueChromaLuminance hcl = HueChromaLuminance.createHCLfromRGB(ll);
-			System.out.println(hcl+" "+Integer.toHexString(ll)+" "+entry.getCount());
+			//System.out.println(hcl+" "+Integer.toHexString(ll)+" "+entry.getCount());
 		}
 //		List<Integer> colorList = new ArrayList<Integer>(colorSet);
 //		Collections.sort(colorList);

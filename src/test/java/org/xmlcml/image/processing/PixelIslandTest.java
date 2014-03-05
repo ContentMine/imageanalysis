@@ -189,7 +189,7 @@ public class PixelIslandTest {
 		Assert.assertEquals("paths", 1, pixelPaths.size());
 		DouglasPeucker douglasPeucker = new DouglasPeucker(2.0);
 		List<Real2> reduced = douglasPeucker.reduce(pixelPaths.get(0).getPoints());
-		LOG.debug(reduced);
+//		LOG.debug(reduced);
 	}
 
 	@Test
@@ -277,7 +277,7 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.BRANCH_PNG);
 		List<Real2Array> segmentArrayList = island.createSegments();
 		Assert.assertEquals("segmentArray", 3, segmentArrayList.size());
-		debug(segmentArrayList);
+		//debug(segmentArrayList);
 		island.debugSVG("target/branch.svg");
 	}
 
@@ -290,30 +290,33 @@ public class PixelIslandTest {
 		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINAL_PNG);
 		island.removeHypotenuses();
 		List<Nucleus> nucleusList = island.getNucleusList();
-		LOG.debug("NUC "+nucleusList);
+		LOG.trace("NUC "+nucleusList);
 	}
 
 	@Test
 	public void testBoundingBox2() throws IOException {
 		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE0_PNG);
 		Real2Range bbox = island.getBoundingBox();
-		LOG.debug(bbox);;
+		Assert.assertEquals("bbox", "((13.0,238.0),(34.0,154.0))", bbox.toString());
+//		LOG.trace(bbox);;
 	}
 	
 	@Test
 	public void testBoundingBoxes() throws IOException {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(ImageIO.read(Fixtures.MALTORYZINE_PNG));
+		Assert.assertEquals("islands", 5, islands.size());
 		for (PixelIsland island : islands) {
 			Real2Range bbox = island.getBoundingBox();
-			LOG.debug(island+" "+bbox);
+			LOG.trace(island+" "+bbox);
 		}
+		Assert.assertEquals("island", "((12.0,240.0),(32.0,155.0))", islands.get(0).getBoundingBox().toString());
 	}
 	
 	@Test
 	public void testLargePhyloJpg() throws IOException {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		Collections.sort(islands.getList(), new PixelIslandComparator(PixelIslandComparator.ComparatorType.SIZE));
-		LOG.debug(islands.get(0).size());
+//		LOG.trace(islands.get(0).size());
 		Assert.assertTrue(islands.size() > 2000);
 		Assert.assertEquals(2224, islands.size());
 		plotBoxes(islands, "target/largePhyloBoxes.svg");
@@ -324,7 +327,7 @@ public class PixelIslandTest {
 //		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG);
 //		PixelIslandList characters = islands.smallerThan(new Real2(20., 20.));
 //		Assert.assertEquals(2202, characters.size());
-//		debug(characters, "target/characters.svg");
+//		trace(characters, "target/characters.svg");
 //	}
 
 	@Test
@@ -376,7 +379,7 @@ public class PixelIslandTest {
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
-			LOG.debug(height+" "+charsi.size());
+			LOG.trace(height+" "+charsi.size());
 			plotBoxes(charsi, "target/charsNoThin"+height+".svg");
 		}
 	}
@@ -397,9 +400,9 @@ public class PixelIslandTest {
 		for (int i = 0; i < nchar; i++) {
 			for (int j = 0; j <= i; j++) {
 				double cor = Util.format(brackets.get(i).binaryIslandCorrelation(brackets.get(j), "brackets/"+i+"_"+j), 2);
-				System.out.print(cor+" ");
+				//System.out.print(cor+" ");
 			}
-			System.out.println();
+			//System.out.println();
 		}
 	}
 
@@ -437,7 +440,7 @@ public class PixelIslandTest {
 				if (cor > correlation) {
 					newList.add(j);
 					usedSet.add(j);
-					System.out.print(i+" "+j+": "+cor+" ");
+					//System.out.print(i+" "+j+": "+cor+" ");
 					g.appendChild(chars.get(j).createSVG(true));
 				}
 			}
@@ -455,12 +458,12 @@ public class PixelIslandTest {
 			text.setFill("green");
 			allg.appendChild(gk);
 			SVGSVG.wrapAndWriteAsSVG(g, new File("target/charsCorr/"+newList.get(0)+".svg"));
-			System.out.println();
+			//System.out.println();
 		}
 		SVGSVG.wrapAndWriteAsSVG(allg, new File("target/charsCorr/All.svg"));
 		Collections.sort(groupList, new ListComparator());
 		for (List<Integer> listi : groupList) {
-			System.out.println(listi);
+			//System.out.println(listi);
 		}
 		
 	}
@@ -495,20 +498,20 @@ public class PixelIslandTest {
 			if (subImage1 == null) {
 				LOG.error("null subImage");
 			} else {
-				LOG.debug(ibbox);
+				LOG.trace(ibbox);
 				File file = new File("target/clip/"+charA+".png");
 				file.getParentFile().mkdirs();
 				ImageIO.write(subImage1, "png", file);
 			}
 		}
 		int nchar = islandsA.size();
-		System.out.println("size: "+nchar);
+//		System.out.println("size: "+nchar);
 		for (int i = 0; i < nchar; i++) {
 			for (int j = i; j < nchar; j++) {
 				double cor = Util.format(islandsA.get(i).binaryIslandCorrelation(islandsA.get(j), "/charsA_"+i+"-"+j), 2);
-				System.out.print(i+"-"+j+": "+cor+" ");
+//				System.out.print(i+"-"+j+": "+cor+" ");
 			}
-			System.out.println();
+//			System.out.println();
 		}
 	}
 
@@ -540,13 +543,13 @@ public class PixelIslandTest {
 			ImageIO.write(subImage1, "png", file);
 		}
 		int nchar = islandsA.size();
-		System.out.println("size: "+nchar);
+//		System.out.println("size: "+nchar);
 		for (int i = 0; i < nchar; i++) {
 			for (int j = 0; j <= i; j++) {
 				double cor = Util.format(org.xmlcml.image.ImageUtil.correlateGray(subImageList.get(i), subImageList.get(j), "charsA/"+i+"__"+j), 2);
-				System.out.print(i+"-"+j+": "+cor+" ");
+//				System.out.print(i+"-"+j+": "+cor+" ");
 			}
-			System.out.println();
+//			System.out.println();
 		}
 	}
 
@@ -614,11 +617,11 @@ public class PixelIslandTest {
 	}
 
 	private void extractCharactersAndCorrelate(BufferedImage rawImage, PixelIslandList islands, String charname, double correlationCutoff) throws IOException {
-		LOG.debug("charname "+charname);
+		LOG.trace("charname "+charname);
 		BufferedImage image = ImageIO.read(new File("src/test/resources/org/xmlcml/image/text/chars/"+charname+".png"));
 		int w = image.getWidth();
 		int h = image.getHeight();
-		LOG.debug("charname "+w+" "+h);
+		LOG.trace("charname "+w+" "+h);
 		extractCharacterImagesAndCorrelate(rawImage, charname, correlationCutoff, image, w, h, islands);
 	}
 
@@ -634,7 +637,7 @@ public class PixelIslandTest {
 			// if charname is not null saves overlaid images (arrgh!)
 			double corr = ImageUtil.correlateGray(characterImage, subImage, null /**"charACorr/"+charname+"/"+i */);
 			if (corr > correlationCutoff) {
-				System.out.println("corr "+i+" "+Util.format(corr, 2));
+				LOG.trace("corr "+i+" "+Util.format(corr, 2));
 				PixelIslandTest.outputPng("target/charACorr/"+charname+"/"+i+".png", subImage);
 			}
 			i++;
@@ -674,7 +677,7 @@ public class PixelIslandTest {
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 //			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
-			LOG.debug(height+" "+charsi.size());
+			LOG.trace(height+" "+charsi.size());
 			plotBoxes(charsi, "target/charsRaw/"+height+".svg");
 		}
 	}
