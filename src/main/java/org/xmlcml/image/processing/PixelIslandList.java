@@ -88,7 +88,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * @throws IOException
 	 */
 	public static PixelIslandList createPixelIslandList(BufferedImage image,
-			Operation... operations) throws IOException {
+			Operation... operations) {
 		List<Operation> opList = Arrays.asList(operations);
 		LOG.trace("pre-bin");
 		if (opList.contains(Operation.BINARIZE)) {
@@ -110,7 +110,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PixelIslandList createPixelIslandList(BufferedImage image) throws IOException {
+	public static PixelIslandList createPixelIslandList(BufferedImage image) {
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();

@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -13,13 +14,27 @@ import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntRange;
+import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.processing.PixelIsland;
+import org.xmlcml.image.processing.PixelIslandList;
+import org.xmlcml.image.text.CharacterMatchList;
 import org.xmlcml.image.text.GrayCharacter;
+import org.xmlcml.image.text.fonts.ReferenceFont;
+import org.xmlcml.image.text.fonts.ReferenceFontManager;
+
 
 public class GrayCharacterTest {
+	
+	static final ReferenceFontManager FONT_MANAGER = new ReferenceFontManager();
+
 	private static final String GENERIC_DIR = "src/main/resources/org/xmlcml/image/text/fonts/generic";
-	private final static Logger LOG = Logger.getLogger(GrayCharacterTest.class);
+	public final static Logger LOG = Logger.getLogger(GrayCharacterTest.class);
 
 	@Test
 	public void testGrayCharacter() throws Exception {
@@ -30,9 +45,10 @@ public class GrayCharacterTest {
 	public void testCorrelate() throws Exception {
 		GrayCharacter character = new GrayCharacter(new File(Fixtures.CHAR_DIR, "A10.png"));
 		GrayCharacter characterA = new GrayCharacter(new File(Fixtures.TEXT_DIR, "testA.png"));
-		character.correlateGray(character, "coor", false);
-		character.correlateGray(characterA, "coor0", false);
-		character.correlateGray(characterA, "coor1", true);
+		boolean scale = false;
+		character.correlateGray(character, "coor", false, scale);
+		character.correlateGray(characterA, "coor0", false, scale);
+		character.correlateGray(characterA, "coor1", true, scale);
 	}
 	
 	@Test
@@ -131,7 +147,8 @@ public class GrayCharacterTest {
 			for (int j = i; j < files.length; j++) {
 // writing images is performance hit				
 //				double corr = gray[i].correlateGray(gray[j], i+"_"+j, /*true*/false);
-				double corr = gray[i].correlateGray(gray[j], null, /*true*/false);
+				boolean scale = false;
+				double corr = gray[i].correlateGray(gray[j], null, /*true*/false, scale);
 				corrMat.setElementAt(i,  j,  corr);
 				corrMat.setElementAt(j,  i,  corr);
 			}
@@ -171,11 +188,118 @@ public class GrayCharacterTest {
 	            height);
 		ImageIO.write(newScaledImage, "png", new File("target/rescaledCapitalA.png"));
 		GrayCharacter refGray = GrayCharacter.readGrayImage(refImage);
-		//GrayCharacter.debugGray(refGray.getGrayImage());
 		GrayCharacter newGray = GrayCharacter.readGrayImage(newScaledImage);
-		//GrayCharacter.debugGray(newGray.getGrayImage());
-		double corr = refGray.correlateGray(newGray, "ref-grayA", true);
+		double corr = refGray.correlateGray(newGray, "ref-grayA", true, false);
 		Assert.assertEquals("corr ", 0.59, Util.format(corr, 2), 0.01);
 		
 	}
+	
+	@Test
+	public void testCorrelatePixelIslandsAgainstReference() throws Exception {
+		double corrMin = 0.50;
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.MONOSPACE);
+		BufferedImage testImage = ImageIO.read(new File(ReferenceFontManager.MONOSPACE_DIR, "aa.png"));
+		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandList(testImage);
+		for (PixelIsland island : pixelIslandList) {
+			BufferedImage image = island.createImage(testImage.getType());
+			if (image == null) {
+				LOG.error("null image "+island);
+			} else {
+				ImageUtil.writeImageQuietly(image, new File("target/reffont/test/aa.png"));
+				LOG.trace(image.getWidth()+"/"+image.getHeight());
+				GrayCharacter grayCharacter = GrayCharacter.readGrayImage(image);
+				CharacterMatchList matchList = referenceFont.getBestCharacters(grayCharacter, corrMin);
+				LOG.debug("matchList: "+matchList);
+			}
+		}
+	}
+
+	
+	@Test
+	public void testCorrelateMonospaceMonospace() throws Exception {
+		double corrMin = 0.20;
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.MONOSPACE);
+//		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "bmcgraph.jpg"));
+		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "monospace.png"));
+		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage, 1000);
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/monospace.svg"));
+
+	}
+
+	@Test
+	public void testCorrelateHelveticaAgainstMonospace() throws Exception {
+		double corrMin = 0.20;
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.MONOSPACE);
+		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "helvetica.png"));
+		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage, 1000);
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/helvetica.svg"));
+
+	}
+
+	@Test
+	public void testCorrelateBMCwFont() throws Exception {
+		double corrMin = 0.20;
+//		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.HELVETICA);
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.TIMES_NEW_ROMAN);
+//		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "1471-2148-14-32-2-l.jpg"));
+		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "1471-2148-14-31-2-l.jpg"));
+		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage, 1000);
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/bmcHelvetica.svg"));
+
+	}
+	
+	
+	@Test
+	public void testCorrelateBMCAgainstHelvetica() throws Exception {
+		double corrMin = 0.20;
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.HELVETICA);
+//		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "bmcgraph.jpg"));
+		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR, "1471-2148-14-20-test.jpg"));
+		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage, 1000);
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/1471-2148-14-20.svg"));
+
+	}
+	
+	@Test
+	public void testC() {
+		
+	}
+
+	@Test
+	public void testCorrelateEightVsTimes() throws Exception {
+		double corrMin = 0.20;
+		boolean overlay = true;
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.TIMES_NEW_ROMAN);
+		File testFile = new File(Fixtures.TEXT_DIR, "1471-2148-14-31-2-l.jpg");
+		Int2Range box = new Int2Range(new IntRange(352, 360), new IntRange(28, 43)).
+				getInt2RangeExtendedInX(1, 1).getInt2RangeExtendedInY(1, 1);
+		GrayCharacter grayImage8 = GrayCharacter.clipCharacterFromImage(testFile, box);
+		
+		boolean scale = true;
+		double corr = referenceFont.correlateAndPlot(overlay, scale, grayImage8, "8");
+		LOG.debug("gray-8 "+corr);
+		corr = referenceFont.correlateAndPlot(overlay, scale, grayImage8, "A");
+		LOG.debug("gray-A "+corr);
+		
+	}
+
+	@Test
+	public void testCorrelateSixVsHelvetica() throws Exception {
+		double corrMin = 0.20;
+		boolean overlay = true;
+		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.HELVETICA);
+		File testFile = new File(Fixtures.TEXT_DIR, "1471-2148-14-20-test.jpg");
+//		Int2Range box = new Int2Range(new IntRange(99, 114), new IntRange(166, 188)).
+//				getInt2RangeExtendedInX(1, 1).getInt2RangeExtendedInY(1, 1);
+		Int2Range box = new Int2Range(new IntRange(99, 114), new IntRange(166, 188));
+		GrayCharacter grayImage6 = GrayCharacter.clipCharacterFromImage(testFile, box);
+		
+		boolean scale = true;
+		double corr = referenceFont.correlateAndPlot(overlay, scale, grayImage6, "6");
+		LOG.debug("gray-6 "+corr);
+		corr = referenceFont.correlateAndPlot(overlay, scale, grayImage6, "3");
+		LOG.debug("gray-3 "+corr);
+		
+	}
+
 }

@@ -64,12 +64,12 @@ public class PixelIsland {
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
-	private List<Pixel> removeList;
+//	private List<Pixel> removeList;
 	private List<Nucleus> nucleusList;
 	private List<Pixel> terminalPixels;
 	private Map<Pixel, Nucleus> nucleusMap;
 	private Set<Pixel> usedPixels;
-	private Set<Nucleus> usedNuclei;
+//	private Set<Nucleus> usedNuclei;
 	private List<PixelPath> pixelPaths;
 	private double tolerance = 1.5;
 
@@ -542,7 +542,7 @@ public class PixelIsland {
 	private PixelPath findTerminalOrBranch(Pixel terminalPixel) {
 		PixelPath pixelPath = new PixelPath();
 		usedPixels = new HashSet<Pixel>();
-		usedNuclei = new HashSet<Nucleus>();
+//		usedNuclei = new HashSet<Nucleus>();
 		Pixel currentPixel = terminalPixel;
 		while (true) {
 			usedPixels.add(currentPixel);
@@ -771,4 +771,41 @@ public class PixelIsland {
 		return subImage;
 	}
 
+	public BufferedImage createImage(int imageType) {
+		Int2Range bbox = this.getIntBoundingBox();
+		int xmin = bbox.getXRange().getMin();
+		int ymin = bbox.getYRange().getMin();
+		int w = bbox.getXRange().getRange();
+		int h = bbox.getYRange().getRange();
+		BufferedImage image = null;
+		if (w == 0 || h == 0) {
+			LOG.trace("zero pixel image");
+			return image;
+		}
+		image = new BufferedImage(w, h, imageType);
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				image.setRGB(i, j, 0xffffffff);
+			}
+		}
+		for (Pixel pixel : this.getPixelList()) {
+			Int2 xy = pixel.getInt2();
+			int x = xy.getX() - xmin;
+			int y = xy.getY() - ymin;
+//			System.out.println(xy+" "+bbox+" "+w+" "+h+" "+x+" "+y);
+			if (x < w && y < h) {
+				image.setRGB(x, y, 0xff000000);
+			}
+		}
+		return image;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("pixels "+((pixelList == null) ? null : pixelList.size()));
+		sb.append("; int2range "+int2range);
+		return sb.toString();
+	}
+	
+	
 }

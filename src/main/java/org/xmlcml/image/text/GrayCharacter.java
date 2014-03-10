@@ -7,8 +7,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.EuclidRuntimeException;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
@@ -29,34 +31,27 @@ public class GrayCharacter {
 	}
 	
 	private BufferedImage grayImage;
-//	private int width;
-//	private int height;
 	private double total;
 	private double sum;
+	private Integer codePoint; // unicode point
 
 	private GrayCharacter() {
 		
 	}
-//	public GrayCharacter(BufferedImage image) {
-//		setImage(image);
-//	}
 
 	private void setImage(BufferedImage image) {
 		if (image == null) {
 			throw new RuntimeException("null image: check files exists and is image");
 		}
 		this.grayImage = ImageUtil.binarizeToGray(image);
-//		this.width = image.getWidth();
-//		this.height = image.getHeight();
-//		GrayCharacter.debugGray(image);
 	}
 	
 	/** deep copy constructor.
 	 * creates new copied image
-	 * @param character2
+	 * @param gray2
 	 */
-	public GrayCharacter(GrayCharacter character2) {
-		BufferedImage image2 = character2.grayImage;
+	public GrayCharacter(GrayCharacter gray2) {
+		BufferedImage image2 = gray2.grayImage;
 		int height = image2.getHeight();
 		int width = image2.getWidth();
 		grayImage = new BufferedImage(width, height, image2.getType());
@@ -65,6 +60,7 @@ public class GrayCharacter {
 				grayImage.setRGB(i, j, image2.getRGB(i, j));
 			}
 		}
+		this.codePoint = gray2.codePoint;
 	}
 
 	public GrayCharacter(File file) throws IOException {
@@ -73,6 +69,18 @@ public class GrayCharacter {
 			throw new RuntimeException("null image for: "+file);
 		}
 		setImage(image);
+		codePoint = getCodePointFromFilename(file);
+	}
+
+	private static Integer getCodePointFromFilename(File file) {
+		String base = FilenameUtils.getBaseName(file.getPath());
+		Integer codePoint = null;
+		try {
+			codePoint = new Integer(base);
+		} catch (Exception e) {
+			throw new RuntimeException("cannot create as codePoint: "+file);
+		}
+		return codePoint;
 	}
 
 	/** correlate characters
@@ -84,10 +92,12 @@ public class GrayCharacter {
 	 * @param overlay if true shift v=centre of copy
 	 * @return
 	 */
-	public double correlateGray(GrayCharacter character2, String title, boolean overlay) {
+	public double correlateGray(GrayCharacter character2, String title, boolean overlay, boolean scale) {
 		double cor = 0.0;
 		GrayCharacter newCharacter2 = new GrayCharacter(character2);
-		//GrayCharacter.debugGray(grayImage);
+		if (scale) {
+			newCharacter2.grayImage = ImageUtil.scaleImage(this.getWidth(), this.getHeight(), newCharacter2.grayImage);
+		}
 		Real2 centre = this.getCentre();
 		LOG.trace("centre "+centre);
 		Real2 centre2 = newCharacter2.getCentre();
@@ -264,6 +274,22 @@ public class GrayCharacter {
 	private void setGrayImage(BufferedImage image) {
 		this.grayImage = image;
 	}
+
+	public Integer getCodePoint() {
+		return codePoint;
+	}
+
+	public void setCodePoint(Integer codePoint) {
+		this.codePoint = codePoint;
+	}
+
+	public static GrayCharacter clipCharacterFromImage(File testFile, Int2Range box) throws IOException {
+		BufferedImage testImage = ImageIO.read(testFile);
+		BufferedImage subImage = ImageUtil.clipSubImage(testImage, box);
+		GrayCharacter grayImage = GrayCharacter.readGrayImage(subImage);
+		return grayImage;
+	}
+	
 	
 
 }

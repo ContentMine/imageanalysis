@@ -4,8 +4,15 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
+import org.imgscalr.Scalr.Mode;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
@@ -210,6 +217,10 @@ public class ImageUtil {
 		return shiftedImage;
 	}
 
+	/**
+	@deprecated use Imgscalr instead {@link ImageUtil#scaleImage(int, int, BufferedImage)}
+	*/
+	@Deprecated
 	public static BufferedImage scaleAndInterpolate(BufferedImage image,
 			int newRows, int newCols) {
 		RealMatrix matrix = new RealMatrix(ImageUtil.getGrayMatrix(image));
@@ -217,6 +228,33 @@ public class ImageUtil {
 		BufferedImage shiftedImage = ImageUtil.putGrayMatrix(new IntMatrix(shiftedMatrix));
 		return shiftedImage;
 	}
-	
+
+	public static void writeImageQuietly(BufferedImage image, File file) {
+		try {
+			String type = FilenameUtils.getExtension(file.getName());
+			file.getParentFile().mkdirs();
+			ImageIO.write(image, type, new FileOutputStream(file));
+		} catch (Exception e) {
+			throw new RuntimeException("cannot write image "+file, e);
+		}
+	}
+	/** uses Imgscalr to scale.
+	 * 
+	 * @param width
+	 * @param height
+	 * @param genImage
+	 * @return
+	 */
+	public static BufferedImage scaleImage(int width, int height,
+			BufferedImage genImage) {
+		BufferedImage scaledGenImage = Scalr.resize(genImage, Method.ULTRA_QUALITY, Mode.FIT_EXACT, width,
+		        height);
+		return scaledGenImage;
+	}
+
+	public static void writeImageQuietly(BufferedImage image, String filename) {
+		writeImageQuietly(image, new File(filename));
+	}
+
 
 }

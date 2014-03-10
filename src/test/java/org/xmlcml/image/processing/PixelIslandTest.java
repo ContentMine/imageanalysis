@@ -676,11 +676,12 @@ public class PixelIslandTest {
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
-//			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
 			LOG.trace(height+" "+charsi.size());
 			plotBoxes(charsi, "target/charsRaw/"+height+".svg");
 		}
 	}
+	
+	
 
 	// =============================================================
 
