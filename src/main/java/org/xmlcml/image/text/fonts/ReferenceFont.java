@@ -1,6 +1,7 @@
 package org.xmlcml.image.text.fonts;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGImage;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGText;
-import org.xmlcml.image.GrayCharacterTest;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;
@@ -159,7 +159,7 @@ public class ReferenceFont {
 		}
 	}
 
-	public BufferedImage getImage(String charx) {
+	public BufferedImage getImage(Integer charx) {
 		ensureImageByCharacter();
 		return imageByCodePointMap.get(charx);
 	}
@@ -239,12 +239,12 @@ public class ReferenceFont {
 			BufferedImage image = island.createImage(testImage.getType());
 			if (image == null ||
 				image.getWidth() * image.getHeight() > maxArea) continue;
-			GrayCharacterTest.LOG.trace(image.getWidth()+"/"+image.getHeight());
+			LOG.trace(image.getWidth()+"/"+image.getHeight());
 			GrayCharacter grayCharacter = GrayCharacter.readGrayImage(image);
 			CharacterMatchList matchList = getBestCharacters(grayCharacter, corrMin);
 			if (matchList.size() > 0) {
 				Real2Range bbox = island.getBoundingBox();
-				GrayCharacterTest.LOG.debug("bbox: "+bbox.format(2)+"; matchList: "+matchList);
+				LOG.debug("bbox: "+bbox.format(2)+"; matchList: "+matchList);
 				SVGRect rect = new SVGRect(bbox);
 				rect.setStrokeWidth(0.5);
 				rect.setStroke("red");

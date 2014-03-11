@@ -70,7 +70,7 @@ public class ImageUtilTest {
 	 * 
 	 */
 	public void testReadGrayImage() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		IntMatrix matrix = ImageUtil.getGrayMatrix(image);
 //		System.out.println(matrix);
 	}
@@ -80,7 +80,7 @@ public class ImageUtilTest {
 	 * 
 	 */
 	public void testShiftGrayImage() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 0.1, 0.2);
 		ImageIO.write(shiftedImage, "png", new File("target/shiftedImage.png"));
 	}
@@ -90,7 +90,7 @@ public class ImageUtilTest {
 	 * 
 	 */
 	public void testScaleAndInterpolate() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.scaleAndInterpolate(image, 17, 13);
 		ImageIO.write(shiftedImage, "png", new File("target/scaledImage.png"));
 	}
@@ -100,7 +100,7 @@ public class ImageUtilTest {
 	 * 
 	 */
 	public void testShiftGrayImageToCentre() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		GrayCharacter character = GrayCharacter.readGrayImage(image);
 		Real2 centre = character.getCentre();
 //		LOG.debug(centre);

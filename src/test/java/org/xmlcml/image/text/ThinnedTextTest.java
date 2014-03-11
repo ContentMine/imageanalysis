@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.processing.OtsuBinarize;
@@ -60,6 +61,7 @@ public class ThinnedTextTest {
 
 	@Test
 	// this example is rubbish
+	@Ignore
 	public void testTimesRoman() throws Exception {
 		OtsuBinarize otsuBinarize = new OtsuBinarize();
 		otsuBinarize.read(Fixtures.TIMESROMAN_JPG);

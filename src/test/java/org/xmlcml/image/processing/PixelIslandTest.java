@@ -560,7 +560,7 @@ public class PixelIslandTest {
 	public void testFindCharsA() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
-		extractCharactersAndCorrelate(rawImage, islands, "A10", 0.27);
+		extractCharactersAndCorrelate(rawImage, islands, "65", 0.27);
 	}
 		
 	@Test
@@ -570,7 +570,7 @@ public class PixelIslandTest {
 	public void testFindCharsAny() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
-		extractCharactersAndCorrelate(rawImage, islands, "A10", 0.30);
+		extractCharactersAndCorrelate(rawImage, islands, "65", 0.30);
 		extractCharactersAndCorrelate(rawImage, islands, "A10b", 0.27);
 		extractCharactersAndCorrelate(rawImage, islands, "a10sb", 0.27);
 		extractCharactersAndCorrelate(rawImage, islands, "B10", 0.70);

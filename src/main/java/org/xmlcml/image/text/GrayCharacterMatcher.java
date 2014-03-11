@@ -15,7 +15,6 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGImage;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGText;
-import org.xmlcml.image.GrayCharacterTest;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;

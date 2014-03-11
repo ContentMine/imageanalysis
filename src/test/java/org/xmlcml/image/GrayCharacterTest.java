@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -13,10 +12,10 @@ import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
-import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGG;
@@ -38,12 +37,12 @@ public class GrayCharacterTest {
 
 	@Test
 	public void testGrayCharacter() throws Exception {
-		GrayCharacter character = new GrayCharacter(new File(Fixtures.CHAR_DIR, "A10.png"));
+		GrayCharacter character = new GrayCharacter(new File(Fixtures.CHAR_DIR, "65.png"));
 	}
 
 	@Test
 	public void testCorrelate() throws Exception {
-		GrayCharacter character = new GrayCharacter(new File(Fixtures.CHAR_DIR, "A10.png"));
+		GrayCharacter character = new GrayCharacter(new File(Fixtures.CHAR_DIR, "65.png"));
 		GrayCharacter characterA = new GrayCharacter(new File(Fixtures.TEXT_DIR, "testA.png"));
 		boolean scale = false;
 		character.correlateGray(character, "coor", false, scale);
@@ -58,7 +57,7 @@ public class GrayCharacterTest {
 	 * @throws Exception
 	 */
 	public void testCorrelateMany() throws Exception {
-		RealSquareMatrix corrMat = generateCorrelationMatrixFromFiles(new File(Fixtures.TEXT_DIR, "A10"));
+		RealSquareMatrix corrMat = generateCorrelationMatrixFromFiles(new File(Fixtures.TEXT_DIR, "65"));
 		LOG.trace(corrMat.format(1));
 	}
 
@@ -74,7 +73,7 @@ public class GrayCharacterTest {
 		  
     @Test
     public void testCluster() throws Exception {
-		analyzeCluster(new File(Fixtures.TEXT_DIR, "A10"), 48);
+		analyzeCluster(new File(Fixtures.TEXT_DIR, "65"), 48);
 		analyzeCluster(Fixtures.CHAR_DIR, 47);
     }
 
@@ -170,20 +169,20 @@ public class GrayCharacterTest {
 
 	@Test
 	public void testScaleCharacter() throws Exception {
-		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		int width = 20;
 		int height = 10;
 		BufferedImage bimage = Scalr.resize(image, Method.ULTRA_QUALITY, Mode.FIT_EXACT, width,
 	            height);
-		ImageIO.write(bimage, "png", new File("target/rescaledA10.png"));
+		ImageIO.write(bimage, "png", new File("target/rescaled65.png"));
 	}
 
 	@Test
 	public void testScaleCapitalA() throws Exception {
-		BufferedImage refImage = ImageIO.read(new File(Fixtures.CHAR_DIR, "A10.png"));
+		BufferedImage refImage = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		int width = refImage.getWidth();
 		int height = refImage.getHeight();
-		BufferedImage newImage = ImageIO.read(new File(GENERIC_DIR, "latin_capital_letter_a.png"));
+		BufferedImage newImage = ImageIO.read(new File(GENERIC_DIR, "65.png"));
 		BufferedImage newScaledImage = Scalr.resize(newImage, Method.ULTRA_QUALITY, Mode.FIT_EXACT, width,
 	            height);
 		ImageIO.write(newScaledImage, "png", new File("target/rescaledCapitalA.png"));
@@ -198,14 +197,14 @@ public class GrayCharacterTest {
 	public void testCorrelatePixelIslandsAgainstReference() throws Exception {
 		double corrMin = 0.50;
 		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.MONOSPACE);
-		BufferedImage testImage = ImageIO.read(new File(ReferenceFontManager.MONOSPACE_DIR, "aa.png"));
+		BufferedImage testImage = ImageIO.read(new File(ReferenceFontManager.MONOSPACE_DIR, "65.png"));
 		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandList(testImage);
 		for (PixelIsland island : pixelIslandList) {
 			BufferedImage image = island.createImage(testImage.getType());
 			if (image == null) {
 				LOG.error("null image "+island);
 			} else {
-				ImageUtil.writeImageQuietly(image, new File("target/reffont/test/aa.png"));
+				ImageUtil.writeImageQuietly(image, new File("target/reffont/test/65.png"));
 				LOG.trace(image.getWidth()+"/"+image.getHeight());
 				GrayCharacter grayCharacter = GrayCharacter.readGrayImage(image);
 				CharacterMatchList matchList = referenceFont.getBestCharacters(grayCharacter, corrMin);
@@ -216,6 +215,7 @@ public class GrayCharacterTest {
 
 	
 	@Test
+	@Ignore
 	public void testCorrelateMonospaceMonospace() throws Exception {
 		double corrMin = 0.20;
 		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.MONOSPACE);
@@ -227,6 +227,7 @@ public class GrayCharacterTest {
 	}
 
 	@Test
+	@Ignore
 	public void testCorrelateHelveticaAgainstMonospace() throws Exception {
 		double corrMin = 0.20;
 		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.MONOSPACE);
@@ -237,6 +238,7 @@ public class GrayCharacterTest {
 	}
 
 	@Test
+	@Ignore
 	public void testCorrelateBMCwFont() throws Exception {
 		double corrMin = 0.20;
 //		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.HELVETICA);
@@ -250,6 +252,7 @@ public class GrayCharacterTest {
 	
 	
 	@Test
+	@Ignore
 	public void testCorrelateBMCAgainstHelvetica() throws Exception {
 		double corrMin = 0.20;
 		ReferenceFont referenceFont = FONT_MANAGER.getFont(ReferenceFontManager.HELVETICA);
