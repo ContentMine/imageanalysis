@@ -1,15 +1,25 @@
 package org.xmlcml.image.lines;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGElement;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.Fixtures;
 
 public class DouglasPeuckerTest {
+	
+	private final static Logger LOG = Logger.getLogger(DouglasPeuckerTest.class);
 	@Test
 	public void testLine() {
 		DouglasPeucker douglasPeucker = new DouglasPeucker(1.0);
@@ -86,4 +96,19 @@ public class DouglasPeuckerTest {
 //		vectorizer.segment(islandList.get(1));
 //		int[] islands =   {492, 33,  25,  29,  25};
 	}
+
+	@Test
+	public void testContours() {
+		SVGElement contour = SVGElement.readAndCreateSVG(new File(Fixtures.LINES_DIR, "contours/1.svg"));
+		List<SVGLine> lines = SVGLine.extractSelfAndDescendantLines(contour);
+		Real2Array points0 = SVGLine.extractPoints(lines, 0.00001);
+		List<Real2> points = points0.getList(); 
+		DouglasPeucker douglasPeucker = new DouglasPeucker(0.1);
+		List<Real2> reducedList = douglasPeucker.reduce(points);
+		boolean close = true;
+		SVGG g = SVGLine.plotPointsAsTouchingLines(reducedList, close);
+		Assert.assertEquals("lines", 11, reducedList.size());
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/contours/1r.svg"));
+	}
+
 }

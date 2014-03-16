@@ -87,6 +87,20 @@ public class DouglasPeucker {
 			return;
 		}
 
+		int idxMax = findMaximallyDeviatingPoint(shape, firstIdx, lastIdx);
+
+		if (maxDevation > tolerance) {
+			marked[indexOfMaxDeviation] = true;
+			douglasPeuckerReduction(firstIdx, idxMax);
+			douglasPeuckerReduction(idxMax, lastIdx);
+		}
+	}
+	private void douglasPeuckerReductionOld(int firstIdx, int lastIdx) {
+		// overlapping indexes
+		if (lastIdx <= firstIdx + 1) {
+			return;
+		}
+
 		findMaximallyDeviatingPoint(shape, firstIdx, lastIdx);
 
 		if (maxDevation > tolerance) {
@@ -95,7 +109,7 @@ public class DouglasPeucker {
 			douglasPeuckerReduction(indexOfMaxDeviation, lastIdx);
 		}
 	}
-	private void findMaximallyDeviatingPoint(List<Real2> shape, int firstIdx, int lastIdx) {
+	private int findMaximallyDeviatingPoint(List<Real2> shape, int firstIdx, int lastIdx) {
 		maxDevation = 0.0;
 		indexOfMaxDeviation = 0;
 
@@ -112,6 +126,7 @@ public class DouglasPeucker {
 				indexOfMaxDeviation = idx;
 			}
 		}
+		return indexOfMaxDeviation;
 	}
 
 	/**
