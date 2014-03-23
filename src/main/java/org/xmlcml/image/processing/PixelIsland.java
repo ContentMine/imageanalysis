@@ -842,7 +842,7 @@ public class PixelIsland {
 	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon, int maxiter) {
 		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
 		while (maxiter-- > 0) {
-			PixelIslandTest.LOG.debug("pixels: "+getPixelList().size());
+			LOG.debug("pixels: "+getPixelList().size());
 			setPixelPaths(null);
 			List<SVGPolyline> polylineList0 = createPolylinesAndRemoveUsedPixels(dpEpsilon);
 			if (polylineList0.size() == 0) {
@@ -850,7 +850,7 @@ public class PixelIsland {
 				break;
 			}
 			polylineList.addAll(polylineList0);
-			PixelIslandTest.LOG.debug("pixels after: "+getPixelList().size()+" polylines "+polylineList0.size());
+			LOG.debug("pixels after: "+getPixelList().size()+" polylines "+polylineList0.size());
 		}
 		if (maxiter == 0) {
 			throw new RuntimeException("couldn't analyze pixelIsland");

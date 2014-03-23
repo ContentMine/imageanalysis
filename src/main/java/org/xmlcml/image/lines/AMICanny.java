@@ -15,9 +15,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
-public class BoofcvCanny {
+public class AMICanny {
 
-	public BoofcvCanny() {
+	public AMICanny() {
 		
 	}
 

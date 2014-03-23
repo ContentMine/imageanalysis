@@ -13,7 +13,6 @@ import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.image.processing.Nucleus;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIsland;
-import org.xmlcml.image.processing.PixelIslandTest;
 
 /** a non-branching path of pixels.
  * 
