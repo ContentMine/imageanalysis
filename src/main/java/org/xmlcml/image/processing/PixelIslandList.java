@@ -163,4 +163,13 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list.get(i).binaryIslandCorrelation(list.get(j), i+"-"+j);
 	}
 
+	public static PixelIslandList thinFillAndGetPixelIslandList(BufferedImage image0) {
+		BufferedImage image = ImageUtil.thin(image0);
+		FloodFill floodFill = new FloodFill(image);
+		floodFill.setDiagonal(true);
+		floodFill.fill();
+		PixelIslandList islandList = floodFill.getPixelIslandList();
+		return islandList;
+	}
+
 }

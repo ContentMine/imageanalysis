@@ -14,14 +14,10 @@ import org.xmlcml.image.Fixtures;
 public class FloodFillTest {
 	private static final Logger LOG = Logger.getLogger(FloodFillTest.class);
 
-	@Test
-	public void testBinaryMaltoryzine() throws IOException {
-		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.fill();
-		Assert.assertEquals("pixelIslands", 5, floodFill.getPixelIslandList().size());
-	}
-	
+	/** floodfill with explicit diagonals.
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void testThinnedMaltoryzineDiagonal() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
@@ -33,8 +29,24 @@ public class FloodFillTest {
 			LOG.debug(pixelIsland.size());
 		}
 	}
+
+	/** flood fill with diagonals default.
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testBinaryMaltoryzine() throws IOException {
+		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
+		FloodFill floodFill = new FloodFill(image);
+		floodFill.fill();
+		Assert.assertEquals("pixelIslands", 5, floodFill.getPixelIslandList().size());
+	}
 	
 	
+	/** without diagonals the fill breaks up badly.
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void testThinnedMaltoryzineNoDiagnal() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);

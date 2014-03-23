@@ -20,6 +20,7 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
@@ -440,6 +441,7 @@ public class PixelIsland {
 			nucleusList.add(nucleus);
 			LOG.trace("nucl "+nucleus.toString());
 		}
+		LOG.debug("nuclei: "+nucleusList.size());
 		return nucleusList;
 	}
 
@@ -470,8 +472,9 @@ public class PixelIsland {
 
 	void flattenNuclei() {
 		List<Nucleus> nucleusList = this.getNucleusList();
+		int maxIterations = 3;
 		for (Nucleus nucleus : nucleusList) {
-			nucleus.ensureFlattened(3);
+			nucleus.ensureFlattened(maxIterations);
 		}
 	}
 
@@ -487,7 +490,7 @@ public class PixelIsland {
 		}
 	}
 
-	public List<PixelPath> createPixelPathList() {
+	public List<PixelPath> createPixelPathListStartingAtTerminals() {
 		if (pixelPaths == null) {
 			pixelPaths = new ArrayList<PixelPath>();
 			removeHypotenuses();
@@ -635,10 +638,10 @@ public class PixelIsland {
 		return usedNeighbours;
 	}
 
-	public SVGG createSVG(boolean pixels) {
+	public SVGG createSVGFromPixelPaths(boolean pixels) {
 		SVGG gg = new SVGG();
 		if (!pixels) {
-			createPixelPathList();
+			createPixelPathListStartingAtTerminals();
 		}
 		if (pixels || pixelPaths.size() == 0) {
 			gg = plotPixels(pixelList);
@@ -652,17 +655,23 @@ public class PixelIsland {
 		return gg;
 	}
 
+	public SVGG plotPixels() {
+		return PixelIsland.plotPixels(this.getPixelList());
+	}
+	
 	public static SVGG plotPixels(List<Pixel> pixelList) {
 		SVGG g = new SVGG();
+		LOG.debug("pixelList "+pixelList.size());
 		for (Pixel pixel : pixelList) {
 			SVGRect rect = pixel.getSVGRect();
+			LOG.trace(rect.getBoundingBox());
 			g.appendChild(rect);
 		}
 		return g;
 	}
 
-	public List<Real2Array> createSegments() {
-		createPixelPathList();
+	public List<Real2Array> createSegments(double tolerance) {
+		createPixelPathListStartingAtTerminals();
 		segmentArrayList = new ArrayList<Real2Array>();
 		for (PixelPath pixelPath : pixelPaths) {
 			Real2Array segmentArray = new Real2Array(pixelPath.createDouglasPeucker(tolerance));
@@ -672,7 +681,7 @@ public class PixelIsland {
 	}
 
 	public SVGG debugSVG(String filename) {
-		SVGG g = createSVG(true);
+		SVGG g = createSVGFromPixelPaths(true);
 		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
 		return g;
 	}
@@ -805,6 +814,48 @@ public class PixelIsland {
 		sb.append("pixels "+((pixelList == null) ? null : pixelList.size()));
 		sb.append("; int2range "+int2range);
 		return sb.toString();
+	}
+
+	public void removePixels(PixelPath pixelPath) {
+		List<Pixel> pixelList = pixelPath.getPixelList();
+		for (Pixel pixel : pixelList) {
+			this.remove(pixel);
+		}
+	}
+
+	public List<SVGPolyline> createPolylinesAndRemoveUsedPixels(double epsilon) {
+		List<PixelPath> pixelPaths = this.createPixelPathListStartingAtTerminals();
+		LOG.debug("pixelPaths: "+pixelPaths.size());
+		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
+		for (PixelPath pixelPath : pixelPaths) {
+			SVGPolyline polyline = pixelPath.createPolyline(epsilon);
+			removePixels(pixelPath);
+			polylineList.add(polyline);
+		}
+		return polylineList;
+	}
+
+	public void setPixelPaths(List<PixelPath> pixelPaths) {
+		this.pixelPaths = pixelPaths;
+	}
+
+	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon, int maxiter) {
+		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
+		while (maxiter-- > 0) {
+			PixelIslandTest.LOG.debug("pixels: "+getPixelList().size());
+			setPixelPaths(null);
+			List<SVGPolyline> polylineList0 = createPolylinesAndRemoveUsedPixels(dpEpsilon);
+			if (polylineList0.size() == 0) {
+				// this seems to break the cycles OK on first example
+				break;
+			}
+			polylineList.addAll(polylineList0);
+			PixelIslandTest.LOG.debug("pixels after: "+getPixelList().size()+" polylines "+polylineList0.size());
+		}
+		if (maxiter == 0) {
+			throw new RuntimeException("couldn't analyze pixelIsland");
+		}
+		return polylineList;
 	}
 	
 	

@@ -7,6 +7,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 
+/** not yet very active.
+ * 
+ * @author pm286
+ *
+ */
 public class SpanningTreeTest {
 
 	public final static Logger LOG = Logger.getLogger(SpanningTreeTest.class);

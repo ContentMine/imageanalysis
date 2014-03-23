@@ -6,11 +6,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.image.processing.Nucleus;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIsland;
+import org.xmlcml.image.processing.PixelIslandTest;
 
 /** a non-branching path of pixels.
  * 
@@ -23,7 +26,7 @@ public class PixelPath {
 
 	private final static Logger LOG = Logger.getLogger(PixelPath.class);
 	
-	private Object island;
+	private PixelIsland island;
 	private List<Real2> rawPoints;
 	private List<Pixel> pixelList;
 	private List<Real2> segmentPoints;
@@ -119,5 +122,14 @@ public class PixelPath {
 		this.startNucleus = nucleus;
 	}
 
-	
+	public List<Pixel> getPixelList() {
+		return this.pixelList;
+	}
+
+
+	public SVGPolyline createPolyline(double epsilon) {
+		List<Real2> points = createDouglasPeucker(epsilon);
+		SVGPolyline polyline = new SVGPolyline(new Real2Array(points));
+		return polyline;
+	}
 }

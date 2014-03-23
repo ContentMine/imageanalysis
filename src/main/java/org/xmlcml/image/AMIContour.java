@@ -3,12 +3,15 @@ package org.xmlcml.image;
 import georegression.struct.point.Point2D_I32;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import nu.xom.Attribute;
-
+import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.lines.DouglasPeucker;
@@ -23,10 +26,12 @@ import boofcv.alg.filter.binary.Contour;
  */
 public class AMIContour {
 
+	private final static Logger LOG = Logger.getLogger(AMIContour.class);
 	private Contour contour;
 	private Real2Array externalPoints;
 	private List<Real2Array> internalPointsList;
 	private DouglasPeucker douglasPeucker;
+	private double maxDist = 3.1; // kludge for contours with "holes" in
 
 	public AMIContour(Contour contour) {
 		this.contour = contour;
@@ -47,14 +52,65 @@ public class AMIContour {
 		}
 	}
 
+	
 	private Real2Array createReal2Points(List<Point2D_I32> points) {
 		Real2Array realPoints = new Real2Array();
-		for (Point2D_I32 p : points) {
-			realPoints.add(new Real2(p.x, p.y));
+		Set<Int2> usedPoints = new HashSet<Int2>();
+		for (int i = 0; i < points.size(); i++) {
+			Int2 int2 = getInt2(points.get(i));
+			if (usedPoints.contains(int2)) {
+				LOG.debug("duplicate point in contour: "+int2);
+				Real2Array reversePoints = createReversePoints(points, int2);
+				realPoints.add(reversePoints);
+				break;
+			}
+			realPoints.add(new Real2(int2));
+			usedPoints.add(int2);
 		}
 		return realPoints;
 	}
 	
+	/** creates array of points from n-1 to break in contour.
+	 * 
+	 * @param points
+	 * @param breakPoint
+	 * @return
+	 */
+	private Real2Array createReversePoints(List<Point2D_I32> points, Int2 breakPoint) {
+		boolean ok = false;
+		Real2Array newPoints = new Real2Array();
+		for (int i = points.size() - 1; i >= 0; i--) {
+			Int2 int2 = getInt2(points.get(i));
+			double dist = breakPoint.getEuclideanDistance(int2);
+			newPoints.add(new Real2(int2));
+			if (dist < maxDist) {
+				ok = true;
+				break;
+			}
+		}
+		if (ok) {
+			newPoints.reverse();
+		} else {
+			newPoints = new Real2Array(); // could not find break
+		}
+		return newPoints;
+	}
+
+	private Int2 getInt2(Point2D_I32 p) {
+		return new Int2(p.x, p.y);
+	}
+
+	private int findNextUnusedPoint(List<Point2D_I32> points, int current, Set<Int2> usedPoints) {
+		int i = current + 1;
+		for (; i < points.size(); i++) {
+			Int2 int2 = getInt2(points.get(i));
+			if (!usedPoints.contains(int2)) {
+				break;
+			}
+		}
+		return i;
+	}
+
 	public AMIContour reduceExternal(double tolerance) {
 		douglasPeucker = new DouglasPeucker(tolerance);
 		List<Real2> reduced = reduce(externalPoints);
@@ -105,7 +161,14 @@ public class AMIContour {
 			line.setWidth(width);
 			gg.appendChild(line);
 		}
+//		addDebugCircle(gg);
 		return gg;
+	}
+
+	private void addDebugCircle(SVGG gg) {
+		SVGCircle circle = new SVGCircle(getExternalPoints().get(0), 4.0);
+		circle.setFill("magenta");
+		gg.appendChild(circle);
 	}
 
 	@Override

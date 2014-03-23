@@ -21,11 +21,11 @@ import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
-import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
@@ -35,12 +35,21 @@ import org.xmlcml.image.lines.DouglasPeucker;
 import org.xmlcml.image.lines.PixelPath;
 import org.xmlcml.image.processing.PixelIslandList.Operation;
 
+import boofcv.io.image.UtilImageIO;
+
 import com.google.common.collect.Multimap;
 
 public class PixelIslandTest {
 
+	private static final int MAX_PIXEL_ITER = 20;
+
+	private static final double DP_EPSILON = 1.5;
+
 	public final static Logger LOG = Logger.getLogger(PixelIslandTest.class);
-	
+
+	private final static double EPS = 0.5;
+	public static String COLOUR[] = {"red", "blue", "green", "yellow", "cyan", "magenta"};
+
 	@Test
 	@Ignore // non-deterministic?
 
@@ -140,52 +149,162 @@ public class PixelIslandTest {
 	}
 
 	@Test
-	public void testCreateSeveralPixelIslands() throws IOException {
+	public void testCreatePixelIslandsAndSegments() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
 		PixelIslandList islandList = floodFill.getPixelIslandList();
 		Assert.assertEquals("islands", 5, islandList.size());
-		int[] islands =   {492, 33,  25,  29,  25};
+		int[] islandsize =   {492, 33,  25,  29,  25};
 		int[] terminals = {6,   2,   2,   2,   2};
 		int[] count2 =    {409, 12,  23,  27,  23};
 		int[] count3 =    {74,  18,  0,   0,   0};
 		int[] count4 =    {3,   1,   0,   0,   0};
 		int[] count5 =    {0,   0,   0,   0,   0};
+		checkCounts(islandList, islandsize, terminals, count2, count3, count4,
+				count5);
+		
+		drawSVG(islandList.get(0), "target/maltoryzine0.svg");
+		drawSVG(islandList.get(1), "target/maltoryzine1.svg");
+		drawSVG(islandList.get(2), "target/maltoryzine2.svg");
+
+		// doesn't seem to do much
+		islandList.get(0).flattenNuclei();
+		islandList.get(1).flattenNuclei();
+		islandList.get(2).flattenNuclei();
+		islandList.get(3).flattenNuclei();
+		islandList.get(4).flattenNuclei();
+
+		checkCounts(islandList, islandsize, terminals, count2, count3, count4,
+				count5);
+
+		
+		PixelIsland island1 = islandList.get(1);
+		List<Pixel> pixelList1 = island1.getPixelList();
+//		for (Pixel pixel : pixelList1) {
+//			LOG.trace("pixel "+pixel.getInt2());
+//		}
+		Pixel pixel32 = pixelList1.get(32);
+		Assert.assertEquals("pixel32", new Int2(206, 66), pixel32.getInt2());
+		
+		island1.createSpanningTree(pixel32);
+		
+		SVGG gg = new SVGG();
+		int islandj = 0;
+		double dpEpsilon = 1.5;
+		int maxiter = 20;
+		for (PixelIsland island : islandList) {
+			SVGG g = new SVGG();
+			List<SVGPolyline> polylineList = island.createPolylinesIteratively(dpEpsilon, maxiter);
+			
+			colourPolylinesAndAddToG(COLOUR, g, polylineList);
+			
+			gg.appendChild(g);
+			SVGG islandG = island.plotPixels();
+			SVGSVG.wrapAndWriteAsSVG((SVGG)islandG.copy(), new File("target/island"+(++islandj)+".svg"));
+			gg.appendChild(islandG);
+		}
+		SVGSVG.wrapAndWriteAsSVG(gg, new File("target/segments.svg"));
+	
+	}
+
+	private void colourPolylinesAndAddToG(String[] colour, SVGG g, List<SVGPolyline> polylineList) {
+		int i = 0;
+		for (SVGPolyline polyline : polylineList) {
+			polyline.setStrokeWidth(0.5);
+			polyline.setStroke(colour[i]);
+			polyline.setFill("none");
+			g.appendChild(polyline);
+			i = (i+1)%colour.length;
+			LOG.trace("col "+i);
+		}
+	}
+	
+	@Test
+	public void testAnalyzeCharA() throws Exception {
+		for (int i = 65; i < 64+26; i++) {
+			LOG.debug(">>>>>>>>>>>>>> "+i);
+			BufferedImage image0 = null;
+			try {
+				image0 = ImageIO.read(new File("src/main/resources/org/xmlcml/image/text/fonts/helvetica/"+i+".png"));
+			} catch (Exception e) {
+				LOG.debug("cannot create image: char"+i+" "+e);
+				continue;
+			}
+			ImageUtil.writeImageQuietly(image0, new File("target/charRecog/char"+i+".thin.png"));
+			PixelIslandList islandList = PixelIslandList.thinFillAndGetPixelIslandList(image0);
+			Assert.assertEquals("islands", 1, islandList.size());
+			PixelIsland island = islandList.get(0);
+			SVGG g = new SVGG();
+			List<SVGPolyline> polylineList = island.createPolylinesIteratively(DP_EPSILON /* *2*/, MAX_PIXEL_ITER);
+			
+			colourPolylinesAndAddToG(COLOUR, g, polylineList);
+			
+			SVGSVG.wrapAndWriteAsSVG(g, new File("target/charRecog/char"+i+".svg"));
+		}
+	}
+
+	@Test
+	public void testOtsu() throws Exception {
+		OtsuBinarize otsuBinarize = new OtsuBinarize();
+		File aFile = new File("src/main/resources/org/xmlcml/image/text/fonts/helvetica/"+65+".png");
+	    otsuBinarize.read(aFile);
+//	    otsuBinarize.toGray();
+	    otsuBinarize.binarize();
+	    BufferedImage imageOut = otsuBinarize.getBinarizedImage();
+	    ImageUtil.writeImageQuietly(imageOut, new File("target/binarized.png"));
+	    BufferedImage imageThin = ImageUtil.thin(imageOut);
+	    ImageUtil.writeImageQuietly(imageThin, new File("target/binarizedThin.png"));
+	}
+
+	@Test
+	public void testTrec() throws Exception {
+		File file = new File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");		
+		Assert.assertTrue(file.exists());
+		BufferedImage image0 = UtilImageIO.loadImage("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");
+
+//		BufferedImage image0 = ImageIO.read(new File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF"));
+		Assert.assertNotNull(image0);
+		ImageUtil.writeImageQuietly(image0, new File("target/trec.thin.png"));
+		PixelIslandList islandList = PixelIslandList.thinFillAndGetPixelIslandList(image0);
+		Assert.assertEquals("islands", 1, islandList.size());
+		PixelIsland island = islandList.get(0);
+		SVGG g = new SVGG();
+		List<SVGPolyline> polylineList = island.createPolylinesIteratively(DP_EPSILON /* *2*/, MAX_PIXEL_ITER);
+		
+		colourPolylinesAndAddToG(COLOUR, g, polylineList);
+		
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/charRecog/trec.svg"));
+	}
+	
+
+	private void drawSVG(PixelIsland island, String filename) {
+		SVGG svgg = island.createSVGFromPixelPaths(true);
+		File svgfile = new File(filename);
+		SVGSVG.wrapAndWriteAsSVG(svgg, svgfile);
+		Assert.assertTrue(svgfile.exists());
+	}
+
+	private void checkCounts(PixelIslandList islandList, int[] islandsize,
+			int[] terminals, int[] count2, int[] count3, int[] count4,
+			int[] count5) {
 		for (int i = 0; i < islandList.size(); i++) {
 			
 			PixelIsland island = islandList.get(i);
-			Assert.assertEquals("island "+i, islands[i], island.size());
+			Assert.assertEquals("island "+i, islandsize[i], island.size());
 			Assert.assertEquals("terminal "+i, terminals[i], island.getTerminalPixels().size());
 			Assert.assertEquals("2-nodes "+i, count2[i], island.getNodesWithNeighbours(2).size());
 			Assert.assertEquals("3-nodes "+i, count3[i], island.getNodesWithNeighbours(3).size());
 			Assert.assertEquals("4-nodes "+i, count4[i], island.getNodesWithNeighbours(4).size());
 			Assert.assertEquals("5-nodes "+i, count5[i], island.getNodesWithNeighbours(5).size());
 		}
-	
-		islandList.get(0).flattenNuclei();
-		islandList.get(1).flattenNuclei();
-		islandList.get(2).flattenNuclei();
-		islandList.get(3).flattenNuclei();
-		islandList.get(4).flattenNuclei();
-		
-		
-		PixelIsland island1 = islandList.get(1);
-		List<Pixel> pixelList = island1.getPixelList();
-		for (Pixel pixel : pixelList) {
-			LOG.trace("pixel "+pixel.getInt2());
-		}
-		Pixel pixel32 = pixelList.get(32);
-		Assert.assertEquals("pixel32", new Int2(206, 66), pixel32.getInt2());
-		island1.createSpanningTree(pixel32);
-	
 	}
 	
 	@Test
 	public void testCreateLinePixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.LINE_PNG);
-		List<PixelPath> pixelPaths = island.createPixelPathList();
+		List<PixelPath> pixelPaths = island.createPixelPathListStartingAtTerminals();
 		Assert.assertEquals("paths", 1, pixelPaths.size());
 		DouglasPeucker douglasPeucker = new DouglasPeucker(2.0);
 		List<Real2> reduced = douglasPeucker.reduce(pixelPaths.get(0).getPoints());
@@ -195,7 +314,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateZigzagPixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.ZIGZAG_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
 		island.debugSVG("target/zigzag.svg");
 	}
@@ -203,7 +322,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateHexagonPixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.HEXAGON_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
 		island.debugSVG("target/hexagon.svg");
 	}
@@ -211,7 +330,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateBranch0PixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.BRANCH0_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 3, segmentArrayList.size());
 		island.debugSVG("target/branch0.svg");
 	}
@@ -219,7 +338,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateMaltoryzine0PixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE0_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 6, segmentArrayList.size());
 		island.debugSVG("target/maltoryzine0.svg");
 	}
@@ -227,7 +346,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateMaltoryzinePixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE_THINNED_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 6, segmentArrayList.size());
 		island.debugSVG("target/maltoryzine.svg");
 	}
@@ -250,7 +369,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateTerminalPixelPaths() throws IOException {
 		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINAL_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
 		island.debugSVG("target/terminalnode.svg");
 	}
@@ -262,7 +381,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateTerminalsPixelPaths() throws IOException{
 		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINALS_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		island.debugSVG("target/terminalnodes.svg");
 		Assert.assertEquals("segmentArray", 1, segmentArrayList.size());
 	}
@@ -275,7 +394,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateBranchPixelPaths() throws IOException {
 		PixelIsland island = createFirstPixelIsland(Fixtures.BRANCH_PNG);
-		List<Real2Array> segmentArrayList = island.createSegments();
+		List<Real2Array> segmentArrayList = island.createSegments(EPS);
 		Assert.assertEquals("segmentArray", 3, segmentArrayList.size());
 		//debug(segmentArrayList);
 		island.debugSVG("target/branch.svg");
@@ -441,13 +560,13 @@ public class PixelIslandTest {
 					newList.add(j);
 					usedSet.add(j);
 					//System.out.print(i+" "+j+": "+cor+" ");
-					g.appendChild(chars.get(j).createSVG(true));
+					g.appendChild(chars.get(j).createSVGFromPixelPaths(true));
 				}
 			}
 			Collections.sort(newList);
 			SVGG gk = null;
 			for (Integer k : newList) {
-				gk = chars.get(k).createSVG(true);
+				gk = chars.get(k).createSVGFromPixelPaths(true);
 				g.appendChild(gk);
 			}
 			gk = new SVGG(gk);
@@ -692,7 +811,7 @@ public class PixelIslandTest {
 			LOG.trace(island+" "+island.size()+" "+bbox);
 			SVGRect rect = new SVGRect(bbox);
 			g.appendChild(rect);
-			SVGG gg = island.createSVG(true);
+			SVGG gg = island.createSVGFromPixelPaths(true);
 			int n = gg.getChildCount();
 			for (int i = n - 1; i >= 0; i--) {
 				SVGElement ggg = (SVGElement) gg.getChild(i);
