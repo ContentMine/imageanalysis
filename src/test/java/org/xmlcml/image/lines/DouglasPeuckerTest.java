@@ -108,7 +108,9 @@ public class DouglasPeuckerTest {
 		boolean close = true;
 		SVGG g = SVGLine.plotPointsAsTouchingLines(reducedList, close);
 		Assert.assertEquals("lines", 11, reducedList.size());
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/contours/1r.svg"));
+		File file = new File("target/contours/");
+		file.mkdirs();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(file, "1r.svg"));
 	}
 
 }

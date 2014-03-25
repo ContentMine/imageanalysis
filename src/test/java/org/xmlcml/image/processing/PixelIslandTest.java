@@ -22,7 +22,9 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.euclid.Vector2;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
@@ -223,7 +225,13 @@ public class PixelIslandTest {
 	
 	@Test
 	public void testAnalyzeCharA() throws Exception {
-		for (int i = 65; i < 64+26; i++) {
+		SVGG gg = new SVGG();
+		double x = 0;
+		double y = 0;
+		double deltax = 50;
+		double deltay = 50;
+		double xmax = 501;
+		for (int i = 33; i < 64+26; i++) {
 			LOG.debug(">>>>>>>>>>>>>> "+i);
 			BufferedImage image0 = null;
 			try {
@@ -232,17 +240,28 @@ public class PixelIslandTest {
 				LOG.debug("cannot create image: char"+i+" "+e);
 				continue;
 			}
-			ImageUtil.writeImageQuietly(image0, new File("target/charRecog/char"+i+".thin.png"));
+			
+//			ImageUtil.writeImageQuietly(image0, new File("target/charRecog/char"+i+".thin.png"));
 			PixelIslandList islandList = PixelIslandList.thinFillAndGetPixelIslandList(image0);
 			Assert.assertEquals("islands", 1, islandList.size());
 			PixelIsland island = islandList.get(0);
 			SVGG g = new SVGG();
-			List<SVGPolyline> polylineList = island.createPolylinesIteratively(DP_EPSILON /* *2*/, MAX_PIXEL_ITER);
+			Transform2 t2 = new Transform2 (new Vector2(x, y));
+			g.setTransform(t2);
+			x += deltax;
+			if (x > xmax) {
+				x = 0;
+				y += deltay;
+			}
+			List<SVGPolyline> polylineList = island.createPolylinesIteratively(DP_EPSILON *0.5 /* *2*/, MAX_PIXEL_ITER);
 			
 			colourPolylinesAndAddToG(COLOUR, g, polylineList);
-			
-			SVGSVG.wrapAndWriteAsSVG(g, new File("target/charRecog/char"+i+".svg"));
+//			File file =  new File("target/charRecog/char"+i+".svg");
+//			SVGSVG.wrapAndWriteAsSVG(g, file);
+			gg.appendChild(g);
 		}
+		File file =  new File("target/charRecog/charAll.svg");
+		SVGSVG.wrapAndWriteAsSVG(gg, file);
 	}
 
 	@Test
@@ -259,6 +278,7 @@ public class PixelIslandTest {
 	}
 
 	@Test
+	@Ignore // material deleted 
 	public void testTrec() throws Exception {
 		File file = new File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");		
 		Assert.assertTrue(file.exists());

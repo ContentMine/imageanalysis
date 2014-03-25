@@ -97,7 +97,7 @@ public class ReferenceFontTest {
 		outdir.delete();
 		outdir.mkdirs();
 		ReferenceFont.createWikpediaFontPngs(glyphFile, outdir);
-		Assert.assertEquals("glyphs", 91, FileUtils.listFiles(outdir, new String[]{"png"}, false).size());
+		Assert.assertTrue("glyphs", FileUtils.listFiles(outdir, new String[]{"png"}, false).size() > 90);
 	}
 	
 	@Test
