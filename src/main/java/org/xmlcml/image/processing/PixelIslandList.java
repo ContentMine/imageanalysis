@@ -35,6 +35,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 	
 	private List<PixelIsland> list;
+	private BufferedImage thinnedImage;
 	
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -170,7 +171,16 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		floodFill.setDiagonal(true);
 		floodFill.fill();
 		PixelIslandList islandList = floodFill.getPixelIslandList();
+		islandList.setThinnedImage(image);
 		return islandList;
+	}
+
+	private void setThinnedImage(BufferedImage image) {
+		this.thinnedImage = image;
+	}
+	
+	public BufferedImage getThinnedImage() {
+		return thinnedImage;
 	}
 
 }

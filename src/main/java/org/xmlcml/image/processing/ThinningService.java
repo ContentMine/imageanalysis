@@ -231,13 +231,6 @@ public class ThinningService {
 	       }
 	}
 
-
-//	public void doZhangSuenThinning(int[][] imageData) {
-//	    copyImageToBinary(image, binaryImage);
-//		doThinning();
-//	}
-
-
 	public int[][] getBinaryImage() {
 		return binaryImage;
 	}

@@ -720,6 +720,7 @@ public class PixelIsland {
 		int yrange = Math.max(yRange1, yRange2);
 		LOG.trace(xrange+" "+yrange);
 		double score = 0.;
+		File file = new File("target/correlate/");
 		SVGG g = new SVGG();
 		for (int i = 0; i < xrange; i++) {
 			int x1 = xMin1 + i;
@@ -747,9 +748,9 @@ public class PixelIsland {
 			}
 		}
 		if (title != null) {
-			File file = new File("target/"+title+".svg");
-			file.getParentFile().mkdirs();
-			SVGSVG.wrapAndWriteAsSVG(g, file);
+			File filex = new File(file, title+".svg");
+			filex.getParentFile().mkdirs();
+			SVGSVG.wrapAndWriteAsSVG(g, filex);
 		}
 		return score / (xrange * yrange);
 	}

@@ -232,7 +232,6 @@ public class PixelIslandTest {
 		double deltay = 50;
 		double xmax = 501;
 		for (int i = 33; i < 64+26; i++) {
-			LOG.debug(">>>>>>>>>>>>>> "+i);
 			BufferedImage image0 = null;
 			try {
 				image0 = ImageIO.read(new File("src/main/resources/org/xmlcml/image/text/fonts/helvetica/"+i+".png"));
@@ -241,8 +240,9 @@ public class PixelIslandTest {
 				continue;
 			}
 			
-//			ImageUtil.writeImageQuietly(image0, new File("target/charRecog/char"+i+".thin.png"));
-			PixelIslandList islandList = PixelIslandList.thinFillAndGetPixelIslandList(image0);
+			BufferedImage binaryImage = ImageUtil.binarize(image0);
+			PixelIslandList islandList = PixelIslandList.thinFillAndGetPixelIslandList(binaryImage);
+			ImageUtil.writeImageQuietly(islandList.getThinnedImage(), new File("target/charRecog/char"+i+".thin.png"));
 			Assert.assertEquals("islands", 1, islandList.size());
 			PixelIsland island = islandList.get(0);
 			SVGG g = new SVGG();
@@ -278,7 +278,7 @@ public class PixelIslandTest {
 	}
 
 	@Test
-	@Ignore // material deleted 
+	@Ignore // file material deleted 
 	public void testTrec() throws Exception {
 		File file = new File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");		
 		Assert.assertTrue(file.exists());
@@ -453,12 +453,13 @@ public class PixelIslandTest {
 	
 	@Test
 	public void testLargePhyloJpg() throws IOException {
+		File phyloDir = new File("target/phylo/");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		Collections.sort(islands.getList(), new PixelIslandComparator(PixelIslandComparator.ComparatorType.SIZE));
 //		LOG.trace(islands.get(0).size());
 		Assert.assertTrue(islands.size() > 2000);
 		Assert.assertEquals(2224, islands.size());
-		plotBoxes(islands, "target/largePhyloBoxes.svg");
+		plotBoxes(islands, new File(phyloDir, "largePhyloBoxes.svg"));
 	}
 
 //	@Test
@@ -478,30 +479,34 @@ public class PixelIslandTest {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Assert.assertEquals("all chars", 2206, characters.size());
-		plotBoxes(characters, "target/charsHeight.svg");
+		File charDir = new File("target/chars/");
+		plotBoxes(characters, new File(charDir, "charsHeight.svg"));
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
-			plotBoxes(charsi, "target/chars"+height+".svg");
+			charDir.mkdirs();
+			plotBoxes(charsi, new File(charDir, "chars"+height+".svg"));
 		}
 	}
 
 
 	@Test
 	public void testLargePhyloJpgSmallChars() throws IOException {
+		File charDir = new File("target/chars/");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 20.), new RealRange(0., 1.));
 		Assert.assertEquals("all chars", 287, characters.size());
-		plotBoxes(characters, "target/chars0-1.svg");
+		plotBoxes(characters, new File(charDir, "chars0-1.svg"));
 	}
 
 	@Test
 	public void testLargePhyloJpgLargeChars() throws IOException {
+		File charDir = new File("target/chars/");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE, Operation.THIN);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 20.), new RealRange(12., 25.));
 		Assert.assertEquals("all chars", 54, characters.size());
-		plotBoxes(characters, "target/charsHeightLarge.svg");
+		plotBoxes(characters, new File(charDir, "target/charsHeightLarge.svg"));
 	}
 
 	@Test
@@ -513,13 +518,14 @@ public class PixelIslandTest {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Assert.assertEquals("all chars", 2240, characters.size());
-		plotBoxes(characters, "target/charsHeight.svg");
+		File charDir = new File("target/chars/");
+		plotBoxes(characters, new File(charDir, "charsHeight.svg"));
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 			Assert.assertEquals("counts"+height, heightCount[height], charsi.size());
 			LOG.trace(height+" "+charsi.size());
-			plotBoxes(charsi, "target/charsNoThin"+height+".svg");
+			plotBoxes(charsi, new File(charDir, "charsNoThin"+height+".svg"));
 		}
 	}
 
@@ -629,6 +635,8 @@ public class PixelIslandTest {
 		Collections.sort(chars.getList(), new PixelIslandComparator(
 				PixelIslandComparator.ComparatorType.TOP, PixelIslandComparator.ComparatorType.LEFT));
 		PixelIslandList islandsA = new PixelIslandList();
+		File clipDir = new File("target/clip/");
+		clipDir.mkdirs();
 		for (int charA : charsA) {
 			PixelIsland island = chars.get(charA);
 			islandsA.add(island);
@@ -638,9 +646,13 @@ public class PixelIslandTest {
 				LOG.error("null subImage");
 			} else {
 				LOG.trace(ibbox);
-				File file = new File("target/clip/"+charA+".png");
-				file.getParentFile().mkdirs();
-				ImageIO.write(subImage1, "png", file);
+				File file = new File(clipDir, charA+".png");
+				try {
+					ImageIO.write(subImage1, "png", file);
+				} catch (Exception e) {
+					LOG.error("couldn't write character: "+charA+" "+e);
+					continue;
+				}
 			}
 		}
 		int nchar = islandsA.size();
@@ -671,13 +683,14 @@ public class PixelIslandTest {
 		Assert.assertNotNull("rawImage not null", rawImage);
 		PixelIslandList islandsA = createAs(charsA);
 		List<BufferedImage> subImageList = new ArrayList<BufferedImage>();
+		File charsAADir = new File("target/charsAA/");
 		for (int i = 0; i < charsA.length; i++) {
 			Int2Range ibbox = islandsA.get(i).getIntBoundingBox();
 			BufferedImage subImage1 = org.xmlcml.image.ImageUtil.clipSubImage(rawImage, ibbox);
 			Assert.assertNotNull("subImage1 not null", subImage1);
 			Assert.assertNotNull("charsA[i] not null", charsA[i]);
 			subImageList.add(subImage1);
-			File file = new File("target/charsA/"+charsA[i]+".png");
+			File file = new File(charsAADir, +charsA[i]+".png");
 			file.getParentFile().mkdirs();
 			ImageIO.write(subImage1, "png", file);
 		}
@@ -808,15 +821,16 @@ public class PixelIslandTest {
 	@Test
 	@Ignore // it looks like a bad idea to omit binarization on antialised jpegs.
 	public void testLargePhyloJpgCharsRaw() throws IOException {
+		File charsRaw = new File("target/charsRaw/");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 25.), new RealRange(0., 25.));
 		Assert.assertEquals("all chars", 4146, characters.size());
-		plotBoxes(characters, "target/charsRaw/all.svg");
+		plotBoxes(characters, new File(charsRaw, "charsRaw/all.svg"));
 		Multimap<Integer, PixelIsland> charactersByHeight = characters.createCharactersByHeight();
 		for (Integer height : charactersByHeight.keySet()) {
 			PixelIslandList charsi = new PixelIslandList(charactersByHeight.get(height));
 			LOG.trace(height+" "+charsi.size());
-			plotBoxes(charsi, "target/charsRaw/"+height+".svg");
+			plotBoxes(charsi, new File(charsRaw, ""+height+".svg"));
 		}
 	}
 	
@@ -824,7 +838,7 @@ public class PixelIslandTest {
 
 	// =============================================================
 
-	private void plotBoxes(PixelIslandList islands, String filename) {
+	private void plotBoxes(PixelIslandList islands, File file) {
 		SVGG g = new SVGG();
 		for (PixelIsland island : islands) {
 			Real2Range bbox = island.getBoundingBox();
@@ -839,7 +853,6 @@ public class PixelIslandTest {
 				g.appendChild(ggg);
 			}
 		}
-		File file = new File(filename);
 		file.getParentFile().mkdirs();
 		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
