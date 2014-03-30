@@ -79,7 +79,7 @@ public class ReferenceFont {
 			File imageFile = new File(outputDirectory, "_"+i+".png");
 			BufferedImage newImage = island.createImage(image.getType());
 			fileList.add(imageFile);
-			ImageIO.write(newImage, "png", imageFile);
+			ImageUtil.writeImageQuietly(newImage, imageFile);
 			i++;
 		}
 		return fileList;

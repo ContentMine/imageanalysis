@@ -648,7 +648,7 @@ public class PixelIslandTest {
 				LOG.trace(ibbox);
 				File file = new File(clipDir, charA+".png");
 				try {
-					ImageIO.write(subImage1, "png", file);
+					ImageUtil.writeImageQuietly(subImage1, file);
 				} catch (Exception e) {
 					LOG.error("couldn't write character: "+charA+" "+e);
 					continue;
@@ -691,8 +691,7 @@ public class PixelIslandTest {
 			Assert.assertNotNull("charsA[i] not null", charsA[i]);
 			subImageList.add(subImage1);
 			File file = new File(charsAADir, +charsA[i]+".png");
-			file.getParentFile().mkdirs();
-			ImageIO.write(subImage1, "png", file);
+			ImageUtil.writeImageQuietly(subImage1, file);
 		}
 		int nchar = islandsA.size();
 //		System.out.println("size: "+nchar);
@@ -762,7 +761,7 @@ public class PixelIslandTest {
 				IntRange iy = i2r.getYRange();
 				Int2Range i2ra = new Int2Range(new IntRange(ix.getMin(), ix.getMax()+1),new IntRange(iy.getMin(), iy.getMax()+1)); 
 				BufferedImage image = ImageUtil.clipSubImage(rawImage, i2ra);
-				outputPng("target/rawChars/"+h+"/"+c+".png", image);
+				ImageUtil.writeImageQuietly(image, "target/rawChars/"+h+"/"+c+".png");
 				c++;
 			}
 		}
@@ -790,19 +789,12 @@ public class PixelIslandTest {
 			double corr = ImageUtil.correlateGray(characterImage, subImage, null /**"charACorr/"+charname+"/"+i */);
 			if (corr > correlationCutoff) {
 				LOG.trace("corr "+i+" "+Util.format(corr, 2));
-				PixelIslandTest.outputPng("target/charACorr/"+charname+"/"+i+".png", subImage);
+				ImageUtil.writeImageQuietly(subImage, "target/charACorr/"+charname+"/"+i+".png");
 			}
 			i++;
 		}
 	}
 
-	public static void outputPng(String filename, BufferedImage image1)
-			throws IOException {
-		File file = new File(filename);
-		file.getParentFile().mkdirs();
-		ImageIO.write(image1, "png", file);
-	}
-		
 	private PixelIslandList createAs(int[] charsA) throws IOException {
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(Fixtures.LARGE_PHYLO_JPG, Operation.BINARIZE);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0., 15.), new RealRange(0., 12.));

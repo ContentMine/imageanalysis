@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGUtil;
+import org.xmlcml.image.ImageUtil;
 
 public abstract class AbstractDetector {
 
@@ -31,14 +32,7 @@ public abstract class AbstractDetector {
 	protected abstract void process();
 	
 	public void writeFile(File outfile) {
-		if (outputImage != null) {
-			try {
-				outfile.mkdirs();
-				ImageIO.write(outputImage, "png", outfile);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
+		ImageUtil.writeImageQuietly(outputImage, outfile);
 	}
 
 	public void writeSvg(File file) throws IOException {

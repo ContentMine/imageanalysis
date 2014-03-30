@@ -31,7 +31,7 @@ public class ImageUtilTest {
 		Assert.assertEquals(85, raster.getHeight());
 		BufferedImage subImage = new BufferedImage(raster.getWidth(), raster.getHeight(), image.getType());
 		subImage.setData(raster);
-		ImageIO.write(subImage, "png", new File("target/subImage.png"));
+		ImageUtil.writeImageQuietly(subImage, "target/subimage/subImage.png");
 	}
 	
 	@Test
@@ -43,7 +43,7 @@ public class ImageUtilTest {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
 		Int2Range boundingBox = new Int2Range(new IntRange(20, 80), new IntRange(50, 135));
 		BufferedImage subImage = ImageUtil.clipSubImage(image, boundingBox);
-		ImageIO.write(subImage, "png", new File("target/subImage1.png"));
+		ImageUtil.writeImageQuietly(subImage, "target/subimage/subImage1.png");
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class ImageUtilTest {
 		Assert.assertEquals(63, imageg.getRGB(30,135) & 0xff);
 		Assert.assertEquals(70, imageg.getRGB(30,130) & 0xff);
 		Assert.assertEquals(252, imageg.getRGB(30,120) & 0xff);
-		ImageIO.write(imageg, "png", new File("target/gray.png"));
+		ImageUtil.writeImageQuietly(imageg, "target/gray/gray.png");
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class ImageUtilTest {
 	public void testShiftGrayImage() throws IOException {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 0.1, 0.2);
-		ImageIO.write(shiftedImage, "png", new File("target/shiftedImage.png"));
+		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/shiftedImage.png");
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class ImageUtilTest {
 	public void testScaleAndInterpolate() throws IOException {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.scaleAndInterpolate(image, 17, 13);
-		ImageIO.write(shiftedImage, "png", new File("target/scaledImage.png"));
+		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/scaledImage.png");
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class ImageUtilTest {
 		Real2 centre = character.getCentre();
 //		LOG.debug(centre);
 		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 4-centre.getX(), 5-centre.getY());
-		ImageIO.write(shiftedImage, "png", new File("target/shiftedImage1.png"));
+		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/shiftedImage1.png");
 	}
 
 

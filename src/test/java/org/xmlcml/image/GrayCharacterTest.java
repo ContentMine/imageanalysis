@@ -155,18 +155,6 @@ public class GrayCharacterTest {
 		return corrMat;
 	}
 	
-//	@Test
-//	public void testTrimCharacter() throws Exception {
-//		BufferedImage image = ImageIO.read(new File(GENERIC_DIR, "_latin_capital_letter_a.png"));
-//		// debug code
-//		GrayCharacter grayCharacter = GrayCharacter.readGrayImage(image);
-//		BufferedImage grayImage = grayCharacter.getGrayImage();
-//		BufferedImage clipImage = grayCharacter.trimEdgesWhite(250);
-//		ImageIO.write(clipImage, "png", new File("target/clipA.png"));
-//		Assert.assertEquals("height", 52, clipImage.getHeight());
-//		Assert.assertEquals("width", 50, clipImage.getWidth());
-//	}
-
 	@Test
 	public void testScaleCharacter() throws Exception {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
@@ -174,7 +162,7 @@ public class GrayCharacterTest {
 		int height = 10;
 		BufferedImage bimage = Scalr.resize(image, Method.ULTRA_QUALITY, Mode.FIT_EXACT, width,
 	            height);
-		ImageIO.write(bimage, "png", new File("target/rescaled65.png"));
+		ImageUtil.writeImageQuietly(bimage, "target/gray/rescaled65.png");
 	}
 
 	@Test
@@ -185,7 +173,7 @@ public class GrayCharacterTest {
 		BufferedImage newImage = ImageIO.read(new File(GENERIC_DIR, "65.png"));
 		BufferedImage newScaledImage = Scalr.resize(newImage, Method.ULTRA_QUALITY, Mode.FIT_EXACT, width,
 	            height);
-		ImageIO.write(newScaledImage, "png", new File("target/rescaledCapitalA.png"));
+		ImageUtil.writeImageQuietly(newScaledImage, "target/gray/rescaledCapitalA.png");
 		GrayCharacter refGray = GrayCharacter.readGrayImage(refImage);
 		GrayCharacter newGray = GrayCharacter.readGrayImage(newScaledImage);
 		double corr = refGray.correlateGray(newGray, "ref-grayA", true, false);

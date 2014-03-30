@@ -11,16 +11,16 @@ import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 
-public class ZhangSuenThinningTest {
+public class HilditchThinningTest {
 
 
 	@Test
 	public void testMolecule() throws IOException {
 	       BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
-	       ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
+	       Thinning thinningService = new HilditchThinning(image);
 	       thinningService.doThinning();
 	       image = thinningService.getThinnedImage();
-	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thinnedMaltoryzine.png");
+	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thin/maltoryzineHilditch.png");
 	       Assert.assertTrue(thinnedPng.exists());
 	}
 

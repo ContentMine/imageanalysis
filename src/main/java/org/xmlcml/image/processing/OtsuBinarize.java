@@ -8,10 +8,13 @@ package org.xmlcml.image.processing;
 	 */
 	 
 	import java.awt.Color;
-	import java.awt.image.BufferedImage;
-	import java.io.File;
-	import java.io.IOException;
-	import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import org.xmlcml.image.ImageUtil;
 	 
 public class OtsuBinarize {
  
@@ -34,7 +37,7 @@ public class OtsuBinarize {
         otsuBinarize.toGray();
         otsuBinarize.binarize();
         File file = new File(args[0]+"out.jpg");
-        otsuBinarize.writeImage(file);        
+        ImageUtil.writeImageQuietly(otsuBinarize.current, file);        
  
     }
 
@@ -42,12 +45,6 @@ public class OtsuBinarize {
 		setImage(ImageIO.read(file));
 	}
 
-    public void writeImage(File file) throws IOException {
-    	String filename = file.getAbsolutePath();
-    	String type = filename.substring(filename.length()-3, filename.length());
-        ImageIO.write(current, type, file);
-    }
- 
     // Return histogram of grayscale image
     private int[] imageHistogram() {
  
@@ -218,6 +215,10 @@ public class OtsuBinarize {
 
 	public BufferedImage getGrayImage() {
 		return grayImage;
+	}
+
+	public BufferedImage getCurrent() {
+		return current;
 	}
 
  

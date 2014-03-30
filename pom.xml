@@ -9,13 +9,13 @@
 	</parent>
 
 	<groupId>org.xml-cml</groupId>
-	<artifactId>canny</artifactId>
+	<artifactId>imageanalysis</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Canny</name>
-	<description> Edge Detector - developed from package gibara</description>
-	<url>http://bitbucket.org/wwmm/canny</url>
+	<name>ImageAnalysis</name>
+	<description> Image analysis and IO routines </description>
+	<url>http://bitbucket.org/petermr/imageanalysis</url>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>

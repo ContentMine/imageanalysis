@@ -19,6 +19,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.ColorUtilities;
 
 public class HoughTest {
@@ -39,7 +40,7 @@ public class HoughTest {
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), -1); 
 	    } 
-	    ImageIO.write(image, "png", new File("target/maltoryzineBinaryHough.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/maltoryzineBinaryHough.png"));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class HoughTest {
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
-	    ImageIO.write(image, "png", new File("target/maltoryzineBinaryHough.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/maltoryzineBinaryHough.png"));
 	}
 
 
@@ -73,7 +74,7 @@ public class HoughTest {
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
-	    ImageIO.write(image, "png", new File("target/moleculeCanny1.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/moleculeCanny1.png"));
 	}
 
 	@Test
@@ -90,8 +91,9 @@ public class HoughTest {
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
-	    ImageIO.write(image, "png", new File("target/moleculeBinaryCannyHough80.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/moleculeBinaryCannyHough80.png"));
 	}
+	
 	@Test
 	@Ignore // file gone missing (maybe in earlier version)
 	public void testEthane() throws IOException {
@@ -105,7 +107,7 @@ public class HoughTest {
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
-	    ImageIO.write(image, "png", new File("target/ethane.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/ethane.png"));
 	}
 
 	@Test
@@ -118,7 +120,7 @@ public class HoughTest {
 	        HoughLine line = lines.get(j); 
 	        line.draw(image, Color.RED.getRGB(), HoughLine.NULL); 
 	    } 
-	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHough.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/maltoryzineThinnedHough.png"));
 	}
 
 	@Test
@@ -152,10 +154,10 @@ public class HoughTest {
 	        }
 	    } 
 	    SVGSVG.wrapAndWriteAsSVG(g, new File("target/maltoryzineLines.svg"));
-	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHough.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/maltoryzineThinnedHough.png"));
 	    h.resetToBlack(Color.RED.getRGB());
 	    h.resetToBlack(Color.YELLOW.getRGB());
-	    ImageIO.write(image, "png", new File("target/maltoryzineThinnedHoughNew.png"));
+	    ImageUtil.writeImageQuietly(image, new File("target/maltoryzineThinnedHoughNew.png"));
 	}
 
 	public void testSegment1() throws Exception {

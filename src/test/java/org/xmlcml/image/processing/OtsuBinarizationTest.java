@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
 
 public class OtsuBinarizationTest {
 
@@ -18,7 +19,7 @@ public class OtsuBinarizationTest {
         otsuBinarize.read(Fixtures.MALTORYZINE_PNG);
         otsuBinarize.toGray();
         otsuBinarize.binarize();
-        otsuBinarize.writeImage(new File("target/maltoryzineBinary.png"));        
+        ImageUtil.writeImageQuietly(otsuBinarize.current, new File("target/maltoryzineBinary.png"));        
 	}
 
 	@Test
@@ -27,7 +28,7 @@ public class OtsuBinarizationTest {
         otsuBinarize.read(Fixtures.MOLECULE_CANNY_PNG);
         otsuBinarize.toGray();
         otsuBinarize.binarize();
-        otsuBinarize.writeImage(new File("target/moleculeCannyBinarize.png"));        
+        ImageUtil.writeImageQuietly(otsuBinarize.current, new File("target/moleculeCannyBinarize.png"));        
 	}
 	
 
@@ -38,7 +39,7 @@ public class OtsuBinarizationTest {
         otsuBinarize.read(Fixtures.MOLECULE_20131119_A_JPG);
         otsuBinarize.toGray();
         otsuBinarize.binarize();
-        otsuBinarize.writeImage(new File("target/molecule20131119Binary.png"));        
+        ImageUtil.writeImageQuietly(otsuBinarize.current, new File("target/molecule20131119Binary.png"));        
 	}
 	
 	@Test
@@ -50,7 +51,7 @@ public class OtsuBinarizationTest {
         BufferedImage image = otsuBinarize.getBinarizedImage();
         Assert.assertEquals(1705, image.getHeight());
         Assert.assertEquals(1200, image.getWidth());
-        otsuBinarize.writeImage(new File("target/largePhylo.png"));        
+        ImageUtil.writeImageQuietly(otsuBinarize.current, new File("target/largePhylo.png"));        
 	}
 	
 	

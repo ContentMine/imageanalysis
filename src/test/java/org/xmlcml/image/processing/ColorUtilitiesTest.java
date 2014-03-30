@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
 
 public class ColorUtilitiesTest {
 	
@@ -15,6 +16,6 @@ public class ColorUtilitiesTest {
 	public void testFlipBlackWhite() throws IOException {
 		BufferedImage image  = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
 		ColorUtilities.flipWhiteBlack(image);
-		ImageIO.write(image, "png", new File("target/maltoryzineFlipped.png"));
+		ImageUtil.writeImageQuietly(image, new File("target/colourutils/maltoryzineFlipped.png"));
 	}
 }

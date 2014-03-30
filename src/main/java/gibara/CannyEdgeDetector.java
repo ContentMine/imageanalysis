@@ -8,6 +8,7 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.image.ImageUtil;
 
 /**
  * <p><em>This software has been released into the public domain.
@@ -628,12 +629,9 @@ public class CannyEdgeDetector {
 		}
 		BufferedImage edges = detector.getEdgesImage();
 		if (edges != null) {
-			File outdir = new File(outputDirName);
-			outdir.mkdirs();
-			File outfile = new File(outdir, root+".png");
-	//		LOG.debug("wrote: "+outfile);
+			File outfile = new File(outputDirName+"/"+ root+".png");
+			ImageUtil.writeImageQuietly(edges, outfile);
 			LOG.debug("wrote: "+outfile);
-			ImageIO.write(edges, "png", outfile);
 		}
 	}
 

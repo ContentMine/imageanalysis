@@ -10,8 +10,9 @@ import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.OtsuBinarize;
-import org.xmlcml.image.processing.ThinningService;
+import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class TextTest {
 	private final static Logger LOG = Logger.getLogger(TextTest.class);
@@ -22,12 +23,12 @@ public class TextTest {
         otsuBinarize.read(Fixtures.NRRL_PNG);
         otsuBinarize.toGray();
         otsuBinarize.binarize();
-        otsuBinarize.writeImage(new File("target/NRRL.binarize.png"));
+        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), new File("target/textthin/NRRL.binarize.png"));
         BufferedImage image = otsuBinarize.getBinarizedImage();
-        ThinningService thinningService = new ThinningService(image);
+        ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
         thinningService.doThinning();
         image = thinningService.getThinnedImage();
-        ImageIO.write(image, "png", new File("target/NRRL.thin.png"));
+        ImageUtil.writeImageQuietly(image, "target/textthin/NRRL.thin.png");
 		
 	}
 	
@@ -112,30 +113,30 @@ public class TextTest {
         otsuBinarize.read(imageFile);
         otsuBinarize.toGray();
         otsuBinarize.binarize();
-        otsuBinarize.writeImage(new File("target/"+abbrev+".binarize.png"));
+        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), new File("target/"+abbrev+".binarize.png"));
         BufferedImage image = otsuBinarize.getBinarizedImage();
-        ThinningService thinningService = new ThinningService(image);
+        ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
         thinningService.doThinning();
         image = thinningService.getThinnedImage();
-        ImageIO.write(image, "png", new File("target/"+abbrev+".thin.png"));
+        ImageUtil.writeImageQuietly(image, new File("target/binarizeThin/"+abbrev+".thin.png"));
 	}
 	
 	private void binarizeThin(String abbrev, boolean sharp) throws IOException {
 		OtsuBinarize otsuBinarize = new OtsuBinarize();
         otsuBinarize.read(new File(Fixtures.TEXT_DIR, abbrev+".png"));
         otsuBinarize.toGray();
-        otsuBinarize.writeImage(new File("target/"+abbrev+".gray.png"));
+        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), "target/binarizeThin/"+abbrev+".gray.png");
         if (sharp) {
 	        otsuBinarize.sharpenGray();
-	        otsuBinarize.writeImage(new File("target/"+abbrev+".sharp.png"));
+	        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), "target/binarizeThin/"+abbrev+".sharp.png");
         }
         otsuBinarize.binarize();
-        otsuBinarize.writeImage(new File("target/"+abbrev+".binarize.png"));
+        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), "target/binarizeThin/"+abbrev+".binarize.png");
         BufferedImage image = otsuBinarize.getBinarizedImage();
-        ThinningService thinningService = new ThinningService(image);
+        ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
         thinningService.doThinning();
         image = thinningService.getThinnedImage();
-        ImageIO.write(image, "png", new File("target/"+abbrev+".thin.png"));
+        ImageUtil.writeImageQuietly(image, "target/binarizeThin/"+abbrev+".thin.png");
 	}
 	
 	

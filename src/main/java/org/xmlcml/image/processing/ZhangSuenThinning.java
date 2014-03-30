@@ -9,29 +9,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+
+import org.xmlcml.image.ImageUtil;
  
 /**
  *
  * @author nayef
  */
-public class ThinningService {
+public class ZhangSuenThinning extends Thinning {
  
-    private BufferedImage image;
-	private int[][] binaryImage;
-	private boolean hasChange;
-
-	public ThinningService(BufferedImage image) {
-    	this.image = image;
-	    binaryImage = new int[image.getHeight()][image.getWidth()];
-    	copyImageToBinary(image, binaryImage);
+    public ZhangSuenThinning(BufferedImage image) {
+    	super(image);
     }
-	
 
-	public ThinningService() {
-		// TODO Auto-generated constructor stub
+
+	public ZhangSuenThinning() {
+		super();
 	}
 
-	public int[][] doThinning(/*int[][] binaryImage*/) {
+	@Override
+	public int[][] doThinning() {
         int a, b;
  
         List<Point> pointsToChange = new LinkedList<Point>();
@@ -160,85 +157,16 @@ public class ThinningService {
     * @param args the command line arguments
     */
    public static void main(String[] args) throws IOException {
-    
-       BufferedImage image = ImageIO.read(new File("/home/nayef/Desktop/bw.jpg"));
-
-       int[][] imageData = new int[image.getHeight()][image.getWidth()];
-       Color c;
-       for (int y = 0; y < imageData.length; y++) {
-           for (int x = 0; x < imageData[y].length; x++) {
-
-               if (image.getRGB(x, y) == Color.BLACK.getRGB()) {
-                   imageData[y][x] = 1;
-               } else {
-                   imageData[y][x] = 0;
-
-               }
-           }
-       }
-
-       ThinningService thinningService = new ThinningService();
-    
-       thinningService.doThinning(/*imageData*/);
-        
-       for (int y = 0; y < imageData.length; y++) {
-
-           for (int x = 0; x < imageData[y].length; x++) {
-
-               if (imageData[y][x] == 1) {
-                   image.setRGB(x, y, Color.BLACK.getRGB());
-
-               } else {
-                   image.setRGB(x, y, Color.WHITE.getRGB());
-               }
-
-
-           }
-       }
-
-       ImageIO.write(image, "jpg", new File("/home/nayef/Desktop/bwThin.jpg"));
+//    
+//       BufferedImage image = ImageIO.read(new File("/home/nayef/Desktop/bw.jpg"));
+//
+//       int[][] imageData = copyImageToBinary(image);
+//       Thinning thinningService = new ZhangSuenThinning();
+//       thinningService.doThinning(/*imageData*/);
+//       copyBinaryToImage(image, imageData);
+//
+//       ImageUtil.writeImageQuietly(image, "/home/nayef/Desktop/bwThin.jpg");
 
    }
-   
-	private void copyImageToBinary(BufferedImage image, int[][] imageData) {
-		for (int y = 0; y < imageData.length; y++) {
-           for (int x = 0; x < imageData[y].length; x++) {
-
-               if (image.getRGB(x, y) == Color.BLACK.getRGB()) {
-                   imageData[y][x] = 1;
-               } else {
-                   imageData[y][x] = 0;
-
-               }
-           }
-       }
-	}
-	
-	private void copyBinaryToImage(BufferedImage image, int[][] imageData) {
-		for (int y = 0; y < imageData.length; y++) {
-
-	           for (int x = 0; x < imageData[y].length; x++) {
-
-	               if (imageData[y][x] == 1) {
-	                   image.setRGB(x, y, Color.BLACK.getRGB());
-
-	               } else {
-	                   image.setRGB(x, y, Color.WHITE.getRGB());
-	               }
-
-
-	           }
-	       }
-	}
-
-	public int[][] getBinaryImage() {
-		return binaryImage;
-	}
-
-
-	public BufferedImage getThinnedImage() {
-	    copyBinaryToImage(image, binaryImage);
-		return image;
-	}
 
 }

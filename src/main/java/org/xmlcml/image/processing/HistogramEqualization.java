@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.image.ImageUtil;
  
 /**
  * Image histogram equalization
@@ -45,20 +46,7 @@ public class HistogramEqualization {
 		this.original = ImageIO.read(inputFile);
 	}
  
-	/**
-	 * 
-	 * @param outfileName suffix (e.g. ".jpg" used for type)
-	 * @throws IOException
-	 */
-    public void writeImage(String outfileName) throws IOException {
-    	int idx = outfileName.lastIndexOf(".");
-    	String type = outfileName.substring(idx+1);
-    	File file = new File(outfileName);
-    	file.mkdirs();
-        ImageIO.write(equalized, type, file);
-    }
- 
-    public BufferedImage histogramEqualization() {
+	public BufferedImage histogramEqualization() {
  
         int red;
         int green;
@@ -223,7 +211,11 @@ public class HistogramEqualization {
         String outfileName = args[1];
         histogramEQ.readImage(infileName);
         histogramEQ.histogramEqualization();
-        histogramEQ.writeImage(outfileName);
+        ImageUtil.writeImageQuietly(histogramEQ.equalized, outfileName);
     }
+
+	public BufferedImage getEqualized() {
+		return equalized;
+	}
 
 }

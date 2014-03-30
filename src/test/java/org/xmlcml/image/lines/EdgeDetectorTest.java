@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
 
 public class EdgeDetectorTest {
 
@@ -72,11 +73,9 @@ public class EdgeDetectorTest {
 		}
 		BufferedImage edges = detector.getEdgesImage();
 		if (edges != null) {
-			File outdir = new File("junk");
-			outdir.mkdirs();
+			File outdir = new File("target/edges/");
 			File outfile = new File(outdir, file.getName()+".png");
-	//		LOG.debug("wrote: "+outfile);
-			ImageIO.write(edges, "png", outfile);
+			ImageUtil.writeImageQuietly(edges, outfile);
 		}
 	}
 	

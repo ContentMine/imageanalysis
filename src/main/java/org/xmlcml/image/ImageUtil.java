@@ -22,13 +22,13 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.processing.OtsuBinarize;
-import org.xmlcml.image.processing.ThinningService;
+import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class ImageUtil {
 	private final static Logger LOG = Logger.getLogger(ImageUtil.class);
 
 	public static BufferedImage thin(BufferedImage image) {
-		ThinningService thinningService = new ThinningService(image);
+		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
 		return image;
@@ -229,8 +229,17 @@ public class ImageUtil {
 		return shiftedImage;
 	}
 
+	/** makes parent directly if not exists.
+	 * 
+	 * @param image
+	 * @param file
+	 */
 	public static void writeImageQuietly(BufferedImage image, File file) {
+		if (image == null) {
+			throw new RuntimeException("Cannot write null image: "+file);
+		}
 		try {
+			// DONT EDIT!
 			String type = FilenameUtils.getExtension(file.getName());
 			file.getParentFile().mkdirs();
 			ImageIO.write(image, type, new FileOutputStream(file));
@@ -252,8 +261,16 @@ public class ImageUtil {
 		return scaledGenImage;
 	}
 
-	public static void writeImageQuietly(BufferedImage image, String filename) {
-		writeImageQuietly(image, new File(filename));
+	/** writes file making dirs if required
+	 * 
+	 * @param image creates filetype from filename suffix
+	 * @param filename
+	 * @return
+	 */
+	public static File writeImageQuietly(BufferedImage image, String filename) {
+		File file = new File(filename);
+		writeImageQuietly(image, file);
+		return file;
 	}
 
 
