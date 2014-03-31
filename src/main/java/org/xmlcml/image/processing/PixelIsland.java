@@ -398,7 +398,7 @@ public class PixelIsland {
 //		return triangleList;
 //	}
 
-	/** look for two neighbours that form a triangle.
+	/* look for two neighbours that form a triangle.
 	 * 
 	 * @param neighbourList
 	 * @param i first neighbour pixel
@@ -485,7 +485,7 @@ public class PixelIsland {
 			int spikeSize = nucleus.getSpikeSet().size();
 			if (spikeSize == 1) {
 				LOG.debug("terminus nucleus "+nucleus.size());
-			} else if (spikeSize == 1) {
+			} else if (spikeSize > 1) {
 				LOG.debug("branch nucleus "+nucleus.size()+" spikes "+spikeSize);
 			}
 		}
@@ -513,19 +513,22 @@ public class PixelIsland {
 	 * in 1.2
 	 *    ....3
 	 *        
-	 * the enighbours are 1-2 and 2-3 - leave them
+	 * the neighbours are 1-2 and 2-3 - leave them
 	 * 
 	 */
 	void removeHypotenuses() {
 		createTriangleSet();
 		LOG.trace("triangle "+triangleSet);
+		for (Triangle t : triangleSet) {
+			t.removeDiagonalNeighbours();
+		}
 	}
 
 	private void createTriangleSet() {
 		triangleSet = new HashSet<Triangle>();
 		for (Pixel pixel : pixelList) {
-			Set<Triangle> triangleSet0 = pixel.getTriangles(this);
-			triangleSet.addAll(triangleSet0);
+			Set<Triangle> triangleSet = pixel.getTriangles(this);
+			this.triangleSet.addAll(triangleSet);
 		}
 	}
 
