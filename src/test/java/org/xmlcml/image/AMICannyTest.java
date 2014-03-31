@@ -147,7 +147,7 @@ public class AMICannyTest {
 	@Test
 	public void testContour() {
 		SVGElement contour = SVGElement.readAndCreateSVG(new File(Fixtures.LINES_DIR, "contours/13.svg"));
-		contour.debug("contour");
+		//contour.debug("contour");
 		List<SVGLine> lines = SVGLine.extractSelfAndDescendantLines(contour);
 		Assert.assertEquals("lines", 477, lines.size());	
 	}

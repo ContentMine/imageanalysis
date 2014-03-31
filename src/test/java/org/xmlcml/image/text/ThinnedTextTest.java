@@ -15,13 +15,15 @@ import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class ThinnedTextTest {
 
+	private static final String TARGET_FONTS = "target/fonts/";
+
 	@Test
 	public void testHelvetica() throws Exception {
 		BufferedImage image = ImageIO.read(Fixtures.HELVETICA_PNG);
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/helvetica.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"helvetica.png");
 	}
 
 	@Test
@@ -30,7 +32,7 @@ public class ThinnedTextTest {
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/helveticaBold.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"helveticaBold.png");
 	}
 
 	@Test
@@ -39,7 +41,7 @@ public class ThinnedTextTest {
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/monospace.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"monospace.png");
 	}
 
 	@Test
@@ -48,7 +50,7 @@ public class ThinnedTextTest {
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/times.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"times.png");
 	}
 
 	@Test
@@ -57,7 +59,7 @@ public class ThinnedTextTest {
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/lucida.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"lucida.png");
 	}
 
 	@Test
@@ -69,11 +71,11 @@ public class ThinnedTextTest {
 		otsuBinarize.toGray();
 		otsuBinarize.binarize();
 		BufferedImage image = otsuBinarize.getBinarizedImage();
-		ImageUtil.writeImageQuietly(image, "target/timesroman0.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"timesroman0.png");
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/timesroman.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"timesroman.png");
 	}
 
 	@Test
@@ -83,7 +85,7 @@ public class ThinnedTextTest {
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/gibbons.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"gibbons.png");
 	}
 
 	@Test
@@ -94,7 +96,7 @@ public class ThinnedTextTest {
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/bmcgraph.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"bmcgraph.png");
 	}
 
 	@Test
@@ -116,11 +118,11 @@ public class ThinnedTextTest {
 		otsuBinarize.toGray();
 		otsuBinarize.binarize();
 		BufferedImage image = otsuBinarize.getBinarizedImage();
-		ImageUtil.writeImageQuietly(image, "target/"+original+"binary.png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+original+"binary.png");
 		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, "target/"+original+".png");
+		ImageUtil.writeImageQuietly(image, TARGET_FONTS+original+".png");
 	}
 
 }

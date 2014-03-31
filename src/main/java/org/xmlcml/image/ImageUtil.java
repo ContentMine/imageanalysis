@@ -21,18 +21,35 @@ import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.processing.HilditchThinning;
 import org.xmlcml.image.processing.OtsuBinarize;
+import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class ImageUtil {
 	private final static Logger LOG = Logger.getLogger(ImageUtil.class);
 
-	public static BufferedImage thin(BufferedImage image) {
-		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
+	public static BufferedImage zhangSuenThin(BufferedImage image) {
+		Thinning thinningService = new ZhangSuenThinning(image);
 		thinningService.doThinning();
 		image = thinningService.getThinnedImage();
 		return image;
 	}
+
+	public static BufferedImage hilditchThin(BufferedImage image) {
+		Thinning thinningService = new HilditchThinning(image);
+		thinningService.doThinning();
+		image = thinningService.getThinnedImage();
+		return image;
+	}
+
+	public static BufferedImage thin(BufferedImage image, Thinning thinning) {
+		thinning.createBinary(image);
+		thinning.doThinning();
+		image = thinning.getThinnedImage();
+		return image;
+	}
+
 
 	public static BufferedImage binarize(BufferedImage image) {
 		OtsuBinarize otsuBinarize = new OtsuBinarize();
@@ -271,6 +288,23 @@ public class ImageUtil {
 		File file = new File(filename);
 		writeImageQuietly(image, file);
 		return file;
+	}
+
+	public static BufferedImage addBorders(BufferedImage image0, int xmargin, int ymargin, int color) {
+		BufferedImage image = new BufferedImage(image0.getWidth() + 2*xmargin,  image0.getHeight()+2*ymargin, image0.getType());
+		// set to colour
+		for (int i = 0; i < image0.getWidth() + 2 * xmargin; i++) {
+			for (int j = 0; j < image0.getHeight() + 2 * ymargin; j++) {
+				image.setRGB(i, j, color);
+			}
+		}
+		// copy
+		for (int i = 0; i < image0.getWidth(); i++) {
+			for (int j = 0; j < image0.getHeight(); j++) {
+				image.setRGB(i + xmargin, j + ymargin, image0.getRGB(i, j));
+			}
+		}
+		return image;
 	}
 
 

@@ -17,7 +17,7 @@ public abstract class Thinning {
 		// TODO Auto-generated constructor stub
 	}
 
-	private void createBinary(BufferedImage image) {
+	public void createBinary(BufferedImage image) {
 		this.image = image;
 	    binaryImage = copyImageToBinary(image);
 	}
@@ -62,6 +62,6 @@ public abstract class Thinning {
 	       }
 	}
 
-	protected abstract int[][] doThinning();
+	public abstract int[][] doThinning();
 
 }

@@ -113,7 +113,7 @@ public class TextTest {
         otsuBinarize.read(imageFile);
         otsuBinarize.toGray();
         otsuBinarize.binarize();
-        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), new File("target/"+abbrev+".binarize.png"));
+        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), new File("target/thin/"+abbrev+".binarize.png"));
         BufferedImage image = otsuBinarize.getBinarizedImage();
         ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
         thinningService.doThinning();

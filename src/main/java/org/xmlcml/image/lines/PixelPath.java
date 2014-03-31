@@ -91,7 +91,7 @@ public class PixelPath {
 		return rawPoints;
 	}
 
-	public SVGG createSVGG() {
+	public SVGG createSVGG(String color) {
 		SVGG g = new SVGG();
 		List<Real2> pointsToDraw = (segmentPoints != null) ? segmentPoints : rawPoints;
 		if (pointsToDraw != null) {
@@ -100,7 +100,7 @@ public class PixelPath {
 				g.appendChild(line);
 			}
 		} else {
-			g = PixelIsland.plotPixels(pixelList);
+			g = PixelIsland.plotPixels(pixelList, color);
 		}
 		return g;
 	}

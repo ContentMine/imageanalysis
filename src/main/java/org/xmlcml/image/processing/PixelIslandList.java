@@ -1,7 +1,6 @@
 package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +15,10 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.image.ImageUtil;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -36,6 +39,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	
 	private List<PixelIsland> list;
 	private BufferedImage thinnedImage;
+	private String pixelColor;
 	
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -97,7 +101,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			image = ImageUtil.binarize(image);
 		}
 	    if (opList.contains(Operation.THIN)) {
-			image = ImageUtil.thin(image);
+			image = ImageUtil.zhangSuenThin(image);
 	    }
 		LOG.trace("postbin ");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
@@ -165,8 +169,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list.get(i).binaryIslandCorrelation(list.get(j), i+"-"+j);
 	}
 
-	public static PixelIslandList thinFillAndGetPixelIslandList(BufferedImage image0) {
-		BufferedImage image = ImageUtil.thin(image0);
+	public static PixelIslandList thinFillAndGetPixelIslandList(BufferedImage image0, Thinning thinning) {
+		BufferedImage image = ImageUtil.thin(image0, thinning);
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
@@ -181,6 +185,36 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	
 	public BufferedImage getThinnedImage() {
 		return thinnedImage;
+	}
+
+	public SVGG plotPixels() {
+		return plotPixels(null); // may change this
+	}
+	
+	public SVGG plotPixels(Transform2 t2) {
+		SVGG g = new SVGG();
+		for (PixelIsland island : this) {
+			String saveColor = island.getPixelColor();
+			island.setPixelColor(this.pixelColor);
+			SVGG gg = 	island.plotPixels();
+			if (t2 != null) gg.setTransform(t2);
+			island.setPixelColor(saveColor);
+			g.appendChild(gg);
+		}
+		return g;
+	}
+	
+	public void setPixelColor(String color) {
+		this.pixelColor = color;
+	}
+	
+	public List<List<SVGPolyline>> createPolylinesIteratively(double dpEpsilon, int maxiter) {
+		List<List<SVGPolyline>> polylineListList = new ArrayList<List<SVGPolyline>>();
+		for (PixelIsland island : this) {
+			List<SVGPolyline> polylineList = island.createPolylinesIteratively(dpEpsilon, maxiter);
+			polylineListList.add(polylineList);
+		}
+		return polylineListList;
 	}
 
 }

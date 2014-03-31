@@ -2,7 +2,6 @@ package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +76,8 @@ public class PixelIsland {
 	private List<Real2Array> segmentArrayList;
 
 	private Set<Triangle> triangleSet;
+
+	private String pixelColor = "red";
 	
 	public PixelIsland() {
 		this.pixelList = new ArrayList<Pixel>();
@@ -441,7 +442,7 @@ public class PixelIsland {
 			nucleusList.add(nucleus);
 			LOG.trace("nucl "+nucleus.toString());
 		}
-		LOG.debug("nuclei: "+nucleusList.size());
+		LOG.trace("nuclei: "+nucleusList.size());
 		return nucleusList;
 	}
 
@@ -644,26 +645,35 @@ public class PixelIsland {
 			createPixelPathListStartingAtTerminals();
 		}
 		if (pixels || pixelPaths.size() == 0) {
-			gg = plotPixels(pixelList);
+			gg = plotPixels(pixelList, this.pixelColor);
 		} else {
 			for (PixelPath pixelPath : pixelPaths) {
-				SVGG g = pixelPath.createSVGG();
+				SVGG g = pixelPath.createSVGG(this.pixelColor);
 				g.setStrokeWidth(0.5);
 				gg.appendChild(g);
 			}
 		}
 		return gg;
 	}
+	
+	public void setPixelColor(String color) {
+		this.pixelColor = color;
+	}
 
+	/** plost pixels as rectangles filled with pixelColor.
+	 * 
+	 * @return
+	 */
 	public SVGG plotPixels() {
-		return PixelIsland.plotPixels(this.getPixelList());
+		return PixelIsland.plotPixels(this.getPixelList(), this.pixelColor);
 	}
 	
-	public static SVGG plotPixels(List<Pixel> pixelList) {
+	public static SVGG plotPixels(List<Pixel> pixelList, String pixelColor) {
 		SVGG g = new SVGG();
-		LOG.debug("pixelList "+pixelList.size());
+		LOG.trace("pixelList "+pixelList.size());
 		for (Pixel pixel : pixelList) {
 			SVGRect rect = pixel.getSVGRect();
+			rect.setFill(pixelColor);
 			LOG.trace(rect.getBoundingBox());
 			g.appendChild(rect);
 		}
@@ -826,7 +836,7 @@ public class PixelIsland {
 
 	public List<SVGPolyline> createPolylinesAndRemoveUsedPixels(double epsilon) {
 		List<PixelPath> pixelPaths = this.createPixelPathListStartingAtTerminals();
-		LOG.debug("pixelPaths: "+pixelPaths.size());
+		LOG.trace("pixelPaths: "+pixelPaths.size());
 		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
 		for (PixelPath pixelPath : pixelPaths) {
 			SVGPolyline polyline = pixelPath.createPolyline(epsilon);
@@ -843,7 +853,7 @@ public class PixelIsland {
 	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon, int maxiter) {
 		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
 		while (maxiter-- > 0) {
-			LOG.debug("pixels: "+getPixelList().size());
+			LOG.trace("pixels: "+getPixelList().size());
 			setPixelPaths(null);
 			List<SVGPolyline> polylineList0 = createPolylinesAndRemoveUsedPixels(dpEpsilon);
 			if (polylineList0.size() == 0) {
@@ -851,13 +861,18 @@ public class PixelIsland {
 				break;
 			}
 			polylineList.addAll(polylineList0);
-			LOG.debug("pixels after: "+getPixelList().size()+" polylines "+polylineList0.size());
+			LOG.trace("pixels after: "+getPixelList().size()+" polylines "+polylineList0.size());
 		}
 		if (maxiter == 0) {
 			throw new RuntimeException("couldn't analyze pixelIsland");
 		}
 		return polylineList;
 	}
+
+	public String getPixelColor() {
+		return pixelColor;
+	}
+
 	
 	
 }

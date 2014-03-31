@@ -192,7 +192,7 @@ public class ReferenceFont {
 				}
 			}
 			testFiles.remove(testFilex);
-			System.out.println("cor "+Util.format(corrmax, 2)+": "+titlemax);
+			LOG.trace("cor "+Util.format(corrmax, 2)+": "+titlemax);
 		}
 	}
 

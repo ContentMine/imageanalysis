@@ -20,7 +20,7 @@ public class ZhangSuenThinningTest {
 	       ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
 	       thinningService.doThinning();
 	       image = thinningService.getThinnedImage();
-	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thinnedMaltoryzine.png");
+	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thinning/zhangSuenMaltoryzine.png");
 	       Assert.assertTrue(thinnedPng.exists());
 	}
 
