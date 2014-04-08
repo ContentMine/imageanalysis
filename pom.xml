@@ -9,13 +9,13 @@
 	</parent>
 
 	<groupId>org.xml-cml</groupId>
-	<artifactId>canny</artifactId>
+	<artifactId>imageanalysis</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Canny</name>
+	<name>Image Analysis</name>
 	<description> Edge Detector - developed from package gibara</description>
-	<url>http://bitbucket.org/wwmm/canny</url>
+	<url>http://bitbucket.org/petermr/imageanalysis</url>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -24,9 +24,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://bitbucket.org/wwmm/canny/src</url>
-		<connection>scm:hg:http://bitbucket.org/wwmm/canny</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/wwmm/canny</developerConnection>
+		<url>https://bitbucket.org/petermr/imageanalysis/src</url>
+		<connection>scm:hg:http://bitbucket.org/petermr/imageanalysis</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/petermr/imageanalysis</developerConnection>
 	</scm>
 	<developers>
 		<developer>
@@ -37,7 +37,7 @@
 
 	<ciManagement>
 		<system>hudson</system>
-		<url>https://hudson.ch.cam.ac.uk/job/canny</url>
+		<url>https://hudson.ch.cam.ac.uk/job/imageanalysis</url>
 	</ciManagement>
 
 	<organization>
