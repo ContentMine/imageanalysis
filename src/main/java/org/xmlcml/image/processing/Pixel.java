@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGRect;
 
 public class Pixel {
@@ -184,6 +185,17 @@ public class Pixel {
 		rect.setFill("red");
 		rect.setStroke(null);
 		return rect;
+	}
+
+	public static Real2Array createReal2Array(List<Pixel> pixelList) {
+		Real2Array array = null;
+		if (pixelList != null) {
+			array = new Real2Array();
+			for (Pixel pixel : pixelList) {
+				array.add(new Real2(pixel.getInt2()));
+			}
+		}
+		return array;
 	}
 
 }

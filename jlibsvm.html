@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- Custom match templates go here --><head>
+    <title>
+      jlibsvm
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="search" href="http://dev.davidsoergel.com/trac/jlibsvm/search">
+        <link rel="help" href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/TracGuide">
+        <link rel="alternate" href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/WikiStart?format=txt" type="text/x-trac-wiki" title="Plain Text">
+        <link rel="start" href="http://dev.davidsoergel.com/trac/jlibsvm/wiki">
+        <link rel="stylesheet" href="jlibsvm_files/trac.css" type="text/css"><link rel="stylesheet" href="jlibsvm_files/wiki.css" type="text/css">
+        <link rel="shortcut icon" href="http://dev.davidsoergel.com/trac/jlibsvm/chrome/common/trac.ico" type="image/x-icon">
+        <link rel="icon" href="http://dev.davidsoergel.com/trac/jlibsvm/chrome/common/trac.ico" type="image/x-icon">
+      <link type="application/opensearchdescription+xml" rel="search" href="http://dev.davidsoergel.com/trac/jlibsvm/search/opensearch" title="Search jlibsvm">
+    <script type="text/javascript" src="jlibsvm_files/jquery.js"></script><script type="text/javascript" src="jlibsvm_files/babel.js"></script><script type="text/javascript" src="jlibsvm_files/trac.js"></script><script type="text/javascript" src="jlibsvm_files/search.js"></script><script type="text/javascript" src="jlibsvm_files/folding.js"></script>
+    <!--[if lt IE 7]>
+    <script type="text/javascript" src="/trac/jlibsvm/chrome/common/js/ie_pre7_hacks.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("#content").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $("#content").find(".wikianchor").each(function() {
+          $(this).addAnchor(babel.format(_("Link to #%(id)s"), {id: $(this).attr('id')}));
+        });
+        $(".foldable").enableFolding(true, true);
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://dev.davidsoergel.com/"><img src="jlibsvm_files/banner.png" alt="" height="73" width="236"></a>
+      </div>
+      <form id="search" action="/trac/jlibsvm/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input id="proj-search" name="q" size="18" type="text">
+          <input value="Search" type="submit">
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="http://dev.davidsoergel.com/trac/jlibsvm/login">Login</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/prefs">Preferences</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/TracGuide">Help/Guide</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/about">About Trac</a></li><li class="last"><a href="http://dev.davidsoergel.com/trac/jlibsvm/register">Register</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="http://dev.davidsoergel.com/trac/jlibsvm/wiki">Wiki</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/timeline">Timeline</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/roadmap">Roadmap</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/browser">Browse Source</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/report">View Tickets</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/search">Search</a></li><li class="last"><a href="http://dev.davidsoergel.com/trac/jlibsvm/discussion">Forums</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="pagepath" class="noprint">
+  <a class="pathentry first" title="View WikiStart" href="http://dev.davidsoergel.com/trac/jlibsvm/wiki">wiki:</a><a class="pathentry" href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/WikiStart" title="View WikiStart">WikiStart</a>
+</div>
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+          <ul>
+              <li class="first"><a href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/WikiStart">Start Page</a></li><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/TitleIndex">Index</a></li><li class="last"><a href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/WikiStart?action=history">History</a></li>
+          </ul>
+        <hr>
+      </div>
+    <div id="content" class="wiki">
+      <div class="wikipage searchable">
+        
+          
+          <div class="trac-modifiedby"><a href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/WikiStart?action=diff&amp;version=32" title="Version 32 by soergel">Last modified</a> <a class="timeline" href="http://dev.davidsoergel.com/trac/jlibsvm/timeline?from=2012-03-13T13%3A19%3A58-04%3A00&amp;precision=second" title="2012-03-13T13:19:58-04:00 in Timeline">2 years</a> ago</div>
+          <div id="wikipage"><h1 id="EfficienttrainingofSupportVectorMachinesinJava">Efficient training of Support Vector Machines in Java<a title="Link to this section" href="#EfficienttrainingofSupportVectorMachinesinJava" class="anchor"> ¶</a></h1>
+<ul><li>Heavily refactored Java port of the venerable <a class="ext-link" href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvm/"><span class="icon">&nbsp;</span>LIBSVM</a> (version 2.88).
+</li><li>Provides <strong>idiomatic Java</strong> class structure and APIs (unlike the Java version provided by LIBSVM, which is transliterated C code).
+</li><li>Easy to <strong>add new kernels</strong>, in addition to the five standard ones provided by LIBSVM.
+</li><li>On the mathematical side, jlibsvm performs <strong>exactly the same computations as LIBSVM</strong>, including shrinking and all the fancy stuff described in the <a class="ext-link" href="http://www.csie.ntu.edu.tw/%7Ecjlin/papers/libsvm.pdf"><span class="icon">&nbsp;</span>LIBSVM implementation docs</a>.
+</li><li><strong>Optimized kernel implementations</strong> run faster, particularly when input vectors are sparse.  For instance, on the <a class="ext-link" href="http://www.csie.ntu.edu.tw/%7Ecjlin/libsvmtools/datasets/binary.html#mushrooms"><span class="icon">&nbsp;</span>mushrooms</a>
+ dataset, jlibsvm trained ~25% faster than LIBSVM (java version) with an
+ RBF kernel and ~40% faster with a linear kernel.  (The C version of 
+LIBSVM is still faster, though).
+</li><li><strong>Multithreaded training</strong> to take advantage of modern multi-core machines (using <a class="ext-link" href="http://dev.davidsoergel.com/trac/conja/"><span class="icon">&nbsp;</span>Conja</a>).
+</li><li><strong>Integrated scaling and normalization</strong> so you don't have to explicitly preprocess your data.
+</li><li><strong>Integrated grid search</strong> for optimal kernel parameters.
+</li><li>Drop-in replacement if you use the command-line tools (e.g. svm-train, etc.), but not if you use LIBSVM programmatically.
+</li><li>Uses Java <strong>generics</strong> throughout, including for 
+classification labels, so you can specify that the "label" of a class be
+ of whatever Java type you like.  In an email-filtering application, for
+ example, you could use objects of type <tt>Mailbox</tt> as the labels.  That would allow you to write something like <tt>mySvmSolutionModel.predict(incomingEmail).addMessage(incomingEmail)</tt>.  The <tt>predict()</tt> method returns a classification label, which in this case is an object of class <tt>Mailbox</tt>, which has an <tt>addMessage()</tt> method.
+</li></ul><p>
+ 
+</p>
+<h2 id="Status">Status<a title="Link to this section" href="#Status" class="anchor"> ¶</a></h2>
+<p>
+This is beta code.  While LIBSVM is stable, it's possible that I broke 
+something in the process of refactoring it.  I've done ad-hoc testing 
+primarily with the C_SVC machine and an RBF kernel, and got results that
+ were identical to LIBSVM as far as I could tell.  There are not (yet?) 
+any unit tests.  I'm running some automated verifications that jlibsvm 
+behaves identically to LIBSVM for a number of input datasets and 
+parameter choices; results will be available here soon.  Please <a class="mail-link" href="mailto:dev@davidsoergel.com"><span class="icon">&nbsp;</span>let me know</a> if you find a situation in which the two packages give different results.
+</p>
+<h2 id="Documentation">Documentation<a title="Link to this section" href="#Documentation" class="anchor"> ¶</a></h2>
+<ul><li><a class="ext-link" href="http://dev.davidsoergel.com/maven/jlibsvm/apidocs"><span class="icon">&nbsp;</span>API docs</a> (jlibsvm only)
+</li><li><a class="ext-link" href="http://dev.davidsoergel.com/apidocs"><span class="icon">&nbsp;</span>Aggregate API docs</a> (all projects hosted here; useful for navigating cross-package dependencies)
+</li></ul><p>
+Sorry, I haven't really had a chance to write any docs.  Have a look at the sources for the command-line programs in the <a href="http://dev.davidsoergel.com/trac/jlibsvm/browser/trunk/src/main/java/edu/berkeley/compbio/jlibsvm/legacyexec">legacyexec</a> package to see how jlibsvm gets called.  Very briefly, you'll need to:
+</p>
+<ol><li>instantiate the <a class="ext-link" href="http://dev.davidsoergel.com/maven/jlibsvm/apidocs/edu/berkeley/compbio/jlibsvm/kernel/KernelFunction.html"><span class="icon">&nbsp;</span>KernelFunction</a> that you want
+</li><li>set up some parameters in a new <a class="ext-link" href="http://dev.davidsoergel.com/maven/jlibsvm/apidocs/edu/berkeley/compbio/jlibsvm/SvmParameter.html"><span class="icon">&nbsp;</span>SvmParameter</a> object
+</li><li>instantiate a concrete subclass of <a class="ext-link" href="http://dev.davidsoergel.com/maven/jlibsvm/apidocs/edu/berkeley/compbio/jlibsvm/SvmProblem.html"><span class="icon">&nbsp;</span>SvmProblem</a> (binary, multiclass, or regression), and populate it with training data
+</li><li>instantiate a concrete subclass of <a class="ext-link" href="http://dev.davidsoergel.com/maven/jlibsvm/apidocs/edu/berkeley/compbio/jlibsvm/SVM.html"><span class="icon">&nbsp;</span>SVM</a>, choosing a type appropriate for your problem
+</li><li>Call <tt>SVM.train(problem)</tt> to yield a <a class="ext-link" href="http://dev.davidsoergel.com/maven/jlibsvm/apidocs/edu/berkeley/compbio/jlibsvm/SolutionModel.html"><span class="icon">&nbsp;</span>SolutionModel</a>, which can be used to make predictions
+</li></ol><h2 id="Download">Download<a title="Link to this section" href="#Download" class="anchor"> ¶</a></h2>
+<p>
+<a class="ext-link" href="http://maven.apache.org/"><span class="icon">&nbsp;</span>Maven</a> is by far the easiest way to make use of jlibsvm.  Just add these to your pom.xml:
+</p>
+<pre class="wiki">&lt;repositories&gt;
+	&lt;repository&gt;
+		&lt;id&gt;dev.davidsoergel.com releases&lt;/id&gt;
+		&lt;url&gt;http://dev.davidsoergel.com/artifactory/repo&lt;/url&gt;
+		&lt;snapshots&gt;
+			&lt;enabled&gt;false&lt;/enabled&gt;
+		&lt;/snapshots&gt;
+	&lt;/repository&gt;
+	&lt;repository&gt;
+		&lt;id&gt;dev.davidsoergel.com snapshots&lt;/id&gt;
+		&lt;url&gt;http://dev.davidsoergel.com/artifactory/repo&lt;/url&gt;
+		&lt;releases&gt;
+			&lt;enabled&gt;false&lt;/enabled&gt;
+		&lt;/releases&gt;
+	&lt;/repository&gt;
+&lt;/repositories&gt;
+
+&lt;dependencies&gt;
+	&lt;dependency&gt;
+		&lt;groupId&gt;edu.berkeley.compbio&lt;/groupId&gt;
+		&lt;artifactId&gt;jlibsvm&lt;/artifactId&gt;
+		&lt;version&gt;0.902&lt;/version&gt;
+	&lt;/dependency&gt;
+&lt;/dependencies&gt;
+</pre><p>
+If you don't use Maven, you can get the distribution (including all external dependencies) here: <a class="ext-link" href="http://dev.davidsoergel.com/artifactory/libs-releases/edu/berkeley/compbio/jlibsvm/0.902/jlibsvm-0.902.tar.gz"><span class="icon">&nbsp;</span>jlibsvm-0.902.tar.gz</a> (2.7 MB)  <em>December 14, 2009</em>
+</p>
+<p>
+Or get the <a class="ext-link" href="http://dev.davidsoergel.com/hudson/job/jlibsvm/lastStableBuild/"><span class="icon">&nbsp;</span>latest stable build</a> from the continuous integration server.  (You may need to pick up the latest versions of the dependencies listed there, too.)
+</p>
+<p>
+You can also <a class="source" href="http://dev.davidsoergel.com/trac/jlibsvm/browser/">browse the source</a>, or get the source with Mercurial:
+</p>
+<pre class="wiki">hg clone https://hg.davidsoergel.com/davidsoergel/jlibsvm
+</pre><p>
+The project is also <a class="ext-link" href="http://hg.davidsoergel.com/jlibsvm"><span class="icon">&nbsp;</span>on BitBucket</a>, so please feel free to fork it there.
+</p>
+<h2 id="Support">Support<a title="Link to this section" href="#Support" class="anchor"> ¶</a></h2>
+<ul><li><a href="http://dev.davidsoergel.com/trac/jlibsvm/discussion/1">Discussion Forum</a>
+</li><li>Feel free to <a class="mail-link" href="mailto:dev@davidsoergel.com"><span class="icon">&nbsp;</span>email me</a> any questions or comments
+</li><li>For bug reports or feature requests, please <a href="http://dev.davidsoergel.com/trac/jlibsvm/newticket">create a ticket</a> (you'll need to <a href="http://dev.davidsoergel.com/trac/jlibsvm/register">create an account</a> and <a href="http://dev.davidsoergel.com/trac/jlibsvm/login">login</a> first).
+</li><li><a class="report" href="http://dev.davidsoergel.com/trac/jlibsvm/report/1">view active tickets</a>
+</li></ul></div>
+        
+        
+      </div>
+      
+
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="last first">
+          <a rel="nofollow" href="http://dev.davidsoergel.com/trac/jlibsvm/wiki/WikiStart?format=txt">Plain Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" xml:lang="en" lang="en"><hr>
+      <a id="tracpowered" href="http://trac.edgewall.org/"><img src="jlibsvm_files/trac_logo_mini.png" alt="Trac Powered" height="30" width="107"></a>
+      <p class="left">Powered by <a href="http://dev.davidsoergel.com/trac/jlibsvm/about"><strong>Trac 0.12.2</strong></a><br>
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Site contents and source code copyright © 2008-2011 <a href="mailto:dev@davidsoergel.com">David Soergel</a></p>
+    </div>
+  
+</body></html>

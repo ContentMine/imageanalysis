@@ -24,9 +24,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://bitbucket.org/wwmm/canny/src</url>
-		<connection>scm:hg:http://bitbucket.org/wwmm/canny</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/wwmm/canny</developerConnection>
+		<url>https://bitbucket.org/petermr/imageanalysis/src</url>
+		<connection>scm:hg:http://bitbucket.org/petermr/imageanalysis</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/petermr/imageanalysis</developerConnection>
 	</scm>
 	<developers>
 		<developer>
@@ -37,7 +37,7 @@
 
 	<ciManagement>
 		<system>hudson</system>
-		<url>https://hudson.ch.cam.ac.uk/job/canny</url>
+		<url>https://hudson.ch.cam.ac.uk/job/imageanalysis</url>
 	</ciManagement>
 
 	<organization>

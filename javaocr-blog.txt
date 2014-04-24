@@ -1,0 +1,44 @@
+Optical Character Recognition (OCR) using Java
+
+In The Content Mine and PLUTo projects we need OCR to interpret diagrams with letters and numbers. OCR is a well tested and developed technology and widely used. Unfortunately it's not trivial to find a Open (F/LOSS) Java solution (please correct me if I'm wrong - would be delighted). Hopefully this blog will help others. If my comments here are knaccurate pleaes correct them - unfortunately most of the codes I discuss are poorly documented and have few or no examples.
+
+OCR has many features but here we restrict this to
+* high-quality born-digital typefaces (i.e. no handwriting, no scanning, no photos - we shall move to those later)
+* a small number of font-families (Helvetica, Times, Courier or their near relations). No ComicSans.
+* understanding what is happening as we shall want to extend this - e.g. to Unicode symbols for graphs and maths and Greek.
+* modular. It needs to be easily integrated, so no GUIs, etc.
+
+If you are desperate and don't mind paying there are commercial solutions. If you don't mind using C(++) there's OpenCV. But I need to integrate with Java as this has to redistribute everywhere. I can't run a server as people may have to post copyright material. 
+
+If you search for Java and OCR you will variously find:
+
+* Tesseract (http://tess4j.sourceforge.net/). This is a de facto standard, BUT it's C(++) wrapped in Java. That will be a nightmare to redistribute.
+* Lookup (https://github.com/axet/lookup). I haven't got to the bottom of this, but I think it's a fast pixel comparator. IOW if you have a small image it will see where it can be found in a larger image. For that you need the precise iamge - it is unlikely to recognize a Times B using a Helvetica B for searching.
+* JavaOCR. This is where the anser may lie but the confusion starts:
+  - javaocr "20100605" (http://sourceforge.net/projects/javaocr/). From Ron Cemer. This seems to be an initial effort which uses simple features such as aspect ratio or very simple moments. There's a zip file to dowload with the name javaocr20100605. the project has been stopped at about 2010 but Ron still appears to comment on the later version below. I think we owe Ron thanks, but 20100605 is not the route we shall follow.
+  - javaocr "2012-10-27"(http://sourceforge.net/p/javaocr/source). This appears to be a fork of javaocr20100605. There's a download but it's basically 20100605. To get the more recent version you must clone the repository:
+  
+    git clone git://git.code.sf.net/p/javaocr/source javaocr-source
+
+The code and useful comments appear to have stopped at 2012-10-xx and the authors admit they haven't documented stuff. However the system loads into Eclipse and tests. After some unrewarding detective work I've come to the conclusions:
+
+* the project distrib is overly complex and poorly documented. It seems to be oriented towards Android and this may be difficult to demodularise. The distrib is a set of maven modules - I think some can be disregarded.
+* the recognition has advanced and uses HuMoments and Mahalanobis distances. (I had come to the independent conclusion that these are what we needed).
+* I have tracked down a demo at:
+  net.sourceforge.javaocr.ocrPlugins.OCRDemo.OCRScannerDemo 
+  which has a main() entry point. It's still very messy - hardocded filenames and no explanation. It looks like a town hit by a pyroclastic flow - abandoned in an instant. There's a training file
+  
+  javaocr/legacy/ocrTests/trainingImages/ascii.png
+  
+   with the characters 33-112 in order as monospace glyphs. This is hardcoded to map the codepoints onto the glyphs (either by x,y coordinate or whitespace - don't know which yet). There's another image
+   
+    javaocr/legacy/ocrTests/asciiSentence.png 
+	
+which is a test. I run the OCRScannerDemo and it prints out the characters on the console output. 
+
+So the system is able to recognize characters exactly if you have the exact or very similar font. This is good news. What I don't know is how much we can vary the test fonts. I'm hoping that our own work on thinning will make skeletons which are less dependent on the font families. Or it may be that simply traing with three families will be ok for most science.
+
+So this is a first step for those - like me - who are finding it difficult to navigate javaocr. If we don't hear anything we may create a forked project with clearer documentation and examples.
+
+
+	

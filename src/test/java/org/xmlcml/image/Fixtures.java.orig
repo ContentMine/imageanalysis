@@ -12,7 +12,8 @@ public class Fixtures {
 	public final static File RESOURCE_DIR = new File("src/test/resources");
 	public final static File IMAGE_DIR = new File(RESOURCE_DIR, "org/xmlcml/image");
 	
-	public final static File JOURNAL_HTML = new File(IMAGE_DIR, "journal.html");
+	public final static File TESS_DIR = new File(IMAGE_DIR, "tess");
+	public final static File JOURNAL_HTML = new File(TESS_DIR, "journal.html");
 	
 	public final static File LINES_DIR = new File(IMAGE_DIR, "lines");
 	public final static File TREE_PNG = new File(LINES_DIR, "tree.png");
@@ -61,9 +62,8 @@ public class Fixtures {
 	public static final File TIMES_GIF = new File(TEXT_DIR, "times.gif");
 	public static final File LARGE_PHYLO_JPG = new File(Fixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
 
-	public static final File GENERAL_DIR = new File(IMAGE_DIR, "general");
-	public static final File REFFONT_DIR = new File(GENERAL_DIR, "refFont");
-	
+	public final static File GENERAL_DIR = new File(Fixtures.IMAGE_DIR, "general");
+	public final static File REFFONT_DIR = new File(Fixtures.GENERAL_DIR, "refFont");
 	
 	public static List<Pixel> LINE_LIST = Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
