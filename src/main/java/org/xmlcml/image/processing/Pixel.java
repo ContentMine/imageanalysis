@@ -26,6 +26,7 @@ public class Pixel {
 	private List<Pixel> neighbourList;
 	PixelIsland island;
 	private Marked marked = null;
+	int value = 0;
 
 	public Pixel(Point p) {
 		this.point = p;
@@ -198,4 +199,11 @@ public class Pixel {
 		return array;
 	}
 
+	public void setValue(int v) {
+		this.value = v;
+	}
+
+	public int getValue() {
+		return value;
+	}
 }

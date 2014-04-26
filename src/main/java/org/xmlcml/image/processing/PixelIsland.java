@@ -58,18 +58,18 @@ public class PixelIsland {
 		TERMINAL,
 	}
 	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
+
+	private static final int NONE = -1;
 	
 	private List<Pixel> pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
-//	private List<Pixel> removeList;
 	private List<Nucleus> nucleusList;
 	private List<Pixel> terminalPixels;
 	private Map<Pixel, Nucleus> nucleusMap;
 	private Set<Pixel> usedPixels;
-//	private Set<Nucleus> usedNuclei;
 	private List<PixelPath> pixelPaths;
 	private double tolerance = 1.5;
 
@@ -98,6 +98,10 @@ public class PixelIsland {
 		indexPixelsAndUpdateMetadata();
 	}
 	
+	public PixelIsland(PixelIsland axes) {
+		this(axes.getPixelList());
+	}
+
 	public Real2Range getBoundingBox() {
 		Real2Range r2r = new Real2Range();
 		for (Pixel pixel : pixelList) {
@@ -874,6 +878,48 @@ public class PixelIsland {
 
 	public String getPixelColor() {
 		return pixelColor;
+	}
+
+	public void findRidge() {
+		markEdges();
+	}
+
+	public void markEdges() {
+		for (Pixel pixel : pixelList) {
+			pixel.setValue(NONE);
+			List<Pixel> neighbours = pixel.getNeighbours(this);
+			int size = neighbours.size();
+			if (size < 8) {
+				pixel.setValue(1);
+			}
+		}
+	}
+
+	public List<Pixel> getPixelsWithValue(int v) {
+		List<Pixel> valueList = new ArrayList<Pixel>();
+		for (Pixel pixel : pixelList) {
+			if (pixel.getValue() == v) {
+				valueList.add(pixel);
+			}
+		}
+		return valueList;
+	}
+
+	public List<Pixel> growFrom(List<Pixel> startPixels, int v) {
+		List<Pixel> growList = new ArrayList<Pixel>();
+		for (Pixel start : startPixels) {
+			if (start.getValue() != v) {
+				throw new RuntimeException("bad pixel "+start.getValue());
+			}
+			List<Pixel> neighbours = start.getNeighbours(this);
+			for (Pixel neighbour : neighbours) {
+				if (neighbour.getValue() == NONE) {
+					neighbour.setValue(v + 1);
+					growList.add(neighbour);
+				}
+			}
+		}
+		return growList;
 	}
 
 	
