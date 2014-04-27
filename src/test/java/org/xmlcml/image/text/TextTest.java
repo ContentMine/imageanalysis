@@ -3,15 +3,20 @@ package org.xmlcml.image.text;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.OtsuBinarize;
+import org.xmlcml.image.processing.PixelIsland;
+import org.xmlcml.image.processing.PixelIslandList;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class TextTest {
@@ -105,6 +110,23 @@ public class TextTest {
 			LOG.debug("");
 		}
 	}
+	
+	@Test
+	public void testScanned() throws IOException {
+		PixelIslandList scanned = PixelIslandList.createPixelIslandList(new File(Fixtures.PROCESSING_DIR, "bp.png"));
+		Assert.assertEquals("scanned", 3011, scanned.size());
+		List<PixelIsland> islandList = new ArrayList<PixelIsland>(scanned.getList());
+		for (PixelIsland island : islandList) {
+			if (island.size() <= 4) {
+				scanned.getList().remove(island);
+			} else {
+				System.out.println(">"+scanned.size());
+			}
+		}
+		Assert.assertEquals("scanned", 937, scanned.size());
+	}
+	
+
 	
 	// =============================================
 

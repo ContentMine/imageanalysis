@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIslandList;
 
@@ -28,7 +29,7 @@ public class ZernikeTest {
 		Assert.assertTrue("refFont", Fixtures.REFFONT_DIR.exists());
 		BufferedImage image = ImageIO.read(new File(Fixtures.REFFONT_DIR, "65.png"));
 		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandList(image);
-		List<Pixel> pixelList = pixelIslandList.getPixelList();
+		PixelList pixelList = pixelIslandList.getPixelList();
 		Assert.assertEquals("pixels", 332, pixelList.size());
 		Real2Array real2Array = Pixel.createReal2Array(pixelList);
 		Assert.assertEquals("pixels", 332, real2Array.size());
@@ -78,7 +79,7 @@ public class ZernikeTest {
 	private ZernikeMomentsOrig.Complex[] calculateComplex(int order, File imageFile) throws IOException {
 		BufferedImage image = ImageIO.read(imageFile);
 		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandList(image);
-		List<Pixel> pixelList = pixelIslandList.getPixelList();
+		PixelList pixelList = pixelIslandList.getPixelList();
 		Real2Array real2Array = Pixel.createReal2Array(pixelList);
 		double[] xarray = real2Array.getXArray().getArray();		
 		double[] yarray = real2Array.getYArray().getArray();

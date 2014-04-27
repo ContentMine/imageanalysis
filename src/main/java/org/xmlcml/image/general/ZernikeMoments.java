@@ -11,9 +11,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xmlcml.euclid.Int2;
-import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIslandList;
 
@@ -62,12 +61,12 @@ public class ZernikeMoments {
 		width = image.getWidth();
 		height = image.getHeight();
 		pixelIslandList = PixelIslandList.createPixelIslandList(image);
-		List<Pixel> pixels = pixelIslandList.getPixelList();
+		PixelList pixels = pixelIslandList.getPixelList();
 		npixels = pixels.size();
 		createXYVals(pixels);
 	}
 
-	private void createXYVals(List<Pixel> pixels) {
+	private void createXYVals(PixelList pixels) {
 		Real2Array real2Array = Pixel.createReal2Array(pixels);
 		xvals = real2Array.getXArray().getArray();
 		yvals = real2Array.getYArray().getArray();

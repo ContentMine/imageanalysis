@@ -1,12 +1,10 @@
 package org.xmlcml.image.processing;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.image.compound.PixelList;
 
 /** coordination shellm radiating out from pixel.
  * 
@@ -28,9 +26,9 @@ public class Shell {
 	}
 
 	public void expandOnePixelFromCurrent() {
-		List<Pixel> shellPixelList = new ArrayList<Pixel>(expandedShell);
+		PixelList shellPixelList = new PixelList(expandedShell);
 		for (Pixel pixel : shellPixelList) {
-			List<Pixel> neightbourList = pixel.getNeighbours(island);
+			PixelList neightbourList = pixel.getNeighbours(island);
 			for (Pixel neighbour  : neightbourList) {
 				expandedShell.add(neighbour);
 			}

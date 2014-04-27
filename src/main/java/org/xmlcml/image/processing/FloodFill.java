@@ -3,12 +3,12 @@ package org.xmlcml.image.processing;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import javax.imageio.ImageIO;
+
+import org.xmlcml.image.compound.PixelList;
 
 public class FloodFill {
 
@@ -60,7 +60,7 @@ public class FloodFill {
 			Queue<Point> queue = new LinkedList<Point>();
 			queue.add(new Point(j, i));
 
-			List<Pixel> pixelList = new ArrayList<Pixel>();
+			PixelList pixelList = new PixelList();
 			while (!queue.isEmpty()) {
 				Point p = queue.remove();
 				if (isInsideImage(p)) {

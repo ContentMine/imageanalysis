@@ -18,7 +18,9 @@ import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
+import org.xmlcml.image.compound.PixelList;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -216,15 +218,43 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return polylineListList;
 	}
 
-	public List<Pixel> getPixelList() {
-		List<Pixel> pixelList = new ArrayList<Pixel>();
+	public PixelList getPixelList() {
+		PixelList pixelList = new PixelList();
 		if (list != null) {
 			for (PixelIsland island : list) {
-				List<Pixel> pList = island.getPixelList();
+				PixelList pList = island.getPixelList();
 				pixelList.addAll(pList);
 			}
 		}
 		return pixelList;
 	}
 
+	/** create a list of list of rings.
+	 * 
+	 * @param outputFile if not null file to write SVG to 
+	 * @return
+	 */
+	public List<RingList> createRingListList(File outputFile) {
+		List<RingList> ringListList = new ArrayList<RingList>();
+		SVGG gg = null;
+		if (outputFile != null) {
+			gg = new SVGG();
+		}
+		for (PixelIsland island : this) {
+			RingList ringList = island.createRingsAndPlot(gg, new String[]{"orange", "green", "blue", "red", "cyan"} );
+			ringListList.add(ringList);
+		}
+		if (outputFile != null) {
+			SVGSVG.wrapAndWriteAsSVG(gg, outputFile);
+		}
+		return ringListList;
+	}
+
+	/** creates list of rings.
+	 * 
+	 * @return list of rings
+	 */
+	public List<RingList> createRingListList() {
+		return createRingListList(null);
+	}
 }

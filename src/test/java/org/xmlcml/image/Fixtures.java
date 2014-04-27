@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
 
 public class Fixtures {
@@ -66,21 +67,21 @@ public class Fixtures {
 	public static final File COMPOUND_DIR = new File(IMAGE_DIR, "compound");
 	
 	
-	public static List<Pixel> LINE_LIST = Arrays.asList(new Pixel[] {
+	public static PixelList LINE_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(1, 2)),
 			new Pixel(new Point(1, 3)), 
 			new Pixel(new Point(1, 4)), 
 			new Pixel(new Point(1, 5)), 
-			});
+			}));
 	
-	public static List<Pixel> DIAG_LIST = Arrays.asList(new Pixel[] {
+	public static PixelList DIAG_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(2, 2)),
 			new Pixel(new Point(3, 3)), 
 			new Pixel(new Point(4, 4)), 
 			new Pixel(new Point(5, 5)), 
-			});
+			}));
 	
 
 	/**
@@ -94,7 +95,7 @@ public class Fixtures {
 	 * +
 	 * +
 	 */
-	public static List<Pixel> T_LIST = Arrays.asList(new Pixel[] {
+	public static PixelList T_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(1, 2)),
 			new Pixel(new Point(1, 3)), 
@@ -102,15 +103,15 @@ public class Fixtures {
 			new Pixel(new Point(1, 5)), 
 			new Pixel(new Point(2, 3)), 
 			new Pixel(new Point(3, 3)), 
-			});
+			}));
 		
-	public static List<Pixel> L_LIST = Arrays.asList(new Pixel[] {
+	public static PixelList L_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(1, 2)),
 			new Pixel(new Point(1, 3)), 
 			new Pixel(new Point(2, 3)), 
 			new Pixel(new Point(3, 3)), 
-			});
+			}));
 
 	/**
 	 * 
@@ -121,13 +122,13 @@ public class Fixtures {
 	 * ++
 	 * +
 	 */
-	public static List<Pixel> LONG_T_LIST = Arrays.asList(new Pixel[] {
+	public static PixelList LONG_T_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
 			new Pixel(new Point(1, 2)),
 			new Pixel(new Point(1, 3)), 
 			new Pixel(new Point(1, 4)), 
 			new Pixel(new Point(2, 3)), 
-			});
+			}));
 	
 	public static File CHAR_DIR = new File(Fixtures.TEXT_DIR, "chars");
 

@@ -11,6 +11,7 @@ import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGRect;
+import org.xmlcml.image.compound.PixelList;
 
 public class Pixel {
 
@@ -23,7 +24,7 @@ public class Pixel {
 	};
 	
 	Point point;
-	private List<Pixel> neighbourList;
+	private PixelList neighbourList;
 	PixelIsland island;
 	private Marked marked = null;
 	int value = 0;
@@ -36,7 +37,7 @@ public class Pixel {
 		return point == null ? null : new Int2(point.x, point.y);
 	}
 
-	public List<Pixel> getNeighbours(PixelIsland island) {
+	public PixelList getNeighbours(PixelIsland island) {
 		this.island = island;
 		ensureNeighbours();
 		return neighbourList;
@@ -64,7 +65,7 @@ public class Pixel {
 
 	private void ensureNeighbours() {
 		if (neighbourList == null) {
-			neighbourList = new ArrayList<Pixel>();
+			neighbourList = new PixelList();
 			List<Int2> coordList = calculateNeighbourCoordList();
 			for (Int2 coord : coordList) {
 				Pixel pixel = island.getPixelByCoordMap().get(coord);
@@ -166,7 +167,7 @@ public class Pixel {
 
 	public Set<Triangle> getTriangles(PixelIsland island) {
 		Set<Triangle> triangleSet = new HashSet<Triangle>();
-		List<Pixel> neighbours = this.getNeighbours(island);
+		PixelList neighbours = this.getNeighbours(island);
 		for (int i = 0; i < neighbours.size() - 1; i++) {
 			for (int j = i+1; j < neighbours.size(); j++) {
 				Triangle triangle = Triangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
@@ -188,7 +189,7 @@ public class Pixel {
 		return rect;
 	}
 
-	public static Real2Array createReal2Array(List<Pixel> pixelList) {
+	public static Real2Array createReal2Array(PixelList pixelList) {
 		Real2Array array = null;
 		if (pixelList != null) {
 			array = new Real2Array();

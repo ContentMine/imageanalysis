@@ -3,15 +3,19 @@ package org.xmlcml.image.compound;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;
+import org.xmlcml.image.processing.PixelIslandList.Operation;
+import org.xmlcml.image.processing.RingList;
 
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
@@ -61,40 +65,107 @@ public class PlotTest {
 	}
 
 	@Test
-	public void testAxes() throws IOException {
+	public void testAxes0() throws IOException {
 		PixelIsland axes = PixelIslandList.createPixelIslandList(new File(G002_DIR, "axes.png")).get(0);
 		Assert.assertEquals("pixels", 7860, axes.size());
 		PixelIsland axesThin = new PixelIsland(axes);
 		axesThin.setDiagonal(true);
 		axesThin.findRidge();
-		List<Pixel> edgeList = axesThin.getPixelsWithValue(1);
+		PixelList edgeList = axesThin.getPixelsWithValue(1);
 		Assert.assertEquals("1:", 3938, edgeList.size());
-		List<Pixel> list2 = axesThin.growFrom(edgeList, 1);
+		PixelList list2 = axesThin.growFrom(edgeList, 1);
 		Assert.assertEquals("2:", 3922, list2.size());
-		List<Pixel> list3 = axesThin.growFrom(list2, 2);
+		PixelList list3 = axesThin.growFrom(list2, 2);
 		Assert.assertEquals("3:", 0, list3.size());
 	}
 
 	@Test
 	public void testErrorBar() throws IOException {
-		PixelIsland errorbar = PixelIslandList.createPixelIslandList(new File(G002_DIR, "errorbar.png")).get(0);
-		Assert.assertEquals("pixels", 285, errorbar.size());
-		PixelIsland barThin = new PixelIsland(errorbar);
-		barThin.setDiagonal(true);
-		barThin.findRidge();
-		List<Pixel> edgeList = barThin.getPixelsWithValue(1);
-		Assert.assertEquals("1:", 181, edgeList.size());
-		List<Pixel> list2 = barThin.growFrom(edgeList, 1);
-		Assert.assertEquals("2:", 49, list2.size());
-		List<Pixel> list3 = barThin.growFrom(list2, 2);
-		Assert.assertEquals("3:", 34, list3.size());
-		List<Pixel> list4 = barThin.growFrom(list3, 3);
-		Assert.assertEquals("4:", 18, list4.size());
-		List<Pixel> list5 = barThin.growFrom(list4, 4);
-		Assert.assertEquals("5:", 3, list5.size());
-		List<Pixel> list6 = barThin.growFrom(list5, 5);
+		PixelIsland errorbar = PixelIslandList.createPixelIslandList(new File(G002_DIR, "errorbar.png"), Operation.BINARIZE).get(0);
+		Assert.assertEquals("pixels", 222, errorbar.size());
+		PixelIsland errorIsland = new PixelIsland(errorbar);
+		SVGG g = new SVGG();
+		errorIsland.setDiagonal(true);
+		errorIsland.findRidge();
+		PixelList list1 = errorIsland.getPixelsWithValue(1);
+		Assert.assertEquals("1:", 131, list1.size());
+		list1.plotPixels(g, "orange");
+		PixelList list2 = errorIsland.growFrom(list1, 1);
+		Assert.assertEquals("2:", 46, list2.size());
+		list2.plotPixels(g, "green");
+		PixelList list3 = errorIsland.growFrom(list2, 2);
+		Assert.assertEquals("3:", 30, list3.size());
+		list3.plotPixels(g, "blue");
+		PixelList list4 = errorIsland.growFrom(list3, 3);
+		Assert.assertEquals("4:", 14, list4.size());
+		list4.plotPixels(g, "red");
+		PixelList list5 = errorIsland.growFrom(list4, 4);
+		Assert.assertEquals("5:", 1, list5.size());
+		list5.plotPixels(g, "cyan");
+		PixelList list6 = errorIsland.growFrom(list5, 5);
 		Assert.assertEquals("6:", 0, list6.size());
 		
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/errorbar.svg"));
+
+		PixelList list12 = list2.getPixelsTouching(list1, errorIsland);
+		list12.plotPixels(g, "yellow");
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/errorbar1.svg"));
+//		makeCentre(list5, "black");
+	}
+	
+	@Test
+	public void testAxes1() throws IOException {
+		PixelIsland axes = PixelIslandList.createPixelIslandList(new File(G002_DIR, "axes.png"), Operation.BINARIZE).get(0);
+		Assert.assertEquals("pixels", 7860, axes.size());
+		SVGG gg = new SVGG();
+		RingList ringList = axes.createRingsAndPlot(gg, new String[]{"orange", "green"} );
+		assertSizes(ringList, new int[]{3938, 3922});
+		SVGSVG.wrapAndWriteAsSVG(gg, new File("target/plot/axes.svg"));
+	}
+
+	@Test
+	public void testXTitle() throws IOException {
+		PixelIslandList titleChars = PixelIslandList.createPixelIslandList(new File(G002_DIR, "xtitle.png"), Operation.BINARIZE);
+		Assert.assertEquals("characters", 33, titleChars.size());
+		List<RingList> characterList = titleChars.createRingListList(new File("target/plot/xtitle.svg"));
+	}
+
+	@Test
+	public void testXNumbers() throws IOException {
+		PixelIslandList xNumbers = PixelIslandList.createPixelIslandList(new File(G002_DIR, "xnumbers.png"), Operation.BINARIZE);
+		Assert.assertEquals("characters", 11, xNumbers.size());
+		xNumbers.createRingListList(new File("target/plot/xnumbers.svg"));
+	}
+
+	@Test
+	public void testYTitle() throws IOException {
+		PixelIslandList yTitle = PixelIslandList.createPixelIslandList(new File(G002_DIR, "ytitle.png"), Operation.BINARIZE);
+		Assert.assertEquals("characters", 32, yTitle.size());
+		yTitle.createRingListList(new File("target/plot/ytitle.svg"));
+	}
+
+	@Test
+	public void testYNumbers() throws IOException {
+		PixelIslandList yNumbers = PixelIslandList.createPixelIslandList(new File(G002_DIR, "ynumbers.png"), Operation.BINARIZE);
+		yNumbers.createRingListList(new File("target/plot/ynumbers.svg"));
+		Assert.assertEquals("characters", 9, yNumbers.size());
+	}
+
+	@Test
+	public void testPoints() throws IOException {
+		PixelIslandList points = PixelIslandList.createPixelIslandList(new File(G002_DIR, "points.png"), Operation.BINARIZE);
+		points.createRingListList(new File("target/plot/points.svg"));
+		Assert.assertEquals("points", 4, points.size());
+	}
+
+	
+	
+	// =========================
+	
+	private static void assertSizes(RingList ringList, int[] sizes) {
+		Assert.assertNotNull("ringList", ringList);
+		Assert.assertNotNull("sizes", sizes);
+		Assert.assertEquals("ring count", sizes.length, ringList.size());
 	}
 
 }

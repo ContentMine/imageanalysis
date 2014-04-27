@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.image.compound.PixelList;
 
 public class TriangleTest {
 
@@ -45,9 +46,9 @@ public class TriangleTest {
 		Assert.assertEquals(2, diagonal.size());
 		Assert.assertTrue(diagonal.contains(pixel[1]));
 		Assert.assertTrue(diagonal.contains(pixel[2]));
-		List<Pixel> neighbours0 = pixel[0].getNeighbours(island);
-		List<Pixel> neighbours1 = pixel[1].getNeighbours(island);
-		List<Pixel> neighbours2 = pixel[2].getNeighbours(island);
+		PixelList neighbours0 = pixel[0].getNeighbours(island);
+		PixelList neighbours1 = pixel[1].getNeighbours(island);
+		PixelList neighbours2 = pixel[2].getNeighbours(island);
 		Assert.assertTrue("n0 ", neighbours0.contains(pixel[1]) && neighbours0.contains(pixel[2]));
 		Assert.assertTrue("n1 ", neighbours1.contains(pixel[0]) && neighbours0.contains(pixel[2]));
 		Assert.assertTrue("n2 ", neighbours2.contains(pixel[0]) && neighbours0.contains(pixel[1]));
@@ -63,9 +64,9 @@ public class TriangleTest {
 		LOG.trace("p1 "+pixel[1]);
 		LOG.trace("p2 "+pixel[2]);
 		triangle.removeDiagonalNeighbours();
-		List<Pixel> neighbours0 = pixel[0].getNeighbours(island);
-		List<Pixel> neighbours1 = pixel[1].getNeighbours(island);
-		List<Pixel> neighbours2 = pixel[2].getNeighbours(island);
+		PixelList neighbours0 = pixel[0].getNeighbours(island);
+		PixelList neighbours1 = pixel[1].getNeighbours(island);
+		PixelList neighbours2 = pixel[2].getNeighbours(island);
 		LOG.trace("n0 "+neighbours0);
 		LOG.trace("n1 "+neighbours1);
 		LOG.trace("n2 "+neighbours2);

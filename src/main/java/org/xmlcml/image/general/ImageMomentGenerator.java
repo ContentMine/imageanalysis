@@ -1,12 +1,11 @@
 package org.xmlcml.image.general;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
-import org.xmlcml.euclid.Util;
+import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIslandList;
 
@@ -46,7 +45,7 @@ public class ImageMomentGenerator {
 	private Real2Array pixelCoords;
 	private BufferedImage image;
 	private PixelIslandList pixelIslandList;
-	private List<Pixel> pixelList;
+	private PixelList pixelList;
 	private Double sumX;
 	private Double sumY;
 	private Double meanX;
@@ -80,7 +79,7 @@ public class ImageMomentGenerator {
 		readPixels(pixelList);
 	}
 	
-	private void readPixels(List<Pixel> pixelList) {
+	private void readPixels(PixelList pixelList) {
 		pixelCoords = Pixel.createReal2Array(pixelList);
 		LOG.debug("pixels: "+pixelCoords.size());
 		calculateMoments();

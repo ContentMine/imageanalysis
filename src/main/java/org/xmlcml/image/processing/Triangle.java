@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.image.compound.PixelList;
 
 public class Triangle {
 
@@ -39,9 +40,9 @@ public class Triangle {
 	private boolean createSet() {
 		boolean created = false;
 		// we must set up neightbours
-		List<Pixel> neighbours0 = pixel[0].getNeighbours(island);
-		List<Pixel> neighbours1 = pixel[1].getNeighbours(island);
-		List<Pixel> neighbours2 = pixel[2].getNeighbours(island);
+		PixelList neighbours0 = pixel[0].getNeighbours(island);
+		PixelList neighbours1 = pixel[1].getNeighbours(island);
+		PixelList neighbours2 = pixel[2].getNeighbours(island);
 		boolean n01 = neighbours0.contains(pixel[1]);
 		boolean n02 = neighbours0.contains(pixel[2]);
 		boolean n12 = neighbours1.contains(pixel[2]);

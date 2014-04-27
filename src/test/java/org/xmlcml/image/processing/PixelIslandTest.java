@@ -33,6 +33,7 @@ import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
+import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.lines.DouglasPeucker;
 import org.xmlcml.image.lines.PixelPath;
 import org.xmlcml.image.processing.PixelIslandList.Operation;
@@ -56,17 +57,17 @@ public class PixelIslandTest {
 	@Ignore // non-deterministic?
 
 	public void testAddPixel() {
-		List<Pixel> longTList = Fixtures.LONG_T_LIST;
+		PixelList longTList = Fixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList);
-		List<Pixel> n0 = longTList.get(0).getNeighbours(island);
+		PixelList n0 = longTList.get(0).getNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
-		List<Pixel> n1 = longTList.get(1).getNeighbours(island);
+		PixelList n1 = longTList.get(1).getNeighbours(island);
 		Assert.assertEquals("1", 2, n1.size());
-		List<Pixel> n2 = longTList.get(2).getNeighbours(island);
+		PixelList n2 = longTList.get(2).getNeighbours(island);
 		Assert.assertEquals("2", 3, n2.size());
-		List<Pixel> n3 = longTList.get(3).getNeighbours(island);
+		PixelList n3 = longTList.get(3).getNeighbours(island);
 		Assert.assertEquals("3", 1, n3.size());
-		List<Pixel> n4 = longTList.get(4).getNeighbours(island);
+		PixelList n4 = longTList.get(4).getNeighbours(island);
 		Assert.assertEquals("3", 1, n4.size());
 	}
 	
@@ -84,42 +85,42 @@ public class PixelIslandTest {
 	@Ignore // non-deterministic?
 	public void testAddPixelWithDiagonal() {
 		boolean diagonal = true;
-		List<Pixel> longTList = Fixtures.LONG_T_LIST;
+		PixelList longTList = Fixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList, diagonal);
-		List<Pixel> n0 = longTList.get(0).getNeighbours(island);
+		PixelList n0 = longTList.get(0).getNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
-		List<Pixel> n1 = longTList.get(1).getNeighbours(island);
+		PixelList n1 = longTList.get(1).getNeighbours(island);
 		Assert.assertEquals("1", 2, n1.size());
-		List<Pixel> n2 = longTList.get(2).getNeighbours(island);
+		PixelList n2 = longTList.get(2).getNeighbours(island);
 		Assert.assertEquals("2", 3, n2.size());
-		List<Pixel> n3 = longTList.get(3).getNeighbours(island);
+		PixelList n3 = longTList.get(3).getNeighbours(island);
 		Assert.assertEquals("3", 1, n3.size());
-		List<Pixel> n4 = longTList.get(4).getNeighbours(island);
+		PixelList n4 = longTList.get(4).getNeighbours(island);
 		Assert.assertEquals("4", 1, n4.size());
 	}
 	
 	@Test
 	public void testgetTerminalPixels() {
-		List<Pixel> lineList = Fixtures.LINE_LIST;
+		PixelList lineList = Fixtures.LINE_LIST;
 		PixelIsland island = new PixelIsland(lineList);
-		List<Pixel> terminalPixels = island.getTerminalPixels();
+		PixelList terminalPixels = island.getTerminalPixels();
 		Assert.assertEquals("terminal", 2, terminalPixels.size());
 	}
 	
 	@Test
 	public void testgetTerminalPixelsL() {
-		List<Pixel> lList = Fixtures.L_LIST;
+		PixelList lList = Fixtures.L_LIST;
 		PixelIsland island = new PixelIsland(lList);
 		Assert.assertNotNull("island", island);
-		List<Pixel> terminalPixels = island.getTerminalPixels();
+		PixelList terminalPixels = island.getTerminalPixels();
 		Assert.assertEquals("terminal", 2, terminalPixels.size());
 	}
 	
 	@Test
 	public void testgetTerminalPixelsT() {
-		List<Pixel> tList = Fixtures.T_LIST;
+		PixelList tList = Fixtures.T_LIST;
 		PixelIsland island = new PixelIsland(tList);
-		List<Pixel> terminalPixels = island.getTerminalPixels();
+		PixelList terminalPixels = island.getTerminalPixels();
 		Assert.assertEquals("terminal", 3, terminalPixels.size());
 		Assert.assertEquals("0", "(1,1)",  terminalPixels.get(0).getInt2().toString());
 		Assert.assertEquals("0", "(1,5)",  terminalPixels.get(1).getInt2().toString());
@@ -183,7 +184,7 @@ public class PixelIslandTest {
 
 		
 		PixelIsland island1 = islandList.get(1);
-		List<Pixel> pixelList1 = island1.getPixelList();
+		PixelList pixelList1 = island1.getPixelList();
 //		for (Pixel pixel : pixelList1) {
 //			LOG.trace("pixel "+pixel.getInt2());
 //		}

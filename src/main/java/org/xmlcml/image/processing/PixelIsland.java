@@ -23,6 +23,8 @@ import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
+import org.xmlcml.image.compound.PixelList;
+import org.xmlcml.image.compound.PlotTest;
 import org.xmlcml.image.lines.PixelPath;
 
 /** connected list of pixels.
@@ -61,13 +63,13 @@ public class PixelIsland {
 
 	private static final int NONE = -1;
 	
-	private List<Pixel> pixelList; // these may have original coordinates
+	private PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private List<Nucleus> nucleusList;
-	private List<Pixel> terminalPixels;
+	private PixelList terminalPixels;
 	private Map<Pixel, Nucleus> nucleusMap;
 	private Set<Pixel> usedPixels;
 	private List<PixelPath> pixelPaths;
@@ -80,10 +82,10 @@ public class PixelIsland {
 	private String pixelColor = "red";
 	
 	public PixelIsland() {
-		this.pixelList = new ArrayList<Pixel>();
+		this.pixelList = new PixelList();
 	}
 	
-	public PixelIsland(List<Pixel> pixelList) {
+	public PixelIsland(PixelList pixelList) {
 		this(pixelList, false);
 	}
 
@@ -92,7 +94,7 @@ public class PixelIsland {
 	 * @param pixelList
 	 * @param diagonal were diagonal neighbours allowed in creating the pixelList?
 	 */
-	public PixelIsland(List<Pixel> pixelList, boolean diagonal) {
+	public PixelIsland(PixelList pixelList, boolean diagonal) {
 		this.pixelList = pixelList;
 		this.allowDiagonal = diagonal;
 		indexPixelsAndUpdateMetadata();
@@ -176,13 +178,13 @@ public class PixelIsland {
 		}
 	}
 
-	public List<Pixel> getPixelList() {
+	public PixelList getPixelList() {
 		return pixelList;
 	}
 
-	public List<Pixel> getTerminalPixels() {
+	public PixelList getTerminalPixels() {
 		terminalPixels = getNodesWithNeighbours(1);
-		List<Pixel> terminalSpikedList = getTerminalSpikes();
+		PixelList terminalSpikedList = getTerminalSpikes();
 		if (terminalSpikedList.size() > 0) {
 			terminalPixels.addAll(terminalSpikedList);
 			LOG.trace("adding pseudo-terminals: "+terminalSpikedList);
@@ -207,14 +209,14 @@ public class PixelIsland {
 	 * 
 	 * @return
 	 */
-	private List<Pixel> getTerminalSpikes() {
-		List<Pixel> terminalList = new ArrayList<Pixel>();
+	private PixelList getTerminalSpikes() {
+		PixelList terminalList = new PixelList();
 //		Pixel terminalSpike = null;
 		if (nucleusList != null) {
 			for (Nucleus nucleus : nucleusList) {
 				Set<Pixel> spikeSet = nucleus.getSpikeSet();
 				for (Pixel spike : spikeSet) {
-					List<Pixel> spikeNeighbours = spike.getNeighbours(this);
+					PixelList spikeNeighbours = spike.getNeighbours(this);
 					if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
 						terminalList.add(spike);
 					}
@@ -224,7 +226,7 @@ public class PixelIsland {
 		return terminalList;
 	}
 
-	private boolean has2NeighboursInNucleus(Nucleus nucleus, List<Pixel> spikeNeighbours) {
+	private boolean has2NeighboursInNucleus(Nucleus nucleus, PixelList spikeNeighbours) {
 		boolean terminal = false;
 		if (spikeNeighbours.size() == 2) {
 			terminal = true;
@@ -237,8 +239,8 @@ public class PixelIsland {
 		return terminal;
 	}
 
-	public List<Pixel> getNodesWithNeighbours(int neighbourCount) {
-		List<Pixel> nodePixels = new ArrayList<Pixel>();
+	public PixelList getNodesWithNeighbours(int neighbourCount) {
+		PixelList nodePixels = new PixelList();
 		for (Pixel pixel : pixelList) {
 			int nCount = getNeighbourCount(pixel);
 			if (neighbourCount == nCount) {
@@ -261,7 +263,7 @@ public class PixelIsland {
 	 */
 	public Pixel getStartPixel() {
 		Pixel start = null;
-		List<Pixel> terminalList = getTerminalPixels();
+		PixelList terminalList = getTerminalPixels();
 		if (terminalList.size() > 0) {
 			start = terminalList.get(0);
 		} else if (pixelList.size() > 0) {
@@ -373,7 +375,7 @@ public class PixelIsland {
 	}
 
 	private void removeFromNeighbourNeighbourList(Pixel pixel) {
-		List<Pixel> neighbours = pixel.getNeighbours(this);
+		PixelList neighbours = pixel.getNeighbours(this);
 		for (Pixel neighbour : neighbours) {
 			neighbour.getNeighbours(this).remove(pixel);
 		}
@@ -439,7 +441,7 @@ public class PixelIsland {
 		nucleusMap = new HashMap<Pixel, Nucleus>();
 		Set<Pixel> multiplyConnectedPixels = new HashSet<Pixel>();
 		for (int i = 3; i <= 8; i++) {
-			multiplyConnectedPixels.addAll(getNodesWithNeighbours(i));
+			multiplyConnectedPixels.addAll(getNodesWithNeighbours(i).getList());
 		}
 		while (multiplyConnectedPixels.size() > 0) {
 			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
@@ -459,7 +461,7 @@ public class PixelIsland {
 			pixel = pixelStack.pop();
 			nucleus.add(pixel);
 			nucleusMap.put(pixel, nucleus);
-			List<Pixel> neighbours = pixel.getNeighbours(this);
+			PixelList neighbours = pixel.getNeighbours(this);
 			for (Pixel neighbour : neighbours) {
 				if (!nucleus.contains(neighbour) && multiplyConnectedPixels.contains(neighbour)) {
 					removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, neighbour);
@@ -581,8 +583,8 @@ public class PixelIsland {
 
 	private Pixel getNextPixel(Pixel pixel) {
 		LOG.trace(pixel);
-		List<Pixel> neighbours = pixel.getNeighbours(this);
-		List<Pixel> unusedPixels = new ArrayList<Pixel>();
+		PixelList neighbours = pixel.getNeighbours(this);
+		PixelList unusedPixels = new PixelList();
 		for (Pixel neighbour : neighbours) {
 			if (!usedPixels.contains(neighbour)) {
 				unusedPixels.add(neighbour);
@@ -627,7 +629,7 @@ public class PixelIsland {
 			LOG.trace("Skipped 2-spike Nucleus from "+currentPixel.getInt2()+" to "+nextPixel.getInt2());
 		} else {
 			// treat as terminal
-			if (!nucleus.getSpikeSet().removeAll(currentPixel.getNeighbours(this))) {
+			if (!nucleus.getSpikeSet().removeAll(currentPixel.getNeighbours(this).getList())) {
 				LOG.error("Failed to remove");
 			}
 			nextPixel = null;
@@ -637,7 +639,7 @@ public class PixelIsland {
 
 	private Set<Pixel> getUsedNeighbours(Pixel currentPixel) {
 		Set<Pixel> usedNeighbours = new HashSet<Pixel>();
-		List<Pixel> neighbours = currentPixel.getNeighbours(this);
+		PixelList neighbours = currentPixel.getNeighbours(this);
 		for (Pixel neighbour : neighbours) {
 			if (usedPixels.contains(neighbour)) {
 				usedNeighbours.add(neighbour);
@@ -675,7 +677,7 @@ public class PixelIsland {
 		return PixelIsland.plotPixels(this.getPixelList(), this.pixelColor);
 	}
 	
-	public static SVGG plotPixels(List<Pixel> pixelList, String pixelColor) {
+	public static SVGG plotPixels(PixelList pixelList, String pixelColor) {
 		SVGG g = new SVGG();
 		LOG.trace("pixelList "+pixelList.size());
 		for (Pixel pixel : pixelList) {
@@ -835,7 +837,7 @@ public class PixelIsland {
 	}
 
 	public void removePixels(PixelPath pixelPath) {
-		List<Pixel> pixelList = pixelPath.getPixelList();
+		PixelList pixelList = pixelPath.getPixelList();
 		for (Pixel pixel : pixelList) {
 			this.remove(pixel);
 		}
@@ -887,7 +889,7 @@ public class PixelIsland {
 	public void markEdges() {
 		for (Pixel pixel : pixelList) {
 			pixel.setValue(NONE);
-			List<Pixel> neighbours = pixel.getNeighbours(this);
+			PixelList neighbours = pixel.getNeighbours(this);
 			int size = neighbours.size();
 			if (size < 8) {
 				pixel.setValue(1);
@@ -895,8 +897,8 @@ public class PixelIsland {
 		}
 	}
 
-	public List<Pixel> getPixelsWithValue(int v) {
-		List<Pixel> valueList = new ArrayList<Pixel>();
+	public PixelList getPixelsWithValue(int v) {
+		PixelList valueList = new PixelList();
 		for (Pixel pixel : pixelList) {
 			if (pixel.getValue() == v) {
 				valueList.add(pixel);
@@ -905,13 +907,13 @@ public class PixelIsland {
 		return valueList;
 	}
 
-	public List<Pixel> growFrom(List<Pixel> startPixels, int v) {
-		List<Pixel> growList = new ArrayList<Pixel>();
+	public PixelList growFrom(PixelList startPixels, int v) {
+		PixelList growList = new PixelList();
 		for (Pixel start : startPixels) {
 			if (start.getValue() != v) {
 				throw new RuntimeException("bad pixel "+start.getValue());
 			}
-			List<Pixel> neighbours = start.getNeighbours(this);
+			PixelList neighbours = start.getNeighbours(this);
 			for (Pixel neighbour : neighbours) {
 				if (neighbour.getValue() == NONE) {
 					neighbour.setValue(v + 1);
@@ -920,6 +922,34 @@ public class PixelIsland {
 			}
 		}
 		return growList;
+	}
+
+	public RingList createOnionRings() {
+		RingList onionRings = new RingList();
+		setDiagonal(true);
+		findRidge();
+		PixelList list = getPixelsWithValue(1);
+		int ring = 1;
+		while (list.size() > 0) {
+			onionRings.add(list);
+			list = growFrom(list, ring++);
+		}
+		return onionRings;
+	}
+
+	public RingList createRingsAndPlot(SVGG gg, String[] colours) {
+		SVGG g = new SVGG();
+		RingList rings = createOnionRings();
+		if (gg != null) {
+			for (int i = 0; i < rings.size(); i++) {
+				rings.get(i).plotPixels(g, colours[i]);
+				if (g.getParent() != null) {
+					g.detach();
+				}
+				gg.appendChild(g);
+			}
+		}
+		return rings;
 	}
 
 	

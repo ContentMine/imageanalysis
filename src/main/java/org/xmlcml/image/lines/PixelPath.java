@@ -10,6 +10,7 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Nucleus;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIsland;
@@ -27,13 +28,13 @@ public class PixelPath {
 	
 	private PixelIsland island;
 	private List<Real2> rawPoints;
-	private List<Pixel> pixelList;
+	private PixelList pixelList;
 	private List<Real2> segmentPoints;
 	private Nucleus finalNucleus;
 	private Nucleus startNucleus;
 
 	public PixelPath() {
-		pixelList = new ArrayList<Pixel>();
+		pixelList = new PixelList();
 	}
 	
 	/** reads a PixelIsland with only one line.
@@ -121,7 +122,7 @@ public class PixelPath {
 		this.startNucleus = nucleus;
 	}
 
-	public List<Pixel> getPixelList() {
+	public PixelList getPixelList() {
 		return this.pixelList;
 	}
 
