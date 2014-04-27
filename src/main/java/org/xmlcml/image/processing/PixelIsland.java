@@ -1,6 +1,7 @@
 package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.compound.PixelList;
-import org.xmlcml.image.compound.PlotTest;
 import org.xmlcml.image.lines.PixelPath;
 
 /** connected list of pixels.
