@@ -520,6 +520,8 @@ public class PixelIsland {
 	 *        
 	 * the neighbours are 1-2 and 2-3 - leave them
 	 * 
+	 * Not sure this is what we want
+	 * 
 	 */
 	void removeHypotenuses() {
 		createTriangleSet();
@@ -528,6 +530,48 @@ public class PixelIsland {
 			t.removeDiagonalNeighbours();
 		}
 	}
+
+	/** remove steps and leave diagonal connections.
+	 * 
+	 * A step is:
+	 * 1-2
+	 * ..3-4
+	 * 
+	 * where 2 and 3 have 3 connections (including diagonals and no other neighbours)
+	 *  
+	 * we want to remove either 2 or 3 
+	 * 
+	 * @return pixels removed
+	 */
+	public Set<Pixel> removeSteps() {
+		Set<Pixel> removed = new HashSet<Pixel>();
+		for (Pixel pixel : pixelList) {
+			if (removed.contains(pixel)) {
+				continue;
+			}
+			PixelList pixelNeighbours = pixel.getNeighbours(this);
+			if (pixelNeighbours.size() == 3) { // could be step or tJunction
+				for (int i = 0; i < pixelNeighbours.size(); i++) {
+					Pixel pi = pixelNeighbours.get(i);
+					if (pi.isOrthogonalNeighbour(pixel)) {
+						int j = (i + 1) % 3;
+						Pixel pj = pixelNeighbours.get(j);
+						int k = (i + 2) % 3;
+						Pixel pk = pixelNeighbours.get(k);
+						if (pj.isKnightsMove(pk, pi)) {
+							removed.add(pixel);
+//							this.remove(pixel);
+						}
+					}
+				}
+			}
+		}
+		for (Pixel pixel : removed) {
+			this.remove(pixel);
+		}
+		return removed;
+	}
+	
 
 	private void createTriangleSet() {
 		triangleSet = new HashSet<Triangle>();
@@ -662,6 +706,14 @@ public class PixelIsland {
 			}
 		}
 		return gg;
+	}
+	
+	public SVGG createSVG() {
+		SVGG g = new SVGG();
+		for (Pixel pixel : pixelList) {
+			g.appendChild(pixel.getSVGRect());
+		}
+		return g;
 	}
 	
 	public void setPixelColor(String color) {
@@ -936,19 +988,51 @@ public class PixelIsland {
 		return onionRings;
 	}
 
+	/** creates a list of onion rings.
+	 * 
+	 * the pixels are organized as 1-pixel-thick rings from the outside
+	 * 
+	 * @param gg if not null plots the rings within gg
+	 * @param colours
+	 * @return
+	 */
 	public RingList createRingsAndPlot(SVGG gg, String[] colours) {
 		SVGG g = new SVGG();
 		RingList rings = createOnionRings();
 		if (gg != null) {
-			for (int i = 0; i < rings.size(); i++) {
-				rings.get(i).plotPixels(g, colours[i]);
+			int i = 0;
+			for (PixelList ring : rings) {
+				ring.plotPixels(g, colours[i]);
 				if (g.getParent() != null) {
 					g.detach();
 				}
 				gg.appendChild(g);
+				i = (i+1) % colours.length;
 			}
 		}
 		return rings;
+	}
+
+	public Set<TJunction> findTJunctions() {
+		Set<TJunction> junctionSet = new HashSet<TJunction>();
+		for (Pixel pixel : pixelList) {
+			TJunction junction = TJunction.createTJunction(pixel, this);
+			if (junction != null) {
+				junctionSet.add(junction);
+			}
+		}
+		return junctionSet;
+	}
+
+	public Pixel get(int i) {
+		return pixelList == null || i < 0 || i >= pixelList.size()? null : pixelList.get(i);
+	}
+
+	public void removeStepsIteratively() {
+		while (true) {
+			Set<Pixel> removed = removeSteps();
+			if (removed.size() == 0) break;
+		}
 	}
 
 	

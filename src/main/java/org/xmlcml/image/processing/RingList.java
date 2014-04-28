@@ -11,7 +11,7 @@ import org.xmlcml.image.compound.PixelList;
 
 public class RingList implements Iterable<PixelList> {
 
-	private static final String[] DEFAULT_COLOURS = {"red", "cyan", "orange", "green", "magenta", "blue"};
+	public static final String[] DEFAULT_COLOURS = {"red", "cyan", "orange", "green", "magenta", "blue"};
 	private List<PixelList> ringList;
 	
 	public RingList() {

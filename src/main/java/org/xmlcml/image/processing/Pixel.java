@@ -33,6 +33,10 @@ public class Pixel {
 		this.point = p;
 	}
 
+	public Pixel(int x, int y) {
+		this(new Point(x, y));
+	}
+
 	public Int2 getInt2() {
 		return point == null ? null : new Int2(point.x, point.y);
 	}
@@ -105,14 +109,11 @@ public class Pixel {
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("point: "+((point == null) ? "null" : this.getInt2()));
-//		sb.append(neighboursString());
-//		sb.append("island: "+island+"\n");
-//		sb.append("; marked: "+marked);
+		sb.append(""+((point == null) ? "null" : this.getInt2()));
 		return sb.toString();
 	}
 
-	private String neighboursString() {
+	public String neighboursString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("; neighbours: ");
 		if (neighbourList == null) {
@@ -206,5 +207,21 @@ public class Pixel {
 
 	public int getValue() {
 		return value;
+	}
+
+	public boolean isOrthogonalNeighbour(Pixel pixel) {
+		Int2 vector = this.getInt2().subtract(pixel.getInt2());
+		return Math.abs(vector.getX()) + Math.abs(vector.getY()) == 1;
+	}
+
+	public boolean isDiagonalNeighbour(Pixel pixel) {
+		Int2 vector = this.getInt2().subtract(pixel.getInt2());
+		return Math.abs(vector.getX()) == 1 && Math.abs(vector.getY()) == 1;
+	}
+
+	public boolean isKnightsMove(Pixel centre, Pixel target) {
+		boolean b1 = this.isOrthogonalNeighbour(centre) && centre.isDiagonalNeighbour(target);
+		boolean b2 = target.isOrthogonalNeighbour(centre) && centre.isDiagonalNeighbour(this);
+		return b1 || b2;
 	}
 }

@@ -35,6 +35,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private final static Logger LOG = Logger.getLogger(PixelIslandList.class);
 	public enum Operation {
 		BINARIZE,
+		DEHYPOTENUSE,
 		THIN
 	}
 	

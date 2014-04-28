@@ -36,6 +36,10 @@ public class PixelList implements Iterable<Pixel> {
 		list.addAll(pixelCollection);
 	}
 
+	public PixelList(PixelList list) {
+		this(list.getList());
+	}
+
 	@Override
 	public Iterator<Pixel> iterator() {
 		return list.iterator();
@@ -120,6 +124,16 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public SVGG plotPixels(String fill) {
 		return plotPixels(null, fill);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("{");
+		for (Pixel pixel : this) {
+			sb.append(pixel.toString());
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 
 }

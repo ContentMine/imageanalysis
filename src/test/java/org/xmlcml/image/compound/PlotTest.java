@@ -3,11 +3,14 @@ package org.xmlcml.image.compound;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -16,6 +19,7 @@ import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;
 import org.xmlcml.image.processing.PixelIslandList.Operation;
 import org.xmlcml.image.processing.RingList;
+import org.xmlcml.image.processing.ZhangSuenThinning;
 
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.core.image.ConvertBufferedImage;
@@ -24,6 +28,9 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageUInt8;
 
 public class PlotTest {
+	
+	private final static Logger LOG = Logger.getLogger(PlotTest.class);
+	
 	private final static File G002_DIR = new File(Fixtures.COMPOUND_DIR, "journal.pone.0095565.g002");
 	private File PLOT_OUT_DIR;
 
@@ -110,7 +117,11 @@ public class PlotTest {
 		PixelList list12 = list2.getPixelsTouching(list1, errorIsland);
 		list12.plotPixels(g, "yellow");
 		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/errorbar1.svg"));
-//		makeCentre(list5, "black");
+		
+		SVGG gg = new SVGG();
+		PixelIslandList thinned = PixelIslandList.thinFillAndGetPixelIslandList(ImageIO.read(new File(G002_DIR, "errorbar.png")), new ZhangSuenThinning());
+		thinned.get(0).createRingsAndPlot(gg, RingList.DEFAULT_COLOURS);
+		SVGSVG.wrapAndWriteAsSVG(gg, new File("target/plot/errorbar2.svg"));
 	}
 	
 	@Test
@@ -128,6 +139,9 @@ public class PlotTest {
 		PixelIslandList titleChars = PixelIslandList.createPixelIslandList(new File(G002_DIR, "xtitle.png"), Operation.BINARIZE);
 		Assert.assertEquals("characters", 33, titleChars.size());
 		List<RingList> characterList = titleChars.createRingListList(new File("target/plot/xtitle.svg"));
+		SVGG gg = new SVGG();
+		PixelIslandList thinned = PixelIslandList.thinFillAndGetPixelIslandList(ImageIO.read(new File(G002_DIR, "xtitle.png")), new ZhangSuenThinning());
+		thinned.createRingListList(new File("target/plot/xtitle2.svg"));
 	}
 
 	@Test
@@ -156,11 +170,70 @@ public class PlotTest {
 		PixelIslandList points = PixelIslandList.createPixelIslandList(new File(G002_DIR, "points.png"), Operation.BINARIZE);
 		points.createRingListList(new File("target/plot/points.svg"));
 		Assert.assertEquals("points", 4, points.size());
+		PixelIslandList thinned = PixelIslandList.thinFillAndGetPixelIslandList(ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning());
+		thinned.createRingListList(new File("target/plot/points2.svg"));
+	}
+
+	@Test
+	public void testNodes() throws IOException {
+		PixelIslandList points = PixelIslandList.createPixelIslandList(new File(G002_DIR, "points.png"), Operation.BINARIZE);
+		points.createRingListList(new File("target/plot/points.svg"));
+		Assert.assertEquals("points", 4, points.size());
+		PixelIslandList thinned = PixelIslandList.thinFillAndGetPixelIslandList(ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning());
+		thinned.createRingListList(new File("target/plot/points2.svg"));
+	}
+	// characters should be done in another project (bring in JavaOCR)
+	
+	@Test
+	// this one is very weak
+	@Ignore
+	public void test0095375() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0095375.g003.png"), 
+				new File("target/plot/0093575.svg"),
+				new File("target/plot/0093575_2.svg"));
+	}
+
+	@Test
+	@Ignore // out of memory (chop up diagram?
+	public void test0095807ManySubDiagrams() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0095807.g003.png"), 
+				new File("target/plot/0095807.svg"),
+				new File("target/plot/0095807_2.svg"));
+	}
+
+	@Test
+	public void test0095816MultiColourAndSuperscripts() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0095816.g002.png"), 
+				new File("target/plot/0095816.svg"),
+				new File("target/plot/0095816_2.svg"));
+	}
+
+	@Test
+	public void test004179BarChart() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094179.g008.png"), 
+				new File("target/plot/0094179_8.svg"),
+				new File("target/plot/0094179_8_2.svg"));
+	}
+
+	@Test
+	public void test004179CirclePlots() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094179.g002.png"), 
+				new File("target/plot/0094179_2.svg"),
+				new File("target/plot/0094179_2_2.svg"));
+	}
+
+	// =========================
+	
+
+	private void plotRingsAndThin(File infile, File outfile1, File outfile2) throws IOException {
+		PixelIslandList plot = PixelIslandList.createPixelIslandList(infile, Operation.BINARIZE);
+		LOG.debug("plot size"+plot.size());
+		plot.createRingListList(outfile1);
+		PixelIslandList thinned = PixelIslandList.thinFillAndGetPixelIslandList(ImageIO.read(infile), new ZhangSuenThinning());
+		thinned.createRingListList(outfile2);
 	}
 
 	
-	
-	// =========================
 	
 	private static void assertSizes(RingList ringList, int[] sizes) {
 		Assert.assertNotNull("ringList", ringList);
