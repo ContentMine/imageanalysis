@@ -61,12 +61,13 @@ public class TJunction {
 	}
 
 	private static boolean getStem(Pixel stem, int i, PixelList neighbours, PixelIsland island) {
-		int n1 = (i+1) % 3;
-		int n2 = (i+2) % 3;
-		Pixel p1 = neighbours.get(n1);
-		Pixel p2 = neighbours.get(n2);
-		PixelList stemNeighbours = stem.getNeighbours(island);
-		return stemNeighbours.contains(p1) && stemNeighbours.contains(p2);
+		int j = (i+1) % 3;
+		int k = (i+2) % 3;
+		Pixel pj = neighbours.get(j);
+		Pixel pk = neighbours.get(k);
+//		PixelList stemNeighbours = stem.getNeighbours(island);
+//		return stemNeighbours.contains(p1) && stemNeighbours.contains(p2);
+		return stem.isDiagonalNeighbour(pk) && stem.isDiagonalNeighbour(pj);
 	}
 
 	public Pixel getCentre() {
