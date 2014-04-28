@@ -109,10 +109,12 @@ public class BoofCVTest {
 		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
 				input.width,input.height,null);
  
-		ShowImages.showWindow(visualBinary,"Binary Original");
-		ShowImages.showWindow(visualFiltered,"Binary Filtered");
-		ShowImages.showWindow(visualLabel,"Labeled Blobs");
-		ShowImages.showWindow(visualContour,"Contours");
+		// these are not suitable for tests
+		
+//		ShowImages.showWindow(visualBinary,"Binary Original");
+//		ShowImages.showWindow(visualFiltered,"Binary Filtered");
+//		ShowImages.showWindow(visualLabel,"Labeled Blobs");
+//		ShowImages.showWindow(visualContour,"Contours");
 	}
  
 	@Test
