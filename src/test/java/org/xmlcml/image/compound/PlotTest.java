@@ -222,12 +222,29 @@ public class PlotTest {
 				new File("target/plot/0094179_2_2.svg"));
 	}
 
+	@Test
+	@Ignore
+	// the resultant tree is not connected. Why? and binarization give a single pixelisland??
+	public void test004172Phylo() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2.png"), 
+				new File("target/plot/0094172_2.svg"),
+				new File("target/plot/0094172_2_2.svg"));
+	}
+
+	@Test
+	@Ignore // file not transferred
+	public void test004172PhyloA() throws IOException {
+		plotRingsAndThin(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2a.png"), 
+				new File("target/plot/0094172_2a.svg"),
+				new File("target/plot/0094172_2a_2.svg"));
+	}
+
 	// =========================
 	
 
 	private void plotRingsAndThin(File infile, File outfile1, File outfile2) throws IOException {
 		PixelIslandList plot = PixelIslandList.createPixelIslandList(infile, Operation.BINARIZE);
-		LOG.debug("plot size"+plot.size());
+		LOG.debug("plot size "+plot.size());
 		plot.createRingListList(outfile1);
 		PixelIslandList thinned = PixelIslandList.thinFillAndGetPixelIslandList(ImageIO.read(infile), new ZhangSuenThinning());
 		thinned.createRingListList(outfile2);
