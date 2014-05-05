@@ -13,8 +13,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Int2Range;
-import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
@@ -24,11 +22,10 @@ import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.compound.PixelList;
+import org.xmlcml.image.processing.PixelIslandComparator.ComparatorType;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
 
 /** container for collection of PixelIslands.
  * 
@@ -266,38 +263,15 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return createRingListList(null);
 	}
 
-	/** analyzes pixelIslands as bounding boxes for characters.
-	 * 
-	 */
-	public void getCharacterBBoxes() {
-		Multiset<Integer> heightSet = HashMultiset.create();
- 		Multiset<IntRange> yranges = HashMultiset.create();
-		
-		for (PixelIsland island : this) {
-			Real2Range bbox = island.getBoundingBox();
-			Int2Range ibbox = new Int2Range(bbox);
-			IntRange yrange = ibbox.getYRange();
-			if (yrange.getMax() < 670) continue;
-			yranges.add(yrange);
-			heightSet.add(yrange.getRange());
+	public void sortX() {
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.LEFT, ComparatorType.TOP));
+	}
+
+	public Real2Range getBoundingBox() {
+		Real2Range boundingBox = new Real2Range();
+		for (PixelIsland island : list) {
+			boundingBox.plusEquals(island.getBoundingBox());
 		}
-		List<IntRange> yRangeList = new ArrayList<IntRange>();
-		for (Multiset.Entry<IntRange> entry : yranges.entrySet()) {
-			yRangeList.add(entry.getElement());
-			LOG.debug("yy:"+entry);
-		}
-		List<Integer> heightList = new ArrayList<Integer>();
-		for (Multiset.Entry<Integer> entry : heightSet.entrySet()) {
-			LOG.debug("height: "+entry);
-			heightList.add(entry.getElement());
-		}
-		Collections.sort(yRangeList);
-		for (IntRange yRange : yRangeList) {
-			LOG.debug("y:"+yRange+" "+yRange.getRange());
-		}
-		Collections.sort(heightList);
-		for (Integer height : heightList) {
-			LOG.debug("height:"+height);
-		}
+		return boundingBox;
 	}
 }
