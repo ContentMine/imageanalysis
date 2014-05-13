@@ -86,6 +86,6 @@ public class TJunctionTest {
 			circle.setOpacity(0.2);
 			g.appendChild(circle);
 		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/branches.svg"));
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/tjunctions.svg"));
 	}
 }

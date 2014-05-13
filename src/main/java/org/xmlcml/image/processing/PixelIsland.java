@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -26,42 +28,37 @@ import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.lines.PixelPath;
 
-/** connected list of pixels.
+/**
+ * connected list of pixels.
  * 
- * It is possible to traverse all pixels without encountering "gaps". May contain "holes"
- * (e.g letter "O").If there are objects within the hole (e.g. "copyright" 0x00A9 which has "C" inside a circle)
- * they may be initially be in a separate island - we may coordinate this later
+ * It is possible to traverse all pixels without encountering "gaps". May
+ * contain "holes" (e.g letter "O").If there are objects within the hole (e.g.
+ * "copyright" 0x00A9 which has "C" inside a circle) they may be initially be in
+ * a separate island - we may coordinate this later
  * 
  * Islands can consist of:
- * <ul> 
+ * <ul>
  * <li>A single pixel</li<
  * <li>A connected chain of pixels (with 2 terminal pixels</li<
  * <li>A tree of pixels with braching nodes (3-8 connected, but likely 3)</li<
- * <li>The above with nuclei (ganglia) in chains or nodes. The nuclei arise from incomplete thinning and 
- * are to be reduced to single pixels or chains while retaining connectivity</li<
+ * <li>The above with nuclei (ganglia) in chains or nodes. The nuclei arise from
+ * incomplete thinning and are to be reduced to single pixels or chains while
+ * retaining connectivity</li<
  * </ul>
  * 
  * @author pm286
- *
+ * 
  */
-public class PixelIsland {
+public class PixelIsland implements Iterable<Pixel> {
 
 	private enum Type {
-		BEND2,
-		BILOZENGE,
-		CHAIN2,
-		CHAIN3,
-		DEMILOZENGE,
-		IMPOSSIBLE,
-		NODE4,
-		NODE5,
-		NULL,
-		TERMINAL,
+		BEND2, BILOZENGE, CHAIN2, CHAIN3, DEMILOZENGE, IMPOSSIBLE, NODE4, NODE5, NULL, TERMINAL,
 	}
+
 	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
 
 	private static final int NONE = -1;
-	
+
 	private PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 	private Int2Range int2range;
@@ -79,26 +76,27 @@ public class PixelIsland {
 	private Set<Triangle> triangleSet;
 
 	private String pixelColor = "red";
-	
+
 	public PixelIsland() {
 		this.pixelList = new PixelList();
 	}
-	
+
 	public PixelIsland(PixelList pixelList) {
 		this(pixelList, false);
 	}
 
-	/** 
+	/**
 	 * 
 	 * @param pixelList
-	 * @param diagonal were diagonal neighbours allowed in creating the pixelList?
+	 * @param diagonal
+	 *            were diagonal neighbours allowed in creating the pixelList?
 	 */
 	public PixelIsland(PixelList pixelList, boolean diagonal) {
 		this.pixelList = pixelList;
 		this.allowDiagonal = diagonal;
 		indexPixelsAndUpdateMetadata();
 	}
-	
+
 	public PixelIsland(PixelIsland axes) {
 		this(axes.getPixelList());
 	}
@@ -119,13 +117,10 @@ public class PixelIsland {
 		return i2r;
 	}
 
-
-	
 	public void addPixel(Pixel pixel) {
 		this.pixelList.add(pixel);
 		addPixelMetadata(pixel);
 	}
-	
 
 	private void indexPixelsAndUpdateMetadata() {
 		for (Pixel pixel : pixelList) {
@@ -165,7 +160,7 @@ public class PixelIsland {
 		this.getTerminalPixels();
 		throw new RuntimeException("NYI");
 	}
-	
+
 	public Map<Int2, Pixel> getPixelByCoordMap() {
 		ensurePixelByCoordMap();
 		return pixelByCoordMap;
@@ -186,31 +181,28 @@ public class PixelIsland {
 		PixelList terminalSpikedList = getTerminalSpikes();
 		if (terminalSpikedList.size() > 0) {
 			terminalPixels.addAll(terminalSpikedList);
-			LOG.trace("adding pseudo-terminals: "+terminalSpikedList);
+			LOG.trace("adding pseudo-terminals: " + terminalSpikedList);
 		}
 		return terminalPixels;
 	}
 
-	/** finds spikes on nuclei that are actually terminals.
+	/**
+	 * finds spikes on nuclei that are actually terminals.
 	 * 
-	 * Example:
-	 * 1 2
-	 *   3 4
-	 *      5 6
-	 *         7
-	 *         
-	 * 1234 should be a nucleus but it may be a 3-nucleus (2,3,4) with a pseudo-spike 1
-	 * return it to the nucleus and remove it from the spike set and label it as
-	 * a terminal.
+	 * Example: 1 2 3 4 5 6 7
 	 * 
-	 * Believe the algorithm is (a) find nuclei (b) find spikeset (c) see if any spikes have
-	 * 2-neighbours, both in nucleus
+	 * 1234 should be a nucleus but it may be a 3-nucleus (2,3,4) with a
+	 * pseudo-spike 1 return it to the nucleus and remove it from the spike set
+	 * and label it as a terminal.
+	 * 
+	 * Believe the algorithm is (a) find nuclei (b) find spikeset (c) see if any
+	 * spikes have 2-neighbours, both in nucleus
 	 * 
 	 * @return
 	 */
 	private PixelList getTerminalSpikes() {
 		PixelList terminalList = new PixelList();
-//		Pixel terminalSpike = null;
+		// Pixel terminalSpike = null;
 		if (nucleusList != null) {
 			for (Nucleus nucleus : nucleusList) {
 				Set<Pixel> spikeSet = nucleus.getSpikeSet();
@@ -225,7 +217,8 @@ public class PixelIsland {
 		return terminalList;
 	}
 
-	private boolean has2NeighboursInNucleus(Nucleus nucleus, PixelList spikeNeighbours) {
+	private boolean has2NeighboursInNucleus(Nucleus nucleus,
+			PixelList spikeNeighbours) {
 		boolean terminal = false;
 		if (spikeNeighbours.size() == 2) {
 			terminal = true;
@@ -252,11 +245,12 @@ public class PixelIsland {
 	private int getNeighbourCount(Pixel pixel) {
 		return pixel.getNeighbours(this).size();
 	}
-	
-	/** for start of spanningTree or other traversals.
+
+	/**
+	 * for start of spanningTree or other traversals.
 	 * 
-	 * If there are terminal pixels get the first one.
-	 * else get the first pixel. This may not be reproducible.
+	 * If there are terminal pixels get the first one. else get the first pixel.
+	 * This may not be reproducible.
 	 * 
 	 * @return first pixel or null for empty island (which shouldn't happen)
 	 */
@@ -275,92 +269,93 @@ public class PixelIsland {
 		this.allowDiagonal = diagonal;
 	}
 
-	/** 
+	/**
 	 * this may be obsolete.
 	 * 
 	 * @param removePixels
 	 */
-//	private void findNucleiAndMarkToRemove(boolean removePixels) {
-//		List<Triangle> lastTriangleList = null;
-//		Type type = null;
-//		Type lastType = null;
-//		removeList = new ArrayList<Pixel>();
-//		for (Pixel pixel : pixelList) {
-//			type = Type.NULL;
-//			List<Pixel> neighbourList = pixel.getNeighbours(Marked.ALL);
-//			List<Triangle> triangleList = scanTriangles(pixel, neighbourList);
-//			if (neighbourList.size() == 1) {
-//				type = Type.TERMINAL;
-//			} else if (neighbourList.size() == 2) {
-//				type = Type.CHAIN2;
-//				if (triangleList.size() == 1) {
-//					type = Type.BEND2;
-//				}
-//			} else if (neighbourList.size() == 3) {
-//				if (triangleList.size() == 1) {
-//					type = Type.CHAIN3;
-//				} else if (triangleList.size() == 2) {
-//					type = Type.DEMILOZENGE;
-//					if (lastType.equals(Type.DEMILOZENGE)) {
-//						tidyLozenge(lastTriangleList, triangleList);
-//					}
-//			} else if (triangleList.size() == 3) {
-//					type = Type.IMPOSSIBLE;
-//				}
-//			} else if (neighbourList.size() == 4) {
-//				if (triangleList.size() == 1) {
-//					type = Type.NODE4;
-//				} else if (triangleList.size() == 2) {
-//					type = Type.BILOZENGE;
-//				} else if (triangleList.size() == 3) {
-//					type = Type.IMPOSSIBLE;
-//				} else if (triangleList.size() == 4) {
-//					type = Type.NODE4;
-//				} else if (triangleList.size() >= 5) {
-//					type = Type.IMPOSSIBLE;
-//				}
-//			} else if (neighbourList.size() >= 5) {
-//				type = Type.NODE5;
-//			}
-//			LOG.trace(type);
-//			lastType = type;
-//			lastTriangleList = triangleList;
-//		}
-//		if (removePixels) {
-//			this.removePixels();
-//		}
-//
-//	}
+	// private void findNucleiAndMarkToRemove(boolean removePixels) {
+	// List<Triangle> lastTriangleList = null;
+	// Type type = null;
+	// Type lastType = null;
+	// removeList = new ArrayList<Pixel>();
+	// for (Pixel pixel : pixelList) {
+	// type = Type.NULL;
+	// List<Pixel> neighbourList = pixel.getNeighbours(Marked.ALL);
+	// List<Triangle> triangleList = scanTriangles(pixel, neighbourList);
+	// if (neighbourList.size() == 1) {
+	// type = Type.TERMINAL;
+	// } else if (neighbourList.size() == 2) {
+	// type = Type.CHAIN2;
+	// if (triangleList.size() == 1) {
+	// type = Type.BEND2;
+	// }
+	// } else if (neighbourList.size() == 3) {
+	// if (triangleList.size() == 1) {
+	// type = Type.CHAIN3;
+	// } else if (triangleList.size() == 2) {
+	// type = Type.DEMILOZENGE;
+	// if (lastType.equals(Type.DEMILOZENGE)) {
+	// tidyLozenge(lastTriangleList, triangleList);
+	// }
+	// } else if (triangleList.size() == 3) {
+	// type = Type.IMPOSSIBLE;
+	// }
+	// } else if (neighbourList.size() == 4) {
+	// if (triangleList.size() == 1) {
+	// type = Type.NODE4;
+	// } else if (triangleList.size() == 2) {
+	// type = Type.BILOZENGE;
+	// } else if (triangleList.size() == 3) {
+	// type = Type.IMPOSSIBLE;
+	// } else if (triangleList.size() == 4) {
+	// type = Type.NODE4;
+	// } else if (triangleList.size() >= 5) {
+	// type = Type.IMPOSSIBLE;
+	// }
+	// } else if (neighbourList.size() >= 5) {
+	// type = Type.NODE5;
+	// }
+	// LOG.trace(type);
+	// lastType = type;
+	// lastTriangleList = triangleList;
+	// }
+	// if (removePixels) {
+	// this.removePixels();
+	// }
+	//
+	// }
 
-//	private void tidyLozenge(List<Triangle> lastTriangleList, List<Triangle> triangleList) {
-//		Set<Pixel> lastUnion = getUnion(lastTriangleList);
-//		Set<Pixel> thisUnion = getUnion(triangleList);
-//		if (!lastUnion.equals(thisUnion)) {
-//			throw new RuntimeException("mismatched union");
-//		}
-//		if (lastUnion.size() != 4) {
-//			throw new RuntimeException("bad union size: "+lastUnion.size());
-//		}
-//		Set<Pixel> lastIntersection = getIntersection(lastTriangleList);
-//		Set<Pixel> thisIntersection = getIntersection(triangleList);
-//		if (!lastIntersection.equals(thisIntersection)) {
-//			throw new RuntimeException("mismatched intersection");
-//		}
-//		if (lastIntersection.size() != 2) {
-//			throw new RuntimeException("bad intersection size: "+lastIntersection.size());
-//		}
-//		LOG.trace("Lozenge");
-//		Pixel toRemove = lastIntersection.iterator().next();
-//		LOG.trace(toRemove);
-//		removeList.add(toRemove);
-//	}
+	// private void tidyLozenge(List<Triangle> lastTriangleList, List<Triangle>
+	// triangleList) {
+	// Set<Pixel> lastUnion = getUnion(lastTriangleList);
+	// Set<Pixel> thisUnion = getUnion(triangleList);
+	// if (!lastUnion.equals(thisUnion)) {
+	// throw new RuntimeException("mismatched union");
+	// }
+	// if (lastUnion.size() != 4) {
+	// throw new RuntimeException("bad union size: "+lastUnion.size());
+	// }
+	// Set<Pixel> lastIntersection = getIntersection(lastTriangleList);
+	// Set<Pixel> thisIntersection = getIntersection(triangleList);
+	// if (!lastIntersection.equals(thisIntersection)) {
+	// throw new RuntimeException("mismatched intersection");
+	// }
+	// if (lastIntersection.size() != 2) {
+	// throw new
+	// RuntimeException("bad intersection size: "+lastIntersection.size());
+	// }
+	// LOG.trace("Lozenge");
+	// Pixel toRemove = lastIntersection.iterator().next();
+	// LOG.trace(toRemove);
+	// removeList.add(toRemove);
+	// }
 
 	/**
-	private List<Pixel> pixelList;
-	boolean allowDiagonal = false;
-	private Int2Range int2range;
-	private Int2 leftmostCoord;
-	Map<Int2, Pixel> pixelByCoordMap;
+	 * private List<Pixel> pixelList; boolean allowDiagonal = false; private
+	 * Int2Range int2range; private Int2 leftmostCoord; Map<Int2, Pixel>
+	 * pixelByCoordMap;
+	 * 
 	 * @param pixel
 	 */
 	private void remove(Pixel pixel) {
@@ -380,60 +375,67 @@ public class PixelIsland {
 		}
 	}
 
-//	private Set<Pixel> getUnion(List<Triangle> triangleList) {
-//		Set<Pixel> unionSet = triangleList.get(0).addAll(triangleList.get(1));
-//		return unionSet;
-//	}
-//
-//	private Set<Pixel> getIntersection(List<Triangle> triangleList) {
-//		Set<Pixel> intersectionSet = triangleList.get(0).retainAll(triangleList.get(1));
-//		return intersectionSet;
-//	}
+	// private Set<Pixel> getUnion(List<Triangle> triangleList) {
+	// Set<Pixel> unionSet = triangleList.get(0).addAll(triangleList.get(1));
+	// return unionSet;
+	// }
+	//
+	// private Set<Pixel> getIntersection(List<Triangle> triangleList) {
+	// Set<Pixel> intersectionSet =
+	// triangleList.get(0).retainAll(triangleList.get(1));
+	// return intersectionSet;
+	// }
 
-//	private List<Triangle> scanTriangles(Pixel pixel, List<Pixel> neighbourList) {
-//		List<Triangle> triangleList = new ArrayList<Triangle>();
-//		int count = neighbourList.size();
-//		for (int i = 0; i < count - 1; i++) {
-//			for (int j = i+1; j < count; j++ ) {
-//				if (scanTriangle(neighbourList, i, j)) {
-//					triangleList.add(new Triangle(pixel, neighbourList.get(i), neighbourList.get(j)));
-//				}
-//			}
-//		}
-//		return triangleList;
-//	}
+	// private List<Triangle> scanTriangles(Pixel pixel, List<Pixel>
+	// neighbourList) {
+	// List<Triangle> triangleList = new ArrayList<Triangle>();
+	// int count = neighbourList.size();
+	// for (int i = 0; i < count - 1; i++) {
+	// for (int j = i+1; j < count; j++ ) {
+	// if (scanTriangle(neighbourList, i, j)) {
+	// triangleList.add(new Triangle(pixel, neighbourList.get(i),
+	// neighbourList.get(j)));
+	// }
+	// }
+	// }
+	// return triangleList;
+	// }
 
-	/* look for two neighbours that form a triangle.
+	/*
+	 * look for two neighbours that form a triangle.
 	 * 
 	 * @param neighbourList
+	 * 
 	 * @param i first neighbour pixel
+	 * 
 	 * @param j second neighbour pixel
+	 * 
 	 * @return Int2(i,j) if they form a triangle, else null
 	 */
-//	private boolean scanTriangle(List<Pixel> neighbourList, int i, int j) {
-//		if (i >= 0 && i < neighbourList.size() && 
-//			j >= 0 && j < neighbourList.size() &&
-//			i != j) {
-//			Pixel pixeli = neighbourList.get(i);
-//			Pixel pixelj = neighbourList.get(j);
-//			if (pixeli.getNeighbours(Marked.ALL).contains(pixelj)) {
-//				return true;
-//			}
-//		} 
-//		return false;
-//	}
+	// private boolean scanTriangle(List<Pixel> neighbourList, int i, int j) {
+	// if (i >= 0 && i < neighbourList.size() &&
+	// j >= 0 && j < neighbourList.size() &&
+	// i != j) {
+	// Pixel pixeli = neighbourList.get(i);
+	// Pixel pixelj = neighbourList.get(j);
+	// if (pixeli.getNeighbours(Marked.ALL).contains(pixelj)) {
+	// return true;
+	// }
+	// }
+	// return false;
+	// }
 
-//	private void removePixels() {
-//		for (Pixel pixel : removeList) {
-//			LOG.trace("remove: "+pixel.getInt2());
-//			remove(pixel);
-//		}
-//	}
+	// private void removePixels() {
+	// for (Pixel pixel : removeList) {
+	// LOG.trace("remove: "+pixel.getInt2());
+	// remove(pixel);
+	// }
+	// }
 
-//	private void cleanChains() {
-//		this.findNucleiAndMarkToRemove(true);
-//		this.findNucleiAndMarkToRemove(false);
-//	}
+	// private void cleanChains() {
+	// this.findNucleiAndMarkToRemove(true);
+	// this.findNucleiAndMarkToRemove(false);
+	// }
 
 	public List<Nucleus> getNucleusList() {
 		nucleusList = new ArrayList<Nucleus>();
@@ -445,9 +447,9 @@ public class PixelIsland {
 		while (multiplyConnectedPixels.size() > 0) {
 			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
 			nucleusList.add(nucleus);
-			LOG.trace("nucl "+nucleus.toString());
+			LOG.trace("nucl " + nucleus.toString());
 		}
-		LOG.trace("nuclei: "+nucleusList.size());
+		LOG.trace("nuclei: " + nucleusList.size());
 		return nucleusList;
 	}
 
@@ -456,22 +458,25 @@ public class PixelIsland {
 		Stack<Pixel> pixelStack = new Stack<Pixel>();
 		Pixel pixel = multiplyConnectedPixels.iterator().next();
 		removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, pixel);
-		while(!pixelStack.isEmpty()) {
+		while (!pixelStack.isEmpty()) {
 			pixel = pixelStack.pop();
 			nucleus.add(pixel);
 			nucleusMap.put(pixel, nucleus);
 			PixelList neighbours = pixel.getNeighbours(this);
 			for (Pixel neighbour : neighbours) {
-				if (!nucleus.contains(neighbour) && multiplyConnectedPixels.contains(neighbour)) {
-					removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, neighbour);
+				if (!nucleus.contains(neighbour)
+						&& multiplyConnectedPixels.contains(neighbour)) {
+					removeFromSetAndPushOnStack(multiplyConnectedPixels,
+							pixelStack, neighbour);
 				}
 			}
 		}
 		return nucleus;
 	}
 
-	private void removeFromSetAndPushOnStack(Set<Pixel> multiplyConnectedPixels,
-			Stack<Pixel> pixelStack, Pixel pixel) {
+	private void removeFromSetAndPushOnStack(
+			Set<Pixel> multiplyConnectedPixels, Stack<Pixel> pixelStack,
+			Pixel pixel) {
 		pixelStack.push(pixel);
 		multiplyConnectedPixels.remove(pixel);
 	}
@@ -489,9 +494,10 @@ public class PixelIsland {
 		for (Nucleus nucleus : nucleusList) {
 			int spikeSize = nucleus.getSpikeSet().size();
 			if (spikeSize == 1) {
-				LOG.debug("terminus nucleus "+nucleus.size());
+				LOG.debug("terminus nucleus " + nucleus.size());
 			} else if (spikeSize > 1) {
-				LOG.debug("branch nucleus "+nucleus.size()+" spikes "+spikeSize);
+				LOG.debug("branch nucleus " + nucleus.size() + " spikes "
+						+ spikeSize);
 			}
 		}
 	}
@@ -501,23 +507,22 @@ public class PixelIsland {
 			pixelPaths = new ArrayList<PixelPath>();
 			removeHypotenuses();
 			getNucleusList();
-			LOG.trace("nucleus list "+nucleusList.size());
+			LOG.trace("nucleus list " + nucleusList.size());
 			getTerminalPixels();
 			createPixelPathsStartingAtTerminals();
 		}
 		return pixelPaths;
 	}
 
-	/** remove any diagonal neighbours where other connecting pixels exist.
+	/**
+	 * remove any diagonal neighbours where other connecting pixels exist.
 	 * 
-	 * In 1.2
-	 *    ..3
-	 *      
+	 * In 1.2 ..3
+	 * 
 	 * the neighbours might be 1-2 2-3 1-3, remove the 1-3
 	 * 
-	 * in 1.2
-	 *    ....3
-	 *        
+	 * in 1.2 ....3
+	 * 
 	 * the neighbours are 1-2 and 2-3 - leave them
 	 * 
 	 * Not sure this is what we want
@@ -525,21 +530,21 @@ public class PixelIsland {
 	 */
 	void removeHypotenuses() {
 		createTriangleSet();
-		LOG.trace("triangle "+triangleSet);
+		LOG.trace("triangle " + triangleSet);
 		for (Triangle t : triangleSet) {
 			t.removeDiagonalNeighbours();
 		}
 	}
 
-	/** remove steps and leave diagonal connections.
+	/**
+	 * remove steps and leave diagonal connections.
 	 * 
-	 * A step is:
-	 * 1-2
-	 * ..3-4
+	 * A step is: 1-2 ..3-4
 	 * 
-	 * where 2 and 3 have 3 connections (including diagonals and no other neighbours)
-	 *  
-	 * we want to remove either 2 or 3 
+	 * where 2 and 3 have 3 connections (including diagonals and no other
+	 * neighbours)
+	 * 
+	 * we want to remove either 2 or 3
 	 * 
 	 * @return pixels removed
 	 */
@@ -560,7 +565,7 @@ public class PixelIsland {
 						Pixel pk = pixelNeighbours.get(k);
 						if (pj.isKnightsMove(pk, pi)) {
 							removed.add(pixel);
-//							this.remove(pixel);
+							// this.remove(pixel);
 						}
 					}
 				}
@@ -571,7 +576,6 @@ public class PixelIsland {
 		}
 		return removed;
 	}
-	
 
 	private void createTriangleSet() {
 		triangleSet = new HashSet<Triangle>();
@@ -598,7 +602,7 @@ public class PixelIsland {
 	private PixelPath findTerminalOrBranch(Pixel terminalPixel) {
 		PixelPath pixelPath = new PixelPath();
 		usedPixels = new HashSet<Pixel>();
-//		usedNuclei = new HashSet<Nucleus>();
+		// usedNuclei = new HashSet<Nucleus>();
 		Pixel currentPixel = terminalPixel;
 		while (true) {
 			usedPixels.add(currentPixel);
@@ -618,7 +622,7 @@ public class PixelIsland {
 				break;
 			} else {
 				currentPixel = nextPixel;
-				LOG.trace("next: "+nextPixel.getInt2());
+				LOG.trace("next: " + nextPixel.getInt2());
 			}
 		}
 		return pixelPath;
@@ -635,15 +639,19 @@ public class PixelIsland {
 		}
 		int size = unusedPixels.size();
 		if (size == 0) {
-//			LOG.trace(neighbours);
+			// LOG.trace(neighbours);
 			LOG.trace("Found terminal"); // temp
 		} else if (size > 1) {
-			LOG.trace("Cannot find unique next pixel: "+size); // could be terminal in nucleus
+			LOG.trace("Cannot find unique next pixel: " + size); // could be
+																	// terminal
+																	// in
+																	// nucleus
 		}
 		return size == 0 ? null : unusedPixels.get(0);
 	}
 
-	/** "jumps over" 2-spike nucleus to "other side"
+	/**
+	 * "jumps over" 2-spike nucleus to "other side"
 	 * 
 	 * 
 	 * marks as used previous neighbour of nextPixel
@@ -652,7 +660,8 @@ public class PixelIsland {
 	 * @param currentPixel
 	 * @return nextPixel far side of nucleus
 	 */
-	private Pixel processNucleusAndGetNextPixel(Nucleus nucleus, Pixel currentPixel) {
+	private Pixel processNucleusAndGetNextPixel(Nucleus nucleus,
+			Pixel currentPixel) {
 		Pixel nextPixel = null;
 		Set<Pixel> spikeSetCopy = new HashSet<Pixel>(nucleus.getSpikeSet());
 		if (spikeSetCopy.size() <= 1) {
@@ -669,10 +678,12 @@ public class PixelIsland {
 					usedPixels.add(neighbour);
 				}
 			}
-			LOG.trace("Skipped 2-spike Nucleus from "+currentPixel.getInt2()+" to "+nextPixel.getInt2());
+			LOG.trace("Skipped 2-spike Nucleus from " + currentPixel.getInt2()
+					+ " to " + nextPixel.getInt2());
 		} else {
 			// treat as terminal
-			if (!nucleus.getSpikeSet().removeAll(currentPixel.getNeighbours(this).getList())) {
+			if (!nucleus.getSpikeSet().removeAll(
+					currentPixel.getNeighbours(this).getList())) {
 				LOG.error("Failed to remove");
 			}
 			nextPixel = null;
@@ -707,7 +718,7 @@ public class PixelIsland {
 		}
 		return gg;
 	}
-	
+
 	public SVGG createSVG() {
 		SVGG g = new SVGG();
 		for (Pixel pixel : pixelList) {
@@ -715,22 +726,23 @@ public class PixelIsland {
 		}
 		return g;
 	}
-	
+
 	public void setPixelColor(String color) {
 		this.pixelColor = color;
 	}
 
-	/** plost pixels as rectangles filled with pixelColor.
+	/**
+	 * plost pixels as rectangles filled with pixelColor.
 	 * 
 	 * @return
 	 */
 	public SVGG plotPixels() {
 		return PixelIsland.plotPixels(this.getPixelList(), this.pixelColor);
 	}
-	
+
 	public static SVGG plotPixels(PixelList pixelList, String pixelColor) {
 		SVGG g = new SVGG();
-		LOG.trace("pixelList "+pixelList.size());
+		LOG.trace("pixelList " + pixelList.size());
 		for (Pixel pixel : pixelList) {
 			SVGRect rect = pixel.getSVGRect();
 			rect.setFill(pixelColor);
@@ -744,7 +756,8 @@ public class PixelIsland {
 		createPixelPathListStartingAtTerminals();
 		segmentArrayList = new ArrayList<Real2Array>();
 		for (PixelPath pixelPath : pixelPaths) {
-			Real2Array segmentArray = new Real2Array(pixelPath.createDouglasPeucker(tolerance));
+			Real2Array segmentArray = new Real2Array(
+					pixelPath.createDouglasPeucker(tolerance));
 			segmentArrayList.add(segmentArray);
 		}
 		return segmentArrayList;
@@ -764,15 +777,17 @@ public class PixelIsland {
 		Real2Range ibox = getBoundingBox();
 		double width = ibox.getXRange().getRange();
 		double height = ibox.getYRange().getRange();
-		boolean include = ((width <= wmax && width >= wmin) &&
-			(height <= hmax && height >= hmin));
+		boolean include = ((width <= wmax && width >= wmin) && (height <= hmax && height >= hmin));
 		return include;
 	}
 
-	/** computes correlations and outputs images.
+	/**
+	 * computes correlations and outputs images.
 	 * 
-	 * @param island2 must be binarized
-	 * @param title if not null creates title.svg
+	 * @param island2
+	 *            must be binarized
+	 * @param title
+	 *            if not null creates title.svg
 	 * @return correlation
 	 */
 	public double binaryIslandCorrelation(PixelIsland island2, String title) {
@@ -788,7 +803,7 @@ public class PixelIsland {
 		int yMin2 = bbox2.getYRange().getMin();
 		int xrange = Math.max(xRange1, xRange2);
 		int yrange = Math.max(yRange1, yRange2);
-		LOG.trace(xrange+" "+yrange);
+		LOG.trace(xrange + " " + yrange);
 		double score = 0.;
 		File file = new File("target/correlate/");
 		SVGG g = new SVGG();
@@ -810,7 +825,7 @@ public class PixelIsland {
 				if (pixel1 != null && pixel2 != null) {
 					g.appendChild(addRect(i2, "purple"));
 					score++;
-				} else if(pixel1 == null && pixel2 == null) {
+				} else if (pixel1 == null && pixel2 == null) {
 					score++;
 				} else {
 					score--;
@@ -818,7 +833,7 @@ public class PixelIsland {
 			}
 		}
 		if (title != null) {
-			File filex = new File(file, title+".svg");
+			File filex = new File(file, title + ".svg");
 			filex.getParentFile().mkdirs();
 			SVGSVG.wrapAndWriteAsSVG(g, filex);
 		}
@@ -828,17 +843,19 @@ public class PixelIsland {
 	private SVGRect addRect(Int2 i2, String color) {
 		double x = i2.getX();
 		double y = i2.getY();
-		SVGRect rect = new SVGRect(new Real2(x, y), new Real2(x+1, y+1));
+		SVGRect rect = new SVGRect(new Real2(x, y), new Real2(x + 1, y + 1));
 		rect.setStroke("none");
 		rect.setFill(color);
 		return rect;
 	}
 
-	/** clips rectangular image from rawImage corresponding to this.
+	/**
+	 * clips rectangular image from rawImage corresponding to this.
 	 * 
 	 * WARNING. still adjusting inclusive/exclusive clip
 	 * 
-	 * @param rawImage to clip from
+	 * @param rawImage
+	 *            to clip from
 	 * @return image in raw image with same bounding box as this
 	 */
 	public BufferedImage clipSubimage(BufferedImage rawImage) {
@@ -846,7 +863,8 @@ public class PixelIsland {
 		// may have clipped 1 pixel too much...
 		IntRange ix = i2r.getXRange();
 		IntRange iy = i2r.getYRange();
-		i2r = new Int2Range(new IntRange(ix.getMin(), ix.getMax()+1), new IntRange(iy.getMin(), iy.getMax()+1));
+		i2r = new Int2Range(new IntRange(ix.getMin(), ix.getMax() + 1),
+				new IntRange(iy.getMin(), iy.getMax() + 1));
 		BufferedImage subImage = ImageUtil.clipSubImage(rawImage, i2r);
 		return subImage;
 	}
@@ -872,18 +890,18 @@ public class PixelIsland {
 			Int2 xy = pixel.getInt2();
 			int x = xy.getX() - xmin;
 			int y = xy.getY() - ymin;
-//			System.out.println(xy+" "+bbox+" "+w+" "+h+" "+x+" "+y);
+			// System.out.println(xy+" "+bbox+" "+w+" "+h+" "+x+" "+y);
 			if (x < w && y < h) {
 				image.setRGB(x, y, 0xff000000);
 			}
 		}
 		return image;
 	}
-	
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("pixels "+((pixelList == null) ? null : pixelList.size()));
-		sb.append("; int2range "+int2range);
+		sb.append("pixels " + ((pixelList == null) ? null : pixelList.size()));
+		sb.append("; int2range " + int2range);
 		return sb.toString();
 	}
 
@@ -895,8 +913,9 @@ public class PixelIsland {
 	}
 
 	public List<SVGPolyline> createPolylinesAndRemoveUsedPixels(double epsilon) {
-		List<PixelPath> pixelPaths = this.createPixelPathListStartingAtTerminals();
-		LOG.trace("pixelPaths: "+pixelPaths.size());
+		List<PixelPath> pixelPaths = this
+				.createPixelPathListStartingAtTerminals();
+		LOG.trace("pixelPaths: " + pixelPaths.size());
 		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
 		for (PixelPath pixelPath : pixelPaths) {
 			SVGPolyline polyline = pixelPath.createPolyline(epsilon);
@@ -910,10 +929,11 @@ public class PixelIsland {
 		this.pixelPaths = pixelPaths;
 	}
 
-	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon, int maxiter) {
+	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon,
+			int maxiter) {
 		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
 		while (maxiter-- > 0) {
-			LOG.trace("pixels: "+getPixelList().size());
+			LOG.trace("pixels: " + getPixelList().size());
 			setPixelPaths(null);
 			List<SVGPolyline> polylineList0 = createPolylinesAndRemoveUsedPixels(dpEpsilon);
 			if (polylineList0.size() == 0) {
@@ -921,7 +941,8 @@ public class PixelIsland {
 				break;
 			}
 			polylineList.addAll(polylineList0);
-			LOG.trace("pixels after: "+getPixelList().size()+" polylines "+polylineList0.size());
+			LOG.trace("pixels after: " + getPixelList().size() + " polylines "
+					+ polylineList0.size());
 		}
 		if (maxiter == 0) {
 			throw new RuntimeException("couldn't analyze pixelIsland");
@@ -962,7 +983,7 @@ public class PixelIsland {
 		PixelList growList = new PixelList();
 		for (Pixel start : startPixels) {
 			if (start.getValue() != v) {
-				throw new RuntimeException("bad pixel "+start.getValue());
+				throw new RuntimeException("bad pixel " + start.getValue());
 			}
 			PixelList neighbours = start.getNeighbours(this);
 			for (Pixel neighbour : neighbours) {
@@ -988,11 +1009,13 @@ public class PixelIsland {
 		return onionRings;
 	}
 
-	/** creates a list of onion rings.
+	/**
+	 * creates a list of onion rings.
 	 * 
 	 * the pixels are organized as 1-pixel-thick rings from the outside
 	 * 
-	 * @param gg if not null plots the rings within gg
+	 * @param gg
+	 *            if not null plots the rings within gg
 	 * @param colours
 	 * @return
 	 */
@@ -1007,7 +1030,7 @@ public class PixelIsland {
 					g.detach();
 				}
 				gg.appendChild(g);
-				i = (i+1) % colours.length;
+				i = (i + 1) % colours.length;
 			}
 		}
 		return rings;
@@ -1025,16 +1048,29 @@ public class PixelIsland {
 	}
 
 	public Pixel get(int i) {
-		return pixelList == null || i < 0 || i >= pixelList.size()? null : pixelList.get(i);
+		return pixelList == null || i < 0 || i >= pixelList.size() ? null
+				: pixelList.get(i);
 	}
 
 	public void removeStepsIteratively() {
 		while (true) {
 			Set<Pixel> removed = removeSteps();
-			if (removed.size() == 0) break;
+			if (removed.size() == 0)
+				break;
 		}
 	}
 
-	
-	
+	public Iterator<Pixel> iterator() {
+		return pixelList.iterator();
+	}
+
+	/** plots pixels onto SVGG with current (or default) colour.
+	 * 
+	 * @return
+	 */
+	public SVGG getSVGG() {
+		return plotPixels(pixelList, pixelColor);
+	}
+
+
 }
