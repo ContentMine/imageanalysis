@@ -172,6 +172,9 @@ public class Pixel {
 		for (int i = 0; i < neighbours.size() - 1; i++) {
 			for (int j = i+1; j < neighbours.size(); j++) {
 				Triangle triangle = Triangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
+				if (triangle != null ) {
+					triangleSet.add(triangle);
+				}
 			}
 		}
 		return triangleSet;
