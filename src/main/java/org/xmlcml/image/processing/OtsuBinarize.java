@@ -119,7 +119,7 @@ public class OtsuBinarize {
     }
  
     // Get binary threshold using Otsu's method
-    private int otsuTreshold() {
+    private int otsuThreshold() {
  
         int[] histogram = imageHistogram();
         int total = original.getHeight() * original.getWidth();
@@ -162,7 +162,7 @@ public class OtsuBinarize {
         int red;
         int newPixel;
  
-        int threshold = otsuTreshold();
+        int threshold = otsuThreshold();
  
 //        binarized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
         binarized = new BufferedImage(current.getWidth(), current.getHeight(), current.getType());
