@@ -39,7 +39,7 @@ public class Triangle {
 
 	private boolean createSet() {
 		boolean created = false;
-		// we must set up neightbours
+		// we must set up neighbours
 		PixelList neighbours0 = pixel[0].getNeighbours(island);
 		PixelList neighbours1 = pixel[1].getNeighbours(island);
 		PixelList neighbours2 = pixel[2].getNeighbours(island);
