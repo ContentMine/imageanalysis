@@ -195,7 +195,7 @@ public class PixelIslandTest {
 		
 		SVGG gg = new SVGG();
 		int islandj = 0;
-		double dpEpsilon = 1.5;
+		double dpEpsilon = 2.0;//0.99 1.5
 		int maxiter = 20;
 		for (PixelIsland island : islandList) {
 			SVGG g = new SVGG();
@@ -262,6 +262,7 @@ public class PixelIslandTest {
 			gg.appendChild(g2);
 		}
 		File file =  new File("target/charRecog/charAll.svg");
+		file.getParentFile().mkdirs();
 		SVGSVG.wrapAndWriteAsSVG(gg, file);
 	}
 
