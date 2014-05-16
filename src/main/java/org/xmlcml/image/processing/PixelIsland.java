@@ -59,7 +59,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private static final int NONE = -1;
 
-	private PixelList pixelList; // these may have original coordinates
+	PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
@@ -72,10 +72,10 @@ public class PixelIsland implements Iterable<Pixel> {
 	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
-
 	private Set<Triangle> triangleSet;
-
 	private String pixelColor = "red";
+	private Set<PixelCycle> circleSet;
+	private PixelConnectionTable connectionTable;
 
 	public PixelIsland() {
 		this.pixelList = new PixelList();
@@ -1036,17 +1036,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		return rings;
 	}
 
-	public Set<TJunction> findTJunctions() {
-		Set<TJunction> junctionSet = new HashSet<TJunction>();
-		for (Pixel pixel : pixelList) {
-			TJunction junction = TJunction.createTJunction(pixel, this);
-			if (junction != null) {
-				junctionSet.add(junction);
-			}
-		}
-		return junctionSet;
-	}
-
 	public Pixel get(int i) {
 		return pixelList == null || i < 0 || i >= pixelList.size() ? null
 				: pixelList.get(i);
@@ -1071,6 +1060,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	public SVGG getSVGG() {
 		return plotPixels(pixelList, pixelColor);
 	}
+
 
 
 }

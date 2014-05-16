@@ -1,6 +1,11 @@
 package org.xmlcml.image.processing;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.image.compound.PixelList;
 
 /** T-junctions in pixelIsland.
@@ -15,42 +20,60 @@ import org.xmlcml.image.compound.PixelList;
  * @author pm286
  *
  */
-public class TJunction {
+public class Junction extends PixelNode {
 	
-	private final static Logger LOG = Logger.getLogger(TJunction.class);
+	private final static Logger LOG = Logger.getLogger(Junction.class);
+
+	private enum Type {
+		FOURPLUS, // four or more - may be reducible
+		TJUNCTION, // centre pixel with 3 orthogonal neighbours
+		UNKNOWN,
+		YJUNCTION, // Y-shaped - three geometries
+	}
 
 	private Pixel centre; // pixel 1
-	private Pixel stem; // pixel 4
+	private Pixel stem; // pixel 4 of TJUNCTION
 	private PixelList neighbours;
+	private Type type = Type.UNKNOWN;
 	
-	public TJunction() {
+	public Junction() {
 		
 	}
 
-	public TJunction(Pixel centre, Pixel stem) {
+	public Junction(Pixel centre, Pixel stem) {
 		this.centre = centre;
 		this.stem  = stem;
 	}
 
-	/** creates a TJunction from a centre pixel.
+	/** creates a Junction from a centre pixel.
 	 * 
 	 * (needs redoing if additional diagonal neighbours)
 	 * @param centre
-	 * @return null if not a TJunction
+	 * @return null if not a Junction
 	 */
-	public static TJunction createTJunction(Pixel centre, PixelIsland island) {
-		TJunction junction = null;
+	public static Junction createJunction(Pixel centre, PixelIsland island) {
+		Junction junction = null;
 		if (centre != null) {
 			PixelList neighbours = new PixelList(centre.getNeighbours(island));
 			if (neighbours.size() == 3) {
-				Pixel stem = TJunction.getStem(centre, neighbours, island);
+				Pixel stem = Junction.getStem(centre, neighbours, island);
+				junction = new Junction(centre, stem);
 				if (stem != null) {
 					neighbours.remove(stem);
-					junction = new TJunction(centre, stem);
+					junction.setType(Junction.Type.TJUNCTION);
+				} else {
+					junction.setType(Junction.Type.YJUNCTION);
 				}
+			} else if (neighbours.size() > 3) {
+				junction = new Junction(centre, null);
+				junction.setType(Junction.Type.FOURPLUS);
 			}
 		}
 		return junction;
+	}
+
+	private void setType(Type type) {
+		this.type  = type;
 	}
 
 	private static Pixel getStem(Pixel centre, PixelList neighbours, PixelIsland island) {
@@ -81,4 +104,15 @@ public class TJunction {
 	public PixelList getNeighbours() {
 		return neighbours;
 	}
+	
+	public static void drawJunctions(Set<Junction> tJunctionSet, SVGG g) {
+		for (Junction tJunction : tJunctionSet) {
+			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentre().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+			circle.setOpacity(0.4);
+			circle.setFill("blue");
+			g.appendChild(circle);
+		}
+	}
+	
+
 }

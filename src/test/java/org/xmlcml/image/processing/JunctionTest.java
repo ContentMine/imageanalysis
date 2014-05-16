@@ -16,9 +16,9 @@ import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.compound.PixelList;
 
-public class TJunctionTest {
+public class JunctionTest {
 
-	public final static Logger LOG = Logger.getLogger(TJunctionTest.class);
+	public final static Logger LOG = Logger.getLogger(JunctionTest.class);
 	
 	private final static File G002_DIR = new File(Fixtures.COMPOUND_DIR, "journal.pone.0095565.g002");
 	private PixelIsland island1;
@@ -57,15 +57,16 @@ public class TJunctionTest {
 	}
 
 	@Test
-	public void testFindTJunctions() throws IOException {
+	public void testFindJunctions() throws IOException {
 		PixelIsland island = createIsland1();
-		Assert.assertNull("00", TJunction.createTJunction(p1_00, island));
-		Assert.assertNotNull("10", TJunction.createTJunction(p1_10, island));
-		Assert.assertNull("20", TJunction.createTJunction(p1_20, island));
-		Assert.assertNull("11", TJunction.createTJunction(p1_11, island));
-		Set<TJunction> junctionSet = island.findTJunctions();
+		PixelConnectionTable connectionTable = PixelConnectionTable.createConnectionTable(island);
+		Assert.assertNull("00", Junction.createJunction(p1_00, island));
+		Assert.assertNotNull("10", Junction.createJunction(p1_10, island));
+		Assert.assertNull("20", Junction.createJunction(p1_20, island));
+		Assert.assertNull("11", Junction.createJunction(p1_11, island));
+		Set<Junction> junctionSet = connectionTable.findJunctions();
 		Assert.assertEquals("set", 1, junctionSet.size());
-		TJunction junction = junctionSet.toArray(new TJunction[0])[0];
+		Junction junction = junctionSet.toArray(new Junction[0])[0];
 		Assert.assertEquals("centre", island.get(1), junction.getCentre());
 		Assert.assertEquals("stem", island.get(3), junction.getStem());
 //		Assert.assertEquals("neighbours", 2, junction.getNeighbours().size());
@@ -74,14 +75,14 @@ public class TJunctionTest {
 	}
 
 	@Test
-	public void testFindTJunctionsInPlot() throws IOException {
+	public void testFindJunctionsInPlot() throws IOException {
 		PixelIsland island = PixelIslandList.thinFillAndGetPixelIslandList(
 				ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning()).get(0);
 		island.removeStepsIteratively();
-		Set<TJunction> set = island.findTJunctions();
+		Set<Junction> set = island.findJunctions();
 		SVGG g = new SVGG();
 		g.appendChild(island.createSVG());
-		for (TJunction tJunction : set) {
+		for (Junction tJunction : set) {
 			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentre().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
 			circle.setOpacity(0.2);
 			g.appendChild(circle);

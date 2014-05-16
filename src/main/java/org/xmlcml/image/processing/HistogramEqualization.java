@@ -28,11 +28,16 @@ public class HistogramEqualization {
 
 	private static final Logger LOG = Logger.getLogger(HistogramEqualization.class);
 
+    private BufferedImage originalImage, equalizedImage;
+
 	public HistogramEqualization() {
 		
 	}
-    private BufferedImage original, equalized;
-
+	
+	public HistogramEqualization(BufferedImage image) {
+		setImage(image);
+	}
+	
     /**
      * 
      * @param inputFile (system knows type)
@@ -43,7 +48,11 @@ public class HistogramEqualization {
 		if (inputFile == null || !inputFile.exists() || inputFile.isDirectory() || inputFile.isHidden()) {
 			throw new IOException("cannot read file (does not exist or is not readable): "+inputFile);
 		}
-		this.original = ImageIO.read(inputFile);
+		this.originalImage = ImageIO.read(inputFile);
+	}
+	
+	public void setImage(BufferedImage image) {
+		this.originalImage = image;
 	}
  
 	public BufferedImage histogramEqualization() {
@@ -55,18 +64,18 @@ public class HistogramEqualization {
         int newPixel = 0;
  
         // Get the Lookup table for histogram equalization
-        ArrayList<int[]> histLUT = histogramEqualizationLUT(original);
+        ArrayList<int[]> histLUT = histogramEqualizationLUT(originalImage);
  
-        equalized = new BufferedImage(original.getWidth(), original.getHeight(), original.getType());
+        equalizedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), originalImage.getType());
  
-        for(int i=0; i<original.getWidth(); i++) {
-            for(int j=0; j<original.getHeight(); j++) {
+        for(int i=0; i<originalImage.getWidth(); i++) {
+            for(int j=0; j<originalImage.getHeight(); j++) {
  
                 // Get pixels by R, G, B
-                alpha = new Color(original.getRGB (i, j)).getAlpha();
-                red = new Color(original.getRGB (i, j)).getRed();
-                green = new Color(original.getRGB (i, j)).getGreen();
-                blue = new Color(original.getRGB (i, j)).getBlue();
+                alpha = new Color(originalImage.getRGB (i, j)).getAlpha();
+                red = new Color(originalImage.getRGB (i, j)).getRed();
+                green = new Color(originalImage.getRGB (i, j)).getGreen();
+                blue = new Color(originalImage.getRGB (i, j)).getBlue();
  
                 // Set new pixel values using the histogram lookup table
                 red = histLUT.get(0)[red];
@@ -77,12 +86,12 @@ public class HistogramEqualization {
                 newPixel = colorToRGB(alpha, red, green, blue);
  
                 // Write pixels into image
-                equalized.setRGB(i, j, newPixel);
+                equalizedImage.setRGB(i, j, newPixel);
  
             }
         }
  
-        return equalized;
+        return equalizedImage;
  
     }
  
@@ -211,11 +220,11 @@ public class HistogramEqualization {
         String outfileName = args[1];
         histogramEQ.readImage(infileName);
         histogramEQ.histogramEqualization();
-        ImageUtil.writeImageQuietly(histogramEQ.equalized, outfileName);
+        ImageUtil.writeImageQuietly(histogramEQ.equalizedImage, outfileName);
     }
 
 	public BufferedImage getEqualized() {
-		return equalized;
+		return equalizedImage;
 	}
 
 }

@@ -192,6 +192,15 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public static PixelIslandList thinFillAndGetPixelIslandList(
 			BufferedImage image0, Thinning thinning) {
+		return thinFillAndGetPixelIslandList(image0, false, thinning);
+	}
+	
+	public static PixelIslandList thinFillAndGetPixelIslandList(
+			BufferedImage image0, boolean binarize, Thinning thinning) {
+		if (binarize) {
+//			image0 = ImageUtil.binarize(image0);
+			image0 = new HistogramEqualization(image0).histogramEqualization();
+		}
 		BufferedImage image = ImageUtil.thin(image0, thinning);
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
