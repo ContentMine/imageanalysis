@@ -15,33 +15,28 @@ import org.xmlcml.image.compound.PixelList;
  * @author pm286
  *
  */
-public class EndNode extends PixelNode {
+public class TerminalNode extends PixelNode {
 
-	private final static Logger LOG = Logger.getLogger(EndNode.class);
+	private final static Logger LOG = Logger.getLogger(TerminalNode.class);
 
-	private Pixel node; // pixel 1
 	private Pixel neighbour;
 	
-	public EndNode() {
+	public TerminalNode() {
 		
 	}
 
-	public EndNode(Pixel node, Pixel neighbour) {
-		this.node = node;
+	public TerminalNode(Pixel node, Pixel neighbour) {
+		super(node);
 		this.neighbour = neighbour;
 	}
 
-	public static void drawEndNodes(Set<EndNode> endNodeSet, SVGG g) {
-		for (EndNode endNode : endNodeSet) {
-			SVGCircle circle = new SVGCircle(new Real2(endNode.getNode().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+	public static void drawEndNodes(Set<TerminalNode> endNodeSet, SVGG g) {
+		for (TerminalNode endNode : endNodeSet) {
+			SVGCircle circle = new SVGCircle(new Real2(endNode.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
 			circle.setOpacity(0.4);
 			circle.setFill("orange");
 			g.appendChild(circle);
 		}
-	}
-
-	public Pixel getNode() {
-		return node;
 	}
 
 	public Pixel getNeighbour() {

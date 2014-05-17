@@ -19,65 +19,38 @@ import org.xmlcml.image.compound.PixelList;
 public class PixelCycle {
 
 	final static Logger LOG = Logger.getLogger(PixelCycle.class);
-	Pixel origin;
-	PixelIsland island;
-	PixelList cycleList;
-	PixelList pixelList;
+	private PixelIsland island;
+	private PixelEdge edge;
 
 	/** special case of single pixel.
 	 * 
 	 * @param pixel
 	 */
-	public PixelCycle(Pixel pixel) {
-		this.origin = pixel;
-		init();
+	public PixelCycle(Pixel pixel, PixelIsland island) {
+		this.edge = new PixelEdge(island);
+		TerminalNode node = new TerminalNode(pixel, null);
+		edge.addStartNode(node);
+		edge.addEndNode(node);
 	}
 
-	private void init() {
-		this.cycleList = new PixelList();
-	}
-
-	public PixelCycle(PixelList pixelList, PixelIsland island) {
-		this.pixelList = pixelList;
-		this.island = island;
-		this.origin = pixelList.get(0);
-		init();
-	}
-
-	void checkAllAre2Connected() {
-		for (Pixel pixel : pixelList) {
-			PixelList neighbours = pixel.getNeighbours(island);
-				if (neighbours.size() != 2) {
-				throw new RuntimeException("not a single cycle "+pixel+"/"+neighbours);
-			}
-		}
-	}
-
-	/** gets next pixel in chain.
+	/** special case of single pixel.
 	 * 
-	 * @param current
-	 * @param last
-	 * @param island
-	 * @return next pixel or null if no more or branch
+	 * @param pixel
 	 */
-	static Pixel getNextUnusedInEdge(Pixel current, Pixel last, PixelIsland island) {
-		PixelList neighbours = current.getNeighbours(island);
-		neighbours.remove(last);
-		Pixel next = neighbours.size() == 1 ? neighbours.get(0) : null;
-		return next;
+	public PixelCycle(PixelEdge edge) {
+		this.edge = edge;
 	}
-	
-	public PixelList getCycleList() {
-		return cycleList;
-	}
-	
+
 	public Pixel getOrigin() {
-		return this.origin;
+		return this.edge.get(0);
+	}
+	
+	public PixelEdge getEdge() {
+		return edge;
 	}
 	
 	public String toString() {
-		String s = "origin: "+origin.toString();
-		s += "; cycle: "+cycleList;
+		String s = "origin: "+getOrigin().toString();
 		return s;
 	}
 

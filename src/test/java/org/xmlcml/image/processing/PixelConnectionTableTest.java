@@ -1,5 +1,7 @@
 package org.xmlcml.image.processing;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,7 +12,6 @@ public class PixelConnectionTableTest {
 	private final static Logger LOG = Logger.getLogger(PixelConnectionTableTest.class);
 	
 	@Test
-//	@Ignore // sort this 
 	public void testSingleCycle() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
@@ -22,12 +23,14 @@ public class PixelConnectionTableTest {
 		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
 		Assert.assertNotNull(table);
 		PixelCycle cycle = table.getCycle();
-		// FAILS
-//		Assert.assertNotNull(cycle);
-//		PixelList list = cycle.getCycleList();
-//		Assert.assertNotNull(list);
-//		Assert.assertEquals("cycle", "{(1,0)(0,1)(-1,0)(0,-1)}", list.toString());
-		LOG.debug(table);
+		Assert.assertNotNull(cycle);
+		PixelEdge edge = cycle.getEdge();
+		Assert.assertNotNull(edge);
+		PixelList list = edge.getPixelList();
+		Assert.assertNotNull(list);
+		Assert.assertEquals("cycle", "{(1,0)(0,1)(-1,0)(0,-1)}", list.toString());
+		List<PixelNode> nodes = edge.getPixelNodes();
+		Assert.assertEquals(0, nodes.size());
 	}
 	
 	@Test

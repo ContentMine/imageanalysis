@@ -31,7 +31,6 @@ public class Junction extends PixelNode {
 		YJUNCTION, // Y-shaped - three geometries
 	}
 
-	private Pixel centre; // pixel 1
 	private Pixel stem; // pixel 4 of TJUNCTION
 	private PixelList neighbours;
 	private Type type = Type.UNKNOWN;
@@ -41,7 +40,7 @@ public class Junction extends PixelNode {
 	}
 
 	public Junction(Pixel centre, Pixel stem) {
-		this.centre = centre;
+		super(centre);
 		this.stem  = stem;
 	}
 
@@ -93,10 +92,6 @@ public class Junction extends PixelNode {
 		return stem.isDiagonalNeighbour(pk) && stem.isDiagonalNeighbour(pj);
 	}
 
-	public Pixel getCentre() {
-		return centre;
-	}
-
 	public Pixel getStem() {
 		return stem;
 	}
@@ -107,7 +102,7 @@ public class Junction extends PixelNode {
 	
 	public static void drawJunctions(Set<Junction> tJunctionSet, SVGG g) {
 		for (Junction tJunction : tJunctionSet) {
-			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentre().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
 			circle.setOpacity(0.4);
 			circle.setFill("blue");
 			g.appendChild(circle);

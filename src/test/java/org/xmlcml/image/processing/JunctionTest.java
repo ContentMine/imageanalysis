@@ -82,11 +82,11 @@ public class JunctionTest {
 				ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning()).get(0);
 		island.removeStepsIteratively();
 		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
-		Set<Junction> set = table.findJunctions();
 		SVGG g = new SVGG();
 		g.appendChild(island.createSVG());
-		for (Junction tJunction : set) {
-			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentre().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+		Set<Junction> junctionSet = table.getJunctionSet();
+		for (Junction tJunction : junctionSet) {
+			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
 			circle.setOpacity(0.2);
 			g.appendChild(circle);
 		}
