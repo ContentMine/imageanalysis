@@ -68,4 +68,8 @@ public class PixelEdge {
 	public Pixel get(int i) {
 		return pixelList.size() == 0 ? null : pixelList.get(i);
 	}
+
+	public PixelNode getPixelNode(int i) {
+		return (i < 0 || i >= nodes.size()) ? null : nodes.get(i);
+	}
 }

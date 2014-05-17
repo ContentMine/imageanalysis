@@ -103,8 +103,8 @@ public class PixelConnectionTable {
 			PixelEdge edge = createEdge(start, nextPixel);
 			// mark all pixels in edge as used
 			usedPixelSet.addAll(edge.getPixelList().getList());
-			PixelNode last = edge.getPixelNodes().get(1);
-			nextPixel = last.getNextUnusedNeighbour(usedPixelSet, island);
+			PixelNode last = edge.getPixelNode(1);
+			nextPixel = (last == null) ? null : last.getNextUnusedNeighbour(usedPixelSet, island);
 			if (nextPixel != null) {
 				nodeStack.push(last);
 			}
