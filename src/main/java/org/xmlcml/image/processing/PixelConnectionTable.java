@@ -36,7 +36,7 @@ public class PixelConnectionTable {
 	private Map<Pixel, TerminalNode> terminalNodeByPixelMap;
 	private Set<Pixel> usedNonNodePixelSet;
 
-	private Set<PixelNode> activeNodeSet;
+	private SortedNodeSet activeNodeSet;
 
 	public PixelConnectionTable(PixelList pixelList, PixelIsland island) {
 		if (pixelList == null) {
@@ -113,47 +113,54 @@ public class PixelConnectionTable {
 	 * @param start
 	 */
 	private void createEdges(PixelNode start) {
-		Pixel nextPixel = start.getNextUnusedNeighbour(usedNonNodePixelSet, island);
+		Pixel nextPixel = start.getNextUnusedNeighbour(usedNonNodePixelSet,
+				island);
 		createEdges();
 	}
 
 	private void createEdges() {
 		edges = new ArrayList<PixelEdge>();
-		activeNodeSet = new HashSet<PixelNode>();
+		activeNodeSet = new SortedNodeSet();
 		activeNodeSet.addAll(terminalNodeSet.getList());
 		activeNodeSet.addAll(junctionSet.getList());
 		while (!activeNodeSet.isEmpty()) {
 			PixelNode startNode = activeNodeSet.iterator().next();
-			LOG.debug("used0: " + usedNonNodePixelSet);
+			LOG.trace("used0: " + usedNonNodePixelSet);
 			PixelEdge edge = createEdge(startNode);
 			if (edge == null) {
-				LOG.debug("null edge from: "+startNode);
+				LOG.trace("null edge from: " + startNode);
 				activeNodeSet.remove(startNode);
 				continue;
 			}
 			add(edge);
-			LOG.debug(edge);
-			LOG.debug("nodeSet: " + activeNodeSet);
+			LOG.trace(">" + edge);
+			LOG.trace("nodeSet: " + activeNodeSet);
 			addNonNodePixelsInEdgeToNonNodeUsedSet(edge);
 			removeEndNodesIfNoUnusedNeighbours(edge);
-			LOG.debug("usedNonNodePixels: " + usedNonNodePixelSet);
+			LOG.trace("usedNonNodePixels: " + usedNonNodePixelSet);
 		}
 	}
 
 	private void removeEndNodesIfNoUnusedNeighbours(PixelEdge edge) {
 		List<PixelNode> nodes = edge.getPixelNodes();
 		for (PixelNode node : nodes) {
+			if (node == null) {
+				throw new RuntimeException("BUG null node: "+nodes.size());
+			}
 			if (node.getNextUnusedNeighbour(usedNonNodePixelSet, island) == null) {
-				LOG.debug("inactivated node: "+node);
 				activeNodeSet.remove(node);
+				LOG.trace("inactivated node: " + node + " / " + activeNodeSet);
 			}
 		}
 	}
 
 	private List<Pixel> addNonNodePixelsInEdgeToNonNodeUsedSet(PixelEdge edge) {
 		// mark all non-node pixels in edge as used
-		List<Pixel> edgePixelList = new ArrayList<Pixel>(edge.getPixelList().getList());
-		edgePixelList.remove(edgePixelList.get(edgePixelList.size()-1)); // remove last pixel
+		List<Pixel> edgePixelList = new ArrayList<Pixel>(edge.getPixelList()
+				.getList());
+		edgePixelList.remove(edgePixelList.get(edgePixelList.size() - 1)); // remove
+																			// last
+																			// pixel
 		edgePixelList.remove(0);
 		usedNonNodePixelSet.addAll(edgePixelList);
 		return edgePixelList;
@@ -161,7 +168,8 @@ public class PixelConnectionTable {
 
 	private PixelEdge createEdge(PixelNode startNode) {
 		PixelEdge edge = null;
-		Pixel nextPixel = startNode.getNextUnusedNeighbour(usedNonNodePixelSet, island);
+		Pixel nextPixel = startNode.getNextUnusedNeighbour(usedNonNodePixelSet,
+				island);
 		if (nextPixel != null) {
 			edge = iterateWhile2Connected(startNode.getCentrePixel(), nextPixel);
 		}
@@ -179,6 +187,7 @@ public class PixelConnectionTable {
 		Pixel current = last.getNeighbours(island).get(0); // arbitrary
 															// direction
 		PixelEdge edge = iterateWhile2Connected(last, current);
+		edge.removeNodes(); // cycles don't have nodes
 		PixelCycle cycle = new PixelCycle(edge);
 		return cycle;
 	}
@@ -192,9 +201,12 @@ public class PixelConnectionTable {
 	 * @return next pixel or null if no more or branch
 	 */
 	static Pixel getNextUnusedInEdge(Pixel current, Pixel last, PixelIsland island) {
-		PixelList neighbours = current.getNeighbours(island);
-		neighbours.remove(last);
-		Pixel next = neighbours.size() == 1 ? neighbours.get(0) : null;
+		Pixel next = null;
+//		if (current != null) {
+			PixelList neighbours = current.getNeighbours(island);
+			neighbours.remove(last);
+			next = neighbours.size() == 1 ? neighbours.get(0) : null;
+//		}
 		return next;
 	}
 
@@ -222,39 +234,43 @@ public class PixelConnectionTable {
 		return cycle;
 	}
 
-	private PixelEdge iterateWhile2Connected(Pixel start, Pixel current) {
+	private PixelEdge iterateWhile2Connected(Pixel startPixel, Pixel currentPixel) {
 		PixelEdge edge = new PixelEdge(island);
-		PixelNode startNode = getPixelNode(start);
-		edge.addStartNode(startNode);;
-		LOG.debug("startNode: "+startNode);
-		PixelNode lastNode = startNode;
+		PixelNode startNode = getPixelNode(startPixel);
+		edge.addStartNode(startNode);
+		LOG.trace("startNode: " + startNode+" current "+currentPixel);
 		while (true) {
-//			usedNonNodePixelSet.add(current); // don't add end pixel
-			Pixel nextPixel = PixelConnectionTable.getNextUnusedInEdge(current,
-					start, island);
-			LOG.trace("current " + current + " next " + nextPixel + "/"
+			Pixel nextPixel = PixelConnectionTable.getNextUnusedInEdge(currentPixel,
+					startPixel, island);
+			LOG.trace("current " + currentPixel + " next " + nextPixel + "/"
 					+ usedNonNodePixelSet + "/");
-			edge.addPixel(start);
+			edge.addPixel(startPixel);
 			PixelNode nextNode = getPixelNode(nextPixel);
-			if (nextNode != null && nextNode != startNode) {
-				LOG.debug("nextNode: " + nextNode);
-//				break;
-			} else if (nextPixel == null || usedNonNodePixelSet.contains(nextPixel)) {
-				edge.addPixel(current);
-				edge.addEndNode(lastNode);
+			if ((nextNode != null && nextNode != startNode) ||
+				(nextPixel == null || usedNonNodePixelSet.contains(nextPixel))) {
+				LOG.trace("nextNode: " + nextNode);
+				edge.addPixel(currentPixel);
+				if (nextNode != null) {
+					edge.addEndNode(nextNode);
+					edge.addPixel(nextPixel);
+				} else {
+					LOG.trace("null next Node");
+				}
 				break;
 			}
-			start = current;
-			current = nextPixel;
-			lastNode = nextNode;
+			startPixel = currentPixel;
+			currentPixel = nextPixel;
 		}
 		return edge;
 	}
 
 	public PixelNode getPixelNode(Pixel pixel) {
-		PixelNode node = junctionByPixelMap.get(pixel);
-		if (node == null) {
-			node = terminalNodeByPixelMap.get(pixel);
+		PixelNode node = null;
+		if (pixel != null) {
+			node = junctionByPixelMap.get(pixel);
+			if (node == null) {
+				node = terminalNodeByPixelMap.get(pixel);
+			}
 		}
 		return node;
 	}

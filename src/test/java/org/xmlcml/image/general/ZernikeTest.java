@@ -3,7 +3,6 @@ package org.xmlcml.image.general;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -42,7 +41,7 @@ public class ZernikeTest {
 		ZernikeMomentsOrig.Complex[] complexArray = ZernikeMomentsOrig.zer_mmts(order, xarray, yarray, npoints);
 		Assert.assertEquals("ncomplex", 2, complexArray.length);
 		for (ZernikeMomentsOrig.Complex complex : complexArray) {
-			LOG.debug(complex);
+			LOG.trace(complex);
 		}
 	}
 	
@@ -52,11 +51,11 @@ public class ZernikeTest {
 		File file = new File(Fixtures.REFFONT_DIR, "65.png");
 		ZernikeMomentsOrig.Complex[] complexArray = calculateComplex(order, file);
 		for (ZernikeMomentsOrig.Complex complex : complexArray) {
-			LOG.debug(complex);
+			LOG.trace(complex);
 		}
 		complexArray = calculateComplex(2, file);
 		for (ZernikeMomentsOrig.Complex complex : complexArray) {
-			LOG.debug(complex);
+			LOG.trace(complex);
 		}
 		for (int i = 65; i <= 126; i++) {
 			file = new File(Fixtures.REFFONT_DIR, i+".png");
@@ -70,7 +69,7 @@ public class ZernikeTest {
 		if (file.exists()) {
 			complexArray = calculateComplex(order, file);
 			for (ZernikeMomentsOrig.Complex complex : complexArray) {
-				LOG.debug(title+": "+complex);
+				LOG.trace(title+": "+complex);
 			}
 			System.out.println();
 		}

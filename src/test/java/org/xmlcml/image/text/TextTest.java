@@ -120,7 +120,7 @@ public class TextTest {
 			if (island.size() <= 4) {
 				scanned.getList().remove(island);
 			} else {
-				System.out.println(">"+scanned.size());
+				LOG.trace(">"+scanned.size());
 			}
 		}
 		Assert.assertEquals("scanned", 937, scanned.size());

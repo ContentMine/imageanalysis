@@ -227,4 +227,21 @@ public class Pixel {
 		boolean b2 = target.isOrthogonalNeighbour(centre) && centre.isDiagonalNeighbour(this);
 		return b1 || b2;
 	}
+
+	/** compares pixels by x,y values.
+	 * 
+	 * first compares Y and if equal then X
+	 * 
+	 * @param pixel1
+	 * @return -1 if this.Int2 < pixel1.Int2, 1 if this.Int2 > pixel1.Int2, else 0
+	 */
+	public int compareTo(Pixel pixel1) {
+		Int2 xy0 = this.getInt2();
+		Int2 xy1 = pixel1.getInt2();
+		int compare = new Integer(xy0.getY()).compareTo(new Integer(xy1.getY()));
+		if (compare == 0) {
+			compare = new Integer(xy0.getX()).compareTo(new Integer(xy1.getX()));
+		}
+		return compare;
+	}
 }

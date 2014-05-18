@@ -78,7 +78,7 @@ public class GrayCharacter {
 		try {
 			codePoint = new Integer(base);
 		} catch (Exception e) {
-			LOG.debug("cannot create as codePoint: "+file);
+			LOG.trace("cannot create as codePoint: "+file);
 		}
 		return codePoint;
 	}

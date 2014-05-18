@@ -10,17 +10,13 @@ import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 
+/** probably superseded by BoofCV
+ * 
+ * @author pm286
+ *
+ */
+		
 public class OtsuBinarizationTest {
-
-	@Test
-	@Ignore // file gone missing (maybe in earlier version)
-	public void testBinarize() throws IOException {
-    	OtsuBinarize otsuBinarize = new OtsuBinarize();
-        otsuBinarize.read(Fixtures.MALTORYZINE_PNG);
-        otsuBinarize.toGray();
-        otsuBinarize.binarize();
-        ImageUtil.writeImageQuietly(otsuBinarize.getCurrent(), new File("target/maltoryzineBinary.png"));        
-	}
 
 	@Test
 	public void testBinarize1() throws IOException {

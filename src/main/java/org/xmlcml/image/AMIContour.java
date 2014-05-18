@@ -59,7 +59,7 @@ public class AMIContour {
 		for (int i = 0; i < points.size(); i++) {
 			Int2 int2 = getInt2(points.get(i));
 			if (usedPoints.contains(int2)) {
-				LOG.debug("duplicate point in contour: "+int2);
+				LOG.trace("duplicate point in contour: "+int2);
 				Real2Array reversePoints = createReversePoints(points, int2);
 				realPoints.add(reversePoints);
 				break;

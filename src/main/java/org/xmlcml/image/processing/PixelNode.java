@@ -28,23 +28,31 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 		int compare = -1;
 		if (node1 != null) {
 			Pixel centrePixel1 = node1.getCentrePixel();
-			Int2 xy21 = (centrePixel1 == null) ? null : centrePixel1.getInt2();
-			Int2 xy20 = (centrePixel == null) ? null : centrePixel.getInt2();
-			compare = new Integer(xy20.getY()).compareTo(new Integer(xy21.getY()));
-			if (compare == 0) {
-				compare = new Integer(xy20.getX()).compareTo(new Integer(xy21.getX()));
-			}
+			compare = this.centrePixel.compareTo(centrePixel1);
 		}
 		return compare;
 	}
 	
-	public Pixel getNextUnusedNeighbour(Set<Pixel> unused, PixelIsland island) {
+	/** get lowest unused neighbour pixel.
+	 * 
+	 * iterates over neighbours to find lowest unused pixel (pixel.compareTo())
+	 * 
+	 * @param used
+	 * @param island
+	 * @return
+	 */
+	public Pixel getNextUnusedNeighbour(Set<Pixel> used, PixelIsland island) {
+		Pixel lowest = null;
 		for (Pixel neighbour : centrePixel.getNeighbours(island)) {
-			if (!unused.contains(neighbour)) {
-				return neighbour;
+			if (!used.contains(neighbour)) {
+				if (lowest == null) {
+					lowest = neighbour;
+				} else if (neighbour.compareTo(lowest) < 0) {
+					lowest = neighbour;
+				}
 			}
 		}
-		return null;
+		return lowest;
 	}
 	
 	public String toString() {

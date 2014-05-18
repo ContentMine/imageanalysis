@@ -6,15 +6,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.text.fonts.ReferenceFont;
 import org.xmlcml.image.text.fonts.ReferenceFontManager;
 
@@ -83,6 +80,7 @@ public class ReferenceFontTest {
 	}
 
 	@Test
+	@Ignore // takes too long
 	public void testCorrelateHelveticaMonospace() throws Exception {
 		List<File> refFiles = new ArrayList<File>(FileUtils.listFiles(ReferenceFontManager.HELVETICA_DIR, new String[]{"png"}, false));
 		List<File> genericFiles = new ArrayList<File>(FileUtils.listFiles(ReferenceFontManager.MONOSPACE_DIR, new String[]{"png"}, false));

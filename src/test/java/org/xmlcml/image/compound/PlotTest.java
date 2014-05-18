@@ -292,7 +292,7 @@ public class PlotTest {
 			throws IOException {
 		PixelIslandList plot = PixelIslandList.createPixelIslandList(infile,
 				Operation.BINARIZE);
-		LOG.debug("plot size " + plot.size());
+		LOG.trace("plot size " + plot.size());
 		plot.createRingListList(outfile1);
 		PixelIslandList thinned = PixelIslandList
 				.thinFillAndGetPixelIslandList(ImageIO.read(infile),

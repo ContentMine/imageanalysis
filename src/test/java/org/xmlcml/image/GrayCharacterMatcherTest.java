@@ -3,6 +3,7 @@ package org.xmlcml.image;
 import java.io.File;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGG;
@@ -15,6 +16,7 @@ public class GrayCharacterMatcherTest {
 	static final ReferenceFontManager FONT_MANAGER = new ReferenceFontManager();
 
 	@Test
+	@Ignore // rather expensive as a test
 	public void testCorrelateBMCAgainstHelvetica() throws Exception {
 		GrayCharacterMatcher matcher = new GrayCharacterMatcher();
 		matcher.setMinimumCorrelation(0.20);

@@ -1,7 +1,6 @@
 package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
-
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -27,7 +26,7 @@ public class FloodFillTest {
 		floodFill.fill();
 		Assert.assertEquals("pixelIslands", 5, floodFill.getPixelIslandList().size());
 		for (PixelIsland pixelIsland : floodFill.getPixelIslandList()) {
-			LOG.debug(pixelIsland.size());
+			LOG.trace(pixelIsland.size());
 		}
 	}
 

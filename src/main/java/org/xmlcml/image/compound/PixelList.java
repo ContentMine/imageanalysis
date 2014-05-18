@@ -2,6 +2,7 @@ package org.xmlcml.image.compound;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -126,6 +127,7 @@ public class PixelList implements Iterable<Pixel> {
 		return plotPixels(null, fill);
 	}
 	
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("{");
@@ -134,6 +136,10 @@ public class PixelList implements Iterable<Pixel> {
 		}
 		sb.append("}");
 		return sb.toString();
+	}
+
+	public void reverse() {
+		Collections.reverse(list);
 	}
 
 }

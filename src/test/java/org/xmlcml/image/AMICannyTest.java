@@ -1,6 +1,7 @@
 package org.xmlcml.image;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.util.List;
 
@@ -26,6 +27,13 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
+/** tests contours in BoofCV.
+ * 
+ * works quite well but can backtrack. we think we have a better approach 
+ * 
+ * @author pm286
+ *
+ */
 public class AMICannyTest {
 	
 	private final static Logger LOG = Logger.getLogger(AMICannyTest.class);
@@ -90,7 +98,7 @@ public class AMICannyTest {
  
 		// First get the contour created by canny
 		List<EdgeContour> edgeContours = canny.getContours();
-		LOG.debug("edgeContours: "+edgeContours.size());
+		LOG.trace("edgeContours: "+edgeContours.size());
 		// The 'edgeContours' is a tree graph that can be difficult to process.  An alternative is to extract
 		// the contours from the binary image, which will produce a single loop for each connected cluster of pixels.
 		// Note that you are only interested in external contours.

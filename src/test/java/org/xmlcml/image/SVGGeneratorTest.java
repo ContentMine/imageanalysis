@@ -2,10 +2,8 @@ package org.xmlcml.image;
 
 import java.io.FileOutputStream;
 
-
 import org.junit.Test;
 import org.xmlcml.graphics.svg.SVGUtil;
-import org.xmlcml.image.SVGGenerator;
 
 public class SVGGeneratorTest {
 	

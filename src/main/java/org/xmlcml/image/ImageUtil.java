@@ -291,6 +291,9 @@ public class ImageUtil {
 	}
 
 	public static BufferedImage addBorders(BufferedImage image0, int xmargin, int ymargin, int color) {
+		if (image0 == null) {
+			return null;
+		}
 		BufferedImage image = new BufferedImage(image0.getWidth() + 2*xmargin,  image0.getHeight()+2*ymargin, image0.getType());
 		// set to colour
 		for (int i = 0; i < image0.getWidth() + 2 * xmargin; i++) {

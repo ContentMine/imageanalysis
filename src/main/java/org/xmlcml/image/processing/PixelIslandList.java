@@ -112,14 +112,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		LOG.trace("pre-bin");
 		if (opList.contains(Operation.BINARIZE)) {
 			image = ImageUtil.binarize(image);
-			LOG.debug("postbin ");
+			LOG.trace("postbin ");
 		}
 		if (opList.contains(Operation.THIN)) {
 			image = ImageUtil.zhangSuenThin(image);
 		}
-		LOG.debug("postbin ");
+		LOG.trace("postbin ");
 		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
-		LOG.debug("islands " + islands.size());
+		LOG.trace("islands " + islands.size());
 		return islands;
 	}
 
@@ -194,11 +194,11 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			BufferedImage image0, Thinning thinning) {
 		return thinFillAndGetPixelIslandList(image0, false, thinning);
 	}
-	
+
 	public static PixelIslandList thinFillAndGetPixelIslandList(
 			BufferedImage image0, boolean binarize, Thinning thinning) {
 		if (binarize) {
-//			image0 = ImageUtil.binarize(image0);
+			// image0 = ImageUtil.binarize(image0);
 			image0 = new HistogramEqualization(image0).histogramEqualization();
 		}
 		BufferedImage image = ImageUtil.thin(image0, thinning);
@@ -361,14 +361,16 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return svgg;
 	}
 
-	/** reverses order of list.
+	/**
+	 * reverses order of list.
 	 * 
 	 */
 	public void reverse() {
 		Collections.reverse(list);
 	}
 
-	/** removes all unnecessary steps while keeping minimum connectivity.
+	/**
+	 * removes all unnecessary steps while keeping minimum connectivity.
 	 * 
 	 */
 	public void removeStepsIteratively() {
@@ -377,7 +379,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-	/** gets sizes of islands in current order.
+	/**
+	 * gets sizes of islands in current order.
 	 * 
 	 * @return
 	 */

@@ -1,6 +1,7 @@
 package org.xmlcml.image.processing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -73,9 +74,25 @@ public class PixelEdge {
 		return (i < 0 || i >= nodes.size()) ? null : nodes.get(i);
 	}
 	
-	public String toString() {
-		String s = "edge: "+pixelList+"/"+nodes;
-		return s;
+	public void removeNodes() {
+		while (nodes != null && nodes.size() > 0) {
+			nodes.remove(0);
+		}
 	}
 	
+	public String toString() {
+		String s = ""+pixelList+"/"+nodes;
+		return s;
+	}
+
+	public boolean equalsIgnoreOrder(String listString) {
+		boolean equals = pixelList.toString().equals(listString);
+		if (!equals) {
+			PixelList newList = new PixelList(pixelList);
+			newList.reverse();
+			equals = newList.toString().equals(listString);
+		}
+		return equals;
+	}
+
 }

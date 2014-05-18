@@ -81,10 +81,11 @@ public class ImageMomentGenerator {
 	
 	private void readPixels(PixelList pixelList) {
 		pixelCoords = Pixel.createReal2Array(pixelList);
-		LOG.debug("pixels: "+pixelCoords.size());
+		LOG.trace("pixels: "+pixelCoords.size());
 		calculateMoments();
-		printMoments(moment, "moment");
-		printMoments(mu, "mu");
+		// disable printing
+//		printMoments(moment, "moment");
+//		printMoments(mu, "mu");
 	}
 
 	/** at present calculate up to 2.
@@ -124,7 +125,7 @@ public class ImageMomentGenerator {
 	 */
 	public double calculateMu(int p, int q) {
 		
-		LOG.debug("p: "+p+", q: "+q);
+		LOG.trace("p: "+p+", q: "+q);
 		double sum = 0.0;
 		for (int i = 0; i < xCoords.size(); i++) {
 			double x = xCoords.get(i);
@@ -173,7 +174,7 @@ public class ImageMomentGenerator {
 		yCoords = pixelCoords.getYArray();
 		this.sumY = yCoords.sumAllElements();
 		this.meanY = yCoords.getMean();
-		LOG.debug("> "+sumX+" "+meanX+" "+sumY+" "+meanY);
+		LOG.trace("> "+sumX+" "+meanX+" "+sumY+" "+meanY);
 	}
 
 }

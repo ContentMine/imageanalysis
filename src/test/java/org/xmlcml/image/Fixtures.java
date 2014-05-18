@@ -3,7 +3,6 @@ package org.xmlcml.image;
 import java.awt.Point;
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
 import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
