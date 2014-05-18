@@ -36,8 +36,8 @@ public class PixelEdge {
 	 * @param node
 	 */
 	public void addEndNode(PixelNode node) {
-		if (this.nodes.size() == 0 || this.nodes.size() > 1) {
-			throw new RuntimeException("Cannot add end node");
+		if (nodes.size() == 0 || nodes.size() > 1) {
+			throw new RuntimeException("Cannot add end node: current count: "+nodes.size());
 		}
 		nodes.add(node);
 	}
@@ -72,4 +72,10 @@ public class PixelEdge {
 	public PixelNode getPixelNode(int i) {
 		return (i < 0 || i >= nodes.size()) ? null : nodes.get(i);
 	}
+	
+	public String toString() {
+		String s = "edge: "+pixelList+"/"+nodes;
+		return s;
+	}
+	
 }

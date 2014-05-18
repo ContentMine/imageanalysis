@@ -84,8 +84,8 @@ public class JunctionTest {
 		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
 		SVGG g = new SVGG();
 		g.appendChild(island.createSVG());
-		Set<Junction> junctionSet = table.getJunctionSet();
-		for (Junction tJunction : junctionSet) {
+		JunctionSet junctionSet = table.getJunctionSet();
+		for (PixelNode tJunction : junctionSet) {
 			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
 			circle.setOpacity(0.2);
 			g.appendChild(circle);
