@@ -116,7 +116,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.xml-cml</groupId>
-			<artifactId>euclid-dev</artifactId>
+			<artifactId>euclid</artifactId>
 			<version>1.1-SNAPSHOT</version>
 		</dependency>
 

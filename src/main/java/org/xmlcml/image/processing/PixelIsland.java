@@ -75,7 +75,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Set<Triangle> triangleSet;
 	private String pixelColor = "red";
 	private Set<PixelCycle> circleSet;
-	private PixelConnectionTable connectionTable;
+	private PixelGraph connectionTable;
 
 	public PixelIsland() {
 		this.pixelList = new PixelList();
@@ -1063,6 +1063,10 @@ public class PixelIsland implements Iterable<Pixel> {
 	 */
 	public SVGG getSVGG() {
 		return plotPixels(pixelList, pixelColor);
+	}
+
+	public void collapseNuclei() {
+		LOG.debug("NYI");
 	}
 
 

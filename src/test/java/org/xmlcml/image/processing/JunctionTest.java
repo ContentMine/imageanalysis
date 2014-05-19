@@ -61,7 +61,7 @@ public class JunctionTest {
 	// FIXME
 	public void testFindJunctions() throws IOException {
 		PixelIsland island = createIsland1();
-		PixelConnectionTable connectionTable = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph connectionTable = PixelGraph.createGraph(island);
 		Assert.assertNull("00", Junction.createJunction(p1_00, island));
 		Assert.assertNotNull("10", Junction.createJunction(p1_10, island));
 		Assert.assertNull("20", Junction.createJunction(p1_20, island));
@@ -85,7 +85,7 @@ public class JunctionTest {
 		PixelIsland island = PixelIslandList.thinFillAndGetPixelIslandList(
 				ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning()).get(0);
 		island.removeStepsIteratively();
-		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph table = PixelGraph.createGraph(island);
 		SVGG g = new SVGG();
 		g.appendChild(island.createSVG());
 		JunctionSet junctionSet = table.getJunctionSet();

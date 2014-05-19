@@ -20,10 +20,10 @@ import org.xmlcml.image.compound.PixelList;
  * @author pm286
  * 
  */
-public class PixelConnectionTable {
+public class PixelGraph {
 
 	private final static Logger LOG = Logger
-			.getLogger(PixelConnectionTable.class);
+			.getLogger(PixelGraph.class);
 
 	private List<PixelEdge> edges;
 	private List<PixelNode> nodes;
@@ -38,7 +38,7 @@ public class PixelConnectionTable {
 
 	private SortedNodeSet activeNodeSet;
 
-	public PixelConnectionTable(PixelList pixelList, PixelIsland island) {
+	public PixelGraph(PixelList pixelList, PixelIsland island) {
 		if (pixelList == null) {
 			throw new RuntimeException("null pixelList");
 		}
@@ -52,7 +52,7 @@ public class PixelConnectionTable {
 	 * @param island
 	 * @return
 	 */
-	public static PixelConnectionTable createConnectionTable(PixelIsland island) {
+	public static PixelGraph createGraph(PixelIsland island) {
 		return island == null ? null : createConnectionTable(
 				island.getPixelList(), island);
 	}
@@ -64,9 +64,9 @@ public class PixelConnectionTable {
 	 * @param island
 	 * @return
 	 */
-	public static PixelConnectionTable createConnectionTable(
+	public static PixelGraph createConnectionTable(
 			PixelList pixelList, PixelIsland island) {
-		PixelConnectionTable table = new PixelConnectionTable(pixelList, island);
+		PixelGraph table = new PixelGraph(pixelList, island);
 		table.fillConnectionTable();
 		return table;
 	}
@@ -241,9 +241,9 @@ public class PixelConnectionTable {
 		PixelEdge edge = new PixelEdge(island);
 		PixelNode startNode = getPixelNode(startPixel);
 		edge.addStartNode(startNode);
-		LOG.trace("startNode: " + startNode+" current "+currentPixel);
+		LOG.debug("*** startNode: " + startNode+" current "+currentPixel);
 		while (true) {
-			Pixel nextPixel = PixelConnectionTable.getNextUnusedInEdge(currentPixel,
+			Pixel nextPixel = PixelGraph.getNextUnusedInEdge(currentPixel,
 					startPixel, island);
 			LOG.trace("current " + currentPixel + " next " + nextPixel + "/"
 					+ usedNonNodePixelSet + "/");
@@ -264,6 +264,7 @@ public class PixelConnectionTable {
 			startPixel = currentPixel;
 			currentPixel = nextPixel;
 		}
+		LOG.debug("***");
 		return edge;
 	}
 

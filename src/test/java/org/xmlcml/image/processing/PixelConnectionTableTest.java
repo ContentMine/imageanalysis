@@ -21,7 +21,7 @@ public class PixelConnectionTableTest {
 		island.addPixel(new Pixel(0,1));
 		island.addPixel(new Pixel(-1,0));
 		island.addPixel(new Pixel(0, -1));
-		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph table = PixelGraph.createGraph(island);
 		Assert.assertNotNull(table);
 		// single cycle, test its properties
 		PixelCycle cycle = table.getCycle();
@@ -53,7 +53,7 @@ public class PixelConnectionTableTest {
 		island.addPixel(new Pixel(0,1));
 		island.addPixel(new Pixel(-1,2));
 		island.addPixel(new Pixel(0, 3));
-		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph table = PixelGraph.createGraph(island);
 		PixelCycle cycle = table.getCycle();
 		Assert.assertNull(cycle);
 		// no junctions
@@ -99,7 +99,7 @@ public class PixelConnectionTableTest {
 		island.addPixel(new Pixel(1, -1));
 		island.addPixel(new Pixel(2, -2));
 		island.addPixel(new Pixel(3, -3));
-		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph table = PixelGraph.createGraph(island);
 		PixelCycle cycle = table.getCycle();
 		Assert.assertNull(cycle);
 		List<PixelEdge> edgeList = table.getEdges();
@@ -140,7 +140,7 @@ public class PixelConnectionTableTest {
 		island.addPixel(new Pixel(-2,-4));
 		island.addPixel(new Pixel(3,-5));
 		island.addPixel(new Pixel(-3,-5));
-		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph table = PixelGraph.createGraph(island);
 		List<PixelEdge> edgeList = table.getEdges();
 		Assert.assertEquals(5, edgeList.size()); 
 		Assert.assertEquals("{(-3,-5)(-2,-4)(-1,-3)(0,-2)}/[(-3,-5), (0,-2)]", edgeList.get(0).toString());
@@ -187,7 +187,7 @@ public class PixelConnectionTableTest {
 		island.addPixel(new Pixel(3,6));
 		island.addPixel(new Pixel(-4,7));
 		island.addPixel(new Pixel(4,7));
-		PixelConnectionTable table = PixelConnectionTable.createConnectionTable(island);
+		PixelGraph table = PixelGraph.createGraph(island);
 		List<PixelEdge> edgeList = table.getEdges();
 		Assert.assertEquals(6, edgeList.size()); 
 		Assert.assertEquals("{(0,0)(0,1)(0,2)}/[(0,0), (0,2)]", edgeList.get(0).toString());
