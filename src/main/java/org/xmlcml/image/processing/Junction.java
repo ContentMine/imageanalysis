@@ -1,7 +1,5 @@
 package org.xmlcml.image.processing;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
@@ -67,8 +65,16 @@ public class Junction extends PixelNode {
 				junction = new Junction(centre, null);
 				junction.setType(Junction.Type.FOURPLUS);
 			}
+			if (junction != null) {
+				junction.setNeighbours(neighbours);
+			}
 		}
 		return junction;
+	}
+
+	private void setNeighbours(PixelList neighbours) {
+		this.neighbours = new PixelList();
+		this.neighbours.addAll(neighbours);
 	}
 
 	private void setType(Type type) {
@@ -107,6 +113,14 @@ public class Junction extends PixelNode {
 			circle.setFill("blue");
 			g.appendChild(circle);
 		}
+	}
+
+	public PixelList getNonJunctionPixels() {
+		PixelList nonJunctionPixelList = new PixelList();
+		for (Pixel neighbour : neighbours) {
+			nonJunctionPixelList.add(neighbour);
+		}
+		return nonJunctionPixelList;
 	}
 	
 

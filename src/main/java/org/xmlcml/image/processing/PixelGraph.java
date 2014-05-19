@@ -35,8 +35,9 @@ public class PixelGraph {
 	private Map<Pixel, Junction> junctionByPixelMap;
 	private Map<Pixel, TerminalNode> terminalNodeByPixelMap;
 	private Set<Pixel> usedNonNodePixelSet;
-
 	private SortedNodeSet activeNodeSet;
+	private Map<Junction, PixelNucleus> nucleusByJunctionMap;
+	private Set<PixelNucleus> nucleusSet;
 
 	public PixelGraph(PixelList pixelList, PixelIsland island) {
 		if (pixelList == null) {
@@ -78,6 +79,7 @@ public class PixelGraph {
 			usedNonNodePixelSet = new HashSet<Pixel>();
 			this.getTerminalNodeSet();
 			this.getJunctionSet();
+			this.createPixelNuclei();
 			if (pixelList.size() == 0) {
 				throw new RuntimeException("no pixels in island");
 			}
@@ -107,6 +109,46 @@ public class PixelGraph {
 		}
 	}
 
+	/** similar to floodfill 
+	 * 
+	 * add locally connected nodes.
+	 */
+	private Map<Junction, PixelNucleus> createPixelNuclei() {
+		nucleusByJunctionMap = new HashMap<Junction, PixelNucleus>();
+		Set<PixelNode> unusedNodes = new HashSet<PixelNode>();
+		nucleusSet = new HashSet<PixelNucleus>();
+		unusedNodes.addAll(junctionSet.getList());
+		while (!unusedNodes.isEmpty()) {
+			LOG.trace("unused "+unusedNodes.size());
+			// new nucleus, find next unused Junction
+			Junction nextNode = (Junction) unusedNodes.iterator().next();
+			unusedNodes.remove(nextNode);
+			Set<Junction> nucleusNodeSet = new HashSet<Junction>();
+			nucleusNodeSet.add(nextNode);
+			PixelNucleus nucleus = new PixelNucleus();
+			nucleusSet.add(nucleus);
+			while (!nucleusNodeSet.isEmpty()) {
+				LOG.trace("nucleus "+nucleusNodeSet.size()+" "+nucleusNodeSet);
+				nextNode = nucleusNodeSet.iterator().next();
+				nucleus.add(nextNode);
+				nucleusByJunctionMap.put(nextNode, nucleus);
+				nucleusNodeSet.remove(nextNode);
+				List<Junction> neighbourJunctions = getNeighbourJunctions(nextNode);
+				for (Junction neighbourJunction : neighbourJunctions) {
+					if (!nucleus.contains(neighbourJunction)) {
+						nucleusNodeSet.add(neighbourJunction);
+						unusedNodes.remove(neighbourJunction);
+					}
+				}
+			}
+		}
+		return nucleusByJunctionMap;
+	}
+	
+	public Map<Junction, PixelNucleus> getNucleusByJunctionMap() {
+		return nucleusByJunctionMap;
+	}
+
 	/**
 	 * take next unused neighbour as second pixel in edge
 	 * 
@@ -122,7 +164,7 @@ public class PixelGraph {
 		activeNodeSet = new SortedNodeSet();
 		activeNodeSet.addAll(terminalNodeSet.getList());
 		activeNodeSet.addAll(junctionSet.getList());
-		LOG.debug(terminalNodeSet+"\n"+junctionSet+"\n"+activeNodeSet);
+		LOG.trace("sets: "+terminalNodeSet+"\n"+junctionSet+"\n"+activeNodeSet);
 		PixelEdge lastEdge = null;
 		while (!activeNodeSet.isEmpty()) {
 			PixelNode startNode = activeNodeSet.iterator().next();
@@ -137,7 +179,7 @@ public class PixelGraph {
 			}
 			lastEdge = edge;
 			add(edge);
-			LOG.debug(">" + edge);
+			LOG.trace(">" + edge.getPixelList().size());
 			LOG.trace("nodeSet: " + activeNodeSet);
 			addNonNodePixelsInEdgeToNonNodeUsedSet(edge);
 			removeEndNodesIfNoUnusedNeighbours(edge);
@@ -241,7 +283,7 @@ public class PixelGraph {
 		PixelEdge edge = new PixelEdge(island);
 		PixelNode startNode = getPixelNode(startPixel);
 		edge.addStartNode(startNode);
-		LOG.debug("*** startNode: " + startNode+" current "+currentPixel);
+//		LOG.debug("*** startNode: " + startNode+" current "+currentPixel);
 		while (true) {
 			Pixel nextPixel = PixelGraph.getNextUnusedInEdge(currentPixel,
 					startPixel, island);
@@ -264,7 +306,7 @@ public class PixelGraph {
 			startPixel = currentPixel;
 			currentPixel = nextPixel;
 		}
-		LOG.debug("***");
+//		LOG.debug("***");
 		return edge;
 	}
 
@@ -362,6 +404,28 @@ public class PixelGraph {
 			}
 		}
 		return lowest;
+	}
+
+	public List<Junction> getNeighbourJunctions(Junction junction) {
+		List<Junction> junctionList = new ArrayList<Junction>();
+		PixelList neighbours = junction.getNeighbours();
+		if (neighbours != null) {
+			for (Pixel neighbour : neighbours) {
+				PixelNode pixelNode = getPixelNode(neighbour);
+				if (pixelNode instanceof Junction) {
+					junctionList.add((Junction)pixelNode);
+				}
+			}
+		}
+		return junctionList;
+	}
+
+	public PixelList getPixelList() {
+		return pixelList;
+	}
+	
+	public Set<PixelNucleus> getNucleusSet() {
+		return nucleusSet;
 	}
 
 }
