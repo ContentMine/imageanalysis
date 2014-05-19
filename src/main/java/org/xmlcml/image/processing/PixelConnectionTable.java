@@ -110,11 +110,10 @@ public class PixelConnectionTable {
 	/**
 	 * take next unused neighbour as second pixel in edge
 	 * 
-	 * @param start
+	 * @param start // seems to be surperfluous
 	 */
 	private void createEdges(PixelNode start) {
-		Pixel nextPixel = start.getNextUnusedNeighbour(usedNonNodePixelSet,
-				island);
+		this.getNextUnusedNonNodeNeighbour(start);
 		createEdges();
 	}
 
@@ -123,6 +122,8 @@ public class PixelConnectionTable {
 		activeNodeSet = new SortedNodeSet();
 		activeNodeSet.addAll(terminalNodeSet.getList());
 		activeNodeSet.addAll(junctionSet.getList());
+		LOG.debug(terminalNodeSet+"\n"+junctionSet+"\n"+activeNodeSet);
+		PixelEdge lastEdge = null;
 		while (!activeNodeSet.isEmpty()) {
 			PixelNode startNode = activeNodeSet.iterator().next();
 			LOG.trace("used0: " + usedNonNodePixelSet);
@@ -131,9 +132,12 @@ public class PixelConnectionTable {
 				LOG.trace("null edge from: " + startNode);
 				activeNodeSet.remove(startNode);
 				continue;
+			} else if (lastEdge != null && edge.toString().equals(lastEdge.toString())) {
+				throw new RuntimeException("BUG duplicate edge");
 			}
+			lastEdge = edge;
 			add(edge);
-			LOG.trace(">" + edge);
+			LOG.debug(">" + edge);
 			LOG.trace("nodeSet: " + activeNodeSet);
 			addNonNodePixelsInEdgeToNonNodeUsedSet(edge);
 			removeEndNodesIfNoUnusedNeighbours(edge);
@@ -147,7 +151,7 @@ public class PixelConnectionTable {
 			if (node == null) {
 				throw new RuntimeException("BUG null node: "+nodes.size());
 			}
-			if (node.getNextUnusedNeighbour(usedNonNodePixelSet, island) == null) {
+			if (this.getNextUnusedNonNodeNeighbour(node) == null) {
 				activeNodeSet.remove(node);
 				LOG.trace("inactivated node: " + node + " / " + activeNodeSet);
 			}
@@ -168,8 +172,7 @@ public class PixelConnectionTable {
 
 	private PixelEdge createEdge(PixelNode startNode) {
 		PixelEdge edge = null;
-		Pixel nextPixel = startNode.getNextUnusedNeighbour(usedNonNodePixelSet,
-				island);
+		Pixel nextPixel = this.getNextUnusedNonNodeNeighbour(startNode);
 		if (nextPixel != null) {
 			edge = iterateWhile2Connected(startNode.getCentrePixel(), nextPixel);
 		}
@@ -335,6 +338,29 @@ public class PixelConnectionTable {
 		s += "; nodes: " + (nodes == null ? "none" : nodes.toString());
 		s += "; cycle: " + (cycle == null ? "none" : cycle.toString());
 		return s;
+	}
+
+	/** get lowest unused neighbour pixel.
+	 * 
+	 * iterates over neighbours to find lowest unused pixel (pixel.compareTo())
+	 * 
+	 * @param pixelNode TODO
+	 * @param used
+	 * @param island
+	 * @return
+	 */
+	public Pixel getNextUnusedNonNodeNeighbour(PixelNode pixelNode) {
+		Pixel lowest = null;
+		for (Pixel neighbour : pixelNode.centrePixel.getNeighbours(island)) {
+			if (getPixelNode(neighbour) == null && !usedNonNodePixelSet.contains(neighbour)) {
+				if (lowest == null) {
+					lowest = neighbour;
+				} else if (neighbour.compareTo(lowest) < 0) {
+					lowest = neighbour;
+				}
+			}
+		}
+		return lowest;
 	}
 
 }

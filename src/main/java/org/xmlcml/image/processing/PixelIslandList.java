@@ -375,7 +375,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 */
 	public void removeStepsIteratively() {
 		for (PixelIsland island : list) {
+			LOG.debug("before remove steps "+island.size());
 			island.removeStepsIteratively();
+			LOG.debug("after remove steps "+island.size());
 		}
 	}
 

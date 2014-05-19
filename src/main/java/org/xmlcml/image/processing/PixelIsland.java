@@ -552,10 +552,13 @@ public class PixelIsland implements Iterable<Pixel> {
 		Set<Pixel> removed = new HashSet<Pixel>();
 		for (Pixel pixel : pixelList) {
 			if (removed.contains(pixel)) {
-				continue;
+				continue; 
 			}
 			PixelList pixelNeighbours = pixel.getNeighbours(this);
 			if (pixelNeighbours.size() == 3) { // could be step or tJunction
+				if (pixelList.size() == 384) {
+					LOG.debug("DEBUG "+pixelList.size());  // debugging
+				}
 				for (int i = 0; i < pixelNeighbours.size(); i++) {
 					Pixel pi = pixelNeighbours.get(i);
 					if (pi.isOrthogonalNeighbour(pixel)) {
@@ -565,6 +568,7 @@ public class PixelIsland implements Iterable<Pixel> {
 						Pixel pk = pixelNeighbours.get(k);
 						if (pj.isKnightsMove(pk, pi)) {
 							removed.add(pixel);
+							LOG.debug("removed: "+pixel);
 							// this.remove(pixel);
 						}
 					}

@@ -100,9 +100,9 @@ public class Junction extends PixelNode {
 		return neighbours;
 	}
 	
-	public static void drawJunctions(Set<Junction> tJunctionSet, SVGG g) {
-		for (Junction tJunction : tJunctionSet) {
-			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+	public static void drawJunctions(JunctionSet junctionSet, SVGG g) {
+		for (PixelNode junction : junctionSet) {
+			SVGCircle circle = new SVGCircle(new Real2(junction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
 			circle.setOpacity(0.4);
 			circle.setFill("blue");
 			g.appendChild(circle);

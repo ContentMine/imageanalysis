@@ -1,12 +1,10 @@
 package org.xmlcml.image.processing;
 
-import java.util.Set;
-
 import org.xmlcml.euclid.Int2;
 
 public abstract class PixelNode implements Comparable<PixelNode> {
 
-	private Pixel centrePixel; // pixel 1
+	Pixel centrePixel; // pixel 1
 
 	protected PixelNode() {
 		
@@ -31,28 +29,6 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 			compare = this.centrePixel.compareTo(centrePixel1);
 		}
 		return compare;
-	}
-	
-	/** get lowest unused neighbour pixel.
-	 * 
-	 * iterates over neighbours to find lowest unused pixel (pixel.compareTo())
-	 * 
-	 * @param used
-	 * @param island
-	 * @return
-	 */
-	public Pixel getNextUnusedNeighbour(Set<Pixel> used, PixelIsland island) {
-		Pixel lowest = null;
-		for (Pixel neighbour : centrePixel.getNeighbours(island)) {
-			if (!used.contains(neighbour)) {
-				if (lowest == null) {
-					lowest = neighbour;
-				} else if (neighbour.compareTo(lowest) < 0) {
-					lowest = neighbour;
-				}
-			}
-		}
-		return lowest;
 	}
 	
 	public String toString() {
