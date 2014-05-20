@@ -1,6 +1,7 @@
 package org.xmlcml.image.processing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +91,7 @@ public class Nucleus {
 					thinnedSet.retainAll(shell.getExpandedSet());
 					if (thinnedSet.size() != 0) {
 						LOG.trace("all shells overlap on iteration "+iteration+ "; size "+thinnedSet.size()+" spikes "+spikeSet.size());
-						getCentre(thinnedSet);
+						getNucleusCentre(thinnedSet);
 						anded = true;
 						break;
 					}
@@ -104,13 +105,9 @@ public class Nucleus {
 		return iteration;
 	}
 
-	public Real2 getCentre(Set<Pixel> pixels) {
+	public Real2 getNucleusCentre(Collection<Pixel> pixels) {
 		if (centre == null) {
-			Real2Array coords = new Real2Array();
-			for (Pixel pixel : pixels) {
-				coords.add(new Real2(pixel.getInt2()));
-			}
-			centre = coords.getMean();
+			centre = Pixel.getCentre(pixels);
 		}
 		return centre;
 	}
@@ -130,7 +127,7 @@ public class Nucleus {
 
 	public Real2 getCentre() {
 //		LOG.trace(pixelSet);
-		return getCentre(pixelSet);
+		return getNucleusCentre(pixelSet);
 	}
 	
 	@Override

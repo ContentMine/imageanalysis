@@ -97,21 +97,35 @@ public class ColorUtilities {
 			Raster raster = image.getRaster();
 			raster.getSampleModel();
 			int numData = raster.getNumDataElements();
-			if (numData != 3) {
-				throw new RuntimeException("I don't understand Raster yet "+numData);
-			}
-			int[] pix = new int[numData];
-			for (int i = 0; i <image.getWidth(); i++) {
-				for (int j = 0; j <image.getHeight(); j++) {
-					pix = raster.getPixel(i, j, pix);
-					for (int k = 0;k <pix.length; k++) {
-						int rgb = RGB_BLACK;
-						if (pix[0]+pix[1]+pix[2] == 0) {
-							rgb = RGB_WHITE;
+			if (numData == 1) {
+				int[] pix = new int[0];
+				for (int i = 0; i <image.getWidth(); i++) {
+					for (int j = 0; j <image.getHeight(); j++) {
+						int rgb = image.getRGB(i, j) & 0x00ffffff;
+						if (rgb == 0) {
+							rgb = 0xffffff;
+						} else if (rgb == 0xffffff) {
+							rgb = 0;
 						}
 						image.setRGB(i, j, rgb);
 					}
 				}
+			} else if (numData == 3) {
+				int[] pix = new int[numData];
+				for (int i = 0; i <image.getWidth(); i++) {
+					for (int j = 0; j <image.getHeight(); j++) {
+						pix = raster.getPixel(i, j, pix);
+						for (int k = 0;k <pix.length; k++) {
+							int rgb = RGB_BLACK;
+							if (pix[0]+pix[1]+pix[2] == 0) {
+								rgb = RGB_WHITE;
+							}
+							image.setRGB(i, j, rgb);
+						}
+					}
+				}
+			} else {
+				throw new RuntimeException("I don't understand Raster yet "+numData);
 			}
 		}
 	}

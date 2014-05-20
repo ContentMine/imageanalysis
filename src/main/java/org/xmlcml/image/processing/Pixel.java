@@ -2,6 +2,7 @@ package org.xmlcml.image.processing;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -244,4 +245,22 @@ public class Pixel {
 		}
 		return compare;
 	}
+	/** get mass centre of pixels with units weights.
+	 * 
+	 * @param pixels
+	 * @return mean or null if pixels is null or size 0
+	 */
+	public static Real2 getCentre(Collection<Pixel> pixels) {
+		Real2 centre = null;
+		if (pixels != null && pixels.size() > 0) {
+			Real2Array coords = new Real2Array();
+			for (Pixel pixel : pixels) {
+				coords.add(new Real2(pixel.getInt2()));
+			}
+			centre = coords.getMean();
+		}
+		return centre;
+	}
+
+
 }

@@ -1,5 +1,8 @@
 package org.xmlcml.image.processing;
 
+import java.util.Collection;
+import java.util.List;
+
 /** set of junctions
  * 
  * @author pm286
@@ -16,5 +19,6 @@ public class JunctionSet extends SortedNodeSet {
 		String s = list.toString();
 		return s;
 	}
-	
+
+
 }

@@ -908,6 +908,10 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public void removePixels(PixelPath pixelPath) {
 		PixelList pixelList = pixelPath.getPixelList();
+		removePixels(pixelList);
+	}
+
+	public void removePixels(PixelList pixelList) {
 		for (Pixel pixel : pixelList) {
 			this.remove(pixel);
 		}

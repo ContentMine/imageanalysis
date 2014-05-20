@@ -109,8 +109,8 @@ public class Junction extends PixelNode {
 	public static void drawJunctions(JunctionSet junctionSet, SVGG g) {
 		for (PixelNode junction : junctionSet) {
 			SVGCircle circle = new SVGCircle(new Real2(junction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
-			circle.setOpacity(0.4);
-			circle.setFill("blue");
+			circle.setOpacity(0.2);
+			circle.setFill("yellow");
 			g.appendChild(circle);
 		}
 	}

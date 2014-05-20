@@ -1,6 +1,7 @@
 package org.xmlcml.image.processing;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
@@ -61,6 +62,25 @@ public class SortedNodeSet implements Iterable<PixelNode> {
 	public void remove(PixelNode node) {
 		sortedSet.remove(node);
 	}
+	
+	public boolean contains(PixelNode node) {
+		return sortedSet.contains(node);
+	}
+	
+	public void removeAll(List<Junction> junctions) {
+		sortedSet.removeAll(junctions);
+	}
+
+	
+	public Collection<Pixel> getPixelList() {
+		List<PixelNode> nodes = getList();
+		List<Pixel> pixels = new ArrayList<Pixel>();
+		for (PixelNode node : nodes) {
+			pixels.add(node.getCentrePixel());
+		}
+		return pixels;
+	}
+	
 	
 	public String toString() {
 		return sortedSet.toString();

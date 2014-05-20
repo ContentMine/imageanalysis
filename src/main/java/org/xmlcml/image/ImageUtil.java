@@ -21,10 +21,16 @@ import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.processing.ColorUtilities;
 import org.xmlcml.image.processing.HilditchThinning;
 import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
+
+import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.struct.image.ImageUInt8;
 
 public class ImageUtil {
 	private final static Logger LOG = Logger.getLogger(ImageUtil.class);
@@ -68,6 +74,16 @@ public class ImageUtil {
 		return image;
 	}
 	
+	public static BufferedImage boofCVBinarization(BufferedImage image, int threshold) {
+		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
+		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
+		ThresholdImageOps.threshold(input, binary, threshold, true);
+		BufferedImage outputImage = VisualizeBinaryData.renderBinary(binary,null);
+		ColorUtilities.flipWhiteBlack(outputImage);
+		return outputImage;
+	}
+
+
 	/** extracts a subimage translated to 0,0.
 	 * 
 	 * @param image

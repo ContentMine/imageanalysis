@@ -48,38 +48,47 @@ public class PixelGraph {
 	}
 
 	/**
-	 * creates table and fills it.
+	 * creates graph and fills it.
 	 * 
 	 * @param island
 	 * @return
 	 */
 	public static PixelGraph createGraph(PixelIsland island) {
-		return island == null ? null : createConnectionTable(
+		return island == null ? null : createGraph(
 				island.getPixelList(), island);
 	}
 
 	/**
-	 * creates table and fills it.
+	 * creates graph and fills it.
 	 * 
 	 * @param pixelList
 	 * @param island
 	 * @return
 	 */
-	public static PixelGraph createConnectionTable(
+	public static PixelGraph createGraph(
 			PixelList pixelList, PixelIsland island) {
-		PixelGraph table = new PixelGraph(pixelList, island);
-		table.fillConnectionTable();
-		return table;
+		PixelGraph graph = new PixelGraph(pixelList, island);
+		LOG.trace("before graph");
+		graph.createGraph();
+		LOG.trace("after graph");
+		return graph;
 	}
 
-	private void fillConnectionTable() {
-		if (this.edges == null) {
-			this.edges = new ArrayList<PixelEdge>();
-			this.nodes = new ArrayList<PixelNode>();
+	private void createGraph() {
+		if (edges == null) {
+			edges = new ArrayList<PixelEdge>();
+			nodes = new ArrayList<PixelNode>();
 			usedNonNodePixelSet = new HashSet<Pixel>();
-			this.getTerminalNodeSet();
-			this.getJunctionSet();
-			this.createPixelNuclei();
+			getTerminalNodeSet();
+			getJunctionSet();
+			createPixelNuclei();
+			LOG.trace("pixelList: "+pixelList.size());
+			removeExtraneousPixelsFromNuclei();
+			LOG.debug("pixelList: "+pixelList.size());
+			createPixelNuclei(); // recompute with thinner graph
+			LOG.debug("junctions "+junctionSet.size());
+			removeExtraneousJunctionsFromNuclei();
+			LOG.debug("junctions "+junctionSet.size());
 			if (pixelList.size() == 0) {
 				throw new RuntimeException("no pixels in island");
 			}
@@ -109,6 +118,22 @@ public class PixelGraph {
 		}
 	}
 
+	private void removeExtraneousPixelsFromNuclei() {
+		for (PixelNucleus nucleus : nucleusSet) {
+			nucleus.removeExtraneousPixels();
+		}
+		junctionSet = null;
+		getJunctionSet();
+	}
+
+	private void removeExtraneousJunctionsFromNuclei() {
+		for (PixelNucleus nucleus : nucleusSet) {
+			List<Junction> junctions = nucleus.removeExtraneousJunctions();
+			junctionSet.removeAll(junctions);
+		}
+	}
+
+
 	/** similar to floodfill 
 	 * 
 	 * add locally connected nodes.
@@ -125,7 +150,7 @@ public class PixelGraph {
 			unusedNodes.remove(nextNode);
 			Set<Junction> nucleusNodeSet = new HashSet<Junction>();
 			nucleusNodeSet.add(nextNode);
-			PixelNucleus nucleus = new PixelNucleus();
+			PixelNucleus nucleus = new PixelNucleus(island);
 			nucleusSet.add(nucleus);
 			while (!nucleusNodeSet.isEmpty()) {
 				LOG.trace("nucleus "+nucleusNodeSet.size()+" "+nucleusNodeSet);
@@ -275,7 +300,7 @@ public class PixelGraph {
 	}
 
 	public PixelCycle getCycle() {
-		fillConnectionTable();
+		createGraph();
 		return cycle;
 	}
 
@@ -322,13 +347,14 @@ public class PixelGraph {
 	}
 
 	public JunctionSet getJunctionSet() {
-		fillConnectionTable();
+		createGraph();
 		if (junctionSet == null) {
 			junctionSet = new JunctionSet();
 			junctionByPixelMap = new HashMap<Pixel, Junction>();
 			for (Pixel pixel : pixelList) {
 				Junction junction = Junction.createJunction(pixel, island);
 				if (junction != null) {
+					LOG.trace(junction+"/"+pixel);
 					junctionSet.add(junction);
 					junctionByPixelMap.put(pixel, junction);
 				}
@@ -338,7 +364,7 @@ public class PixelGraph {
 	}
 
 	public TerminalNodeSet getTerminalNodeSet() {
-		fillConnectionTable();
+		createGraph();
 		if (terminalNodeSet == null) {
 			terminalNodeSet = new TerminalNodeSet();
 			terminalNodeByPixelMap = new HashMap<Pixel, TerminalNode>();
