@@ -71,7 +71,7 @@ public class ZernikeTest {
 			for (ZernikeMomentsOrig.Complex complex : complexArray) {
 				LOG.trace(title+": "+complex);
 			}
-			System.out.println();
+//			System.out.println();
 		}
 	}
 	

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.image.compound.PixelList;
 
 /**
@@ -22,8 +23,7 @@ import org.xmlcml.image.compound.PixelList;
  */
 public class PixelGraph {
 
-	private final static Logger LOG = Logger
-			.getLogger(PixelGraph.class);
+	private final static Logger LOG = Logger.getLogger(PixelGraph.class);
 
 	private List<PixelEdge> edges;
 	private List<PixelNode> nodes;
@@ -38,6 +38,10 @@ public class PixelGraph {
 	private SortedNodeSet activeNodeSet;
 	private Map<Junction, PixelNucleus> nucleusByJunctionMap;
 	private Set<PixelNucleus> nucleusSet;
+
+	private static long timecounter0;
+	private static long timecounter1;
+	private static long timecounter2;
 
 	public PixelGraph(PixelList pixelList, PixelIsland island) {
 		if (pixelList == null) {
@@ -54,8 +58,8 @@ public class PixelGraph {
 	 * @return
 	 */
 	public static PixelGraph createGraph(PixelIsland island) {
-		return island == null ? null : createGraph(
-				island.getPixelList(), island);
+		return island == null ? null : createGraph(island.getPixelList(),
+				island);
 	}
 
 	/**
@@ -65,8 +69,7 @@ public class PixelGraph {
 	 * @param island
 	 * @return
 	 */
-	public static PixelGraph createGraph(
-			PixelList pixelList, PixelIsland island) {
+	public static PixelGraph createGraph(PixelList pixelList, PixelIsland island) {
 		PixelGraph graph = new PixelGraph(pixelList, island);
 		LOG.trace("before graph");
 		graph.createGraph();
@@ -82,13 +85,13 @@ public class PixelGraph {
 			getTerminalNodeSet();
 			getJunctionSet();
 			createPixelNuclei();
-			LOG.trace("pixelList: "+pixelList.size());
+			LOG.trace("pixelList: " + pixelList.size());
 			removeExtraneousPixelsFromNuclei();
-			LOG.debug("pixelList: "+pixelList.size());
+			LOG.trace("pixelList: " + pixelList.size());
 			createPixelNuclei(); // recompute with thinner graph
-			LOG.debug("junctions "+junctionSet.size());
+			LOG.trace("junctions " + junctionSet.size());
 			removeExtraneousJunctionsFromNuclei();
-			LOG.debug("junctions "+junctionSet.size());
+			LOG.trace("junctions " + junctionSet.size());
 			if (pixelList.size() == 0) {
 				throw new RuntimeException("no pixels in island");
 			}
@@ -133,8 +136,8 @@ public class PixelGraph {
 		}
 	}
 
-
-	/** similar to floodfill 
+	/**
+	 * similar to floodfill
 	 * 
 	 * add locally connected nodes.
 	 */
@@ -144,7 +147,7 @@ public class PixelGraph {
 		nucleusSet = new HashSet<PixelNucleus>();
 		unusedNodes.addAll(junctionSet.getList());
 		while (!unusedNodes.isEmpty()) {
-			LOG.trace("unused "+unusedNodes.size());
+			LOG.trace("unused " + unusedNodes.size());
 			// new nucleus, find next unused Junction
 			Junction nextNode = (Junction) unusedNodes.iterator().next();
 			unusedNodes.remove(nextNode);
@@ -153,7 +156,8 @@ public class PixelGraph {
 			PixelNucleus nucleus = new PixelNucleus(island);
 			nucleusSet.add(nucleus);
 			while (!nucleusNodeSet.isEmpty()) {
-				LOG.trace("nucleus "+nucleusNodeSet.size()+" "+nucleusNodeSet);
+				LOG.trace("nucleus " + nucleusNodeSet.size() + " "
+						+ nucleusNodeSet);
 				nextNode = nucleusNodeSet.iterator().next();
 				nucleus.add(nextNode);
 				nucleusByJunctionMap.put(nextNode, nucleus);
@@ -169,7 +173,7 @@ public class PixelGraph {
 		}
 		return nucleusByJunctionMap;
 	}
-	
+
 	public Map<Junction, PixelNucleus> getNucleusByJunctionMap() {
 		return nucleusByJunctionMap;
 	}
@@ -177,7 +181,8 @@ public class PixelGraph {
 	/**
 	 * take next unused neighbour as second pixel in edge
 	 * 
-	 * @param start // seems to be surperfluous
+	 * @param start
+	 *            // seems to be surperfluous
 	 */
 	private void createEdges(PixelNode start) {
 		this.getNextUnusedNonNodeNeighbour(start);
@@ -189,26 +194,26 @@ public class PixelGraph {
 		activeNodeSet = new SortedNodeSet();
 		activeNodeSet.addAll(terminalNodeSet.getList());
 		activeNodeSet.addAll(junctionSet.getList());
-		LOG.trace("sets: "+terminalNodeSet+"\n"+junctionSet+"\n"+activeNodeSet);
+		LOG.trace("sets: " + terminalNodeSet + "\n" + junctionSet + "\n"
+				+ activeNodeSet);
 		PixelEdge lastEdge = null;
 		while (!activeNodeSet.isEmpty()) {
 			PixelNode startNode = activeNodeSet.iterator().next();
-			LOG.trace("used0: " + usedNonNodePixelSet);
 			PixelEdge edge = createEdge(startNode);
+			LOG.trace("created edge: ");
 			if (edge == null) {
 				LOG.trace("null edge from: " + startNode);
 				activeNodeSet.remove(startNode);
 				continue;
-			} else if (lastEdge != null && edge.toString().equals(lastEdge.toString())) {
+			} else if (lastEdge != null
+					&& edge.toString().equals(lastEdge.toString())) {
 				throw new RuntimeException("BUG duplicate edge");
 			}
 			lastEdge = edge;
+
 			add(edge);
-			LOG.trace(">" + edge.getPixelList().size());
-			LOG.trace("nodeSet: " + activeNodeSet);
 			addNonNodePixelsInEdgeToNonNodeUsedSet(edge);
 			removeEndNodesIfNoUnusedNeighbours(edge);
-			LOG.trace("usedNonNodePixels: " + usedNonNodePixelSet);
 		}
 	}
 
@@ -216,7 +221,7 @@ public class PixelGraph {
 		List<PixelNode> nodes = edge.getPixelNodes();
 		for (PixelNode node : nodes) {
 			if (node == null) {
-				throw new RuntimeException("BUG null node: "+nodes.size());
+				throw new RuntimeException("BUG null node: " + nodes.size());
 			}
 			if (this.getNextUnusedNonNodeNeighbour(node) == null) {
 				activeNodeSet.remove(node);
@@ -270,13 +275,19 @@ public class PixelGraph {
 	 * @param island
 	 * @return next pixel or null if no more or branch
 	 */
-	static Pixel getNextUnusedInEdge(Pixel current, Pixel last, PixelIsland island) {
+	static Pixel getNextUnusedInEdge(Pixel current, Pixel last,
+			PixelIsland island) {
 		Pixel next = null;
-//		if (current != null) {
-			PixelList neighbours = current.getNeighbours(island);
-			neighbours.remove(last);
-			next = neighbours.size() == 1 ? neighbours.get(0) : null;
-//		}
+		Long time0 = System.currentTimeMillis();
+		PixelList neighbours = current.getNeighbours(island);
+		Long time1 = System.currentTimeMillis();
+		neighbours.remove(last);
+		Long time2 = System.currentTimeMillis();
+		timecounter0 += (time1 - time0);
+		timecounter1 += (time2 - time1);
+		next = neighbours.size() == 1 ? neighbours.get(0) : null;
+		Long time3 = System.currentTimeMillis();
+		timecounter2 += (time3 - time2);
 		return next;
 	}
 
@@ -304,20 +315,19 @@ public class PixelGraph {
 		return cycle;
 	}
 
-	private PixelEdge iterateWhile2Connected(Pixel startPixel, Pixel currentPixel) {
+	private PixelEdge iterateWhile2Connected(Pixel startPixel,
+			Pixel currentPixel) {
 		PixelEdge edge = new PixelEdge(island);
 		PixelNode startNode = getPixelNode(startPixel);
 		edge.addStartNode(startNode);
-//		LOG.debug("*** startNode: " + startNode+" current "+currentPixel);
 		while (true) {
 			Pixel nextPixel = PixelGraph.getNextUnusedInEdge(currentPixel,
 					startPixel, island);
-			LOG.trace("current " + currentPixel + " next " + nextPixel + "/"
-					+ usedNonNodePixelSet + "/");
 			edge.addPixel(startPixel);
 			PixelNode nextNode = getPixelNode(nextPixel);
-			if ((nextNode != null && nextNode != startNode) ||
-				(nextPixel == null || usedNonNodePixelSet.contains(nextPixel))) {
+			if ((nextNode != null && nextNode != startNode)
+					|| (nextPixel == null || usedNonNodePixelSet
+							.contains(nextPixel))) {
 				LOG.trace("nextNode: " + nextNode);
 				edge.addPixel(currentPixel);
 				if (nextNode != null) {
@@ -331,7 +341,6 @@ public class PixelGraph {
 			startPixel = currentPixel;
 			currentPixel = nextPixel;
 		}
-//		LOG.debug("***");
 		return edge;
 	}
 
@@ -354,7 +363,6 @@ public class PixelGraph {
 			for (Pixel pixel : pixelList) {
 				Junction junction = Junction.createJunction(pixel, island);
 				if (junction != null) {
-					LOG.trace(junction+"/"+pixel);
 					junctionSet.add(junction);
 					junctionByPixelMap.put(pixel, junction);
 				}
@@ -409,11 +417,13 @@ public class PixelGraph {
 		return s;
 	}
 
-	/** get lowest unused neighbour pixel.
+	/**
+	 * get lowest unused neighbour pixel.
 	 * 
 	 * iterates over neighbours to find lowest unused pixel (pixel.compareTo())
 	 * 
-	 * @param pixelNode TODO
+	 * @param pixelNode
+	 *            TODO
 	 * @param used
 	 * @param island
 	 * @return
@@ -421,7 +431,8 @@ public class PixelGraph {
 	public Pixel getNextUnusedNonNodeNeighbour(PixelNode pixelNode) {
 		Pixel lowest = null;
 		for (Pixel neighbour : pixelNode.centrePixel.getNeighbours(island)) {
-			if (getPixelNode(neighbour) == null && !usedNonNodePixelSet.contains(neighbour)) {
+			if (getPixelNode(neighbour) == null
+					&& !usedNonNodePixelSet.contains(neighbour)) {
 				if (lowest == null) {
 					lowest = neighbour;
 				} else if (neighbour.compareTo(lowest) < 0) {
@@ -439,7 +450,7 @@ public class PixelGraph {
 			for (Pixel neighbour : neighbours) {
 				PixelNode pixelNode = getPixelNode(neighbour);
 				if (pixelNode instanceof Junction) {
-					junctionList.add((Junction)pixelNode);
+					junctionList.add((Junction) pixelNode);
 				}
 			}
 		}
@@ -449,9 +460,18 @@ public class PixelGraph {
 	public PixelList getPixelList() {
 		return pixelList;
 	}
-	
+
 	public Set<PixelNucleus> getNucleusSet() {
 		return nucleusSet;
+	}
+
+	public void createAndDrawGraph(SVGG g) {
+		JunctionSet junctionSet = getJunctionSet();
+		Junction.drawJunctions(junctionSet, g);
+		TerminalNodeSet endNodeSet = getTerminalNodeSet();
+		TerminalNode.drawEndNodes(endNodeSet, g);
+		Set<PixelNucleus> nucleusSet = getNucleusSet();
+		PixelNucleus.drawSet(nucleusSet, g);
 	}
 
 }
