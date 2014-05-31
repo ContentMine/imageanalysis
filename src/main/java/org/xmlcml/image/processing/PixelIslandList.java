@@ -197,7 +197,10 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public static PixelIslandList thinFillAndGetPixelIslandList(
 			BufferedImage image0, boolean binarize, Thinning thinning) {
-		int threshold = 128;
+//		int threshold = 192;
+//		int threshold = 64;
+		// this will need to be set adaptively
+		int threshold = 128; 
 		LOG.trace("processing ");
 		if (binarize) {
 //			 image0 = ImageUtil.binarize(image0);
@@ -205,6 +208,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			image0 = ImageUtil.boofCVBinarization(image0, threshold);
 			LOG.debug("binarized ");
 		}
+		// debug
 		ImageUtil.writeImageQuietly(image0, "target/pixel0.png");
 		BufferedImage image = ImageUtil.thin(image0, thinning);
 		LOG.trace("thinned ");
