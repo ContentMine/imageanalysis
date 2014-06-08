@@ -85,9 +85,9 @@ public class PixelGraph {
 			getTerminalNodeSet();
 			getJunctionSet();
 			createPixelNuclei();
-			LOG.trace("pixelList: " + pixelList.size());
+			LOG.debug("pixelList: " + pixelList.size());
 			removeExtraneousPixelsFromNuclei();
-			LOG.trace("pixelList: " + pixelList.size());
+			LOG.debug("pixelList after extraneous: " + pixelList.size());
 			createPixelNuclei(); // recompute with thinner graph
 			LOG.trace("junctions " + junctionSet.size());
 			removeExtraneousJunctionsFromNuclei();
@@ -207,7 +207,8 @@ public class PixelGraph {
 				continue;
 			} else if (lastEdge != null
 					&& edge.toString().equals(lastEdge.toString())) {
-				throw new RuntimeException("BUG duplicate edge");
+				LOG.error("BUG duplicate edge: "+edge);
+				break;
 			}
 			lastEdge = edge;
 

@@ -30,8 +30,10 @@ public class Junction extends PixelNode {
 	}
 
 	private Pixel stem; // pixel 4 of TJUNCTION
-	private PixelList neighbours;
+	PixelList neighbours;
 	private Type type = Type.UNKNOWN;
+	private boolean isDiagonalY;
+	private boolean isOrthogonalY;
 	
 	public Junction() {
 		
@@ -57,13 +59,13 @@ public class Junction extends PixelNode {
 				junction = new Junction(centre, stem);
 				if (stem != null) {
 					neighbours.remove(stem);
-					junction.setType(Junction.Type.TJUNCTION);
+					junction.setType(Type.TJUNCTION);
 				} else {
-					junction.setType(Junction.Type.YJUNCTION);
+					junction.setType(Type.YJUNCTION);
 				}
 			} else if (neighbours.size() > 3) {
 				junction = new Junction(centre, null);
-				junction.setType(Junction.Type.FOURPLUS);
+				junction.setType(Type.FOURPLUS);
 			}
 			if (junction != null) {
 				junction.setNeighbours(neighbours);
@@ -122,6 +124,29 @@ public class Junction extends PixelNode {
 		}
 		return nonJunctionPixelList;
 	}
-	
 
+	boolean processDiagonal(Pixel diagonalPixel, PixelList orthogonalPixels) {
+		isDiagonalY = false;
+		if (orthogonalPixels.size() == 2 
+				&& !diagonalPixel.isOrthogonalNeighbour(orthogonalPixels.get(0)) 
+				&& !diagonalPixel.isOrthogonalNeighbour(orthogonalPixels.get(1))) {
+				isDiagonalY = true;
+			}
+		return isDiagonalY;
+	}
+
+	boolean processOrthogonal(Pixel orthogonalPixel, PixelList diagonalPixels) {
+		isOrthogonalY = false;
+		if (diagonalPixels.size() == 2 
+			&& !orthogonalPixel.isOrthogonalNeighbour(diagonalPixels.get(0)) 
+			&& !orthogonalPixel.isOrthogonalNeighbour(diagonalPixels.get(1))) {
+			isOrthogonalY = true;
+		}
+		return isOrthogonalY;
+	}
+
+	public boolean isYJunction() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

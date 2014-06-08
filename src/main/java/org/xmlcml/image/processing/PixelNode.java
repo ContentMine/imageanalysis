@@ -1,6 +1,7 @@
 package org.xmlcml.image.processing;
 
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.image.compound.PixelList;
 
 public abstract class PixelNode implements Comparable<PixelNode> {
 
@@ -33,6 +34,14 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 	
 	public String toString() {
 		return centrePixel.toString();
+	}
+
+	public PixelList getDiagonalNeighbours(PixelIsland island) {
+		return centrePixel.getDiagonalNeighbours(island);
+	}
+
+	public PixelList getOrthogonalNeighbours(PixelIsland island) {
+		return centrePixel.getOrthogonalNeighbours(island);
 	}
 
 }

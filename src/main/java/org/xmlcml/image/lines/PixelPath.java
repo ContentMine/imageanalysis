@@ -56,11 +56,11 @@ public class PixelPath {
 	}
 
 	private void createLine() {
-		throw new RuntimeException("NYI");
+		throw new RuntimeException("createLine NYI");
 	}
 
 	private void createCycle() {
-		throw new RuntimeException("NYI");
+		throw new RuntimeException("createCycle NYI");
 	}
 
 	public void add(Pixel pixel) {

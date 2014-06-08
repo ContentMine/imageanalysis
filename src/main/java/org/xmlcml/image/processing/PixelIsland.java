@@ -77,6 +77,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Set<PixelCycle> circleSet;
 	private PixelGraph connectionTable;
 
+	private Set<Pixel> cornerSet;
+
 	public PixelIsland() {
 		this.pixelList = new PixelList();
 	}
@@ -158,7 +160,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public void createSpanningTree() {
 		this.getTerminalPixels();
-		throw new RuntimeException("NYI");
+		throw new RuntimeException("create spanning tree NYI");
 	}
 
 	public Map<Int2, Pixel> getPixelByCoordMap() {
@@ -552,7 +554,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		Set<Pixel> removed = new HashSet<Pixel>();
 		for (Pixel pixel : pixelList) {
 			if (removed.contains(pixel)) {
-				continue; 
+				continue;
 			}
 			PixelList pixelNeighbours = pixel.getNeighbours(this);
 			if (pixelNeighbours.size() == 3) { // could be step or tJunction
@@ -565,7 +567,7 @@ public class PixelIsland implements Iterable<Pixel> {
 						Pixel pk = pixelNeighbours.get(k);
 						if (pj.isKnightsMove(pk, pi)) {
 							removed.add(pixel);
-							LOG.trace("removed: "+pixel);
+							LOG.trace("removed: " + pixel);
 							// this.remove(pixel);
 						}
 					}
@@ -896,6 +898,7 @@ public class PixelIsland implements Iterable<Pixel> {
 				image.setRGB(x, y, 0xff000000);
 			}
 		}
+		LOG.debug("created image, size: "+pixelList.size());
 		return image;
 	}
 
@@ -1049,8 +1052,9 @@ public class PixelIsland implements Iterable<Pixel> {
 	public void removeStepsIteratively() {
 		while (true) {
 			Set<Pixel> removed = removeSteps();
-			if (removed.size() == 0)
+			if (removed.size() == 0) {
 				break;
+			}
 		}
 	}
 
@@ -1058,7 +1062,8 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixelList.iterator();
 	}
 
-	/** plots pixels onto SVGG with current (or default) colour.
+	/**
+	 * plots pixels onto SVGG with current (or default) colour.
 	 * 
 	 * @return
 	 */
@@ -1066,6 +1071,76 @@ public class PixelIsland implements Iterable<Pixel> {
 		return plotPixels(pixelList, pixelColor);
 	}
 
+	public void removeCorners() {
+		while (true) {
+			makeCornerSet();
+			if (cornerSet.size() == 0) break;
+			removeCornerSet();
+		}
+	}
 
+	/** this may be better or complementary to triangles;
+	 * 
+	 * finds all corners of form
+	 * 
+	 *    ++
+	 *    +
+	 *    
+	 */
+	private Set<Pixel> makeCornerSet() {
+		cornerSet = new HashSet<Pixel>();
+		for (Pixel pixel : this) {
+			PixelList orthogonalNeighbours = pixel.getOrthogonalNeighbours(this);
+			// two orthogonal at right angles?
+			if (orthogonalNeighbours.size() == 2) {
+				Pixel orthNeigh0 = orthogonalNeighbours.get(0);
+				Pixel orthNeigh1 = orthogonalNeighbours.get(1);
+				// corner?
+				if (orthNeigh0.isDiagonalNeighbour(orthNeigh1)) {
+					PixelList diagonalNeighbours = pixel.getDiagonalNeighbours(this);
+					// is this a diagonal Y-junction?
+					boolean add = true;
+					for (Pixel diagonalNeighbour : diagonalNeighbours) {
+						if (diagonalNeighbour.isKnightsMove(orthNeigh0) &&
+							diagonalNeighbour.isKnightsMove(orthNeigh1)) {
+								LOG.debug("skipped diagonal Y Junction: "+diagonalNeighbour+"/"+pixel+"/"+orthNeigh0+"//"+orthNeigh1);
+								add = false;
+								break; // Y-junction
+						}
+					}
+					if (add) {
+						cornerSet.add(pixel);
+					}
+				}
+			}
+		}
+		LOG.debug("cornerSet: "+cornerSet.size());
+		return cornerSet;
+	}
+	
+	/** removes all corners not next to each other.
+	 * 
+	 * in some cases may not take the same route and so may give different answers but the 
+	 * result should always have no corners.
+	 */
+	public void removeCornerSet() {
+		ensureCornerSet();
+		while (!cornerSet.isEmpty()) {
+			Pixel pixel = cornerSet.iterator().next();
+			PixelList neighbours = pixel.getNeighbours(this);
+			// remove neighbours from set - if they are corners, if not no-op
+			for (Pixel neighbour : neighbours) {
+				cornerSet.remove(neighbour);
+			}
+			cornerSet.remove(pixel);
+			this.remove(pixel);
+		}
+	}
+
+	private void ensureCornerSet() {
+		if (cornerSet == null) {
+			makeCornerSet();
+		}
+	}
 
 }

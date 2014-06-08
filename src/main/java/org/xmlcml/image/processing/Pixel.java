@@ -160,7 +160,7 @@ public class Pixel {
 	}
 
 	public void remove() {
-		throw new RuntimeException("NYI");
+		throw new RuntimeException("remove pixel NYI");
 	}
 
 	public void setInt2(Int2 int2) {
@@ -223,6 +223,12 @@ public class Pixel {
 		return Math.abs(vector.getX()) == 1 && Math.abs(vector.getY()) == 1;
 	}
 
+	public boolean isKnightsMove(Pixel pixel) {
+		Int2 vector = this.getInt2().subtract(pixel.getInt2());
+		return Math.abs(vector.getX()) + Math.abs(vector.getY()) == 3 &&
+				Math.abs(Math.abs(vector.getX()) - Math.abs(vector.getY())) == 1;
+	}
+
 	public boolean isKnightsMove(Pixel centre, Pixel target) {
 		boolean b1 = this.isOrthogonalNeighbour(centre) && centre.isDiagonalNeighbour(target);
 		boolean b2 = target.isOrthogonalNeighbour(centre) && centre.isDiagonalNeighbour(this);
@@ -245,6 +251,29 @@ public class Pixel {
 		}
 		return compare;
 	}
+	
+	PixelList getDiagonalNeighbours(PixelIsland island) {
+		PixelList neighbours = getNeighbours(island);
+		PixelList pixelList = new PixelList();
+		for (Pixel neighbour : neighbours) {
+			if (isDiagonalNeighbour(neighbour)) {
+				pixelList.add(neighbour);
+			}
+		}
+		return pixelList;
+	}
+
+	PixelList getOrthogonalNeighbours(PixelIsland island) {
+		PixelList neighbours = getNeighbours(island);
+		PixelList pixelList = new PixelList();
+		for (Pixel neighbour : neighbours) {
+			if (isOrthogonalNeighbour(neighbour)) {
+				pixelList.add(neighbour);
+			}
+		}
+		return pixelList;
+	}
+
 	/** get mass centre of pixels with units weights.
 	 * 
 	 * @param pixels

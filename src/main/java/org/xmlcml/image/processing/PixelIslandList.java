@@ -192,19 +192,18 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public static PixelIslandList thinFillAndGetPixelIslandList(
 			BufferedImage image0, Thinning thinning) {
-		return thinFillAndGetPixelIslandList(image0, false, thinning);
+		return thinFillAndGetPixelIslandList(image0, false, thinning, 128);
 	}
 
 	public static PixelIslandList thinFillAndGetPixelIslandList(
-			BufferedImage image0, boolean binarize, Thinning thinning) {
-//		int threshold = 192;
-//		int threshold = 64;
-		// this will need to be set adaptively
-		int threshold = 128; 
+			BufferedImage image0, Thinning thinning, int threshold) {
+		return thinFillAndGetPixelIslandList(image0, true, thinning, threshold);
+	}
+
+	public static PixelIslandList thinFillAndGetPixelIslandList(
+			BufferedImage image0, boolean binarize, Thinning thinning, int threshold) {
 		LOG.trace("processing ");
 		if (binarize) {
-//			 image0 = ImageUtil.binarize(image0);
-//			image0 = new HistogramEqualization(image0).histogramEqualization();
 			image0 = ImageUtil.boofCVBinarization(image0, threshold);
 			LOG.debug("binarized ");
 		}
@@ -218,6 +217,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		floodFill.fill();
 		LOG.trace("filled ");
 		PixelIslandList islandList = floodFill.getPixelIslandList();
+		LOG.debug("pixel island size: "+islandList.size());
 		islandList.setThinnedImage(image);
 		return islandList;
 	}
@@ -387,9 +387,19 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 */
 	public void removeStepsIteratively() {
 		for (PixelIsland island : list) {
-			LOG.trace("before remove steps "+island.size());
-			island.removeStepsIteratively();
-			LOG.trace("after remove steps "+island.size());
+			LOG.debug("before remove steps "+island.size());
+//			island.removeStepsIteratively();
+//			LOG.debug("after remove steps "+island.size());
+			if (island.size() > 6000) {
+				ImageUtil.writeImageQuietly(island.createImage(thinnedImage.getType()), new File("target/thin1.png"));
+			}
+			// may be better...
+			island.removeCorners();
+			LOG.debug("after remove corners "+island.size());
+			if (island.size() > 6000) {
+				BufferedImage image = island.createImage(thinnedImage.getType());
+				ImageUtil.writeImageQuietly(image, new File("target/thin2.png"));
+			}
 		}
 	}
 
