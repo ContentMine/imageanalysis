@@ -85,40 +85,53 @@ public class PixelGraph {
 			getTerminalNodeSet();
 			getJunctionSet();
 			createPixelNuclei();
-			LOG.debug("pixelList: " + pixelList.size());
 			removeExtraneousPixelsFromNuclei();
-			LOG.debug("pixelList after extraneous: " + pixelList.size());
 			createPixelNuclei(); // recompute with thinner graph
-			LOG.trace("junctions " + junctionSet.size());
 			removeExtraneousJunctionsFromNuclei();
-			LOG.trace("junctions " + junctionSet.size());
-			if (pixelList.size() == 0) {
-				throw new RuntimeException("no pixels in island");
-			}
-			if (pixelList.size() == 1) {
-				// single pixel - conventionally a cycle of 1
-				PixelCycle cycle = new PixelCycle(pixelList.get(0), island);
-				this.add(cycle);
-			} else if (this.terminalNodeSet.size() == 0) {
-				if (this.junctionSet.size() == 0) { // a circle?
-					PixelCycle cycle = this.createCycle();
-					if (cycle == null) {
-						throw new RuntimeException(
-								"Cannot create a single cycle");
-					}
-					this.add(cycle);
-				} else {
-					// start at arbitrary end node
-					Junction start = (Junction) junctionSet.iterator().next();
-					this.createEdges(start);
-				}
-			} else {
-				// start at arbitrary end node
-				TerminalNode start = (TerminalNode) terminalNodeSet.iterator()
-						.next();
-				this.createEdges(start);
-			}
+			
+			createGraphs();
 		}
+	}
+
+	private void createGraphs() {
+		if (pixelList.size() == 0) {
+			throw new RuntimeException("no pixels in island");
+		}
+		if (pixelList.size() == 1) {
+			createSinglePixelCycle();
+		} else if (this.terminalNodeSet.size() == 0) {
+			if (this.junctionSet.size() == 0) { // a circle?
+				createAndAddCycle();
+			} else {
+				createEdgesatArbitraryStart();
+			}
+		} else {
+			// start at arbitrary end node
+			TerminalNode start = (TerminalNode) terminalNodeSet.iterator()
+					.next();
+			this.createEdges(start);
+		}
+	}
+
+	private void createSinglePixelCycle() {
+		// single pixel - conventionally a cycle of 1
+		PixelCycle cycle = new PixelCycle(pixelList.get(0), island);
+		this.add(cycle);
+	}
+
+	private void createEdgesatArbitraryStart() {
+		// start at arbitrary end node
+		Junction start = (Junction) junctionSet.iterator().next();
+		this.createEdges(start);
+	}
+
+	private void createAndAddCycle() {
+		PixelCycle cycle = this.createCycle();
+		if (cycle == null) {
+			throw new RuntimeException(
+					"Cannot create a single cycle");
+		}
+		this.add(cycle);
 	}
 
 	private void removeExtraneousPixelsFromNuclei() {

@@ -146,7 +146,6 @@ public class Junction extends PixelNode {
 	}
 
 	public boolean isYJunction() {
-		// TODO Auto-generated method stub
-		return false;
+		return isDiagonalY || isOrthogonalY;
 	}
 }

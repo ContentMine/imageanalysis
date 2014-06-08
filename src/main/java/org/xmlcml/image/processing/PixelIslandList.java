@@ -387,18 +387,13 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 */
 	public void removeStepsIteratively() {
 		for (PixelIsland island : list) {
-			LOG.debug("before remove steps "+island.size());
 //			island.removeStepsIteratively();
-//			LOG.debug("after remove steps "+island.size());
-			if (island.size() > 6000) {
-				ImageUtil.writeImageQuietly(island.createImage(thinnedImage.getType()), new File("target/thin1.png"));
-			}
 			// may be better...
 			island.removeCorners();
-			LOG.debug("after remove corners "+island.size());
+			LOG.trace("after remove corners "+island.size());
 			if (island.size() > 6000) {
 				BufferedImage image = island.createImage(thinnedImage.getType());
-				ImageUtil.writeImageQuietly(image, new File("target/thin2.png"));
+//				ImageUtil.writeImageQuietly(image, new File("target/thin2.png"));
 			}
 		}
 	}

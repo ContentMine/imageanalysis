@@ -898,7 +898,7 @@ public class PixelIsland implements Iterable<Pixel> {
 				image.setRGB(x, y, 0xff000000);
 			}
 		}
-		LOG.debug("created image, size: "+pixelList.size());
+		LOG.trace("created image, size: " + pixelList.size());
 		return image;
 	}
 
@@ -1074,38 +1074,43 @@ public class PixelIsland implements Iterable<Pixel> {
 	public void removeCorners() {
 		while (true) {
 			makeCornerSet();
-			if (cornerSet.size() == 0) break;
+			if (cornerSet.size() == 0)
+				break;
 			removeCornerSet();
 		}
 	}
 
-	/** this may be better or complementary to triangles;
+	/**
+	 * this may be better or complementary to triangles;
 	 * 
 	 * finds all corners of form
 	 * 
-	 *    ++
-	 *    +
-	 *    
+	 * ++ +
+	 * 
 	 */
 	private Set<Pixel> makeCornerSet() {
 		cornerSet = new HashSet<Pixel>();
 		for (Pixel pixel : this) {
-			PixelList orthogonalNeighbours = pixel.getOrthogonalNeighbours(this);
+			PixelList orthogonalNeighbours = pixel
+					.getOrthogonalNeighbours(this);
 			// two orthogonal at right angles?
 			if (orthogonalNeighbours.size() == 2) {
 				Pixel orthNeigh0 = orthogonalNeighbours.get(0);
 				Pixel orthNeigh1 = orthogonalNeighbours.get(1);
 				// corner?
 				if (orthNeigh0.isDiagonalNeighbour(orthNeigh1)) {
-					PixelList diagonalNeighbours = pixel.getDiagonalNeighbours(this);
+					PixelList diagonalNeighbours = pixel
+							.getDiagonalNeighbours(this);
 					// is this a diagonal Y-junction?
 					boolean add = true;
 					for (Pixel diagonalNeighbour : diagonalNeighbours) {
-						if (diagonalNeighbour.isKnightsMove(orthNeigh0) &&
-							diagonalNeighbour.isKnightsMove(orthNeigh1)) {
-								LOG.debug("skipped diagonal Y Junction: "+diagonalNeighbour+"/"+pixel+"/"+orthNeigh0+"//"+orthNeigh1);
-								add = false;
-								break; // Y-junction
+						if (diagonalNeighbour.isKnightsMove(orthNeigh0)
+								&& diagonalNeighbour.isKnightsMove(orthNeigh1)) {
+							LOG.trace("skipped diagonal Y Junction: "
+									+ diagonalNeighbour + "/" + pixel + "/"
+									+ orthNeigh0 + "//" + orthNeigh1);
+							add = false;
+							break; // Y-junction
 						}
 					}
 					if (add) {
@@ -1114,14 +1119,14 @@ public class PixelIsland implements Iterable<Pixel> {
 				}
 			}
 		}
-		LOG.debug("cornerSet: "+cornerSet.size());
 		return cornerSet;
 	}
-	
-	/** removes all corners not next to each other.
+
+	/**
+	 * removes all corners not next to each other.
 	 * 
-	 * in some cases may not take the same route and so may give different answers but the 
-	 * result should always have no corners.
+	 * in some cases may not take the same route and so may give different
+	 * answers but the result should always have no corners.
 	 */
 	public void removeCornerSet() {
 		ensureCornerSet();
