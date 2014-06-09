@@ -1,6 +1,7 @@
 package org.xmlcml.image.processing;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
@@ -110,7 +111,13 @@ public class Junction extends PixelNode {
 	
 	public static void drawJunctions(JunctionSet junctionSet, SVGG g) {
 		for (PixelNode junction : junctionSet) {
-			SVGCircle circle = new SVGCircle(new Real2(junction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+			LOG.trace("DrawJunctions");
+			Pixel centrePixel = junction.getCentrePixel();
+			SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+			if (((Junction)junction).isYJunction()) {
+				LOG.debug("ISY");
+				circle.setStrokeWidth(1.);
+			}
 			circle.setOpacity(0.2);
 			circle.setFill("yellow");
 			g.appendChild(circle);
@@ -137,10 +144,19 @@ public class Junction extends PixelNode {
 
 	boolean processOrthogonal(Pixel orthogonalPixel, PixelList diagonalPixels) {
 		isOrthogonalY = false;
-		if (diagonalPixels.size() == 2 
-			&& !orthogonalPixel.isOrthogonalNeighbour(diagonalPixels.get(0)) 
-			&& !orthogonalPixel.isOrthogonalNeighbour(diagonalPixels.get(1))) {
-			isOrthogonalY = true;
+		if (diagonalPixels.size() == 2) {
+			Pixel diag0 = diagonalPixels.get(0);
+			Pixel diag1 = diagonalPixels.get(1);
+			Int2 delta = diag0.getInt2().subtract(diag1.getInt2());
+			if ((Math.abs(delta.getX()) == 2 && Math.abs(delta.getY()) == 0) ||
+					(Math.abs(delta.getX()) == 0 || Math.abs(delta.getY()) == 2)) {
+				if (orthogonalPixel.isKnightsMove(diag0) 
+				    && orthogonalPixel.isKnightsMove(diag1)) {
+					isOrthogonalY = true;
+				}
+			} else {
+				LOG.debug("bad diag");
+			}
 		}
 		return isOrthogonalY;
 	}

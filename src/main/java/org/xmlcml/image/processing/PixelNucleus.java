@@ -187,7 +187,7 @@ public class PixelNucleus {
 		Junction centreJunction = findCentreJunction(centre);
 		List<Junction> removedJunctionList = new ArrayList<Junction>();
 		if (centreJunction == null) {
-			throw new RuntimeException("YJunctions should not be here");
+			LOG.debug("YJunctions should not be here");
 		} else {
 			removedJunctionList = processTJunctions(centreJunction);
 			LOG.trace("removed: "+removedJunctionList.size());
