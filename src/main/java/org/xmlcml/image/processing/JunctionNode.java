@@ -19,9 +19,9 @@ import org.xmlcml.image.compound.PixelList;
  * @author pm286
  *
  */
-public class Junction extends PixelNode {
+public class JunctionNode extends PixelNode {
 	
-	private final static Logger LOG = Logger.getLogger(Junction.class);
+	private final static Logger LOG = Logger.getLogger(JunctionNode.class);
 
 	private enum Type {
 		FOURPLUS, // four or more - may be reducible
@@ -36,11 +36,11 @@ public class Junction extends PixelNode {
 	private boolean isDiagonalY;
 	private boolean isOrthogonalY;
 	
-	public Junction() {
+	public JunctionNode() {
 		
 	}
 
-	public Junction(Pixel centre, Pixel stem) {
+	public JunctionNode(Pixel centre, Pixel stem) {
 		super(centre);
 		this.stem  = stem;
 	}
@@ -51,13 +51,13 @@ public class Junction extends PixelNode {
 	 * @param centre
 	 * @return null if not a Junction
 	 */
-	public static Junction createJunction(Pixel centre, PixelIsland island) {
-		Junction junction = null;
+	public static JunctionNode createJunction(Pixel centre, PixelIsland island) {
+		JunctionNode junction = null;
 		if (centre != null) {
 			PixelList neighbours = new PixelList(centre.getNeighbours(island));
 			if (neighbours.size() == 3) {
-				Pixel stem = Junction.getStem(centre, neighbours, island);
-				junction = new Junction(centre, stem);
+				Pixel stem = JunctionNode.getStem(centre, neighbours, island);
+				junction = new JunctionNode(centre, stem);
 				if (stem != null) {
 					neighbours.remove(stem);
 					junction.setType(Type.TJUNCTION);
@@ -65,7 +65,7 @@ public class Junction extends PixelNode {
 					junction.setType(Type.YJUNCTION);
 				}
 			} else if (neighbours.size() > 3) {
-				junction = new Junction(centre, null);
+				junction = new JunctionNode(centre, null);
 				junction.setType(Type.FOURPLUS);
 			}
 			if (junction != null) {
@@ -109,12 +109,12 @@ public class Junction extends PixelNode {
 		return neighbours;
 	}
 	
-	public static void drawJunctions(JunctionSet junctionSet, SVGG g) {
+	public static void drawJunctions(JunctionSet junctionSet, SVGG g, double size) {
 		for (PixelNode junction : junctionSet) {
 			LOG.trace("DrawJunctions");
 			Pixel centrePixel = junction.getCentrePixel();
-			SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), 3.);
-			if (((Junction)junction).isYJunction()) {
+			SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), size);
+			if (((JunctionNode)junction).isYJunction()) {
 				LOG.debug("ISY");
 				circle.setStrokeWidth(1.);
 			}

@@ -218,7 +218,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(6, graph.getPixelList().size());
 		Assert.assertEquals(4, graph.getJunctionSet().size());
-		Map<Junction, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
+		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
 		Assert.assertEquals(4, nucleusByJunctionMap.size());
 		Set<PixelNucleus> nucleusSet = graph.getNucleusSet();
 		Assert.assertEquals(1, nucleusSet.size());
@@ -239,7 +239,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(7, graph.getPixelList().size());
 		Assert.assertEquals(5, graph.getJunctionSet().size());
-		Map<Junction, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
+		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
 		Assert.assertEquals(5, nucleusByJunctionMap.size());
 		Set<PixelNucleus> nucleusSet = graph.getNucleusSet();
 		Assert.assertEquals(1, nucleusSet.size());
@@ -265,7 +265,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(12, graph.getPixelList().size());
 		Assert.assertEquals(9, graph.getJunctionSet().size());
-		Map<Junction, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
+		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
 		Assert.assertEquals(9, nucleusByJunctionMap.size());
 		Set<PixelNucleus> nucleusSet = graph.getNucleusSet();
 		Assert.assertEquals(2, nucleusSet.size());

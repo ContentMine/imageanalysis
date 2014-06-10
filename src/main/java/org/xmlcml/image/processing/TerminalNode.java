@@ -30,9 +30,9 @@ public class TerminalNode extends PixelNode {
 		this.neighbour = neighbour;
 	}
 
-	public static void drawEndNodes(TerminalNodeSet endNodeSet, SVGG g) {
+	public static void drawEndNodes(TerminalNodeSet endNodeSet, SVGG g, double rad) {
 		for (PixelNode endNode : endNodeSet) {
-			SVGCircle circle = new SVGCircle(new Real2(endNode.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+			SVGCircle circle = new SVGCircle(new Real2(endNode.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), rad);
 			circle.setOpacity(0.4);
 			circle.setFill("orange");
 			g.appendChild(circle);

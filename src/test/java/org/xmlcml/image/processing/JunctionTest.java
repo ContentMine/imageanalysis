@@ -62,9 +62,9 @@ public class JunctionTest {
 	public void testFindJunctions() throws IOException {
 		PixelIsland island = createIsland1();
 		PixelGraph connectionTable = PixelGraph.createGraph(island);
-		Assert.assertNull("00", Junction.createJunction(p1_00, island));
-		Assert.assertNotNull("10", Junction.createJunction(p1_10, island));
-		Assert.assertNull("20", Junction.createJunction(p1_20, island));
+		Assert.assertNull("00", JunctionNode.createJunction(p1_00, island));
+		Assert.assertNotNull("10", JunctionNode.createJunction(p1_10, island));
+		Assert.assertNull("20", JunctionNode.createJunction(p1_20, island));
 		
 		// check all this
 //		Assert.assertNull("11", Junction.createJunction(p1_11, island));
