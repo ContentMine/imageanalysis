@@ -1,5 +1,6 @@
 package org.xmlcml.image.compound;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -140,6 +141,27 @@ public class PixelList implements Iterable<Pixel> {
 
 	public void reverse() {
 		Collections.reverse(list);
+	}
+
+	/** create PixelList from all pixels with given value.
+	 * 
+	 * @param image1
+	 * @param colorValue
+	 * @return
+	 */
+	public static PixelList createPixelList(BufferedImage image, int colorValue) {
+		PixelList list = new PixelList();
+		int width = image.getWidth();
+		int height = image.getHeight();
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				int rgb = image.getRGB(i, j) & 0x00ffffff;
+				if (rgb == colorValue) {
+					list.add(new Pixel(i, j));
+				}
+			}
+		}
+		return list;
 	}
 
 }

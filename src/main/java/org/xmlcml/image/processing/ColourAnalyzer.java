@@ -45,7 +45,7 @@ public class ColourAnalyzer {
 		this.xyRange = new Int2Range(new IntRange(0, width), new IntRange(0, height));
 	}
 	
-	public Multiset<Integer> createColorMap() {
+	public Multiset<Integer> createColorSet() {
 		IntRange xRange = xyRange.getXRange();
 		IntRange yRange = xyRange.getYRange();
 		for (int jy = yRange.getMin(); jy <= yRange.getMax(); jy++) {
@@ -53,6 +53,20 @@ public class ColourAnalyzer {
 				int color = image.getRGB(ix, jy);
 				if (fourbits) {
 					color = color & 0xF0F0F0;
+				}
+				colorSet.add(color);
+			}
+		}
+		return colorSet;
+	}
+
+	public Multiset<Integer> createColorSetNew() {
+		for (int jy = 0; jy < image.getHeight(); jy++) {
+			for (int ix = 0; ix < image.getWidth(); ix++) {
+				int color = image.getRGB(ix, jy);
+				String s = Integer.toHexString(color);
+				if (!s.equals("ffffffff") && !s.equals("ff3366ff")) {
+//					System.out.println(">>"+s);
 				}
 				colorSet.add(color);
 			}
@@ -73,6 +87,7 @@ public class ColourAnalyzer {
 	}
 
 	public Multiset<Integer> getColorSet() {
+		createColorSetNew();
 		return colorSet;
 	}
 

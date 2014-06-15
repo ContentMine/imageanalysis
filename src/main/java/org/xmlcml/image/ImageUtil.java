@@ -3,6 +3,7 @@ package org.xmlcml.image;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -326,5 +327,69 @@ public class ImageUtil {
 		return image;
 	}
 
+	/** flatten colours in image.
+	 * 
+	 * uses ImageUtil.flattenPixel
+	 * 
+	 * creates nvalues of single colour with min 0 and max 255. thus  
+	 * 
+	 * @param image
+	 * @param nvalues number of discrete (integer) values of r or g or b. 
+ 	 *        currently 2, 4, 8, 16, 32, 64, 128 (maybe alter this later)
+	 */
+	public static BufferedImage flattenImage(BufferedImage image, int nvalues) {
+
+		if (nvalues != 2 && nvalues != 4 && nvalues != 8 && nvalues != 16 &&
+		    nvalues != 32 && nvalues != 64 && nvalues != 128) {
+			throw new RuntimeException("Bad value of nvalues, should be power of 2 within 2 - 128");
+		}
+		int delta = 256 / nvalues;
+		int width = image.getWidth();
+		int height = image.getHeight();
+		BufferedImage image1 = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				image1.setRGB(i, j, 0);
+				flattenPixel(image, i, j, delta, image1);
+			}
+		}
+		return image1;
+	}
+
+	/** flattens pixel to range of values.
+	 * 
+	 * @param image
+	 * @param i
+	 * @param j
+	 * @param delta distance between values (power of 2)
+	 */
+	public static void flattenPixel(BufferedImage image, int i, int j, int delta, BufferedImage image1) {
+		int rgb = image.getRGB(i, j);
+		int a = 0;
+		int r = (rgb & 0x00ff0000) >> 16;
+		int g = (rgb & 0x0000ff00) >> 8;
+		int b = (rgb & 0x000000ff);
+		
+		r = flattenChannel(r, delta);
+		g = flattenChannel(g, delta);
+		b = flattenChannel(b, delta);
+		
+		int col = /*(a << 24) | */ (r << 16) | (g << 8) | b;
+		image1.setRGB(i, j, col);
+	}
+
+	/**
+	 * 
+	 * @param r r/g/b channel (0-255)
+	 * @param delta distance between allowed values (power of 2)
+	 * @return nearest fencepost value (0 - 255) at intervals of delta
+	 */
+	public static int flattenChannel(int r, int delta) {
+		int rr = r + delta/2; // round to nearest fencepost
+		rr = (rr / delta) * delta;
+		return rr == 0 ? 0 : rr - 1;
+	}
+
+	
 
 }

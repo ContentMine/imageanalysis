@@ -30,7 +30,7 @@ public class ColorAnalyzerTest {
 		analyzer.setXYRange(new Int2Range(new IntRange(0, 300), new IntRange(50, 300)));
 		LOG.trace(analyzer.getWidth()+"/"+analyzer.getHeight());
 		analyzer.set4Bits(true);
-		Multiset<Integer> colorSet = analyzer.createColorMap();
+		Multiset<Integer> colorSet = analyzer.createColorSet();
 		for (Entry entry : colorSet.entrySet()) {
 			if (entry.getCount() < 10) continue;
 			int ll = (Integer)entry.getElement();
