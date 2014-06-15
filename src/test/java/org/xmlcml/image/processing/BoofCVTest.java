@@ -7,12 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.xmlcml.euclid.IntArray;
-import org.xmlcml.euclid.IntSet;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.compound.PixelList;
+import org.xmlcml.image.Fixtures;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -25,14 +20,10 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multiset.Entry;
-
 public class BoofCVTest {
 
 	private static Logger LOG = Logger.getLogger(BoofCVTest.class);
 
-	private static final String IMAGE_PROCESSING = "src/test/resources/org/xmlcml/image/processing/";
 	private File BOOFCV_OUT_DIR;
 	
 	
@@ -43,7 +34,7 @@ public class BoofCVTest {
 	}
 	@Test
 	public void testInt2() {
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 imageInt2 = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		BufferedImage outImage = ConvertBufferedImage.convertTo(imageInt2,null);
 		UtilImageIO.saveImage(outImage, new File(BOOFCV_OUT_DIR, "postermol.png").toString());
@@ -51,7 +42,7 @@ public class BoofCVTest {
 
 	@Test
 	public void testBinarize() {
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
@@ -86,7 +77,7 @@ public class BoofCVTest {
 	@Test
 	public void testMoreBinary() {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
  
 		// convert into a usable format
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
@@ -130,7 +121,7 @@ public class BoofCVTest {
  
 	@Test
 	public void testBlobs() {
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
@@ -148,93 +139,6 @@ public class BoofCVTest {
 //		Detect and label blobs in the binary image using a 4-connect rule. blobs is an image of type ImageSInt32.
 //		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);	
 	}
-	
-	@Test
-	public void testPosterize() {
-		int nvalues = 4; // i.e. 16-bit color
-		nvalues = 2;
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"phylo.jpg");
-		ImageUtil.flattenImage(image, nvalues);
-		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(image);
-		Multiset<Integer> set = colorAnalyzer.getColorSet();
-		for (Entry<Integer> entry : set.entrySet()) {
-			int ii = ((int) entry.getElement()) & 0x00ffffff;
-			// uncomment for debug
-//			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount()); 
-		}
-		/**
-		    ff  26      BLUE
-		  7f7f  351     cyan
-		7f7f7f  34019   grey
-		7fffff  80      cyanw
-		  7fff  49      cyan
-		    7f  2301    blue
-		7fff7f  586     greenw
-		7f7fff  102006  cyanw
-		7f007f  27      magenta
-		     0  25578   BLACK
-		ffff7f  40      yellow
-		ff7fff  37      magenta
-		7f0000  2863    red
-		  7f00  489     green
-		ff7f7f  1562    redw
-		7f7f00  1676    yellow
-		ffffff  937110  white
-		*/
-
-		ImageUtil.writeImageQuietly(image, new File("target/posterize.png"));
-	}
-	
-	@Test
-	public void testPosterize22249() {
-		int nvalues = 4; // i.e. 16-bit color
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"22249.png");
-		BufferedImage image1 = ImageUtil.flattenImage(image, nvalues);
-		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(image1);
-		Multiset<Integer> set = colorAnalyzer.getColorSet();
-		LOG.trace(set.entrySet().size());
-		IntArray colorValues = new IntArray();
-		IntArray colorCount = new IntArray();
-		for (Entry<Integer> entry : set.entrySet()) {
-			int ii = ((int) entry.getElement()) & 0x00ffffff;
-			colorValues.addElement(ii);
-			colorCount.addElement(entry.getCount());
-		}
-		IntSet index = colorCount.indexSortDescending();
-		for (int ii = 0; ii < index.size(); ii++) {
-			int idx = index.elementAt(ii);
-			int colorValue = colorValues.elementAt(idx);
-			String hex = Integer.toHexString(colorValue);
-			PixelList pixelList = PixelList.createPixelList(image1, colorValue);
-			// plot some images
-			if (ii > 0 && ii < 4) {
-				SVGG g = new SVGG();
-				pixelList.plotPixels(g, "#"+hex);
-				SVGSVG.wrapAndWriteAsSVG(g, new File("target/"+hex+".svg"));
-			}
-			LOG.trace("size "+pixelList.size());
-		}
-
-		ImageUtil.writeImageQuietly(image1, new File("target/22249.png"));
-	}
-	
-	@Test
-	public void testPosterize36933() {
-		int nvalues = 4; // i.e. 16-bit color
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"36933.png");
-		BufferedImage imageNew = ImageUtil.flattenImage(image, nvalues);
-		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(imageNew);
-		Multiset<Integer> set = colorAnalyzer.getColorSet();
-		for (Entry<Integer> entry : set.entrySet()) {
-			int ii = ((int) entry.getElement()) & 0x00ffffff;
-			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount());
-		}
-
-		ImageUtil.writeImageQuietly(imageNew, new File("target/36933.png"));
-	}
-	
-
-	// ====================================
 	
 	private static void outputBinary(ImageUInt8 image, File file) {
 		BufferedImage binaryImage = VisualizeBinaryData.renderBinary(image,null);
