@@ -336,6 +336,7 @@ public class ImageUtil {
 	 * @param image
 	 * @param nvalues number of discrete (integer) values of r or g or b. 
  	 *        currently 2, 4, 8, 16, 32, 64, 128 (maybe alter this later)
+ 	 * @return new BufferedImage
 	 */
 	public static BufferedImage flattenImage(BufferedImage image, int nvalues) {
 
@@ -365,7 +366,6 @@ public class ImageUtil {
 	 */
 	public static void flattenPixel(BufferedImage image, int i, int j, int delta, BufferedImage image1) {
 		int rgb = image.getRGB(i, j);
-		int a = 0;
 		int r = (rgb & 0x00ff0000) >> 16;
 		int g = (rgb & 0x0000ff00) >> 8;
 		int b = (rgb & 0x000000ff);
@@ -374,7 +374,7 @@ public class ImageUtil {
 		g = flattenChannel(g, delta);
 		b = flattenChannel(b, delta);
 		
-		int col = /*(a << 24) | */ (r << 16) | (g << 8) | b;
+		int col = (r << 16) | (g << 8) | b;
 		image1.setRGB(i, j, col);
 	}
 

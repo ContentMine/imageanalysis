@@ -217,7 +217,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		floodFill.fill();
 		LOG.trace("filled ");
 		PixelIslandList islandList = floodFill.getPixelIslandList();
-		LOG.debug("pixel island size: "+islandList.size());
+		LOG.trace("pixel island size: "+islandList.size());
 		islandList.setThinnedImage(image);
 		return islandList;
 	}

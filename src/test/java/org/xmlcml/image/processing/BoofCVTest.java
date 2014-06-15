@@ -86,7 +86,6 @@ public class BoofCVTest {
 	@Test
 	public void testMoreBinary() {
 		// load and convert the image into a usable format
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
 		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
  
 		// convert into a usable format
@@ -158,10 +157,10 @@ public class BoofCVTest {
 		ImageUtil.flattenImage(image, nvalues);
 		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(image);
 		Multiset<Integer> set = colorAnalyzer.getColorSet();
-		LOG.debug(set.entrySet().size());
 		for (Entry<Integer> entry : set.entrySet()) {
 			int ii = ((int) entry.getElement()) & 0x00ffffff;
-			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount());
+			// uncomment for debug
+//			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount()); 
 		}
 		/**
 		    ff  26      BLUE
@@ -193,7 +192,7 @@ public class BoofCVTest {
 		BufferedImage image1 = ImageUtil.flattenImage(image, nvalues);
 		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(image1);
 		Multiset<Integer> set = colorAnalyzer.getColorSet();
-		LOG.debug(set.entrySet().size());
+		LOG.trace(set.entrySet().size());
 		IntArray colorValues = new IntArray();
 		IntArray colorCount = new IntArray();
 		for (Entry<Integer> entry : set.entrySet()) {
@@ -206,14 +205,14 @@ public class BoofCVTest {
 			int idx = index.elementAt(ii);
 			int colorValue = colorValues.elementAt(idx);
 			String hex = Integer.toHexString(colorValue);
-			System.out.println(Integer.toHexString(colorValue)+"/"+colorCount.elementAt(idx));
 			PixelList pixelList = PixelList.createPixelList(image1, colorValue);
-			if (ii > 0) {
+			// plot some images
+			if (ii > 0 && ii < 4) {
 				SVGG g = new SVGG();
 				pixelList.plotPixels(g, "#"+hex);
 				SVGSVG.wrapAndWriteAsSVG(g, new File("target/"+hex+".svg"));
 			}
-			LOG.debug("size "+pixelList.size());
+			LOG.trace("size "+pixelList.size());
 		}
 
 		ImageUtil.writeImageQuietly(image1, new File("target/22249.png"));
@@ -222,27 +221,20 @@ public class BoofCVTest {
 	@Test
 	public void testPosterize36933() {
 		int nvalues = 4; // i.e. 16-bit color
-		nvalues = 2;
 		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"36933.png");
-		ImageUtil.flattenImage(image, nvalues);
-		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(image);
+		BufferedImage imageNew = ImageUtil.flattenImage(image, nvalues);
+		ColourAnalyzer colorAnalyzer = new ColourAnalyzer(imageNew);
 		Multiset<Integer> set = colorAnalyzer.getColorSet();
-		LOG.debug(set.entrySet().size());
 		for (Entry<Integer> entry : set.entrySet()) {
 			int ii = ((int) entry.getElement()) & 0x00ffffff;
 			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount());
 		}
 
-		ImageUtil.writeImageQuietly(image, new File("target/36933.png"));
+		ImageUtil.writeImageQuietly(imageNew, new File("target/36933.png"));
 	}
 	
 
 	// ====================================
-	
-//	private static void outputRaw(ImageUInt8 image, File file) {
-//		BufferedImage out = ConvertBufferedImage.convertTo(image,null);
-//		UtilImageIO.saveImage(out, file.toString());
-//	}
 	
 	private static void outputBinary(ImageUInt8 image, File file) {
 		BufferedImage binaryImage = VisualizeBinaryData.renderBinary(image,null);
