@@ -95,6 +95,11 @@ public class ColorAnalyzerTest {
 	}
 
 	@Test
+	public void testPosterizeSpect2() throws IOException {
+		testPosterize0("spect2");
+	}
+
+	@Test
 	public void testPosterizeSpect5() throws IOException {
 		testPosterize0("spect5");
 	}
@@ -110,6 +115,8 @@ public class ColorAnalyzerTest {
 		colorAnalyzer.setStartPlot(1);
 		colorAnalyzer.setMaxPixelSize(1000000);
 		colorAnalyzer.setIntervalCount(4);
+		colorAnalyzer.setEndPlot(15);
+		colorAnalyzer.setMinPixelSize(300);
 		colorAnalyzer.flattenImage();
 		colorAnalyzer.setOutputDirectory(new File("target/"+filename));
 		colorAnalyzer.analyzeFlattenedColours();

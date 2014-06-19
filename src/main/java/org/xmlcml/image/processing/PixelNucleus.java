@@ -28,6 +28,12 @@ public class PixelNucleus {
 	private Set<Pixel> externalPixelSet;
 	private PixelIsland island;
 
+	private Real2 centre;
+
+	private Pixel centrePixel;
+
+	private PixelList pixelList;
+
 	public PixelNucleus(PixelIsland island) {
 		junctionSet = new JunctionSet();
 		externallyConnectedJunctionSet = new JunctionSet();
@@ -44,6 +50,14 @@ public class PixelNucleus {
 		}
 	}
 
+//	public PixelList getPixelList() {
+//		if (pixelList == null) {
+//			for (PixelNode junction : junctionSet) {
+//				PixelList junctionPixels = junction.getCentrePixel()
+//			}
+//		}
+//	}
+	
 	public boolean contains(PixelNode junction) {
 		return junctionSet.contains(junction);
 	}
@@ -54,19 +68,28 @@ public class PixelNucleus {
 
 	public static void drawNucleusSet(Set<PixelNucleus> nucleusSet, SVGG g, double rad) {
 		for (PixelNucleus nucleus : nucleusSet) {
-			SVGCircle circle = new SVGCircle(nucleus.getCentre().plus(new Real2(0.5, 0.5)), rad);
-			circle.setOpacity(0.4);
-			circle.setFill("magenta");
-			g.appendChild(circle);
+			nucleus.drawCentre(g, rad);
 		}
 	}
 
-	private Real2 getCentre() {
-		Real2Array real2Array = new Real2Array();
-		for (PixelNode junction : junctionSet) {
-			real2Array.add(new Real2(junction.getCentrePixel().getInt2()));
+	private void drawCentre(SVGG g, double rad) {
+		Real2 centre = this.getCentre();
+		SVGCircle circle = new SVGCircle(centre.plus(new Real2(0.5, 0.5)), rad);
+		circle.setOpacity(0.4);
+		circle.setFill("magenta");
+		g.appendChild(circle);
+	}
+
+	public Real2 getCentre() {
+		if (centre == null) {
+			Real2Array real2Array = new Real2Array();
+			for (PixelNode junction : junctionSet) {
+				Pixel pixel = ((JunctionNode)junction).getCentrePixel();
+				real2Array.add(new Real2(pixel.getInt2()));
+			}
+			centre = real2Array.getMean();
 		}
-		return real2Array.getMean();
+		return centre;
 	}
 
 	/**
@@ -326,6 +349,23 @@ public class PixelNucleus {
 
 	public JunctionSet getJunctionSet() {
 		return junctionSet;
+	}
+
+	public Pixel getCentrePixel() {
+		centrePixel = null;
+		PixelList pixelList = island.getPixelList();
+		if (pixelList.size() > 0) {
+			double dist0 = Integer.MAX_VALUE;
+			getCentre();
+			for (Pixel pixel : pixelList) {
+				double dist = centre.getDistance(new Real2(pixel.getInt2()));
+				if (dist < dist0) {
+					dist0 = dist;
+					centrePixel = pixel;
+				}
+			}
+		}
+		return centrePixel;
 	}
 
 }

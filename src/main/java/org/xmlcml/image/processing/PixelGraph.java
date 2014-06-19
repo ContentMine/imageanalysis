@@ -80,6 +80,12 @@ public class PixelGraph {
 		return graph;
 	}
 
+	public static PixelGraph createGraphNew(PixelIsland island) {
+		PixelGraph graph = new PixelGraph(island.getPixelList(), island);
+		graph.createGraphNew();
+		return graph;
+	}
+	
 	private void createGraph() {
 		if (edges == null) {
 			edges = new ArrayList<PixelEdge>();
@@ -92,6 +98,22 @@ public class PixelGraph {
 			createPixelNuclei(); // recompute with thinner graph
 			removeExtraneousJunctionsFromNuclei();
 			tidyNucleiIntoNodes();
+			createGraphComponents();
+		}
+	}
+
+	private void createGraphNew() {
+		if (edges == null) {
+			edges = new ArrayList<PixelEdge>();
+			nodes = new ArrayList<PixelNode>();
+			usedNonNodePixelSet = new HashSet<Pixel>();
+			getTerminalNodeSet();
+			getJunctionSet();
+			createPixelNuclei();
+			removeExtraneousPixelsFromNuclei();
+			createPixelNuclei(); // recompute with thinner graph
+			removeExtraneousJunctionsFromNuclei();
+			tidyNucleiIntoNodesNew();
 			createGraphComponents();
 		}
 	}
@@ -113,6 +135,18 @@ public class PixelGraph {
 			}
 		}
 		junctionSet = junctionSetNew;
+	}
+
+	private void tidyNucleiIntoNodesNew() {
+		junctionSet = new JunctionSet();
+		for (PixelNucleus nucleus : nucleusSet) {
+//			Real2 centre = nucleus.getCentre();
+			Pixel centrePixel = nucleus.getCentrePixel();
+			JunctionNode junction = new JunctionNode(centrePixel, null);
+//			LOG.debug("centrePixel "+centrePixel);
+			junctionSet.add(junction);
+		}
+//		PixelList twoConnectedSet = get2ConnectedPixels();
 	}
 
 	private void createGraphComponents() {
