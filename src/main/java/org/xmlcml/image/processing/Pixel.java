@@ -274,6 +274,24 @@ public class Pixel {
 		return pixelList;
 	}
 
+	boolean isConnectedAny(PixelIsland island, int neighbourCount) {
+		PixelList neighbours = getNeighbours(island);
+		boolean connected = (neighbours.size() != neighbourCount) ? false : true;
+		return connected;
+	}
+
+	boolean is1ConnectedAny(PixelIsland island) {
+		PixelList neighbours = getNeighbours(island);
+		boolean connected = (neighbours.size() != 1) ? false : true;
+		return connected;
+	}
+
+	boolean is2ConnectedAny(PixelIsland island) {
+		PixelList neighbours = getNeighbours(island);
+		boolean connected = (neighbours.size() != 2) ? false : true;
+		return connected;
+	}
+
 	/** get mass centre of pixels with units weights.
 	 * 
 	 * @param pixels
@@ -289,6 +307,15 @@ public class Pixel {
 			centre = coords.getMean();
 		}
 		return centre;
+	}
+
+	public Pixel getNextNeighbourIn2ConnectedChain(Pixel last) {
+		Pixel next = null;
+		if (this.is2ConnectedAny(island)) {
+			PixelList neighbours = this.getNeighbours(island);
+			next = (neighbours.get(0) == last) ? neighbours.get(1) : neighbours.get(0);
+		}
+		return next;
 	}
 
 

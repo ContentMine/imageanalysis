@@ -1,6 +1,7 @@
 package org.xmlcml.image.compound;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIsland;
 
@@ -49,6 +51,10 @@ public class PixelList implements Iterable<Pixel> {
 	
 	public Pixel get(int i) {
 		return (list == null || i < 0 || i >= list.size()) ? null : list.get(i);
+	}
+	
+	public Pixel last() {
+		return (list == null || list.size() == 0 ) ? null : list.get(list.size() - 1);
 	}
 	
 	public void add(Pixel pixel) {
@@ -162,6 +168,31 @@ public class PixelList implements Iterable<Pixel> {
 			}
 		}
 		return list;
+	}
+	
+	/** draw pixelList.
+	 * 
+	 * @param file if not null write to file
+	 * @param fill colour
+	 * @return SVGG container
+	 */
+	public SVGG draw(File file, String fill) {
+		SVGG g = new SVGG();
+		plotPixels(g, fill);
+		if (file != null) {
+			SVGSVG.wrapAndWriteAsSVG(g, file);
+		}
+		return g;
+		
+	}
+
+	public boolean isCycle() {
+		boolean isCycle = false;
+		int size = size();
+		if (size > 0) {
+			isCycle = (get(0).equals(get(size - 1)));
+		}
+		return isCycle;
 	}
 
 }

@@ -61,6 +61,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
+//	boolean allowDiagonal = true;
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
@@ -870,6 +871,14 @@ public class PixelIsland implements Iterable<Pixel> {
 				new IntRange(iy.getMin(), iy.getMax() + 1));
 		BufferedImage subImage = ImageUtil.clipSubImage(rawImage, i2r);
 		return subImage;
+	}
+
+	/** creates RGB image.
+	 * 
+	 * @return
+	 */
+	public BufferedImage createImage() {
+		return createImage(BufferedImage.TYPE_INT_RGB);
 	}
 
 	public BufferedImage createImage(int imageType) {

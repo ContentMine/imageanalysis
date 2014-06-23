@@ -47,6 +47,10 @@ public class PixelEdge {
 		pixelList.add(pixel);
 	}
 	
+	public void addPixelList(PixelList pixelList) {
+		this.pixelList.addAll(pixelList);
+	}
+	
 	public PixelList getPixelList() {
 		return pixelList;
 	}

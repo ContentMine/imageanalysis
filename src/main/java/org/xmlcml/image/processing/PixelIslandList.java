@@ -411,4 +411,46 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return array;
 	}
 
+	public void removeStepsSortAndReverse() {
+		LOG.trace("removing steps; current Pixel size()"+this.getPixelList().size());
+		removeStepsIteratively();
+		createCleanIslandList();
+		this.
+		LOG.trace("sort and reverse");
+		sortSize();
+		reverse();
+		LOG.trace("finish");
+	}
+
+	private void createCleanIslandList() {
+		List<PixelIsland> newIslandList = new ArrayList<PixelIsland>();
+		for (PixelIsland island : this) {
+			PixelIsland newIsland = new PixelIsland(island.getPixelList());
+			newIslandList.add(newIsland);
+			this.list = newIslandList;
+		}
+	}
+
+	public List<PixelGraph> analyzeEdgesAndPlot(File outputDir, int maxIsland) throws IOException {
+		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
+		removeStepsSortAndReverse();
+		outputDir.mkdirs();
+		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
+		// main tree
+		SVGG g = new SVGG();
+		for (int i = 0; i < Math.min(size(), maxIsland); i++) {
+			LOG.debug("============ island "+i+"=============");
+			PixelIsland island = get(i);
+			BufferedImage image1 = island.createImage();
+			if (image1 == null) continue;
+			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
+			g.appendChild(island.createSVG());
+			PixelGraph graph = PixelGraph.createGraphNew(island, i);
+			graph.createAndDrawGraphEdges(g, i);
+			pixelGraphList.add(graph);
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
+		return pixelGraphList;
+	}
+
 }
