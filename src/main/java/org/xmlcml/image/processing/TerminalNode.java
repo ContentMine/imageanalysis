@@ -22,11 +22,10 @@ public class TerminalNode extends PixelNode {
 	private Pixel neighbour;
 	
 	public TerminalNode() {
-		
 	}
 
-	public TerminalNode(Pixel node, Pixel neighbour) {
-		super(node);
+	public TerminalNode(Pixel pixel, Pixel neighbour) {
+		super(pixel);
 		this.neighbour = neighbour;
 	}
 

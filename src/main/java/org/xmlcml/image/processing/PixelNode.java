@@ -8,7 +8,6 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 	Pixel centrePixel; // pixel 1
 
 	protected PixelNode() {
-		
 	}
 	
 	protected PixelNode(Pixel pixel) {
@@ -33,7 +32,8 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 	}
 	
 	public String toString() {
-		return centrePixel.toString();
+		getCentrePixel();
+		return (centrePixel == null) ? "?" : String.valueOf(centrePixel);
 	}
 
 	public PixelList getDiagonalNeighbours(PixelIsland island) {

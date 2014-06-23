@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -71,6 +72,7 @@ public class PixelGraph {
 	 * @param island
 	 * @return
 	 */
+	@Deprecated 
 	public static PixelGraph createGraph(PixelIsland island) {
 		return island == null ? null : createGraph(island.getPixelList(),
 				island);
@@ -82,10 +84,18 @@ public class PixelGraph {
 	 * @param pixelList
 	 * @param island
 	 * @return
+	 * 
 	 */
+	@Deprecated 
 	public static PixelGraph createGraph(PixelList pixelList, PixelIsland island) {
 		PixelGraph graph = new PixelGraph(pixelList, island);
 		graph.createGraph();
+		return graph;
+	}
+
+	public static PixelGraph createGraphNew(PixelIsland island) {
+		PixelGraph graph = new PixelGraph(island.getPixelList(), island);
+		graph.createGraphNew(-1);
 		return graph;
 	}
 
@@ -103,40 +113,76 @@ public class PixelGraph {
 			usedNonNodePixelSet = new HashSet<Pixel>();
 			getTerminalNodeSet();
 			getJunctionSet();
-			createPixelNuclei();
+			getOrCreateNucleusSetAndMap();
 			removeExtraneousPixelsFromNuclei();
-			createPixelNuclei(); // recompute with thinner graph
+			getOrCreateNucleusSetAndMap(); // recompute with thinner graph
 			removeExtraneousJunctionsFromNuclei();
 			tidyNucleiIntoNodes();
 			createGraphComponents();
 		}
 	}
 
+	private void createGraphNew() {
+		createGraphNew(-1);
+	}
+	
 	private void createGraphNew(int serial) {
 		if (edges == null) {
 			edges = new ArrayList<PixelEdge>();
 			nodes = new ArrayList<PixelNode>();
 			getTerminalNodeSet();
 			getJunctionSet();
+//			if (nucleusSet == null) {
+			makeNucleusMap();
+//			}
 			usedNonNodePixelSet = new HashSet<Pixel>();
-			createPixelNuclei();
-			tidyNucleiIntoNodesNew();
+			// lets try removing it
+//			createPixelNuclei();
+//			tidyNucleiIntoNodesNew();
 			SVGG g = new SVGG();
-			createEdgesNew(serial, g);
+			createEdgesNew(g);
+			createNodes(g);
 			SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/lines"+serial+".svg"));
 //			removeExtraneousPixelsFromNuclei();
 //			createPixelNuclei(); // recompute with thinner graph
 //			removeExtraneousJunctionsFromNuclei();
-			createGraphComponents();
+
+//			createGraphComponents();
 		}
+	}
+
+	private void createNodes(SVGG g) {
+		for (PixelEdge edge : edges) {
+			Pixel pixel0 = edge.getPixelList().get(0);
+			PixelNode node0 = createNode(pixel0, g);
+			edge.addStartNode(node0);
+
+			Pixel pixel1 = edge.getPixelList().last();
+			PixelNode node1 = createNode(pixel1, g);
+			edge.addEndNode(node1);
+			
+		}
+	}
+
+	private PixelNode createNode(Pixel pixel, SVGG g ) {
+		PixelNode node = null;
+		PixelNucleus nucleus = nucleusByPixelMap.get(pixel);
+		if (nucleus != null) {
+			node = new NucleusNode(nucleus);
+		}
+		if (node == null) {
+			node = terminalNodeByPixelMap.get(pixel);
+		}
+		return node;
 	}
 
 	/** messy as nuclei may contain several proto-junctions in JunctionSet;
 	 * 
 	 */
+	@Deprecated  // probably
 	private void tidyNucleiIntoNodes() {
 		JunctionSet junctionSetNew = new JunctionSet();
-		for (PixelNucleus nucleus : nucleusSet) {
+		for (PixelNucleus nucleus : getNucleusSet()) {
 			JunctionSet jSet = nucleus.getJunctionSet();
 			LOG.debug("junctions: "+jSet.size());
 			for (PixelNode junction0 : jSet) {
@@ -152,7 +198,7 @@ public class PixelGraph {
 
 	private void tidyNucleiIntoNodesNew() {
 		junctionSet = new JunctionSet();
-		for (PixelNucleus nucleus : nucleusSet) {
+		for (PixelNucleus nucleus : getNucleusSet()) {
 //			Real2 centre = nucleus.getCentre();
 			Pixel centrePixel = nucleus.getCentrePixel();
 			JunctionNode junction = new JunctionNode(centrePixel, null);
@@ -162,6 +208,7 @@ public class PixelGraph {
 //		PixelList twoConnectedSet = get2ConnectedPixels();
 	}
 
+	@Deprecated // BUT need to manage cycles and singleton pixels
 	private void createGraphComponents() {
 		if (pixelList.size() == 0) {
 			throw new RuntimeException("no pixels in island");
@@ -203,7 +250,7 @@ public class PixelGraph {
 	}
 
 	private void removeExtraneousPixelsFromNuclei() {
-		for (PixelNucleus nucleus : nucleusSet) {
+		for (PixelNucleus nucleus : getNucleusSet()) {
 			nucleus.removeExtraneousPixels();
 		}
 		junctionSet = null;
@@ -211,7 +258,7 @@ public class PixelGraph {
 	}
 
 	private void removeExtraneousJunctionsFromNuclei() {
-		for (PixelNucleus nucleus : nucleusSet) {
+		for (PixelNucleus nucleus : getNucleusSet()) {
 			List<JunctionNode> junctions = nucleus.removeExtraneousJunctions();
 			junctionSet.removeAll(junctions);
 		}
@@ -220,15 +267,24 @@ public class PixelGraph {
 	/**
 	 * similar to floodfill
 	 * 
+	 * maybe unnecessary as we are treating nuclei as unstructured
+	 * 
 	 * add locally connected nodes.
 	 */
-	private Map<JunctionNode, PixelNucleus> createPixelNuclei() {
-		nucleusByJunctionMap = new HashMap<JunctionNode, PixelNucleus>();
-		Set<PixelNode> unusedNodes = new HashSet<PixelNode>();
-		nucleusSet = new HashSet<PixelNucleus>();
-		if (junctionSet != null) {
-			unusedNodes.addAll(junctionSet.getList());
+	private Map<JunctionNode, PixelNucleus> getOrCreateNucleusSetAndMap() {
+		if (nucleusSet == null) {
+			nucleusByJunctionMap = new HashMap<JunctionNode, PixelNucleus>();
+			Set<PixelNode> unusedNodes = new HashSet<PixelNode>();
+			nucleusSet = new HashSet<PixelNucleus>();
+			if (junctionSet != null) {
+				unusedNodes.addAll(junctionSet.getList());
+			}
+			createNucleiFromJunctionSet(unusedNodes);
 		}
+		return nucleusByJunctionMap;
+	}
+
+	private void createNucleiFromJunctionSet(Set<PixelNode> unusedNodes) {
 		while (!unusedNodes.isEmpty()) {
 			LOG.trace("unused " + unusedNodes.size());
 			// new nucleus, find next unused Junction
@@ -237,24 +293,30 @@ public class PixelGraph {
 			Set<JunctionNode> nucleusNodeSet = new HashSet<JunctionNode>();
 			nucleusNodeSet.add(nextNode);
 			PixelNucleus nucleus = new PixelNucleus(island);
-			nucleusSet.add(nucleus);
-			while (!nucleusNodeSet.isEmpty()) {
-				LOG.trace("nucleus " + nucleusNodeSet.size() + " "
-						+ nucleusNodeSet);
-				nextNode = nucleusNodeSet.iterator().next();
-				nucleus.add(nextNode);
-				nucleusByJunctionMap.put(nextNode, nucleus);
-				nucleusNodeSet.remove(nextNode);
-				List<JunctionNode> neighbourJunctions = getNeighbourJunctions(nextNode);
-				for (JunctionNode neighbourJunction : neighbourJunctions) {
-					if (!nucleus.contains(neighbourJunction)) {
-						nucleusNodeSet.add(neighbourJunction);
-						unusedNodes.remove(neighbourJunction);
-					}
+			getNucleusSet().add(nucleus);
+			// do we need this?
+			addNucleustoNucleusByJunctionMap(unusedNodes, nucleusNodeSet, nucleus);
+		}
+	}
+
+	private void addNucleustoNucleusByJunctionMap(Set<PixelNode> unusedNodes,
+			Set<JunctionNode> nucleusNodeSet, PixelNucleus nucleus) {
+		JunctionNode nextNode;
+		while (!nucleusNodeSet.isEmpty()) {
+			LOG.trace("nucleus " + nucleusNodeSet.size() + " "
+					+ nucleusNodeSet);
+			nextNode = nucleusNodeSet.iterator().next();
+			nucleus.add(nextNode);
+			nucleusByJunctionMap.put(nextNode, nucleus);
+			nucleusNodeSet.remove(nextNode);
+			List<JunctionNode> neighbourJunctions = getNeighbourJunctions(nextNode);
+			for (JunctionNode neighbourJunction : neighbourJunctions) {
+				if (!nucleus.contains(neighbourJunction)) {
+					nucleusNodeSet.add(neighbourJunction);
+					unusedNodes.remove(neighbourJunction);
 				}
 			}
 		}
-		return nucleusByJunctionMap;
 	}
 
 	public Map<JunctionNode, PixelNucleus> getNucleusByJunctionMap() {
@@ -302,8 +364,8 @@ public class PixelGraph {
 		}
 	}
 
-	private void createEdgesNew(int serial, SVGG g) {
-		drawConnectedPixels(serial);
+	private void createEdgesNew(SVGG g) {
+		createConnectedPixelSets();
 		edges = new ArrayList<PixelEdge>();
 		
 		while (!twoConnectedSet.isEmpty()) {
@@ -312,7 +374,6 @@ public class PixelGraph {
 			PixelEdge edge = getEdgeFrom2ConnectedPixels(current);
 			edges.add(edge);
 			SVGLine line = drawLine(edge);
-//			LOG.debug("gg "+g+"/"+line);
 			g.appendChild(line);
 		}
 		LOG.trace("edges "+edges.size());
@@ -358,11 +419,13 @@ public class PixelGraph {
 			list0.addAll(list1);
 			edge.addPixelList(list0);
 			// find nodes
+			/** not yet ...
 			ensureNucleusByPixelMap();
 			PixelList pixelList = edge.getPixelList();
 			PixelNucleus nucleus0 = nucleusByPixelMap.get(pixelList.get(0));
 			PixelNucleus nucleus1 = nucleusByPixelMap.get(pixelList.last());
 			LOG.debug("NUCLEI "+nucleus0+ "/" +nucleus1);
+			*/
 			
 			return edge;
 		}
@@ -436,6 +499,17 @@ public class PixelGraph {
 
 	private void drawConnectedPixels(int serial) {
 		String[] color = {"red", "blue", "green", "magenta", "cyan"};
+		createConnectedPixelSets();
+		SVGG gg = new SVGG();
+		PixelList pixelList;
+		drawPixels(serial, color, gg, 0, twoConnectedSet);
+		drawPixels(serial, color, gg, 1, oneConnectedSet);
+		drawPixels(serial, color, gg, 2, threeConnectedSet);
+		drawPixels(serial, color, gg, 3, multiConnectedSet);
+		SVGSVG.wrapAndWriteAsSVG(gg, new File("target/plot/onetwothree"+serial+".svg"));
+	}
+
+	private void createConnectedPixelSets() {
 		createMultiConnectedDiagonalPixelSet();
 		zeroConnectedSet = createConnectedDiagonalPixelSet(0);
 		oneConnectedSet = createConnectedDiagonalPixelSet(1);
@@ -446,13 +520,6 @@ public class PixelGraph {
 		LOG.trace("2connected "+twoConnectedSet.size());
 		LOG.trace("3connected "+threeConnectedSet.size());
 		LOG.trace("Multiconnected "+multiConnectedSet.size());
-		SVGG gg = new SVGG();
-		PixelList pixelList;
-		drawPixels(serial, color, gg, 0, twoConnectedSet);
-		drawPixels(serial, color, gg, 1, oneConnectedSet);
-		drawPixels(serial, color, gg, 2, threeConnectedSet);
-		drawPixels(serial, color, gg, 3, multiConnectedSet);
-		SVGSVG.wrapAndWriteAsSVG(gg, new File("target/plot/onetwothree"+serial+".svg"));
 	}
 
 	private void drawPixels(int serial, String[] color, SVGG gg, int col1, Set<Pixel> set) {
@@ -665,7 +732,7 @@ public class PixelGraph {
 	}
 
 	public JunctionSet getJunctionSet() {
-		createGraph();
+		createGraphNew();
 		if (junctionSet == null) {
 			junctionSet = new JunctionSet();
 			junctionByPixelMap = new HashMap<Pixel, JunctionNode>();
@@ -681,7 +748,7 @@ public class PixelGraph {
 	}
 
 	public TerminalNodeSet getTerminalNodeSet() {
-		createGraph();
+		createGraphNew();
 		if (terminalNodeSet == null) {
 			terminalNodeSet = new TerminalNodeSet();
 			terminalNodeByPixelMap = new HashMap<Pixel, TerminalNode>();
@@ -759,17 +826,15 @@ public class PixelGraph {
 		return pixelList;
 	}
 
-	public Set<PixelNucleus> getNucleusSet() {
-		return nucleusSet;
-	}
-
 	public void createAndDrawGraph(SVGG g) {
 		JunctionSet junctionSet = getJunctionSet();
 		JunctionNode.drawJunctions(junctionSet, g, 2.);
 		TerminalNodeSet endNodeSet = getTerminalNodeSet();
 		TerminalNode.drawEndNodes(endNodeSet, g, 1.5);
-		Set<PixelNucleus> nucleusSet = getNucleusSet();
-		PixelNucleus.drawNucleusSet(nucleusSet, g, 5.);
+		if (getNucleusSet() == null) {
+			makeNucleusMap();
+		}
+		PixelNucleus.drawNucleusSet(getNucleusSet(), g, 5.);
 	}
 
 	/** creates graph and draws edges.
@@ -783,14 +848,20 @@ public class PixelGraph {
 
 	public void createAndDrawGraphEdges(SVGG g, int serial) {
 		JunctionSet junctionSet = getJunctionSet();
-		if (junctionSet.size() > 0) {LOG.debug("Junctions: "+junctionSet);}
-		JunctionNode.drawJunctions(junctionSet, g, 2.);
+		if (junctionSet.size() > 0) {
+			LOG.debug("Junctions: "+junctionSet);
+		}
+		JunctionNode.drawJunctions(junctionSet, g, 5.);
 		TerminalNodeSet endNodeSet = getTerminalNodeSet();
-		TerminalNode.drawEndNodes(endNodeSet, g, 1.5);
-		Set<PixelNucleus> nucleusSet = getNucleusSet();
-		if (nucleusSet.size() > 0) {LOG.debug("NucleusSet: "+nucleusSet);}
-		PixelNucleus.drawNucleusSet(nucleusSet, g, 5.);
-		createEdgesNew(serial, g);
+		TerminalNode.drawEndNodes(endNodeSet, g, 3.);
+		if (getNucleusSet() == null) {
+			makeNucleusMap();
+		}
+		if (nucleusSet != null) {
+			if (nucleusSet.size() > 0) {LOG.debug("NucleusSet: "+nucleusSet);}
+			PixelNucleus.drawNucleusSet(nucleusSet, g, 10.);
+		}
+		createEdgesNew(g);
 		LOG.debug("edges: "+edges.size()+ edges);
 //		drawEdges(g);
 		
@@ -859,16 +930,19 @@ public class PixelGraph {
 		}
 	}
 
-	private void makeNucleusMap() {
-		nucleusByPixelMap = new HashMap<Pixel, PixelNucleus>();
-		for (PixelNucleus nucleus : nucleusSet) {
-			JunctionSet junctionSet = nucleus.getJunctionSet();
-			for (PixelNode pixelNode : junctionSet) {
-				JunctionNode junction = (JunctionNode) pixelNode;
-				for (Pixel neighbour : junction.getNeighbours()) {
-					nucleusByPixelMap.put(neighbour, nucleus);
+	void makeNucleusMap() {
+		getOrCreateNucleusSetAndMap();
+		if (nucleusByPixelMap == null) {
+			nucleusByPixelMap = new HashMap<Pixel, PixelNucleus>();
+			for (PixelNucleus nucleus : getNucleusSet()) {
+				JunctionSet junctionSet = nucleus.getJunctionSet();
+				for (PixelNode pixelNode : junctionSet) {
+					JunctionNode junction = (JunctionNode) pixelNode;
+					for (Pixel neighbour : junction.getNeighbours()) {
+						nucleusByPixelMap.put(neighbour, nucleus);
+					}
+					nucleusByPixelMap.put(junction.getCentrePixel(), nucleus);
 				}
-				nucleusByPixelMap.put(junction.getCentrePixel(), nucleus);
 			}
 		}
 		LOG.debug("nucleusMap "+nucleusByPixelMap);
@@ -880,6 +954,10 @@ public class PixelGraph {
 		s += "; nodes: " + (nodes == null ? "none" : nodes.toString());
 		s += "; cycle: " + (cycle == null ? "none" : cycle.toString());
 		return s;
+	}
+
+	public Set<PixelNucleus> getNucleusSet() {
+		return nucleusSet;
 	}
 
 }

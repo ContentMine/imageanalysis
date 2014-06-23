@@ -186,10 +186,14 @@ public class Pixel {
 	}
 
 	public SVGRect getSVGRect() {
+		return getSVGRect(1, "red");
+	}
+
+	public SVGRect getSVGRect(int size, String color) {
 		SVGRect rect = new SVGRect(
 				new Real2(this.point.getX(), this.point.getY()),
-				new Real2(this.point.getX()+1, this.point.getY()+1));
-		rect.setFill("red");
+				new Real2(this.point.getX() + size, this.point.getY() + size));
+		rect.setFill(color);
 		rect.setStroke(null);
 		return rect;
 	}
