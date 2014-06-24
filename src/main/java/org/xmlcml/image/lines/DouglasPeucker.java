@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 
 /**
  * Reduces the number of points in a shape using the Douglas-Peucker algorithm. <br>
@@ -19,7 +20,7 @@ public class DouglasPeucker {
 	private boolean[] marked;
 	private List<Real2> shape;
 	private List<Real2> newShape;
-	private double maxDevation;
+	private double maxDeviation;
 	private int indexOfMaxDeviation;
 
 	public DouglasPeucker(double tolerance) {
@@ -54,6 +55,7 @@ public class DouglasPeucker {
 		newShape = createNewShapeFromMarked();
 		return newShape;
 	}
+	
 	private List<Real2> createNewShapeFromMarked() {
 		newShape = new ArrayList<Real2>(); 
 		for (int i = 0; i < shape.size(); i++) {
@@ -89,7 +91,7 @@ public class DouglasPeucker {
 
 		int idxMax = findMaximallyDeviatingPoint(shape, firstIdx, lastIdx);
 
-		if (maxDevation > tolerance) {
+		if (maxDeviation > tolerance) {
 			marked[indexOfMaxDeviation] = true;
 			douglasPeuckerReduction(firstIdx, idxMax);
 			douglasPeuckerReduction(idxMax, lastIdx);
@@ -103,14 +105,14 @@ public class DouglasPeucker {
 
 		findMaximallyDeviatingPoint(shape, firstIdx, lastIdx);
 
-		if (maxDevation > tolerance) {
+		if (maxDeviation > tolerance) {
 			marked[indexOfMaxDeviation] = true;
 			douglasPeuckerReduction(firstIdx, indexOfMaxDeviation);
 			douglasPeuckerReduction(indexOfMaxDeviation, lastIdx);
 		}
 	}
 	private int findMaximallyDeviatingPoint(List<Real2> shape, int firstIdx, int lastIdx) {
-		maxDevation = 0.0;
+		maxDeviation = 0.0;
 		indexOfMaxDeviation = 0;
 
 		Real2 firstPoint = shape.get(firstIdx);
@@ -121,8 +123,8 @@ public class DouglasPeucker {
 
 			double distance = orthogonalDistance(point, firstPoint, lastPoint);
 			// the point with the greatest distance
-			if (distance > maxDevation) {
-				maxDevation = distance;
+			if (distance > maxDeviation) {
+				maxDeviation = distance;
 				indexOfMaxDeviation = idx;
 			}
 		}
@@ -154,5 +156,9 @@ public class DouglasPeucker {
 				lineStart.getX() - lineEnd.getX());
 
 		return (area / bottom * 2.0);
+	}
+	public Real2Array reduceToArray(Real2Array real2Array) {
+		 List<Real2> real2List = reduce(real2Array.getList());
+		return new Real2Array(real2List);
 	}
 }

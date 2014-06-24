@@ -128,8 +128,8 @@
 
 		<dependency>
 			<groupId>org.xml-cml</groupId>
-			<artifactId>svg-dev</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<artifactId>svg</artifactId>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

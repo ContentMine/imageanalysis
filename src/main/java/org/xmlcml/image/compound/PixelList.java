@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -26,6 +28,7 @@ import org.xmlcml.image.processing.PixelIsland;
 public class PixelList implements Iterable<Pixel> {
 
 	private List<Pixel> list;
+	private Real2Array points;
 	
 	public PixelList() {
 		init();
@@ -193,6 +196,15 @@ public class PixelList implements Iterable<Pixel> {
 			isCycle = (get(0).equals(get(size - 1)));
 		}
 		return isCycle;
+	}
+
+	public Real2Array getReal2Array() {
+		points = new Real2Array();
+		for (Pixel pixel : list) {
+			Real2 point = new Real2(pixel.getInt2());
+			points.add(point);
+		}
+		return points;
 	}
 
 }

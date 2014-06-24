@@ -1,11 +1,15 @@
 package org.xmlcml.image.processing;
 
-import org.xmlcml.euclid.Int2;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.xmlcml.image.compound.PixelList;
 
 public abstract class PixelNode implements Comparable<PixelNode> {
 
 	Pixel centrePixel; // pixel 1
+	private List<PixelEdge> edgeList;
+	private String label;
 
 	protected PixelNode() {
 	}
@@ -44,4 +48,27 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 		return centrePixel.getOrthogonalNeighbours(island);
 	}
 
+	public void addEdge(PixelEdge pixelEdge) {
+		ensureEdgeList();
+		this.edgeList.add(pixelEdge);
+	}
+
+	private void ensureEdgeList() {
+		if (edgeList == null) {
+			edgeList = new ArrayList<PixelEdge>();
+		}
+	}
+
+	public List<PixelEdge> getEdges() {
+		ensureEdgeList();
+		return edgeList;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getLabel() {
+		return label;
+	}
 }

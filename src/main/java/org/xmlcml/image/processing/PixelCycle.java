@@ -29,8 +29,8 @@ public class PixelCycle {
 	public PixelCycle(Pixel pixel, PixelIsland island) {
 		this.edge = new PixelEdge(island);
 		TerminalNode node = new TerminalNode(pixel, null);
-		edge.addStartNode(node);
-		edge.addEndNode(node);
+		edge.addNode(node, 0);
+		edge.addNode(node, 1);
 	}
 
 	/** special case of single pixel.
