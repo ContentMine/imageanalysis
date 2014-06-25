@@ -213,10 +213,8 @@ public class PixelGraph {
 		JunctionSet junctionSetNew = new JunctionSet();
 		for (PixelNucleus nucleus : getNucleusSet()) {
 			JunctionSet jSet = nucleus.getJunctionSet();
-			LOG.debug("junctions: "+jSet.size());
 			for (PixelNode junction0 : jSet) {
 				JunctionNode junction = (JunctionNode)junction0;
-				LOG.debug(junction+" is in junctionSet: "+junctionSet.contains(junction));
 				if (junction.isYJunction()) {
 					junctionSetNew.add((JunctionNode)junction);
 				}
@@ -232,7 +230,6 @@ public class PixelGraph {
 //			Real2 centre = nucleus.getCentre();
 			Pixel centrePixel = nucleus.getCentrePixel();
 			JunctionNode junction = new JunctionNode(centrePixel, null);
-//			LOG.debug("centrePixel "+centrePixel);
 			junctionSet.add(junction);
 		}
 //		PixelList twoConnectedSet = get2ConnectedPixels();
@@ -443,7 +440,7 @@ public class PixelGraph {
 		PixelList list0 = traverseTillNon2Connected(neighbours.get(0), current);
 		if (list0.isCycle()) {
 			edge.addPixelList(list0);
-			LOG.debug("CYCLE");
+			LOG.trace("CYCLE");
 			return edge;
 		} else {
 			// lists started in different directions so reverse this and add starting point
@@ -907,69 +904,6 @@ public class PixelGraph {
 		LOG.trace("edges: "+edges.size()+ edges);
 	}
 
-//	private void drawEdges(SVGG g) {
-//		Set<PixelNode> nodeSet = new HashSet<PixelNode>();
-//		for (PixelEdge edge : edges) {
-//			PixelNode node0 = edge.getPixelNode(0);
-//			Real2 xy0 = new Real2(node0.getCentrePixel().getInt2());
-//			nodeSet.add(node0);
-//			PixelNode node1 = edge.getPixelNode(1);
-//			if (node1 == null) {
-//				LOG.debug("BUG single end edge");
-//			} else {
-//				createAndAddLine(g, nodeSet, xy0, node1);
-//			}
-//		}
-//		if (nodeSet.size() > 0) {
-//			LOG.debug("nodes: "+nodeSet.size());
-//			for (PixelNode node : nodeSet) {
-//				createAndAddText(g, node);
-//			}
-//		}
-//	}
-
-//	private void createAndAddText(SVGG g, PixelNode node) {
-//		Int2 int2 = node.getCentrePixel().getInt2();
-//		SVGText text = new SVGText(new Real2(int2), String.valueOf(int2));
-//		text.setFontSize(18.);
-//		g.appendChild(text);
-//	}
-
-//	private void createAndAddLine(SVGG g, Set<PixelNode> nodeSet, Real2 xy0,
-//			PixelNode node1) {
-//		Pixel centrePixel = node1.getCentrePixel();
-//		Real2 xy1 = new Real2(centrePixel.getInt2());
-//		nodeSet.add(node1);
-//		SVGLine line = new SVGLine(xy0, xy1);
-//		line.setStrokeWidth(3.);
-//		g.appendChild(line);
-//	}
-//
-//	private void drawEdgesOld(SVGG g) {
-//		makeNucleusMap();
-//		for (PixelEdge edge : edges) {
-//			PixelNode node0 = edge.getPixelNode(0);
-//			Pixel pixel0 = node0.getCentrePixel();
-//			PixelNucleus nucleus0 = nucleusByPixelMap.get(pixel0);
-//			if (nucleus0 == null) {
-//				continue;
-//			}
-//			pixel0 = nucleus0.getJunctionSet().iterator().next().getCentrePixel();
-//			PixelNode node1 = edge.getPixelNode(1);
-//			Pixel pixel1 = node1.getCentrePixel();
-////			JunctionNode junction1 = junctionByPixelMap.get(pixel1);
-//			PixelNucleus nucleus1 = nucleusByPixelMap.get(pixel1);
-//			if (nucleus1 == null) {
-//				continue;
-//			}
-//			pixel1 = nucleus1.getJunctionSet().iterator().next().getCentrePixel();
-////			LOG.debug(node0+", "+junction0+"/"+node1+", "+junction1);
-//			SVGLine line = new SVGLine(new Real2(pixel0.getInt2()), new Real2(pixel1.getInt2()));
-//			line.setStrokeWidth(3.);
-//			g.appendChild(line);
-//		}
-//	}
-
 	void makeNucleusMap() {
 		getOrCreateNucleusSetAndMap();
 		if (nucleusByPixelMap == null) {
@@ -1039,11 +973,11 @@ public class PixelGraph {
 		PixelEdge rootEdge = null;
 		PixelNode midNode = null;
 		for (PixelEdge edge : edges) {
-			LOG.debug(edge.getPixelNodes());
+			LOG.trace(edge.getPixelNodes());
 			SVGPolyline polyline = edge.getOrCreateSegmentedPolyline();
 			Angle deviation = polyline.getSignedAngleOfDeviation();
 			if (Math.abs(deviation.getRadian()) < 2.0) continue;
-			LOG.debug("POLY "+polyline.getLineList().get(0)+"/"+polyline.getLineList().get(polyline.size() - 1)+"/"+deviation);
+			LOG.trace("POLY "+polyline.getLineList().get(0)+"/"+polyline.getLineList().get(polyline.size() - 1)+"/"+deviation);
 			if (polyline.size() == 3) {
 				SVGLine midline = polyline.getLineList().get(1);
 				Pixel midPixel = edge.getNearestPixelToMidPoint(midline.getMidPoint());
@@ -1101,40 +1035,19 @@ public class PixelGraph {
 			ii = 0;
 		}
 		if (ii != null) {
-			LOG.debug(angle[0]+"/"+angle[1]+"/"+angle[2]);
+			LOG.trace(angle[0]+"/"+angle[1]+"/"+angle[2]);
 		}
 		return ii != null;
 	}
 
-//	private boolean allVectorProductsParallel(PixelNode node, List<PixelEdge> edgeList) { 
-//		Vector3[] vector3 = create3Vector3s(node, edgeList);
-//		Integer sign = null;
-//		for (int i = 0; i < 3; i++) {
-//			int j = (i + 1) % 3;
-//			Vector3 z = vector3[i].cross(vector3[j]);
-//			LOG.debug("z "+z);
-//			int signz = (int) Math.signum(z.getArray()[2]);
-//			if (sign == null) {
-//				sign = signz;
-//			} else {
-//				if (sign != signz) {
-//					return false;
-//				}
-//			}
-//		}
-//		return true;
-//	}
-
 	private Vector3[] create3Vector3s(PixelNode node, List<PixelEdge> edgeList) {
 		Real2 xy0 = new Real2(node.getCentrePixel().getInt2());
-		LOG.debug("========="+xy0+"========");
 		Vector3 vector3[] = new Vector3[3];
 		for (int i = 0; i < 3; i++) {
 			PixelNode otherNode = edgeList.get(i).getOtherNode(node);
 			Real2 otherxy = new Real2(otherNode.getCentrePixel().getInt2());
 			Vector2 vector = new Vector2(otherxy.subtract(xy0));
 			vector3[i] = new Vector3(vector.getX(), vector.getY(), 0.0);
-			LOG.debug("v"+vector3[i]);
 		}
 		return vector3;
 	}
