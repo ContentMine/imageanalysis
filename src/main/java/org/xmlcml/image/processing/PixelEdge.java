@@ -17,7 +17,6 @@ public class PixelEdge {
 	private List<PixelNode> nodes;
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
-
 	private SVGPolyline polyline;
 
 	public PixelEdge(PixelIsland island) {
@@ -32,6 +31,7 @@ public class PixelEdge {
 	 * @param pos 0 or 1
 	 */
 	public void addNode(PixelNode node, int pos) {
+		ensureNodes();
 		if (this.nodes.size() != pos) {
 			LOG.error("Cannot add node");
 		} else if (node == null) {
@@ -43,6 +43,12 @@ public class PixelEdge {
 		}
 	}
 	
+	private void ensureNodes() {
+		if (nodes == null) {
+			nodes = new ArrayList<PixelNode>();
+		}
+	}
+
 	public void addPixel(Pixel pixel) {
 		pixelList.add(pixel);
 	}
@@ -99,7 +105,7 @@ public class PixelEdge {
 		return equals;
 	}
 
-	public SVGPolyline getOrCreateSegments() {
+	public SVGPolyline getOrCreateSegmentedPolyline() {
 		if (polyline == null) {
 			DouglasPeucker douglasPeucker = new DouglasPeucker(2.0);
 			Real2Array points = pixelList.getReal2Array();
@@ -119,6 +125,27 @@ public class PixelEdge {
 		} else {
 			return null;
 		}
+	}
+
+	public Pixel getNearestPixelToMidPoint(Real2 midPoint) {
+		Pixel midPixel = null;
+		Real2 midPixelXY = null;
+		double distMin = Double.MAX_VALUE;
+		for (Pixel pixel :pixelList) {
+			if (midPixel == null) {
+				midPixel = pixel;
+				midPixelXY = new Real2(midPixel.getInt2());
+			} else {
+				Real2 xy = new Real2(pixel.getInt2());
+				double dist = midPixelXY.getDistance(xy);
+				if (dist < distMin) {
+					midPixelXY = xy;
+					distMin = dist;
+					midPixel = pixel;
+				}
+			}
+		}
+		return midPixel;
 	}
 
 }

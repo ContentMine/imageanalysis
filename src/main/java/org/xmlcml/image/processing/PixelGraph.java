@@ -10,10 +10,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Vector2;
+import org.xmlcml.euclid.Vector3;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.compound.PixelList;
 
@@ -995,19 +1000,171 @@ public class PixelGraph {
 		return nucleusSet;
 	}
 
-	public List<PixelNode> getPossibleRootNodes() {
+	public List<PixelNode> getPossibleRootNodes1() {
 		List<PixelNode> pixelNodeList = new ArrayList<PixelNode>();
-		PixelNode terminal = null;
 		for (PixelNode node : nodes) {
 			List<PixelEdge> edgeList = node.getEdges();
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
-				if (edge.getOrCreateSegments().size() == 1) {
+				if (edge.getOrCreateSegmentedPolyline().size() == 1) {
 					pixelNodeList.add(node);
 				}
 			}
 		}
 		return pixelNodeList;
+	}
+
+	public List<PixelNode> getPossibleRootNodes3() {
+		List<PixelNode> pixelNodeList = new ArrayList<PixelNode>();
+		for (PixelNode node : nodes) {
+			List<PixelEdge> edgeList = node.getEdges();
+			if (edgeList.size() == 3) {
+//				if (allVectorProductsParallel(node, edgeList)) {
+//					pixelNodeList.add(node);
+//				}
+				if (allInOneSemicircle(node, edgeList)) {
+					pixelNodeList.add(node);
+				}
+			}
+		}
+		return pixelNodeList;
+	}
+
+	/** assume node in middle of 3-segment path.
+	 * 
+	 * @return
+	 */
+	public List<PixelNode> getPossibleRootNodes2() {
+		List<PixelNode> pixelNodeList = new ArrayList<PixelNode>();
+		PixelEdge rootEdge = null;
+		PixelNode midNode = null;
+		for (PixelEdge edge : edges) {
+			LOG.debug(edge.getPixelNodes());
+			SVGPolyline polyline = edge.getOrCreateSegmentedPolyline();
+			Angle deviation = polyline.getSignedAngleOfDeviation();
+			if (Math.abs(deviation.getRadian()) < 2.0) continue;
+			LOG.debug("POLY "+polyline.getLineList().get(0)+"/"+polyline.getLineList().get(polyline.size() - 1)+"/"+deviation);
+			if (polyline.size() == 3) {
+				SVGLine midline = polyline.getLineList().get(1);
+				Pixel midPixel = edge.getNearestPixelToMidPoint(midline.getMidPoint());
+				midNode = new JunctionNode(midPixel, null);
+				pixelNodeList.add(midNode);
+				rootEdge = edge;
+			}
+		}
+		if (pixelNodeList.size() == 1) {
+			PixelNode rootNode = pixelNodeList.get(0);
+			removeOldEdgeAndAddNewEdge(rootNode, rootEdge, 0);
+			removeOldEdgeAndAddNewEdge(rootNode, rootEdge, 1);
+		}
+		return pixelNodeList;
+	}
+
+	private void removeOldEdgeAndAddNewEdge(PixelNode rootNode, PixelEdge rootEdge, int nodeNum) {
+		PixelNode childNode = rootEdge.getPixelNode(nodeNum);
+		this.removeEdgeFromNode(childNode, rootEdge);
+		addNewEdge(rootNode, childNode);
+	}
+
+	private void addNewEdge(PixelNode node0, PixelNode node1) {
+		PixelEdge edge = new PixelEdge(null);
+		if (node0 != null) {
+	 		edge.addNode(node0, 0);
+			node0.addEdge(edge);
+		}
+		if (node1 != null) {
+			edge.addNode(node1, 1);
+			node1.addEdge(edge);
+		}
+		this.edges.add(edge);
+	}
+
+	private void removeEdgeFromNode(PixelNode node, PixelEdge edge) {
+		if (node != null) {
+			node.removeEdge(edge);
+		}
+		edges.remove(edge);
+	}
+
+	private boolean allInOneSemicircle(PixelNode node, List<PixelEdge> edgeList) {
+		Vector3[] vector3 = create3Vector3s(node, edgeList);
+		Angle[] angle = new Angle[3];
+		for (int i = 0; i < 3; i++) {
+			angle[i] = vector3[i].getAngleMadeWith(vector3[(i + 1) % 3]);
+		}
+		Integer ii = null;
+		if (Real.isEqual(angle[0].getRadian() + angle[1].getRadian(),  angle[2].getRadian(), 0.01)) {
+			ii = 2;
+		} else if (Real.isEqual(angle[0].getRadian() + angle[2].getRadian(),  angle[1].getRadian(), 0.01)) {
+			ii = 1;
+		} else if (Real.isEqual(angle[1].getRadian() + angle[2].getRadian(),  angle[0].getRadian(), 0.01)) {
+			ii = 0;
+		}
+		if (ii != null) {
+			LOG.debug(angle[0]+"/"+angle[1]+"/"+angle[2]);
+		}
+		return ii != null;
+	}
+
+//	private boolean allVectorProductsParallel(PixelNode node, List<PixelEdge> edgeList) { 
+//		Vector3[] vector3 = create3Vector3s(node, edgeList);
+//		Integer sign = null;
+//		for (int i = 0; i < 3; i++) {
+//			int j = (i + 1) % 3;
+//			Vector3 z = vector3[i].cross(vector3[j]);
+//			LOG.debug("z "+z);
+//			int signz = (int) Math.signum(z.getArray()[2]);
+//			if (sign == null) {
+//				sign = signz;
+//			} else {
+//				if (sign != signz) {
+//					return false;
+//				}
+//			}
+//		}
+//		return true;
+//	}
+
+	private Vector3[] create3Vector3s(PixelNode node, List<PixelEdge> edgeList) {
+		Real2 xy0 = new Real2(node.getCentrePixel().getInt2());
+		LOG.debug("========="+xy0+"========");
+		Vector3 vector3[] = new Vector3[3];
+		for (int i = 0; i < 3; i++) {
+			PixelNode otherNode = edgeList.get(i).getOtherNode(node);
+			Real2 otherxy = new Real2(otherNode.getCentrePixel().getInt2());
+			Vector2 vector = new Vector2(otherxy.subtract(xy0));
+			vector3[i] = new Vector3(vector.getX(), vector.getY(), 0.0);
+			LOG.debug("v"+vector3[i]);
+		}
+		return vector3;
+	}
+
+	public void addNode(PixelNode node) {
+		ensureNodes();
+		if (!nodes.contains(node)) {
+			nodes.add(node);
+		}
+	}
+
+	public void addEdge(PixelEdge edge) {
+		ensureEdges();
+		if (!edges.contains(edge)) {
+			edges.add(edge);
+			addNode(edge.getPixelNode(0));
+			addNode(edge.getPixelNode(1));
+		}
+	}
+
+	private void ensureNodes() {
+		if (nodes == null) {
+			nodes = new ArrayList<PixelNode>();
+		}
+	}
+
+	private void ensureEdges() {
+		if (edges == null) {
+			edges = new ArrayList<PixelEdge>();
+		}
 	}
 
 }

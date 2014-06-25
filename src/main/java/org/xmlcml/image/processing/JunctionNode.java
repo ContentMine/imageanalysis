@@ -16,6 +16,9 @@ import org.xmlcml.image.compound.PixelList;
  *  </code>
  *  
  *  where 1 is exactly 3-connected and 4 is 3- or 4- connected and 1 and 3 are 2- or 3-connected
+ *  
+ *  This logic is probably obsolete
+ *  
  * @author pm286
  *
  */

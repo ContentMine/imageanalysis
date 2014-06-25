@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.xmlcml.image.compound.PixelList;
 
+import boofcv.alg.feature.detect.edge.EdgeSegment;
+
 public abstract class PixelNode implements Comparable<PixelNode> {
 
 	Pixel centrePixel; // pixel 1
@@ -70,5 +72,9 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 
 	public String getLabel() {
 		return label;
+	}
+
+	public boolean removeEdge(PixelEdge edge) {
+		return edgeList.remove(edge);
 	}
 }
