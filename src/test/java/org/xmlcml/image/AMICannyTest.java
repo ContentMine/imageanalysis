@@ -24,6 +24,7 @@ import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
@@ -61,12 +62,12 @@ public class AMICannyTest {
  
 		// First get the contour created by canny
 		List<EdgeContour> edgeContours = canny.getContours();
-		Assert.assertEquals("edgeContours: ", 772, edgeContours.size());
+		Assert.assertEquals("edgeContours: ", 841, edgeContours.size());
 		// The 'edgeContours' is a tree graph that can be difficult to process.  An alternative is to extract
 		// the contours from the binary image, which will produce a single loop for each connected cluster of pixels.
 		// Note that you are only interested in external contours.
-		List<Contour> contours = BinaryImageOps.contour(edgeImage, 8, null);
-		Assert.assertEquals("contours", 379, contours.size());
+		List<Contour> contours = BinaryImageOps.contour(edgeImage, ConnectRule.EIGHT, null);
+		Assert.assertEquals("contours", 398, contours.size());
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, null);
 		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours,null,
 				gray.width,gray.height,null);
@@ -105,7 +106,7 @@ public class AMICannyTest {
 //		BufferedImage edgeImage0 = new BufferedImage(gray.width, gray.height, image.getType());
 		BufferedImage edgeImage0 = ConvertBufferedImage.convertTo(edgeImage, null);
 		UtilImageIO.saveImage(edgeImage0, "target/edgeImage.png"); // black at present
-		List<Contour> contours = BinaryImageOps.contour(edgeImage, 8, null);
+		List<Contour> contours = BinaryImageOps.contour(edgeImage, ConnectRule.EIGHT, null);
 		Assert.assertTrue("contours", contours.size() > 300); // may vary on different machines
 		SVGG g = new SVGG();
 		int i = 0;

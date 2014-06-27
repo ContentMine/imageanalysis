@@ -16,6 +16,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
@@ -55,16 +56,16 @@ public class BoofCVTest {
 		int best = 70;
 		ThresholdImageOps.threshold(input, binary, best, true);
 //		Apply an erode operation on the binary image, writing over the original image reference.
-		ImageUInt8 erode8 = BinaryImageOps.erode8(binary,null);
-		erode8 = BinaryImageOps.erode8(erode8,null);
+		ImageUInt8 erode8 = BinaryImageOps.erode8(binary,1,null);
+		erode8 = BinaryImageOps.erode8(erode8,1,null);
 		outputBinary(erode8, new File(BOOFCV_OUT_DIR, "postermolErode"+best+"_8.png"));
 		
 		ImageUInt8 output = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Apply an erode operation on the binary image, saving results to the output binary image.
 //		BinaryImageOps.erode8(binary,output);
 //		Apply an erode operation with a 4-connect rule.
-		BinaryImageOps.erode4(binary,output);
-		ImageUInt8 erode4 = BinaryImageOps.erode4(binary,null);
+		BinaryImageOps.erode4(binary,1,output);
+		ImageUInt8 erode4 = BinaryImageOps.erode4(binary,1,null);
 		outputBinary(erode4, new File(BOOFCV_OUT_DIR, "postermolErode"+best+"_4.png"));
 //		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
 //		Detect and label blobs in the binary image using a 4-connect rule. blobs is an image of type ImageSInt32.
@@ -93,23 +94,23 @@ public class BoofCVTest {
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs
 		// this is less efficient, but easier to code.
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary,null);
-		filtered = BinaryImageOps.dilate8(filtered, null);
+		ImageUInt8 filtered = BinaryImageOps.erode8(binary,1,null);
+		filtered = BinaryImageOps.dilate8(filtered,1,null);
 		outputBinary(filtered, new File(BOOFCV_OUT_DIR, "dilate8.png"));
  
 		// Detect blobs inside the image using an 8-connect rule
-		List<Contour> contours = BinaryImageOps.contour(filtered, 8, label);
+		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label);
  
 		// colors of contours
 		int colorExternal = 0xFFFFFF;
 		int colorInternal = 0xFF2020;
  
 		// display the results
-		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
-		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
-		BufferedImage visualLabel = VisualizeBinaryData.renderLabeled(label, contours.size(), null);
-		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
-				input.width,input.height,null);
+//		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
+//		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
+//		BufferedImage visualLabel = VisualizeBinaryData.renderLabeled(label, contours.size(), null);
+//		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
+//				input.width,input.height,null);
  
 		// these are not suitable for tests
 		
