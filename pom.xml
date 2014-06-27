@@ -122,8 +122,8 @@
 
 		<dependency>
 			<groupId>org.xml-cml</groupId>
-			<artifactId>html-dev</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<artifactId>html</artifactId>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
