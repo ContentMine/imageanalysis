@@ -64,7 +64,8 @@ public class Fixtures {
 	public static final File GENERAL_DIR = new File(IMAGE_DIR, "general");
 	public static final File REFFONT_DIR = new File(GENERAL_DIR, "refFont");
 	public static final File COMPOUND_DIR = new File(IMAGE_DIR, "compound");
-	
+
+
 	
 	public static PixelList LINE_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 
