@@ -12,6 +12,7 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
@@ -33,9 +34,9 @@ public class AMICanny {
 		// The edge image is actually an optional parameter.  If you don't need it just pass in null
 //		canny.process(gray,0.8f,0.9f,null);
 //		canny.process(gray,0.1f,0.3f,null);
-		canny.process(gray,0.1f,0.3f,edgeImage);
+		canny.process(gray,0.1f,0.3f,edgeImage);	
 		// First get the contour created by canny
-		List<Contour> contours = BinaryImageOps.contour(edgeImage, 8, null);
+		List<Contour> contours = BinaryImageOps.contour(edgeImage, ConnectRule.EIGHT, null);
 		return contours;
 	}
 	
