@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.processing.ColorUtilities;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -134,17 +135,32 @@ public class BoofCVTest {
 		}
 		int best = 70;
 		ThresholdImageOps.threshold(input, binary, best, true);
-		ImageSInt32 blobs = new ImageSInt32();
+//		ImageSInt32 blobs = new ImageSInt32();
 //		??
 //		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
 //		Detect and label blobs in the binary image using a 4-connect rule. blobs is an image of type ImageSInt32.
 //		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);	
 	}
 	
+	@Test
+	public void testNatprod() {
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "natprod1.png").toString());
+		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
+		ImageUInt8 binary = new ImageUInt8(image.getWidth(), input.getHeight());
+		for (int i = 10; i < 150; i+= 10) {
+			ThresholdImageOps.threshold(input, binary, i, true);
+			BufferedImage binaryImage = VisualizeBinaryData.renderBinary(binary,null);
+			ColorUtilities.flipWhiteBlack(binaryImage);
+			UtilImageIO.saveImage(binaryImage, new File(BOOFCV_OUT_DIR, "natprod1_"+i+".png").toString());
+		}
+	}
+	
 	private static void outputBinary(ImageUInt8 image, File file) {
 		BufferedImage binaryImage = VisualizeBinaryData.renderBinary(image,null);
 		UtilImageIO.saveImage(binaryImage, file.toString());
 	}
+	
+	
 	
 	
 

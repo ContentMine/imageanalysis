@@ -665,7 +665,7 @@ public class PixelGraph {
 	@Deprecated
 	private PixelCycle createCycle() {
 		if (!checkAllAre2Connected()) {
-			throw new RuntimeException("should be only 2-connected");
+			LOG.debug("should be only 2-connected");
 		}
 
 		Pixel last = pixelList.get(0);
