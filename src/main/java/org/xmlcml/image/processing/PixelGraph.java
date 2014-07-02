@@ -50,10 +50,6 @@ public class PixelGraph {
 	private Map<JunctionNode, PixelNucleus> nucleusByJunctionMap;
 	private Set<PixelNucleus> nucleusSet;
 
-	private static long timecounter0;
-	private static long timecounter1;
-	private static long timecounter2;
-
 	private Map<Pixel, PixelNucleus> nucleusByPixelMap;
 	private Set<Pixel> oneConnectedSet;
 	private Set<Pixel> twoConnectedSet;
@@ -62,6 +58,8 @@ public class PixelGraph {
 	private Set<Pixel> zeroConnectedSet;
 
 	private Map<PixelNucleus, PixelNode> nodeByNucleusMap;
+	
+	private SVGG svgGraph;
 
 	private PixelGraph() {
 		
@@ -109,19 +107,13 @@ public class PixelGraph {
 		graph.createGraph();
 		return graph;
 	}
+//
+//	public PixelGraph createGraphNewxx() {
+//		PixelGraph graph = new PixelGraph(this.getPixelList(), this);
+//		graph.createNodesAndEdges();
+//		return graph;
+//	}
 
-	public static PixelGraph createGraphNew(PixelIsland island) {
-		PixelGraph graph = new PixelGraph(island.getPixelList(), island);
-		graph.createGraphNew(-1);
-		return graph;
-	}
-
-	public static PixelGraph createGraphNew(PixelIsland island, int serial) {
-		PixelGraph graph = new PixelGraph(island.getPixelList(), island);
-		graph.createGraphNew(serial);
-		return graph;
-	}
-	
 	@Deprecated
 	private void createGraph() {
 		if (edges == null) {
@@ -139,33 +131,21 @@ public class PixelGraph {
 		}
 	}
 
-	private void createGraphNew() {
-		createGraphNew(-1);
-	}
-	
-	private void createGraphNew(int serial) {
+	SVGG createNodesAndEdges() {
+		
 		if (edges == null) {
 			edges = new ArrayList<PixelEdge>();
 			nodes = new ArrayList<PixelNode>();
 			getTerminalNodeSet();
 			getJunctionSet();
-//			if (nucleusSet == null) {
 			makeNucleusMap();
-//			}
 			usedNonNodePixelSet = new HashSet<Pixel>();
-			// lets try removing it
-//			createPixelNuclei();
-//			tidyNucleiIntoNodesNew();
-			SVGG g = new SVGG();
-			createEdgesNew(g);
-			createNodes(g);
-			SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/lines"+serial+".svg"));
-//			removeExtraneousPixelsFromNuclei();
-//			createPixelNuclei(); // recompute with thinner graph
-//			removeExtraneousJunctionsFromNuclei();
-
-//			createGraphComponents();
+			svgGraph = new SVGG();
+			createEdgesNew(svgGraph);
+			createNodes(svgGraph);
+//			SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/lines"+serial+".svg"));
 		}
+		return svgGraph;
 	}
 
 	private void createNodes(SVGG g) {
@@ -690,16 +670,10 @@ public class PixelGraph {
 	static Pixel getNextUnusedInEdge(Pixel current, Pixel last,
 			PixelIsland island) {
 		Pixel next = null;
-		Long time0 = System.currentTimeMillis();
 		PixelList neighbours = current.getNeighbours(island);
-		Long time1 = System.currentTimeMillis();
 		neighbours.remove(last);
-		Long time2 = System.currentTimeMillis();
-		timecounter0 += (time1 - time0);
-		timecounter1 += (time2 - time1);
 		next = neighbours.size() == 1 ? neighbours.get(0) : null;
 		Long time3 = System.currentTimeMillis();
-		timecounter2 += (time3 - time2);
 		return next;
 	}
 
@@ -769,7 +743,7 @@ public class PixelGraph {
 	}
 
 	public JunctionSet getJunctionSet() {
-		createGraphNew();
+		createNodesAndEdges();
 		if (junctionSet == null) {
 			junctionSet = new JunctionSet();
 			junctionByPixelMap = new HashMap<Pixel, JunctionNode>();
@@ -785,7 +759,7 @@ public class PixelGraph {
 	}
 
 	public TerminalNodeSet getTerminalNodeSet() {
-		createGraphNew();
+		createNodesAndEdges();
 		if (terminalNodeSet == null) {
 			terminalNodeSet = new TerminalNodeSet();
 			terminalNodeByPixelMap = new HashMap<Pixel, TerminalNode>();
@@ -876,16 +850,7 @@ public class PixelGraph {
 		PixelNucleus.drawNucleusSet(getNucleusSet(), g, 5.);
 	}
 
-	/** creates graph and draws edges.
-	 * 
-	 * serial defaults to 0
-	 * @param g
-	 */
 	public void createAndDrawGraphEdges(SVGG g) {
-		createAndDrawGraphEdges(g, 0);
-	}
-
-	public void createAndDrawGraphEdges(SVGG g, int serial) {
 		JunctionSet junctionSet = getJunctionSet();
 		if (junctionSet.size() > 0) {
 			LOG.trace("JunctionSet: "+junctionSet);
@@ -1078,6 +1043,20 @@ public class PixelGraph {
 		if (edges == null) {
 			edges = new ArrayList<PixelEdge>();
 		}
+	}
+
+	public void numberTerminalNodes() {
+		int i = 0;
+		for (PixelNode node : getNodes()) {
+			if (node instanceof TerminalNode) {
+				node.setLabel("n" + i);
+			}
+			i++;
+		}
+	}
+
+	public SVGG getSVG() {
+		return svgGraph;
 	}
 
 }

@@ -249,14 +249,13 @@ public class PixelIslandTest {
 			if (image0 == null)
 				continue;
 
-			PixelIslandList islandList = PixelIslandList
-					.thinFillAndGetPixelIslandList(image0,
-							new ZhangSuenThinning());
+			image0 = ImageProcessor.createDefaultProcessor().processImage(image0);
+			PixelIslandList islandList = PixelIslandList.createPixelIslandList(image0);
 			islandList.setPixelColor("blue");
 			SVGG g0 = islandList.plotPixels(t2);
 			g0.setOpacity(0.5);
 			gg.appendChild(g0);
-			ImageUtil.writeImageQuietly(islandList.getThinnedImage(), new File(
+			ImageUtil.writeImageQuietly(islandList.getImage(), new File(
 					"target/charRecog/char" + i + ".thin.png"));
 			Assert.assertEquals("islands", 1, islandList.size());
 			List<List<SVGPolyline>> polylineListList = islandList
@@ -324,34 +323,34 @@ public class PixelIslandTest {
 				"target/segments/binarizedThin.png"));
 	}
 
-	@Test
-	@Ignore
-	// file material deleted
-	public void testTrec() throws Exception {
-		File file = new File(
-				"src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");
-		Assert.assertTrue(file.exists());
-		BufferedImage image0 = UtilImageIO
-				.loadImage("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");
-
-		// BufferedImage image0 = ImageIO.read(new
-		// File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF"));
-		Assert.assertNotNull(image0);
-		ImageUtil.writeImageQuietly(image0, new File(
-				"target/segments/trec.thin.png"));
-		Thinning thinning = new HilditchThinning();
-		PixelIslandList islandList = PixelIslandList
-				.thinFillAndGetPixelIslandList(image0, thinning);
-		Assert.assertEquals("islands", 1, islandList.size());
-		PixelIsland island = islandList.get(0);
-		SVGG g = new SVGG();
-		List<SVGPolyline> polylineList = island.createPolylinesIteratively(
-				DP_EPSILON /* *2 */, MAX_PIXEL_ITER);
-
-		colourPolylinesAndAddToG(COLOUR, g, polylineList);
-
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/charRecog/trec.svg"));
-	}
+//	@Test
+//	@Ignore
+//	// file material deleted
+//	public void testTrec() throws Exception {
+//		File file = new File(
+//				"src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");
+//		Assert.assertTrue(file.exists());
+//		BufferedImage image0 = UtilImageIO
+//				.loadImage("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF");
+//
+//		// BufferedImage image0 = ImageIO.read(new
+//		// File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF"));
+//		Assert.assertNotNull(image0);
+//		ImageUtil.writeImageQuietly(image0, new File(
+//				"target/segments/trec.thin.png"));
+//		Thinning thinning = new HilditchThinning();
+//		PixelIslandList islandList = PixelIslandList
+//				.thinFillAndGetPixelIslandList(image0, thinning);
+//		Assert.assertEquals("islands", 1, islandList.size());
+//		PixelIsland island = islandList.get(0);
+//		SVGG g = new SVGG();
+//		List<SVGPolyline> polylineList = island.createPolylinesIteratively(
+//				DP_EPSILON /* *2 */, MAX_PIXEL_ITER);
+//
+//		colourPolylinesAndAddToG(COLOUR, g, polylineList);
+//
+//		SVGSVG.wrapAndWriteAsSVG(g, new File("target/charRecog/trec.svg"));
+//	}
 
 	private void drawSVG(PixelIsland island, String filename) {
 		SVGG svgg = island.createSVGFromPixelPaths(true);

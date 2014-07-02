@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.processing.ColorUtilities;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -35,6 +35,7 @@ public class BoofCVTest {
 		BOOFCV_OUT_DIR.mkdirs();
 	}
 	@Test
+	@Ignore // takes 3 secs
 	public void testInt2() {
 		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 imageInt2 = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
@@ -49,7 +50,7 @@ public class BoofCVTest {
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
 		BufferedImage binaryImage = null;
-		for (int i = 10; i < 150; i+= 10) {
+		for (int i = 50; i < 130; i+= 20) {
 			ThresholdImageOps.threshold(input, binary, i, true);
 			binaryImage = VisualizeBinaryData.renderBinary(binary,null);
 			UtilImageIO.saveImage(binaryImage, new File(BOOFCV_OUT_DIR, "postermolBinary"+i+".png").toString());
@@ -122,6 +123,7 @@ public class BoofCVTest {
 	}
  
 	@Test
+	@Ignore
 	public void testBlobs() {
 		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
@@ -147,7 +149,7 @@ public class BoofCVTest {
 		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "natprod1.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(image.getWidth(), input.getHeight());
-		for (int i = 10; i < 150; i+= 10) {
+		for (int i = 70; i <= 130; i+= 20) {
 			ThresholdImageOps.threshold(input, binary, i, true);
 			BufferedImage binaryImage = VisualizeBinaryData.renderBinary(binary,null);
 			ColorUtilities.flipWhiteBlack(binaryImage);

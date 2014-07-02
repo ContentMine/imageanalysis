@@ -1157,4 +1157,10 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
+	public PixelGraph createGraphNew() {
+		PixelGraph graph = new PixelGraph(getPixelList(), this);
+		graph.createNodesAndEdges();
+		return graph;
+	}
+
 }

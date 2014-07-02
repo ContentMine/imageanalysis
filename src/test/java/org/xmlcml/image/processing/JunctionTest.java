@@ -78,22 +78,22 @@ public class JunctionTest {
 //		Assert.assertTrue("neighbours", junction.getNeighbours().contains(new Pixel(2, 0)));
 	}
 
-	@Test
-	@Ignore // fails with new connection table
-	// FIXME
-	public void testFindJunctionsInPlot() throws IOException {
-		PixelIsland island = PixelIslandList.thinFillAndGetPixelIslandList(
-				ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning()).get(0);
-		island.removeStepsIteratively();
-		PixelGraph table = PixelGraph.createGraph(island);
-		SVGG g = new SVGG();
-		g.appendChild(island.createSVG());
-		JunctionSet junctionSet = table.getJunctionSet();
-		for (PixelNode tJunction : junctionSet) {
-			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
-			circle.setOpacity(0.2);
-			g.appendChild(circle);
-		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/tjunctions.svg"));
-	}
+//	@Test
+//	@Ignore // fails with new connection table
+//	// FIXME
+//	public void testFindJunctionsInPlot() throws IOException {
+//		PixelIsland island = MiscTest.thinFillAndGetPixelIslandList(
+//				ImageIO.read(new File(G002_DIR, "points.png")), new ZhangSuenThinning()).get(0);
+//		island.removeStepsIteratively();
+//		PixelGraph table = PixelGraph.createGraph(island);
+//		SVGG g = new SVGG();
+//		g.appendChild(island.createSVG());
+//		JunctionSet junctionSet = table.getJunctionSet();
+//		for (PixelNode tJunction : junctionSet) {
+//			SVGCircle circle = new SVGCircle(new Real2(tJunction.getCentrePixel().getInt2()).plus(new Real2(0.5, 0.5)), 3.);
+//			circle.setOpacity(0.2);
+//			g.appendChild(circle);
+//		}
+//		SVGSVG.wrapAndWriteAsSVG(g, new File("target/plot/tjunctions.svg"));
+//	}
 }

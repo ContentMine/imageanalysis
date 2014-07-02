@@ -37,6 +37,7 @@ import com.google.common.collect.Multimap;
  */
 public class PixelIslandList implements Iterable<PixelIsland> {
 
+	private static final int MAXPIXEL = 6000;
 	private final static Logger LOG = Logger.getLogger(PixelIslandList.class);
 
 	public enum Operation {
@@ -44,7 +45,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	private List<PixelIsland> list;
-	private BufferedImage thinnedImage;
+	private BufferedImage image;
 	private String pixelColor;
 	private SVGG svgg;
 
@@ -137,6 +138,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		floodFill.setDiagonal(true);
 		floodFill.fill();
 		PixelIslandList islandList = floodFill.getPixelIslandList();
+		islandList.setImage(image);
 		return islandList;
 	}
 
@@ -190,44 +192,12 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list.get(i).binaryIslandCorrelation(list.get(j), i + "-" + j);
 	}
 
-	public static PixelIslandList thinFillAndGetPixelIslandList(
-			BufferedImage image0, Thinning thinning) {
-		return thinFillAndGetPixelIslandList(image0, false, thinning, 128);
+	public void setImage(BufferedImage image) {
+		this.image = image;
 	}
 
-	public static PixelIslandList thinFillAndGetPixelIslandList(
-			BufferedImage image0, Thinning thinning, int threshold) {
-		return thinFillAndGetPixelIslandList(image0, true, thinning, threshold);
-	}
-
-	public static PixelIslandList thinFillAndGetPixelIslandList(
-			BufferedImage image0, boolean binarize, Thinning thinning, int threshold) {
-		LOG.trace("processing ");
-		if (binarize) {
-			image0 = ImageUtil.boofCVBinarization(image0, threshold);
-			LOG.debug("binarized ");
-		}
-		// debug
-		ImageUtil.writeImageQuietly(image0, "target/pixel0.png");
-		BufferedImage image = ImageUtil.thin(image0, thinning);
-		LOG.trace("thinned ");
-		ImageUtil.writeImageQuietly(image, "target/thin.png");
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.setDiagonal(true);
-		floodFill.fill();
-		LOG.trace("filled ");
-		PixelIslandList islandList = floodFill.getPixelIslandList();
-		LOG.trace("pixel island size: "+islandList.size());
-		islandList.setThinnedImage(image);
-		return islandList;
-	}
-
-	private void setThinnedImage(BufferedImage image) {
-		this.thinnedImage = image;
-	}
-
-	public BufferedImage getThinnedImage() {
-		return thinnedImage;
+	public BufferedImage getImage() {
+		return image;
 	}
 
 	public SVGG plotPixels() {
@@ -391,8 +361,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			// may be better...
 			island.removeCorners();
 			LOG.trace("after remove corners "+island.size());
-			if (island.size() > 6000) {
-				BufferedImage image = island.createImage(thinnedImage.getType());
+			if (island.size() > MAXPIXEL) {
+				image = island.createImage(image.getType());
 //				ImageUtil.writeImageQuietly(image, new File("target/thin2.png"));
 			}
 		}
@@ -445,8 +415,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			if (image1 == null) continue;
 			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
 			g.appendChild(island.createSVG());
-			PixelGraph graph = PixelGraph.createGraphNew(island, i);
-			graph.createAndDrawGraphEdges(g, i);
+			PixelGraph graph = island.createGraphNew();
+			graph.createAndDrawGraphEdges(g);
 			pixelGraphList.add(graph);
 		}
 		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
