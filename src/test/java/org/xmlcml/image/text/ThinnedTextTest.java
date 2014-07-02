@@ -63,22 +63,6 @@ public class ThinnedTextTest {
 	}
 
 	@Test
-	// this example is rubbish
-	@Ignore
-	public void testTimesRoman() throws Exception {
-		OtsuBinarize otsuBinarize = new OtsuBinarize();
-		otsuBinarize.read(Fixtures.TIMESROMAN_JPG);
-		otsuBinarize.toGray();
-		otsuBinarize.binarize();
-		BufferedImage image = otsuBinarize.getBinarizedImage();
-		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"timesroman0.png");
-		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
-		thinningService.doThinning();
-		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, TARGET_FONTS+"timesroman.png");
-	}
-
-	@Test
 	// badly antialised
 	public void testGibbonTree() throws Exception {
 		BufferedImage image = ImageIO.read(Fixtures.GIBBONS_PNG);
@@ -101,6 +85,7 @@ public class ThinnedTextTest {
 
 	@Test
 	// poor
+	@Ignore // not using Otsu
 	public void testGraph1() throws Exception {
 		binarizethin("bmcgraph.jpg");
 //		binarizethin("bmcgraph1.jpg");
@@ -108,6 +93,7 @@ public class ThinnedTextTest {
 	}
 
 	@Test
+	@Ignore // not using Otsu
 	public void testGraph2() throws Exception {
 		binarizethin("phylo.jpg");
 	}

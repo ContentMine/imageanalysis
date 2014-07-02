@@ -142,6 +142,21 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return islandList;
 	}
 
+	/**
+	 * find all separated islands.
+	 * 
+	 * creates a FloodFill and extracts Islands from it. diagonal set to true
+	 * 
+	 * @param image
+	 * @return
+	 * @throws IOException
+	 */
+	public static PixelIslandList createSuperThinnedPixelIslandList(BufferedImage image) {
+		PixelIslandList islandList = createPixelIslandList(image);
+		islandList.removeStepsSortAndReverse();
+		return islandList;
+	}
+
 	public PixelIslandList smallerThan(Real2 box) {
 		List<PixelIsland> newList = new ArrayList<PixelIsland>();
 		for (PixelIsland island : list) {

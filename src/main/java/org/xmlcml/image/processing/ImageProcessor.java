@@ -1,6 +1,9 @@
 package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.image.ImageUtil;
@@ -46,8 +49,8 @@ public class ImageProcessor {
 		this.debug = debug;
 	}
 
-	public void setImage(BufferedImage image) {
-		this.image = image;
+	public void setImage(BufferedImage img) {
+		this.image = img;
 	}
 
 	public void setThinning(Thinning thinning) {
@@ -56,37 +59,47 @@ public class ImageProcessor {
 
 	public void setThreshold(int threshold) {
 		this.threshold = threshold;
-	}
-	
-	public BufferedImage processImage(BufferedImage image) {
-		this.setImage(image);
-		processImage();
-		return image;
+		this.binarize = true;
 	}
 
-	public BufferedImage processImage() {
+	
+	public BufferedImage processImageFile(File file) {
+		if (file == null || !file.exists() || file.isDirectory()) {
+			throw new RuntimeException("Image file is null/missing/directory: "+file);
+		}
+		try {
+			BufferedImage image = ImageIO.read(file);
+			processImage(image);
+			return image;
+		} catch (Exception e) {
+			throw new RuntimeException("bad image: "+file, e);
+		}
+	}
+
+	public BufferedImage processImage(BufferedImage img) {
+		this.setImage(img);
 		if (debug) {
 			String filename =  TARGET+"/"+base+"/"+RAW_IMAGE_PNG;
-			ImageUtil.writeImageQuietly(image, filename);
+			ImageUtil.writeImageQuietly(this.image, filename);
 			System.err.println("wrote raw image file: "+filename);
 		}
 		if (this.binarize) {
-			image = ImageUtil.boofCVBinarization(image, threshold);
+			this.image = ImageUtil.boofCVBinarization(this.image, threshold);
 			if (debug) {
 				String filename =  TARGET+"/"+base+"/"+BINARIZED_PNG;
-				ImageUtil.writeImageQuietly(image, filename);
+				ImageUtil.writeImageQuietly(this.image, filename);
 				System.err.println("wrote binarized file: "+filename);
 			}
 		}
 		if (thinning != null) {
-			image = ImageUtil.thin(image, thinning);
+			image = ImageUtil.thin(this.image, thinning);
 			if (debug) {
 				String filename =  TARGET+"/"+base+"/"+THINNED_PNG;
-				ImageUtil.writeImageQuietly(image, filename);
+				ImageUtil.writeImageQuietly(this.image, filename);
 				System.err.println("wrote thinned file: "+filename);
 			}
 		}
-		return image;
+		return this.image;
 	}
 
 	public Thinning getThinning() {

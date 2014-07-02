@@ -15,7 +15,8 @@ import org.xmlcml.image.ImageUtil;
  * @author pm286
  *
  */
-		
+	
+@Ignore // not using this ; replaced by BoofCV
 public class OtsuBinarizationTest {
 
 	@Test
