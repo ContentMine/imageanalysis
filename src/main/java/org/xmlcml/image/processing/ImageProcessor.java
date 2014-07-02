@@ -52,6 +52,10 @@ public class ImageProcessor {
 	public void setImage(BufferedImage img) {
 		this.image = img;
 	}
+	
+	public BufferedImage getImage() {
+		return this.image;
+	}
 
 	public void setThinning(Thinning thinning) {
 		this.thinning = thinning;
