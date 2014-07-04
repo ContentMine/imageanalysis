@@ -32,6 +32,8 @@ public class ImageProcessor {
 	private BufferedImage image;
 	private Thinning thinning;
 	private int threshold;
+	private File inputFile;
+	private PixelProcessor pixelProcessor;
 
 	public ImageProcessor() {
 		
@@ -127,5 +129,26 @@ public class ImageProcessor {
 		imageProcessor.setBinarize(true);
 		imageProcessor.setThreshold(DEFAULT_THRESHOLD);
 		return imageProcessor;
+	}
+
+	public String getBase() {
+		return base;
+	}
+
+	public void readAndProcessFile(File file) {
+		this.setInputFile(file);
+	}
+
+	private void setInputFile(File file) {
+		this.inputFile = file;
+	}
+
+	public void debug() {
+		System.err.println("threshold: "+threshold);
+		pixelProcessor.debug();
+	}
+
+	public PixelProcessor getPixelProcessor() {
+		return this.pixelProcessor;
 	}
 }

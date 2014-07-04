@@ -45,20 +45,30 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	private List<PixelIsland> list;
-	private BufferedImage image;
 	private String pixelColor;
 	private SVGG svgg;
-
+	private boolean debug = false;
+	private PixelProcessor pixelProcessor;
+	
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
+		init();
 	}
 
 	public PixelIslandList(List<PixelIsland> newList) {
 		this.list = newList;
+		init();
+	}
+	
+	private void init() {
 	}
 
 	public PixelIslandList(Collection<PixelIsland> collection) {
 		this(new ArrayList<PixelIsland>(collection));
+	}
+	
+	public void setPixelProcessor(PixelProcessor pixelProcessor) {
+		this.pixelProcessor = pixelProcessor;
 	}
 
 	public int size() {
@@ -124,23 +134,23 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return islands;
 	}
 
-	/**
-	 * find all separated islands.
-	 * 
-	 * creates a FloodFill and extracts Islands from it. diagonal set to true
-	 * 
-	 * @param image
-	 * @return
-	 * @throws IOException
-	 */
-	public static PixelIslandList createPixelIslandList(BufferedImage image) {
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.setDiagonal(true);
-		floodFill.fill();
-		PixelIslandList islandList = floodFill.getPixelIslandList();
-		islandList.setImage(image);
-		return islandList;
-	}
+//	/**
+//	 * find all separated islands.
+//	 * 
+//	 * creates a FloodFill and extracts Islands from it. diagonal set to true
+//	 * 
+//	 * @param image
+//	 * @return
+//	 * @throws IOException
+//	 */
+//	public static PixelIslandList createPixelIslandList(BufferedImage image) {
+//		FloodFill floodFill = new FloodFill(image);
+//		floodFill.setDiagonal(true);
+//		floodFill.fill();
+//		PixelIslandList islandList = floodFill.getPixelIslandList();
+////		islandList.setImage(image);
+//		return islandList;
+//	}
 
 	/**
 	 * find all separated islands.
@@ -205,14 +215,6 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public double correlation(int i, int j) {
 		return list.get(i).binaryIslandCorrelation(list.get(j), i + "-" + j);
-	}
-
-	public void setImage(BufferedImage image) {
-		this.image = image;
-	}
-
-	public BufferedImage getImage() {
-		return image;
 	}
 
 	public SVGG plotPixels() {
@@ -376,10 +378,6 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			// may be better...
 			island.removeCorners();
 			LOG.trace("after remove corners "+island.size());
-			if (island.size() > MAXPIXEL) {
-				image = island.createImage(image.getType());
-//				ImageUtil.writeImageQuietly(image, new File("target/thin2.png"));
-			}
 		}
 	}
 
@@ -416,14 +414,15 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-	public List<PixelGraph> analyzeEdgesAndPlot(File outputDir, int maxIsland) throws IOException {
+	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
 		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
 		removeStepsSortAndReverse();
+		File outputDir = pixelProcessor.getOutputDir();
 		outputDir.mkdirs();
 		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
 		// main tree
 		SVGG g = new SVGG();
-		for (int i = 0; i < Math.min(size(), maxIsland); i++) {
+		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
 			LOG.debug("============ island "+i+"=============");
 			PixelIsland island = get(i);
 			BufferedImage image1 = island.createImage();
@@ -437,5 +436,10 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
 		return pixelGraphList;
 	}
+
+	public void debug() {
+//		System.err.println("maxIsland:    "+this.maxIsland);
+	}
+
 
 }

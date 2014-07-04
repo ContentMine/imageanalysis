@@ -255,8 +255,8 @@ public class PixelIslandTest {
 			SVGG g0 = islandList.plotPixels(t2);
 			g0.setOpacity(0.5);
 			gg.appendChild(g0);
-			ImageUtil.writeImageQuietly(islandList.getImage(), new File(
-					"target/charRecog/char" + i + ".thin.png"));
+//			ImageUtil.writeImageQuietly(islandList.getImage(), new File(
+//					"target/charRecog/char" + i + ".thin.png"));
 			Assert.assertEquals("islands", 1, islandList.size());
 			List<List<SVGPolyline>> polylineListList = islandList
 					.createPolylinesIteratively(DP_EPSILON /* *0.5 *//* *2 */,
