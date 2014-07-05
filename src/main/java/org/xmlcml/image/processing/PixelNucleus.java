@@ -11,7 +11,6 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.image.compound.PixelList;
 
 /**
  * connected Nodes.

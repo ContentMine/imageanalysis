@@ -12,6 +12,7 @@ import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.processing.FloodFill;
 import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;
+import org.xmlcml.image.processing.PixelPath;
 
 /** vectorizes pixel maps
  * 

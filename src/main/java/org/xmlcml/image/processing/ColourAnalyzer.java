@@ -18,7 +18,6 @@ import org.xmlcml.euclid.IntSet;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.compound.PixelList;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;

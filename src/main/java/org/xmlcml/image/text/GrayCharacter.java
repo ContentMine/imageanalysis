@@ -39,12 +39,12 @@ public class GrayCharacter {
 		
 	}
 
-	private void setImage(BufferedImage image) {
-		if (image == null) {
-			throw new RuntimeException("null image: check files exists and is image");
-		}
-		this.grayImage = ImageUtil.binarizeToGray(image);
-	}
+//	private void setImage(BufferedImage image) {
+//		if (image == null) {
+//			throw new RuntimeException("null image: check files exists and is image");
+//		}
+//		this.grayImage = ImageUtil.binarizeToGray(image);
+//	}
 	
 	/** deep copy constructor.
 	 * creates new copied image
@@ -68,7 +68,7 @@ public class GrayCharacter {
 		if (image == null) {
 			throw new RuntimeException("null image for: "+file);
 		}
-		setImage(image);
+//		setImage(image);
 		codePoint = getCodePointFromFilename(file);
 	}
 

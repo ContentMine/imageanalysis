@@ -8,8 +8,6 @@ import java.util.Queue;
 
 import javax.imageio.ImageIO;
 
-import org.xmlcml.image.compound.PixelList;
-
 public class FloodFill {
 
 	// informed by

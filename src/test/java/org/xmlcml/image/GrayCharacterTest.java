@@ -22,11 +22,13 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;
+import org.xmlcml.image.processing.PixelProcessor;
 import org.xmlcml.image.text.CharacterMatchList;
 import org.xmlcml.image.text.GrayCharacter;
 import org.xmlcml.image.text.fonts.ReferenceFont;
 import org.xmlcml.image.text.fonts.ReferenceFontManager;
 
+@Ignore // refactor this
 public class GrayCharacterTest {
 
 	static final ReferenceFontManager FONT_MANAGER = new ReferenceFontManager();
@@ -196,8 +198,8 @@ public class GrayCharacterTest {
 				.getFont(ReferenceFontManager.MONOSPACE);
 		BufferedImage testImage = ImageIO.read(new File(
 				ReferenceFontManager.MONOSPACE_DIR, "65.png"));
-		PixelIslandList pixelIslandList = PixelIslandList
-				.createPixelIslandList(testImage);
+		PixelProcessor pixelProcessor = new PixelProcessor(testImage);
+		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList();
 		for (PixelIsland island : pixelIslandList) {
 			BufferedImage image = island.createImage(testImage.getType());
 			if (image == null) {
@@ -215,69 +217,6 @@ public class GrayCharacterTest {
 		}
 	}
 
-	@Test
-	@Ignore
-	public void testCorrelateMonospaceMonospace() throws Exception {
-		double corrMin = 0.20;
-		ReferenceFont referenceFont = FONT_MANAGER
-				.getFont(ReferenceFontManager.MONOSPACE);
-		// BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-		// "bmcgraph.jpg"));
-		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-				"monospace.png"));
-		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage,
-				1000);
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/monospace.svg"));
-
-	}
-
-	@Test
-	@Ignore
-	public void testCorrelateHelveticaAgainstMonospace() throws Exception {
-		double corrMin = 0.20;
-		ReferenceFont referenceFont = FONT_MANAGER
-				.getFont(ReferenceFontManager.MONOSPACE);
-		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-				"helvetica.png"));
-		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage,
-				1000);
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/helvetica.svg"));
-
-	}
-
-	@Test
-	@Ignore
-	public void testCorrelateBMCwFont() throws Exception {
-		double corrMin = 0.20;
-		// ReferenceFont referenceFont =
-		// FONT_MANAGER.getFont(ReferenceFontManager.HELVETICA);
-		ReferenceFont referenceFont = FONT_MANAGER
-				.getFont(ReferenceFontManager.TIMES_NEW_ROMAN);
-		// BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-		// "1471-2148-14-32-2-l.jpg"));
-		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-				"1471-2148-14-31-2-l.jpg"));
-		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage,
-				1000);
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/bmcHelvetica.svg"));
-
-	}
-
-	@Test
-	@Ignore
-	public void testCorrelateBMCAgainstHelvetica() throws Exception {
-		double corrMin = 0.20;
-		ReferenceFont referenceFont = FONT_MANAGER
-				.getFont(ReferenceFontManager.HELVETICA);
-		// BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-		// "bmcgraph.jpg"));
-		BufferedImage testImage = ImageIO.read(new File(Fixtures.TEXT_DIR,
-				"1471-2148-14-20-test.jpg"));
-		SVGG g = referenceFont.extractAndPlotCharacters(corrMin, testImage,
-				1000);
-		SVGSVG.wrapAndWriteAsSVG(g, new File("target/1471-2148-14-20.svg"));
-
-	}
 
 	@Test
 	public void testC() {

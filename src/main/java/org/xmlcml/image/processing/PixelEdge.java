@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGPolyline;
-import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.lines.DouglasPeucker;
 
 public class PixelEdge {

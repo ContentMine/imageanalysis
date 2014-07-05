@@ -3,8 +3,6 @@ package org.xmlcml.image.processing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xmlcml.image.compound.PixelList;
-
 import boofcv.alg.feature.detect.edge.EdgeSegment;
 
 public abstract class PixelNode implements Comparable<PixelNode> {

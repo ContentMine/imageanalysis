@@ -12,6 +12,10 @@ import org.xmlcml.image.ImageUtil;
  * 
  * may use a variety of ImageUtil routines
  * 
+ *  * NOTE: setters return ImageProcessor so they can be chained, e.g.
+ *     ImageProcessor processor = new ImageProcessor().setThreshold(190).setThinning(null);
+
+ * 
  * @author pm286
  *
  */
@@ -36,7 +40,10 @@ public class ImageProcessor {
 	private PixelProcessor pixelProcessor;
 
 	public ImageProcessor() {
-		
+	}
+	
+	public ImageProcessor(BufferedImage image) {
+		this.image = image;
 	}
 
 	public void setBase(String base) {
@@ -131,6 +138,37 @@ public class ImageProcessor {
 		return imageProcessor;
 	}
 
+	/** creates default processor and processes image.
+	 * 
+	 * currently sets binarize=true, thinning=ZhangSuenThinning(), threshold=128
+	 * But use getters to query actual values
+	 * 
+	 * @return
+	 */
+	public static ImageProcessor createDefaultProcessorAndProcess(BufferedImage image) {
+		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessor();
+		imageProcessor.processImage(image);
+		return imageProcessor;
+	}
+
+	/** creates default processor and processes image.
+	 * 
+	 * uses createDefaultProcessorAndProcess(BufferedImage image)
+	 * 
+	 * @return
+	 */
+	public static ImageProcessor createDefaultProcessorAndProcess(File imageFile) {
+		if (imageFile == null || !imageFile.exists() || imageFile.isDirectory()) {
+			throw new RuntimeException("Cannot find/open file "+imageFile);
+		} else {
+			try {
+				return ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(imageFile));
+			} catch (Exception e) {
+				throw new RuntimeException("Cannot read image file: "+imageFile, e);
+			}
+		} 
+	}
+
 	public String getBase() {
 		return base;
 	}
@@ -150,5 +188,27 @@ public class ImageProcessor {
 
 	public PixelProcessor getPixelProcessor() {
 		return this.pixelProcessor;
+	}
+
+	/** creates a default ImageProcessor and immediately processes Image.
+	 *  
+	 * @param image
+	 * @return
+	 */
+	public static ImageProcessor readAndProcess(BufferedImage image) {
+		ImageProcessor imageProcessor = new ImageProcessor(image);
+		imageProcessor.processImage(image);
+		return imageProcessor;
+	}
+
+	public PixelIslandList getOrCreatePixelIslandList() {
+		ensurePixelProcessor();
+		return pixelProcessor.getOrCreatePixelIslandList();
+	}
+
+	private void ensurePixelProcessor() {
+		if (pixelProcessor == null) {
+			pixelProcessor = new PixelProcessor(image);
+		}
 	}
 }

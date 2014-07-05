@@ -23,7 +23,6 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.PixelIslandComparator.ComparatorType;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -92,47 +91,47 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list;
 	}
 
-	/**
-	 * creates islands
-	 * 
-	 * @param file
-	 *            of image
-	 * @param operations
-	 *            BINARIZE and THIN
-	 * @return island list
-	 * @throws IOException
-	 */
-	public static PixelIslandList createPixelIslandList(File file,
-			Operation... operations) throws IOException {
-		BufferedImage image = ImageIO.read(file);
-		return createPixelIslandList(image, operations);
-	}
+//	/**
+//	 * creates islands
+//	 * 
+//	 * @param file
+//	 *            of image
+//	 * @param operations
+//	 *            BINARIZE and THIN
+//	 * @return island list
+//	 * @throws IOException
+//	 */
+//	public static PixelIslandList createPixelIslandList(File file,
+//			Operation... operations) throws IOException {
+//		BufferedImage image = ImageIO.read(file);
+//		return createPixelIslandList(image, operations);
+//	}
 
-	/**
-	 * creates PixelIslands ffrom iamge using floodfill.
-	 * 
-	 * @param image
-	 * @param operations
-	 *            optionally BINARIZE and THIN (maybe better done elsewhere)
-	 * @return
-	 * @throws IOException
-	 */
-	public static PixelIslandList createPixelIslandList(BufferedImage image,
-			Operation... operations) {
-		List<Operation> opList = Arrays.asList(operations);
-		LOG.trace("pre-bin");
-		if (opList.contains(Operation.BINARIZE)) {
-			image = ImageUtil.binarize(image);
-			LOG.trace("postbin ");
-		}
-		if (opList.contains(Operation.THIN)) {
-			image = ImageUtil.zhangSuenThin(image);
-		}
-		LOG.trace("postbin ");
-		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
-		LOG.trace("islands " + islands.size());
-		return islands;
-	}
+//	/**
+//	 * creates PixelIslands ffrom iamge using floodfill.
+//	 * 
+//	 * @param image
+//	 * @param operations
+//	 *            optionally BINARIZE and THIN (maybe better done elsewhere)
+//	 * @return
+//	 * @throws IOException
+//	 */
+//	public static PixelIslandList createPixelIslandList(BufferedImage image,
+//			Operation... operations) {
+//		List<Operation> opList = Arrays.asList(operations);
+//		LOG.trace("pre-bin");
+//		if (opList.contains(Operation.BINARIZE)) {
+//			image = ImageUtil.binarize(image);
+//			LOG.trace("postbin ");
+//		}
+//		if (opList.contains(Operation.THIN)) {
+//			image = ImageUtil.zhangSuenThin(image);
+//		}
+//		LOG.trace("postbin ");
+//		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
+//		LOG.trace("islands " + islands.size());
+//		return islands;
+//	}
 
 //	/**
 //	 * find all separated islands.
@@ -162,7 +161,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * @throws IOException
 	 */
 	public static PixelIslandList createSuperThinnedPixelIslandList(BufferedImage image) {
-		PixelIslandList islandList = createPixelIslandList(image);
+		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
 		islandList.removeStepsSortAndReverse();
 		return islandList;
 	}

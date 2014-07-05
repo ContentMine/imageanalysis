@@ -1,4 +1,4 @@
-package org.xmlcml.image.compound;
+package org.xmlcml.image.processing;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,8 +15,6 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.processing.Pixel;
-import org.xmlcml.image.processing.PixelIsland;
 
 /**
  * container for a lit of pixels. 

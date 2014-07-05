@@ -1,4 +1,4 @@
-package org.xmlcml.image.lines;
+package org.xmlcml.image.processing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,7 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolyline;
-import org.xmlcml.image.compound.PixelList;
-import org.xmlcml.image.processing.Nucleus;
-import org.xmlcml.image.processing.Pixel;
-import org.xmlcml.image.processing.PixelIsland;
+import org.xmlcml.image.lines.DouglasPeucker;
 
 /** a non-branching path of pixels.
  * 

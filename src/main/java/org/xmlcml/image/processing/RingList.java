@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
-import org.xmlcml.image.compound.PixelList;
 
 public class RingList implements Iterable<PixelList> {
 

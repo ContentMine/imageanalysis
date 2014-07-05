@@ -15,10 +15,9 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGImage;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGText;
-import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.PixelIsland;
 import org.xmlcml.image.processing.PixelIslandList;
-import org.xmlcml.image.processing.PixelIslandList.Operation;
+import org.xmlcml.image.processing.PixelProcessor;
 import org.xmlcml.image.text.fonts.ReferenceFont;
 import org.xmlcml.image.text.fonts.ReferenceFontManager;
 
@@ -119,8 +118,8 @@ public class GrayCharacterMatcher {
 	 * 
 	 */
 	public void match() {
-		BufferedImage testImage0 = (binarize) ? ImageUtil.binarize(testImage) : testImage;
-		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandList(testImage, Operation.BINARIZE);
+		PixelProcessor pixelProcessor = new PixelProcessor(testImage);
+		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList();
 		g = new SVGG();
 		for (PixelIsland island : pixelIslandList) {
 			BufferedImage image = island.createImage(testImage.getType());

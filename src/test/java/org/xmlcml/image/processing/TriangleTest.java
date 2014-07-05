@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2;
-import org.xmlcml.image.compound.PixelList;
 
 public class TriangleTest {
 

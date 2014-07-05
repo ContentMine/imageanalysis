@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
  * used to be PixelIslandList but that became over-complex.
  * Also the pixelIslandList might be null but this shouldn't be.
  * 
+ * NOTE: setters return PixelProcessor so they can be chained, e.g.
+ *     PixelProcessor processor = new PixelProcessor(image).setMaxisland(3).setOutputDir(file)
  * 
  * @author pm286
  *
@@ -28,42 +30,45 @@ public class PixelProcessor {
 	private File outputDir;
 
 	
-	public PixelProcessor() {
-		init();
+	public PixelProcessor(BufferedImage image) {
+		this.image = image;
+		setDefaults();
 	}
 	
-	private void init() {
+	private void setDefaults() {
 		outputDir = new File("target/misc1/");
 		maxIsland = 6;
 	}
 	
-	public PixelIslandList getPixelIslandList() {
-		if (pixelIslandList == null) {
+	public PixelIslandList getOrCreatePixelIslandList() {
+		if (pixelIslandList == null && image != null) {
 			FloodFill floodFill = new FloodFill(this.image);
 			floodFill.setDiagonal(true);
 			floodFill.fill();
 			pixelIslandList = floodFill.getPixelIslandList();
 			LOG.debug("after floodfill islands: "+pixelIslandList.size());
-//			pixelIslandList.setImage(image);
 			pixelIslandList.removeStepsSortAndReverse();
+			pixelIslandList.setPixelProcessor(this);
 		}
 		return pixelIslandList;
 	}
 
-	public void setMaxIsland(int maxIsland) {
+	public PixelProcessor setMaxIsland(int maxIsland) {
 		this.maxIsland = maxIsland;
+		return this;
 	}
 
 	public int getMaxIsland() {
 		return maxIsland;
 	}
 
-	public File getOutputDir() {
-		return outputDir;
+	public PixelProcessor setOutputDir(File outputDir) {
+		this.outputDir = outputDir;
+		return this;
 	}
 
-	public void setOutputDir(File outputDir) {
-		this.outputDir = outputDir;
+	public File getOutputDir() {
+		return outputDir;
 	}
 
 	

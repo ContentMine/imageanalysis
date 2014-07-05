@@ -24,7 +24,6 @@ import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.processing.ColorUtilities;
 import org.xmlcml.image.processing.HilditchThinning;
-import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
@@ -57,23 +56,6 @@ public class ImageUtil {
 		return image;
 	}
 
-
-	public static BufferedImage binarize(BufferedImage image) {
-		OtsuBinarize otsuBinarize = new OtsuBinarize();
-		otsuBinarize.setImage(image);
-		otsuBinarize.toGray();
-		otsuBinarize.binarize();
-		image = otsuBinarize.getBinarizedImage();
-		return image;
-	}
-
-	public static BufferedImage binarizeToGray(BufferedImage image) {
-		OtsuBinarize otsuBinarize = new OtsuBinarize();
-		otsuBinarize.setImage(image);
-		otsuBinarize.toGray();
-		image = otsuBinarize.getGrayImage();
-		return image;
-	}
 	
 	public static BufferedImage boofCVBinarization(BufferedImage image, int threshold) {
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);

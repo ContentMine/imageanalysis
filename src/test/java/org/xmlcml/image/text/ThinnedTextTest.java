@@ -1,6 +1,7 @@
 package org.xmlcml.image.text;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -10,7 +11,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class ThinnedTextTest {
@@ -99,16 +99,16 @@ public class ThinnedTextTest {
 	}
 
 	private void binarizethin(String original) throws IOException {
-		OtsuBinarize otsuBinarize = new OtsuBinarize();
-		otsuBinarize.read(new File(Fixtures.TEXT_DIR, original));
-		otsuBinarize.toGray();
-		otsuBinarize.binarize();
-		BufferedImage image = otsuBinarize.getBinarizedImage();
-		ImageUtil.writeImageQuietly(image, TARGET_FONTS+original+"binary.png");
-		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
-		thinningService.doThinning();
-		image = thinningService.getThinnedImage();
-		ImageUtil.writeImageQuietly(image, TARGET_FONTS+original+".png");
+//		OtsuBinarize otsuBinarize = new OtsuBinarize();
+//		otsuBinarize.read(new File(Fixtures.TEXT_DIR, original));
+//		otsuBinarize.toGray();
+//		otsuBinarize.binarize();
+//		BufferedImage image = otsuBinarize.getBinarizedImage();
+//		ImageUtil.writeImageQuietly(image, TARGET_FONTS+original+"binary.png");
+//		ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
+//		thinningService.doThinning();
+//		image = thinningService.getThinnedImage();
+//		ImageUtil.writeImageQuietly(image, TARGET_FONTS+original+".png");
 	}
 
 }

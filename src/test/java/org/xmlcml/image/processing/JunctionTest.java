@@ -14,7 +14,6 @@ import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.compound.PixelList;
 
 public class JunctionTest {
 

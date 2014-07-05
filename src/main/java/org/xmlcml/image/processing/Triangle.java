@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.xmlcml.euclid.Int2;
-import org.xmlcml.image.compound.PixelList;
 
 public class Triangle {
 

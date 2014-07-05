@@ -5,9 +5,10 @@ import java.awt.image.BufferedImage;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
-import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIslandList;
+import org.xmlcml.image.processing.PixelList;
+import org.xmlcml.image.processing.PixelProcessor;
 
 /**
  * see http://en.wikipedia.org/wiki/Image_moment
@@ -70,7 +71,8 @@ public class ImageMomentGenerator {
 			throw new RuntimeException("null image");
 		}
 		this.image = image;
-		pixelIslandList = PixelIslandList.createPixelIslandList(image);
+		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		pixelIslandList = pixelProcessor.getOrCreatePixelIslandList();
 		readPixelList(pixelIslandList);
 	}
 	

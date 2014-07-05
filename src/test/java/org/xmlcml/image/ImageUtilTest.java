@@ -47,25 +47,6 @@ public class ImageUtilTest {
 	}
 
 	@Test
-	/** check a few pixels to identify the gray values.
-	 * 
-	 * @throws IOException
-	 */
-	public void testGray() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.PROCESSING_DIR, "colors.png"));
-		Assert.assertNotNull("not null", image);
-		BufferedImage imageg = ImageUtil.binarizeToGray(image);
-		Assert.assertNotNull("not nullg", imageg);
-		Assert.assertEquals(252, imageg.getRGB(10,0) & 0xff);
-		Assert.assertEquals(167, imageg.getRGB(10,140) & 0xff);
-		Assert.assertEquals(168, imageg.getRGB(30,140) & 0xff);
-		Assert.assertEquals(63, imageg.getRGB(30,135) & 0xff);
-		Assert.assertEquals(70, imageg.getRGB(30,130) & 0xff);
-		Assert.assertEquals(252, imageg.getRGB(30,120) & 0xff);
-		ImageUtil.writeImageQuietly(imageg, "target/gray/gray.png");
-	}
-
-	@Test
 	/** shifts image by dx dy.
 	 * 
 	 */

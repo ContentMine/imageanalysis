@@ -12,9 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.image.compound.PixelList;
 import org.xmlcml.image.processing.Pixel;
 import org.xmlcml.image.processing.PixelIslandList;
+import org.xmlcml.image.processing.PixelList;
+import org.xmlcml.image.processing.PixelProcessor;
 
 /**
  * This class provides a set of methods for computing Zernike moments.
@@ -60,7 +61,8 @@ public class ZernikeMoments {
 		this.image = image;
 		width = image.getWidth();
 		height = image.getHeight();
-		pixelIslandList = PixelIslandList.createPixelIslandList(image);
+		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		pixelIslandList = pixelProcessor.getOrCreatePixelIslandList();
 		PixelList pixels = pixelIslandList.getPixelList();
 		npixels = pixels.size();
 		createXYVals(pixels);

@@ -25,8 +25,6 @@ import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.compound.PixelList;
-import org.xmlcml.image.lines.PixelPath;
 
 /**
  * connected list of pixels.

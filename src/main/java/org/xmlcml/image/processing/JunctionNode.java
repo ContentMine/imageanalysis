@@ -5,7 +5,6 @@ import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.image.compound.PixelList;
 
 /** T-junctions in pixelIsland.
  * 
