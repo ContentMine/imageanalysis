@@ -14,7 +14,6 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.image.text.GrayCharacter;
 
 public class ImageUtilTest {
 
@@ -74,19 +73,6 @@ public class ImageUtilTest {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.scaleAndInterpolate(image, 17, 13);
 		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/scaledImage.png");
-	}
-
-	@Test
-	/** shifts image to  centre.
-	 * 
-	 */
-	public void testShiftGrayImageToCentre() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
-		GrayCharacter character = GrayCharacter.readGrayImage(image);
-		Real2 centre = character.getCentre();
-//		LOG.debug(centre);
-		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 4-centre.getX(), 5-centre.getY());
-		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/shiftedImage1.png");
 	}
 
 

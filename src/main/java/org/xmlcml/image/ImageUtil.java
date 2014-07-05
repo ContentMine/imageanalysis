@@ -22,7 +22,7 @@ import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.processing.ColorUtilities;
+import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.processing.HilditchThinning;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;

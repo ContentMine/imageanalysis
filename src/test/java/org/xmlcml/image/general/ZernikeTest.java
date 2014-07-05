@@ -12,10 +12,10 @@ import org.junit.Test;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.processing.Pixel;
-import org.xmlcml.image.processing.PixelIslandList;
-import org.xmlcml.image.processing.PixelList;
-import org.xmlcml.image.processing.PixelProcessor;
+import org.xmlcml.image.pixel.Pixel;
+import org.xmlcml.image.pixel.PixelIslandList;
+import org.xmlcml.image.pixel.PixelList;
+import org.xmlcml.image.pixel.PixelProcessor;
 
 public class ZernikeTest {
 

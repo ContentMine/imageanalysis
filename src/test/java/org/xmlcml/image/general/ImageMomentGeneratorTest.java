@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.moments.ImageMomentGenerator;
 
 public class ImageMomentGeneratorTest {
 

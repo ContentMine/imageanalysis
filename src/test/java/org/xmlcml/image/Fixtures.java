@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Arrays;
 
-import org.xmlcml.image.processing.Pixel;
-import org.xmlcml.image.processing.PixelList;
+import org.xmlcml.image.pixel.Pixel;
+import org.xmlcml.image.pixel.PixelList;
 
 public class Fixtures {
 
