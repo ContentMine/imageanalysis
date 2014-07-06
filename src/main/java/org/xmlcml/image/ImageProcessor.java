@@ -73,6 +73,14 @@ public class ImageProcessor {
 		this.thinning = thinning;
 	}
 
+	/** sets threshold.
+	 * 
+	 * this assumes an image with white background and black lines and characters.
+	 * 
+	 * if the antialising bleeds between characters, set the threshold low. Thus
+	 * in 
+	 * @param threshold
+	 */
 	public void setThreshold(int threshold) {
 		this.threshold = threshold;
 		this.binarize = true;
@@ -84,7 +92,7 @@ public class ImageProcessor {
 			throw new RuntimeException("Image file is null/missing/directory: "+file);
 		}
 		try {
-			BufferedImage image = ImageIO.read(file);
+			image = ImageIO.read(file);
 			processImage(image);
 			return image;
 		} catch (Exception e) {
@@ -178,6 +186,8 @@ public class ImageProcessor {
 
 	public void readAndProcessFile(File file) {
 		this.setInputFile(file);
+		processImageFile(file);
+		
 	}
 
 	private void setInputFile(File file) {
@@ -206,12 +216,14 @@ public class ImageProcessor {
 
 	public PixelIslandList getOrCreatePixelIslandList() {
 		ensurePixelProcessor();
-		return pixelProcessor.getOrCreatePixelIslandList();
+		// this is messy - the super thinning should have been done earlier
+		return pixelProcessor.getOrCreatePixelIslandList(thinning != null);
 	}
 
-	private void ensurePixelProcessor() {
+	public PixelProcessor ensurePixelProcessor() {
 		if (pixelProcessor == null) {
 			pixelProcessor = new PixelProcessor(image);
 		}
+		return pixelProcessor;
 	}
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.image.processing.Thinning;
 
 /** manager for all pixel operations.
  * 
@@ -29,6 +30,9 @@ public class PixelProcessor {
 	private List<PixelGraph> pixelGraphList;
 	private File outputDir;
 
+	private boolean superThinning;
+//	private Thinning thinning = 
+
 	
 	public PixelProcessor(BufferedImage image) {
 		this.image = image;
@@ -40,14 +44,48 @@ public class PixelProcessor {
 		maxIsland = 6;
 	}
 	
+	/** messy.
+	 * If we have set thinning to null, then we don't use superthinning
+	 * @param thinning
+	 * @return
+	 */
+	public PixelIslandList getOrCreatePixelIslandList(Thinning thinning) {
+		return getOrCreatePixelIslandList((thinning != null));
+	}
+
+	/** get PixelIslandList.
+	 * 
+	 * create it if it doesn't exist.
+	 * 
+	 * this default is NOT to superthin after creating islands
+	 * 
+	 * @return
+	 */
 	public PixelIslandList getOrCreatePixelIslandList() {
+		return getOrCreatePixelIslandList(false);
+	}
+		
+	/** get pixelIslandList.
+	 * 
+	 * if not existing, do floodfill on pixels
+	 * 
+	 * if superthinning (ie. cleaning thisck edges and pixelNuclei) is required carry it
+	 * out here. Ideally it shold be with the Z-S thinning, but the code is written for pixels after 
+	 * pixelIslands are created.
+	 * 
+	 * @param superThinning 
+	 * @return
+	 */
+	public PixelIslandList getOrCreatePixelIslandList(boolean superThinning) {
 		if (pixelIslandList == null && image != null) {
 			FloodFill floodFill = new FloodFill(this.image);
 			floodFill.setDiagonal(true);
 			floodFill.fill();
 			pixelIslandList = floodFill.getPixelIslandList();
-			LOG.debug("after floodfill islands: "+pixelIslandList.size());
-			pixelIslandList.removeStepsSortAndReverse();
+			LOG.trace("after floodfill islands: "+pixelIslandList.size());
+			if (superThinning) {
+				pixelIslandList.removeStepsSortAndReverse();
+			}
 			pixelIslandList.setPixelProcessor(this);
 		}
 		return pixelIslandList;

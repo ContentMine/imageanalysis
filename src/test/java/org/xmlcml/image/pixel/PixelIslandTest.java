@@ -592,7 +592,7 @@ public class PixelIslandTest {
 	@Test
 	/** finds and correlates bracket characters which are ca 21 pixels high.
 	 * 
-	 * note being run on partially thinned characters; appear to be brackets
+	 * note appear to be brackets or pipes
 	 * 
 	 *  creates plot in target/brackets/i_j.svg
 	 * @throws IOException
@@ -620,10 +620,10 @@ public class PixelIslandTest {
 		}
 		correlationMatrix.format(2);
 		Assert.assertEquals("correlation", "{4,4}\n"+
-			"(1.0,0.6,0.58,0.67)\n"+
-			"(0.6,1.0,0.62,0.64)\n"+
-			"(0.58,0.62,1.0,0.69)\n"+
-			"(0.67,0.64,0.69,1.0)", correlationMatrix.toString());
+			"(1.0,0.8,0.69,0.89)\n"+
+			"(0.8,1.0,0.75,0.8)\n"+
+			"(0.69,0.75,1.0,0.73)\n"+
+			"(0.89,0.8,0.73,1.0)", correlationMatrix.toString());
 	}
 
 	@Test
