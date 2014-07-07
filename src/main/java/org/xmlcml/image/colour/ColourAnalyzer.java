@@ -168,6 +168,10 @@ public class ColourAnalyzer {
 		}
 		currentImage = inputImage;
 	}
+	
+	public File getInputFile() {
+		return inputFile;
+	}
 
 	public void setIntervalCount(int nvals) {
 		this.intervalCount = nvals;

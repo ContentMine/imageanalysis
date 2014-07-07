@@ -2,9 +2,11 @@ package org.xmlcml.image;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.PixelProcessor;
@@ -28,6 +30,19 @@ public class ImageProcessor {
 
 	private static final Logger LOG = Logger.getLogger(ImageProcessor.class);
 
+	public static final String DEBUG = "-d";
+	public static final String DEBUG1 = "--debug";
+	public static final String INPUT = "-i";
+	public static final String INPUT1 = "--input";
+	public static final String OUTPUT = "-o";
+	public static final String OUTPUT1 = "--output";
+	public static final String BINARIZE = "-b";
+	public static final String BINARIZE1 = "--binarize";
+	public static final String THRESH = "-t";
+	public static final String THRESH1 = "--threshold";
+	public static final String THINNING = "-v";
+	public static final String THINNING1 = "--thinning";
+	
 	private static final String BINARIZED_PNG = "binarized.png";
 	private static final String RAW_IMAGE_PNG = "rawImage.png";
 	private static final String TARGET = "target";
@@ -40,14 +55,28 @@ public class ImageProcessor {
 	private Thinning thinning;
 	private int threshold;
 	private File inputFile;
+	private File outputDir;
 	private PixelProcessor pixelProcessor;
 
 	public ImageProcessor() {
+		setDefaults();
 	}
 	
 	public ImageProcessor(BufferedImage image) {
 		this.image = image;
+		setDefaults();
 	}
+
+	public void setDefaults() {
+		ensurePixelProcessor();
+		pixelProcessor.setDefaults();
+		this.setThreshold(getDefaultThreshold());
+		this.setThinning(new ZhangSuenThinning());
+		this.setOutputDir(getDefaultOutputDirectory());
+		this.setBinarize(true);
+		this.setThreshold(DEFAULT_THRESHOLD);
+	}
+	
 
 	public void setBase(String base) {
 		this.base = base;
@@ -56,9 +85,17 @@ public class ImageProcessor {
 	public void setBinarize(boolean binarize) {
 		this.binarize = binarize;
 	}
+	
+	public boolean getBinarize() {
+		return binarize;
+	}
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+	
+	public boolean getDebug() {
+		return debug;
 	}
 
 	public void setImage(BufferedImage img) {
@@ -92,12 +129,17 @@ public class ImageProcessor {
 			throw new RuntimeException("Image file is null/missing/directory: "+file);
 		}
 		try {
+			this.inputFile = file;
 			image = ImageIO.read(file);
 			processImage(image);
 			return image;
 		} catch (Exception e) {
 			throw new RuntimeException("bad image: "+file, e);
 		}
+	}
+	
+	public File getInputFile() {
+		return inputFile;
 	}
 
 	public BufferedImage processImage(BufferedImage img) {
@@ -143,9 +185,7 @@ public class ImageProcessor {
 	 */
 	public static ImageProcessor createDefaultProcessor() {
 		ImageProcessor imageProcessor = new ImageProcessor();
-		imageProcessor.setThinning(new ZhangSuenThinning());
-		imageProcessor.setBinarize(true);
-		imageProcessor.setThreshold(DEFAULT_THRESHOLD);
+		// defaults are standard
 		return imageProcessor;
 	}
 
@@ -181,7 +221,14 @@ public class ImageProcessor {
 	}
 
 	public String getBase() {
+		if (base == null && inputFile != null) {
+			base = FilenameUtils.getBaseName(inputFile.toString());
+		}
 		return base;
+	}
+
+	private static int getDefaultThreshold() {
+		return DEFAULT_THRESHOLD;
 	}
 
 	public void readAndProcessFile(File file) {
@@ -190,12 +237,35 @@ public class ImageProcessor {
 		
 	}
 
-	private void setInputFile(File file) {
+	public void setInputFile(File file) {
 		this.inputFile = file;
 	}
+	
+	public BufferedImage processImageFile() {
+		BufferedImage img = null;
+		if (inputFile == null || !inputFile.exists()) {
+			throw new RuntimeException("File does not exist: "+inputFile);
+		} 
+		if (getBase() == null) {
+			setBase(FilenameUtils.getBaseName(inputFile.toString()));
+		}
+		try {
+			img = ImageIO.read(inputFile);
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot find/read imagefile: "+inputFile, e);
+		}
+		if (img != null) {
+			img = processImage(img);
+		}
+		return img;
+	}
+
 
 	public void debug() {
+		System.err.println("input:     "+((inputFile == null) ? "null" : inputFile.getAbsolutePath()));
+		System.err.println("output:    "+((outputDir == null) ? "null" : outputDir.getAbsolutePath()));
 		System.err.println("threshold: "+threshold);
+		System.err.println("thinning:  "+thinning);
 		pixelProcessor.debug();
 	}
 
@@ -222,8 +292,182 @@ public class ImageProcessor {
 
 	public PixelProcessor ensurePixelProcessor() {
 		if (pixelProcessor == null) {
-			pixelProcessor = new PixelProcessor(image);
+			pixelProcessor = new PixelProcessor(this);
 		}
 		return pixelProcessor;
 	}
+	
+	public static File getDefaultOutputDirectory() {
+		return new File(TARGET);
+	}
+
+	public void setOutputDir(File file) {
+		if (file == null) {
+			throw new RuntimeException("Null output directory");
+		}
+		this.outputDir = file;
+		outputDir.mkdirs();
+	}
+
+	public File getOutputDir() {
+		return outputDir;
+	}
+
+	
+	public void usage() {
+		System.err.println("  imageanalysis options:");
+		System.err.println("       "+INPUT+" "+INPUT1+"        input file (directory not yet supported)");
+		System.err.println("       "+OUTPUT+" "+OUTPUT1+"        output directory; def="+getDefaultOutputDirectory());
+		System.err.println("       "+BINARIZE+" "+BINARIZE1+"        set binarize on");
+		System.err.println("       "+DEBUG+" "+DEBUG1+"        set debug on");
+		System.err.println("       "+THRESH+" "+THRESH1+"    threshold (default: "+getDefaultThreshold()+")");
+		System.err.println("       "+THINNING+" "+THINNING1+"    thinning ('none', 'z' (ZhangSuen))");
+	}
+
+	protected int parseArgs(ArgIterator argIterator) {
+		if (argIterator.size() == 0) {
+			usage();
+		} else {
+			while (argIterator.hasNext()) {
+				if (debug) {
+					LOG.debug(argIterator.getCurrent());
+				}
+				parseArgAndAdvance(argIterator);
+			}
+		}
+		if (debug) {
+			this.debug();
+		}
+		return 0;
+	}
+
+
+	public static void checkHasMoreArgs(int iarg, String[] args) {
+		if (iarg >= args.length) {
+			throw new RuntimeException("ran out of args after "+args[iarg-1]);
+		}
+	}
+
+	public void parseArgAndAdvance(ArgIterator argIterator) {
+		ensurePixelProcessor();
+		String arg = argIterator.getCurrent();
+		if (false) {
+			
+		} else if (arg.equals(ImageProcessor.DEBUG) || arg.equals(ImageProcessor.DEBUG1)) {
+			debug = true;
+			argIterator.setDebug(true);
+			argIterator.next();
+		} else if (arg.equals(BINARIZE) || arg.equals(BINARIZE1)) {
+			this.setBinarize(true);
+			argIterator.next();
+		} else if (arg.equals(INPUT) || arg.equals(INPUT1)) {
+			String value = argIterator.getSingleValue();
+			if (value != null) {
+				setInputFile(new File(value));
+			}
+		} else if (arg.equals(OUTPUT) || arg.equals(OUTPUT1)) {
+			String value = argIterator.getSingleValue();
+			if (value != null) {
+				setOutputDir(new File(value));
+			}
+		} else if (arg.equals(THINNING) || arg.equals(THINNING1)) {
+			String value = argIterator.getSingleValue();
+			if (value != null) {
+				setThin(value);
+			}
+		} else if (arg.equals(THRESH) || arg.equals(THRESH1)) {
+			Integer value = argIterator.getSingleIntegerValue();
+			if (value != null) {
+				setThreshold(value);
+			}
+		} else {
+			boolean found = pixelProcessor.processArg(argIterator);
+			if (!found) {
+				LOG.debug("skipped unknown token: "+argIterator.getCurrent());
+				argIterator.next();
+			}
+		}
+	}
+
+	public int parseArg(int iarg, String[] args) {
+		ensurePixelProcessor();
+		if (false) {
+			
+		} else if (args[iarg].equals(ImageProcessor.DEBUG) || args[iarg].equals(ImageProcessor.DEBUG1)) {
+			debug = true;
+			iarg++;
+		} else if (args[iarg].equals(BINARIZE) || args[iarg].equals(BINARIZE1)) {
+			this.setBinarize(true);
+			iarg++;
+		} else if (args[iarg].equals(INPUT) || args[iarg].equals(INPUT1)) {
+			checkHasMoreArgs(iarg++, args);
+			setInputFile(new File(args[iarg++]));
+		} else if (args[iarg].equals(OUTPUT) || args[iarg].equals(OUTPUT1)) {
+			checkHasMoreArgs(iarg++, args);
+			setOutputDir(new File(args[iarg++]));
+		} else if (args[iarg].equals(THINNING) || args[iarg].equals(THINNING1)) {
+			checkHasMoreArgs(iarg++, args);
+			setThin(args[iarg++]);
+		} else if (args[iarg].equals(THRESH) || args[iarg].equals(THRESH1)) {
+			checkHasMoreArgs(iarg++, args);
+			String s = args[iarg++];
+			Integer ii = parseInt(s);
+			if (ii == null) {
+				LOG.error("bad integer value: "+s);
+			} else {
+				this.setThreshold(ii);
+			}
+		} else {
+			iarg = pixelProcessor.processArg(iarg, args);
+		}
+		return iarg;
+	}
+
+	public static Integer parseInt(String number) {
+		Integer result = null;
+		try {
+			result = new Integer(number);
+		} catch (Exception e) {
+//			LOG.debug("cannot parse as integer: "+number);
+		}
+		return result;
+	}
+
+	private void setThin(String thinningS) {
+		if (thinningS == null) {
+			throw new RuntimeException("no thinning argument [for none use 'none']");
+		} else if (thinningS.equalsIgnoreCase("none")) {
+			setThinning(null);
+		} else if (thinningS.equalsIgnoreCase("z")) {
+			setThinning(new ZhangSuenThinning()); 
+		} else {
+			LOG.error("unknown thinning argument: "+thinningS);
+		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		ImageProcessor imageProcessor = new ImageProcessor();
+		ArgIterator argIterator = new ArgIterator(args);
+		imageProcessor.processArgsAndRun(argIterator);		
+	}
+
+	private void processArgsAndRun(ArgIterator argIterator) {
+		if (argIterator.size() == 0) {
+			this.usage();
+		} else {
+			this.parseArgs(argIterator);
+			this.runArgs();
+		}
+	}
+
+	private void runArgs() {
+		ensurePixelProcessor();
+		if (this.image == null) {
+			throw new RuntimeException("no image file to process");
+		}
+		processImage(image);
+		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
+		LOG.debug("islandList "+islandList.size());
+	}
+
 }

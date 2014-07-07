@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.image.ArgIterator;
+import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.processing.Thinning;
 
 /** manager for all pixel operations.
@@ -26,24 +28,41 @@ public class PixelProcessor {
 	
 	private PixelIslandList pixelIslandList;
 	private int maxIsland;
-	private BufferedImage image;
 	private List<PixelGraph> pixelGraphList;
+//	private boolean superThinning;
+	private boolean debug;
+	private ImageProcessor imageProcessor;
+	private BufferedImage image;
 	private File outputDir;
 
-	private boolean superThinning;
-//	private Thinning thinning = 
-
 	
-	public PixelProcessor(BufferedImage image) {
-		this.image = image;
+	public PixelProcessor(ImageProcessor imageProcessor) {
+		this.imageProcessor = imageProcessor;
 		setDefaults();
 	}
 	
-	private void setDefaults() {
-		outputDir = new File("target/misc1/");
-		maxIsland = 6;
+	public PixelProcessor(BufferedImage image) {
+		this.image = image;
+	}
+
+	public void setDefaults() {
+//		outputDir = new File("target/misc1/");
+		this.setMaxIsland(getDefaultMaxIsland());
+//		this.setOutputDir(getDefaultOutputDirectory());
 	}
 	
+	private int getDefaultMaxIsland() {
+		return 3;
+	}
+
+	public BufferedImage getImage() {
+		if (image == null) {
+			if (imageProcessor != null) {
+				image = imageProcessor.getImage();
+			}
+		}
+		return image;
+	}
 	/** messy.
 	 * If we have set thinning to null, then we don't use superthinning
 	 * @param thinning
@@ -77,7 +96,7 @@ public class PixelProcessor {
 	 * @return
 	 */
 	public PixelIslandList getOrCreatePixelIslandList(boolean superThinning) {
-		if (pixelIslandList == null && image != null) {
+		if (pixelIslandList == null && getImage() != null) {
 			FloodFill floodFill = new FloodFill(this.image);
 			floodFill.setDiagonal(true);
 			floodFill.fill();
@@ -106,7 +125,51 @@ public class PixelProcessor {
 	}
 
 	public File getOutputDir() {
+		if (outputDir == null) {
+			outputDir = imageProcessor.getOutputDir();
+		}
 		return outputDir;
+	}
+
+
+	public boolean processArg(ArgIterator argIterator) {
+		boolean found = false;
+		String arg = argIterator.getCurrent();
+		if (false) {
+			
+		} else if (arg.equals(ImageProcessor.DEBUG) || arg.equals(ImageProcessor.DEBUG1)) {
+			this.debug = true;
+			found = true;
+//		} else if (args[iarg].equals(INPUT) || args[iarg].equals(INPUT1)) {
+//			checkHasMoreArgs(iarg++, args);
+//			setInputFile(new File(args[iarg++]));
+//		} else if (args[iarg].equals(OUTPUT) || args[iarg].equals(OUTPUT1)) {
+//			checkHasMoreArgs(iarg++, args);
+//			setOutputDir(new File(args[iarg++]));
+		} else {
+//			iarg = -1;
+			found = false;
+		}
+		return found;
+	}
+
+
+	public int processArg(int iarg, String[] args) {
+		if (false) {
+			
+		} else if (args[iarg].equals(ImageProcessor.DEBUG) || args[iarg].equals(ImageProcessor.DEBUG1)) {
+			this.debug = true;
+			iarg++;
+//		} else if (args[iarg].equals(INPUT) || args[iarg].equals(INPUT1)) {
+//			checkHasMoreArgs(iarg++, args);
+//			setInputFile(new File(args[iarg++]));
+//		} else if (args[iarg].equals(OUTPUT) || args[iarg].equals(OUTPUT1)) {
+//			checkHasMoreArgs(iarg++, args);
+//			setOutputDir(new File(args[iarg++]));
+		} else {
+			iarg = -1;
+		}
+		return iarg;
 	}
 
 	
