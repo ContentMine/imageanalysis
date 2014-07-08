@@ -81,7 +81,7 @@ public class ImageProcessorTest {
 	@Test
 	public void testGetPixelIslandThroughCommandLine() {
 		String[] args = {"-d", "-i", "src/test/resources/org/xmlcml/image/processing/36933.png", "--island", "0"};
-		PROCESSOR.parseArgs(args);
-		PROCESSOR.runCommands();
+		PROCESSOR.parseArgsAndRun(args);
 	}
+
 }

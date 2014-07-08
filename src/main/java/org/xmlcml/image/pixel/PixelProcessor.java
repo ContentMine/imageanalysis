@@ -52,7 +52,7 @@ public class PixelProcessor {
 	public void setDefaults() {
 //		outputDir = new File("target/misc1/");
 		this.setMaxIsland(getDefaultMaxIsland());
-		this.setIsland(-1);
+		this.setIsland(-1); // because 0 is a valid island
 	}
 	
 	private int getDefaultMaxIsland() {
@@ -157,6 +157,10 @@ public class PixelProcessor {
 
 	private void setIsland(int island) {
 		this.island = island;
+	}
+
+	public int getIsland() {
+		return island;
 	}
 
 	public void debug() {

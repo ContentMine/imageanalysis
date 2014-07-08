@@ -30,7 +30,7 @@ public class ArgIterator {
 	}
 
 	public String getCurrent() {
-		return argList.get(pointer);
+		return (pointer < size()) ? argList.get(pointer) : null;
 	}
 
 	public String getLast() {

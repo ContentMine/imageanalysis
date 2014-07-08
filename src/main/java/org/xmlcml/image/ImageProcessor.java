@@ -242,22 +242,23 @@ public class ImageProcessor {
 	}
 	
 	public BufferedImage processImageFile() {
-		BufferedImage img = null;
-		if (inputFile == null || !inputFile.exists()) {
-			throw new RuntimeException("File does not exist: "+inputFile);
-		} 
-		if (getBase() == null) {
-			setBase(FilenameUtils.getBaseName(inputFile.toString()));
+		if (image == null) {
+			if (inputFile == null || !inputFile.exists()) {
+				throw new RuntimeException("File does not exist: "+inputFile);
+			} 
+			if (getBase() == null) {
+				setBase(FilenameUtils.getBaseName(inputFile.toString()));
+			}
+			try {
+				image = ImageIO.read(inputFile);
+			} catch (Exception e) {
+				throw new RuntimeException("Cannot find/read imagefile: "+inputFile, e);
+			}
 		}
-		try {
-			img = ImageIO.read(inputFile);
-		} catch (Exception e) {
-			throw new RuntimeException("Cannot find/read imagefile: "+inputFile, e);
+		if (image != null) {
+			image = processImage(image);
 		}
-		if (img != null) {
-			img = processImage(img);
-		}
-		return img;
+		return image;
 	}
 
 
@@ -423,8 +424,9 @@ public class ImageProcessor {
 			} else {
 				throw new RuntimeException("no image file to process");
 			}
+		} else {
+			processImage(image);
 		}
-		processImage(image);
 		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
 		LOG.debug("islandList "+islandList.size());
 	}
@@ -434,6 +436,11 @@ public class ImageProcessor {
 		while (argIterator.hasNext()) {
 			parseArgAndAdvance(argIterator);
 		}
+	}
+
+	public void parseArgsAndRun(String[] args) {
+		this.parseArgs(args);
+		this.runCommands();
 	}
 
 }
