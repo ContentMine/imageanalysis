@@ -20,8 +20,7 @@ public class ImageProcessorTest {
 	@Test
 	public void testUsage() {
 		String[] args = {};
-		ArgIterator argIterator = new ArgIterator(args);
-		PROCESSOR.parseArgs(argIterator);		
+		PROCESSOR.parseArgs(args);		
 	}
 	
 	/** verify defaults
@@ -30,8 +29,7 @@ public class ImageProcessorTest {
 	@Test
 	public void testCommandLineDefaults() {
 		String[] args = {"-d"};
-		ArgIterator argIterator = new ArgIterator(args);
-		PROCESSOR.parseArgs(argIterator);		
+		PROCESSOR.parseArgs(args);		
 		Assert.assertTrue("debug", PROCESSOR.getDebug());
 		Assert.assertNull("base", PROCESSOR.getBase());
 		Assert.assertNull("inputFile", PROCESSOR.getInputFile());
@@ -47,8 +45,7 @@ public class ImageProcessorTest {
 	@Test
 	public void testCommandLine() {
 		String[] args = {"-i", "fred", "-o", "sue", "-b", "-d", "-t", "180", "-v", "z"};
-		ArgIterator argIterator = new ArgIterator(args);
-		PROCESSOR.parseArgs(argIterator);		
+		PROCESSOR.parseArgs(args);		
 		Assert.assertNotNull("base", PROCESSOR.getBase());
 		Assert.assertEquals("base", "fred", PROCESSOR.getBase());
 		Assert.assertEquals("inputFile", "fred", PROCESSOR.getInputFile().toString());
@@ -67,8 +64,7 @@ public class ImageProcessorTest {
 	@Test
 	public void testCommandLineErrors() {
 		String[] args = {"-i", "-q", "-o", "sue", "-b", "dummy", "-t", "x160", "-v", "junk"};
-		ArgIterator argIterator = new ArgIterator(args);
-		PROCESSOR.parseArgs(argIterator);		
+		PROCESSOR.parseArgs(args);		
 		Assert.assertNull("base", PROCESSOR.getBase());
 		Assert.assertNull("inputFile", PROCESSOR.getInputFile());
 		Assert.assertNotNull("outputDir", PROCESSOR.getOutputDir());
@@ -77,5 +73,15 @@ public class ImageProcessorTest {
 		Assert.assertFalse("debug", PROCESSOR.getDebug());
 		Assert.assertEquals("threshold", 128, PROCESSOR.getThreshold());
 		Assert.assertEquals("thinning", ZhangSuenThinning.class, PROCESSOR.getThinning().getClass());
+	}
+	
+	/** get PixelIsland through CommandLine.
+	 * 
+	 */
+	@Test
+	public void testGetPixelIslandThroughCommandLine() {
+		String[] args = {"-d", "-i", "src/test/resources/org/xmlcml/image/processing/36933.png", "--island", "0"};
+		PROCESSOR.parseArgs(args);
+		PROCESSOR.runCommands();
 	}
 }

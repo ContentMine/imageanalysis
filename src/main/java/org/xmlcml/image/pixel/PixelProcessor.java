@@ -25,7 +25,10 @@ import org.xmlcml.image.processing.Thinning;
 public class PixelProcessor {
 
 	private final static Logger LOG = Logger.getLogger(PixelProcessor.class);
-	
+
+	public static final String ISLAND = "-y";
+	public static final String ISLAND1 = "--island";
+
 	private PixelIslandList pixelIslandList;
 	private int maxIsland;
 	private List<PixelGraph> pixelGraphList;
@@ -34,6 +37,7 @@ public class PixelProcessor {
 	private ImageProcessor imageProcessor;
 	private BufferedImage image;
 	private File outputDir;
+	private int island;
 
 	
 	public PixelProcessor(ImageProcessor imageProcessor) {
@@ -48,7 +52,7 @@ public class PixelProcessor {
 	public void setDefaults() {
 //		outputDir = new File("target/misc1/");
 		this.setMaxIsland(getDefaultMaxIsland());
-//		this.setOutputDir(getDefaultOutputDirectory());
+		this.setIsland(-1);
 	}
 	
 	private int getDefaultMaxIsland() {
@@ -133,46 +137,28 @@ public class PixelProcessor {
 
 
 	public boolean processArg(ArgIterator argIterator) {
-		boolean found = false;
+		boolean found = true;
 		String arg = argIterator.getCurrent();
 		if (false) {
 			
 		} else if (arg.equals(ImageProcessor.DEBUG) || arg.equals(ImageProcessor.DEBUG1)) {
 			this.debug = true;
-			found = true;
-//		} else if (args[iarg].equals(INPUT) || args[iarg].equals(INPUT1)) {
-//			checkHasMoreArgs(iarg++, args);
-//			setInputFile(new File(args[iarg++]));
-//		} else if (args[iarg].equals(OUTPUT) || args[iarg].equals(OUTPUT1)) {
-//			checkHasMoreArgs(iarg++, args);
-//			setOutputDir(new File(args[iarg++]));
+		} else if (arg.equals(PixelProcessor.ISLAND) || arg.equals(PixelProcessor.ISLAND1)) {
+			Integer value = argIterator.getSingleIntegerValue();
+			if (value != null) {
+				setIsland(value);
+			}
+			
 		} else {
-//			iarg = -1;
 			found = false;
 		}
 		return found;
 	}
 
-
-	public int processArg(int iarg, String[] args) {
-		if (false) {
-			
-		} else if (args[iarg].equals(ImageProcessor.DEBUG) || args[iarg].equals(ImageProcessor.DEBUG1)) {
-			this.debug = true;
-			iarg++;
-//		} else if (args[iarg].equals(INPUT) || args[iarg].equals(INPUT1)) {
-//			checkHasMoreArgs(iarg++, args);
-//			setInputFile(new File(args[iarg++]));
-//		} else if (args[iarg].equals(OUTPUT) || args[iarg].equals(OUTPUT1)) {
-//			checkHasMoreArgs(iarg++, args);
-//			setOutputDir(new File(args[iarg++]));
-		} else {
-			iarg = -1;
-		}
-		return iarg;
+	private void setIsland(int island) {
+		this.island = island;
 	}
 
-	
 	public void debug() {
 		System.err.println("pixelIslandList   "+pixelIslandList);
 		System.err.println("maxIsland         "+maxIsland);

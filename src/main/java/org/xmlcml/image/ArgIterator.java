@@ -33,6 +33,10 @@ public class ArgIterator {
 		return argList.get(pointer);
 	}
 
+	public String getLast() {
+		return (pointer == 0) ? null : argList.get(pointer - 1);
+	}
+
 	public void next() {
 		pointer++;
 	}
@@ -41,7 +45,7 @@ public class ArgIterator {
 		String value = null;
 		List<String> values = getValues();
 		if (values.size() != 1) {
-			LOG.error("expected exactly one arg");
+			LOG.error("expected exactly one arg at "+getCurrent()+" after "+getLast());
 		} else {
 			value = values.get(0);
 		}
@@ -64,11 +68,8 @@ public class ArgIterator {
 
 	public Integer getSingleIntegerValue() {
 		Integer value = null;
-		List<String> values = getValues();
-		if (values.size() != 1) {
-			LOG.error("expected exactly one arg");
-		} else {
-			String vv = values.get(0);
+		String vv = getSingleValue();
+		if (vv != null) {
 			try {
 				value = new Integer(vv);
 			} catch (Exception e) {

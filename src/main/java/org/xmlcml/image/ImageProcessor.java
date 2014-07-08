@@ -324,7 +324,7 @@ public class ImageProcessor {
 		System.err.println("       "+THINNING+" "+THINNING1+"    thinning ('none', 'z' (ZhangSuen))");
 	}
 
-	protected int parseArgs(ArgIterator argIterator) {
+	protected void parseArgs(ArgIterator argIterator) {
 		if (argIterator.size() == 0) {
 			usage();
 		} else {
@@ -338,25 +338,22 @@ public class ImageProcessor {
 		if (debug) {
 			this.debug();
 		}
-		return 0;
 	}
 
-
-	public static void checkHasMoreArgs(int iarg, String[] args) {
-		if (iarg >= args.length) {
-			throw new RuntimeException("ran out of args after "+args[iarg-1]);
-		}
-	}
-
-	public void parseArgAndAdvance(ArgIterator argIterator) {
+	public boolean parseArgAndAdvance(ArgIterator argIterator) {
+		boolean found = true;
 		ensurePixelProcessor();
 		String arg = argIterator.getCurrent();
+		if (debug) {
+			LOG.debug(arg);
+		}
 		if (false) {
 			
 		} else if (arg.equals(ImageProcessor.DEBUG) || arg.equals(ImageProcessor.DEBUG1)) {
 			debug = true;
 			argIterator.setDebug(true);
 			argIterator.next();
+			
 		} else if (arg.equals(BINARIZE) || arg.equals(BINARIZE1)) {
 			this.setBinarize(true);
 			argIterator.next();
@@ -381,57 +378,15 @@ public class ImageProcessor {
 				setThreshold(value);
 			}
 		} else {
-			boolean found = pixelProcessor.processArg(argIterator);
+			found = pixelProcessor.processArg(argIterator);
 			if (!found) {
-				LOG.debug("skipped unknown token: "+argIterator.getCurrent());
+				LOG.debug("skipped unknown token: "+argIterator.getLast());
 				argIterator.next();
 			}
 		}
+		return found;
 	}
 
-	public int parseArg(int iarg, String[] args) {
-		ensurePixelProcessor();
-		if (false) {
-			
-		} else if (args[iarg].equals(ImageProcessor.DEBUG) || args[iarg].equals(ImageProcessor.DEBUG1)) {
-			debug = true;
-			iarg++;
-		} else if (args[iarg].equals(BINARIZE) || args[iarg].equals(BINARIZE1)) {
-			this.setBinarize(true);
-			iarg++;
-		} else if (args[iarg].equals(INPUT) || args[iarg].equals(INPUT1)) {
-			checkHasMoreArgs(iarg++, args);
-			setInputFile(new File(args[iarg++]));
-		} else if (args[iarg].equals(OUTPUT) || args[iarg].equals(OUTPUT1)) {
-			checkHasMoreArgs(iarg++, args);
-			setOutputDir(new File(args[iarg++]));
-		} else if (args[iarg].equals(THINNING) || args[iarg].equals(THINNING1)) {
-			checkHasMoreArgs(iarg++, args);
-			setThin(args[iarg++]);
-		} else if (args[iarg].equals(THRESH) || args[iarg].equals(THRESH1)) {
-			checkHasMoreArgs(iarg++, args);
-			String s = args[iarg++];
-			Integer ii = parseInt(s);
-			if (ii == null) {
-				LOG.error("bad integer value: "+s);
-			} else {
-				this.setThreshold(ii);
-			}
-		} else {
-			iarg = pixelProcessor.processArg(iarg, args);
-		}
-		return iarg;
-	}
-
-	public static Integer parseInt(String number) {
-		Integer result = null;
-		try {
-			result = new Integer(number);
-		} catch (Exception e) {
-//			LOG.debug("cannot parse as integer: "+number);
-		}
-		return result;
-	}
 
 	private void setThin(String thinningS) {
 		if (thinningS == null) {
@@ -456,18 +411,29 @@ public class ImageProcessor {
 			this.usage();
 		} else {
 			this.parseArgs(argIterator);
-			this.runArgs();
+			this.runCommands();
 		}
 	}
 
-	private void runArgs() {
+	void runCommands() {
 		ensurePixelProcessor();
 		if (this.image == null) {
-			throw new RuntimeException("no image file to process");
+			if (inputFile != null) {
+				processImageFile();
+			} else {
+				throw new RuntimeException("no image file to process");
+			}
 		}
 		processImage(image);
 		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
 		LOG.debug("islandList "+islandList.size());
+	}
+
+	public void parseArgs(String[] args) {
+		ArgIterator argIterator = new ArgIterator(args);
+		while (argIterator.hasNext()) {
+			parseArgAndAdvance(argIterator);
+		}
 	}
 
 }

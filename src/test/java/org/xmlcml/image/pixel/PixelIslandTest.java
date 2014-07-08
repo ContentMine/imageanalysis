@@ -373,8 +373,7 @@ public class PixelIslandTest {
 	@Test
 	public void testCreateLinePixelPaths() throws IOException {
 		PixelIsland island = createFirstPixelIsland(Fixtures.LINE_PNG);
-		List<PixelPath> pixelPaths = island
-				.createPixelPathListStartingAtTerminals();
+		List<PixelPath> pixelPaths = island.getOrCreatePixelPathList();
 		Assert.assertEquals("paths", 1, pixelPaths.size());
 		DouglasPeucker douglasPeucker = new DouglasPeucker(2.0);
 		List<Real2> reduced = douglasPeucker.reduce(pixelPaths.get(0)

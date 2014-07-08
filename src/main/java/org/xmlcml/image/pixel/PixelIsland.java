@@ -68,7 +68,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelList terminalPixels;
 	private Map<Pixel, Nucleus> nucleusMap;
 	private Set<Pixel> usedPixels;
-	private List<PixelPath> pixelPaths;
+	private List<PixelPath> pixelPathList;
 	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
@@ -493,16 +493,33 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
-	public List<PixelPath> createPixelPathListStartingAtTerminals() {
-		if (pixelPaths == null) {
-			pixelPaths = new ArrayList<PixelPath>();
+	List<PixelPath> getOrCreatePixelPathList() {
+		if (pixelPathList == null) {
 			removeHypotenuses();
 			getNucleusList();
-			LOG.trace("nucleus list " + nucleusList.size());
 			getTerminalPixels();
-			createPixelPathsStartingAtTerminals();
+			pixelPathList = createPixelPathListFromTerminals();
 		}
-		return pixelPaths;
+		return pixelPathList;
+	}
+
+	private List<PixelPath> createPixelPathListFromTerminals() {
+		Set<Pixel> usedTerminalPixels = new HashSet<Pixel>();
+		pixelPathList = new ArrayList<PixelPath>();
+		for (int i = 0; i < terminalPixels.size(); i++) {
+			Pixel terminal = terminalPixels.get(i);
+			addPixelPathFromTerminal(usedTerminalPixels, terminal);
+		}
+		return pixelPathList;
+	}
+
+	private void addPixelPathFromTerminal(Set<Pixel> usedTerminalPixels, Pixel terminal) {
+		if (!usedTerminalPixels.contains(terminal)) {
+			usedTerminalPixels.add(terminal);
+			PixelPath pixelPath = findTerminalOrBranch(terminal);
+			usedTerminalPixels.add(pixelPath.getLastPixel());
+			pixelPathList.add(pixelPath);
+		}
 	}
 
 	/**
@@ -577,20 +594,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
-	private void createPixelPathsStartingAtTerminals() {
-		Set<Pixel> usedTerminalPixels = new HashSet<Pixel>();
-		for (int i = 0; i < terminalPixels.size(); i++) {
-			Pixel terminal = terminalPixels.get(i);
-			if (usedTerminalPixels.contains(terminal)) {
-				continue;
-			}
-			usedTerminalPixels.add(terminal);
-			PixelPath pixelPath = findTerminalOrBranch(terminal);
-			usedTerminalPixels.add(pixelPath.getLastPixel());
-			pixelPaths.add(pixelPath);
-		}
-	}
-
 	private PixelPath findTerminalOrBranch(Pixel terminalPixel) {
 		PixelPath pixelPath = new PixelPath();
 		usedPixels = new HashSet<Pixel>();
@@ -662,7 +665,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		} else if (spikeSetCopy.size() == 2) {
 			spikeSetCopy.removeAll(getUsedNeighbours(currentPixel));
 			if (spikeSetCopy.size() != 1) {
-				LOG.error("BUG: should have removed pixel");
+				LOG.trace("BUG: should have removed pixel");
 			}
 			nextPixel = spikeSetCopy.iterator().next();
 			for (Pixel neighbour : nextPixel.getNeighbours(this)) {
@@ -697,12 +700,12 @@ public class PixelIsland implements Iterable<Pixel> {
 	public SVGG createSVGFromPixelPaths(boolean pixels) {
 		SVGG gg = new SVGG();
 		if (!pixels) {
-			createPixelPathListStartingAtTerminals();
+			getOrCreatePixelPathList();
 		}
-		if (pixels || pixelPaths.size() == 0) {
+		if (pixels || pixelPathList.size() == 0) {
 			gg = plotPixels(pixelList, this.pixelColor);
 		} else {
-			for (PixelPath pixelPath : pixelPaths) {
+			for (PixelPath pixelPath : pixelPathList) {
 				SVGG g = pixelPath.createSVGG(this.pixelColor);
 				g.setStrokeWidth(0.5);
 				gg.appendChild(g);
@@ -745,9 +748,9 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public List<Real2Array> createSegments(double tolerance) {
-		createPixelPathListStartingAtTerminals();
+		getOrCreatePixelPathList();
 		segmentArrayList = new ArrayList<Real2Array>();
-		for (PixelPath pixelPath : pixelPaths) {
+		for (PixelPath pixelPath : pixelPathList) {
 			Real2Array segmentArray = new Real2Array(
 					pixelPath.createDouglasPeucker(tolerance));
 			segmentArrayList.add(segmentArray);
@@ -919,7 +922,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public List<SVGPolyline> createPolylinesAndRemoveUsedPixels(double epsilon) {
 		List<PixelPath> pixelPaths = this
-				.createPixelPathListStartingAtTerminals();
+				.getOrCreatePixelPathList();
 		LOG.trace("pixelPaths: " + pixelPaths.size());
 		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
 		for (PixelPath pixelPath : pixelPaths) {
@@ -931,7 +934,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public void setPixelPaths(List<PixelPath> pixelPaths) {
-		this.pixelPaths = pixelPaths;
+		this.pixelPathList = pixelPaths;
 	}
 
 	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon,
