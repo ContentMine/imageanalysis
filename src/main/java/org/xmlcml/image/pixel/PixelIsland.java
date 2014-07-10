@@ -56,7 +56,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
 
-	private static final int NONE = -1;
+	private static final int NEIGHBOUR8 = -1;
 
 	PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
@@ -886,19 +886,21 @@ public class PixelIsland implements Iterable<Pixel> {
 		image = new BufferedImage(w, h, imageType);
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
-				image.setRGB(i, j, 0xffffffff);
+				image.setRGB(i, j, 0xffffff);
 			}
 		}
+		int wrote = 0;
 		for (Pixel pixel : this.getPixelList()) {
 			Int2 xy = pixel.getInt2();
 			int x = xy.getX() - xmin;
 			int y = xy.getY() - ymin;
 			// System.out.println(xy+" "+bbox+" "+w+" "+h+" "+x+" "+y);
 			if (x < w && y < h) {
-				image.setRGB(x, y, 0xff000000);
+				image.setRGB(x, y, 0);
+				wrote++;
 			}
 		}
-		LOG.trace("created image, size: " + pixelList.size());
+		LOG.trace("created image, size: " + pixelList.size()+" "+wrote);
 		return image;
 	}
 
@@ -966,9 +968,14 @@ public class PixelIsland implements Iterable<Pixel> {
 		markEdges();
 	}
 
+	/** mark all pixels which have an exposre to the outside.
+	 * 
+	 * set value to ffffff (white) by default and 1 if < 8 neighbours
+	 * 
+	 */
 	public void markEdges() {
 		for (Pixel pixel : pixelList) {
-			pixel.setValue(NONE);
+			pixel.setValue(NEIGHBOUR8);
 			PixelList neighbours = pixel.getNeighbours(this);
 			int size = neighbours.size();
 			if (size < 8) {
@@ -977,6 +984,11 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
+	/** get list of all pixels with value v.
+	 * 
+	 * @param v
+	 * @return
+	 */
 	public PixelList getPixelsWithValue(int v) {
 		PixelList valueList = new PixelList();
 		for (Pixel pixel : pixelList) {
@@ -987,6 +999,12 @@ public class PixelIsland implements Iterable<Pixel> {
 		return valueList;
 	}
 
+	/** for each pixel of value v in list (ring) increment neighbours.
+	 * 
+	 * @param startPixels
+	 * @param v
+	 * @return
+	 */
 	public PixelList growFrom(PixelList startPixels, int v) {
 		PixelList growList = new PixelList();
 		for (Pixel start : startPixels) {
@@ -995,7 +1013,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			}
 			PixelList neighbours = start.getNeighbours(this);
 			for (Pixel neighbour : neighbours) {
-				if (neighbour.getValue() == NONE) {
+				if (neighbour.getValue() == NEIGHBOUR8) {
 					neighbour.setValue(v + 1);
 					growList.add(neighbour);
 				}
@@ -1003,7 +1021,10 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 		return growList;
 	}
-
+	/** find rings round rideg.
+	 * 
+	 * @return
+	 */
 	public PixelRingList createOnionRings() {
 		PixelRingList onionRings = new PixelRingList();
 		setDiagonal(true);
@@ -1049,6 +1070,9 @@ public class PixelIsland implements Iterable<Pixel> {
 				: pixelList.get(i);
 	}
 
+	/** removes the pixels from an incompletely thinned island.
+	 * 
+	 */
 	public void removeStepsIteratively() {
 		while (true) {
 			Set<Pixel> removed = removeSteps();
@@ -1153,5 +1177,25 @@ public class PixelIsland implements Iterable<Pixel> {
 		graph.createNodesAndEdges();
 		return graph;
 	}
+
+//	/** create rings of pixels starting at the outside.
+//	 * 
+//	 * list.get(0) is outermost ring.
+//	 * list.get(1) touches it...
+//	 * @return
+//	 */
+//	public List<PixelList> createNestedRings() {
+//		setDiagonal(true);
+//		findRidge();
+//		int value = 1;
+//		List<PixelList> pixelListList = new ArrayList<PixelList>();
+//		PixelList list = getPixelsWithValue(value);
+//		while (list.size() > 0) {
+//			pixelListList.add(list);
+//			list = growFrom(list, value);
+//			value++;
+//		}
+//		return pixelListList;
+//	}
 
 }

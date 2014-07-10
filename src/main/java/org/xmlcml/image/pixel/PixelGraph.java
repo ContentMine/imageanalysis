@@ -161,7 +161,7 @@ public class PixelGraph {
 			Pixel pixel, int end) {
 		PixelNode node = createNode(pixel, g);
 		if (node == null) {
-			LOG.error("null node");
+			LOG.trace("null node");
 		} else {
 			edge.addNode(node, end);
 			nodeSet.add(node);

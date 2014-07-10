@@ -32,9 +32,9 @@ public class PixelEdge {
 	public void addNode(PixelNode node, int pos) {
 		ensureNodes();
 		if (this.nodes.size() != pos) {
-			LOG.error("Cannot add node");
+			LOG.trace("Cannot add node");
 		} else if (node == null) {
-			LOG.error("Cannot add null node");
+			LOG.trace("Cannot add null node");
 		} else {
 			nodes.add(node);
 			node.addEdge(this);

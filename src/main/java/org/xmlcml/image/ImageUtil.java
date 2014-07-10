@@ -247,6 +247,7 @@ public class ImageUtil {
 
 	/** makes parent directly if not exists.
 	 * 
+	 * selectes type from extension; chooses ".png" if none 
 	 * @param image
 	 * @param file
 	 */
@@ -257,6 +258,9 @@ public class ImageUtil {
 		try {
 			// DONT EDIT!
 			String type = FilenameUtils.getExtension(file.getName());
+			if (type == null || type.equals("")) {
+				type ="png";
+			}
 			file.getParentFile().mkdirs();
 			ImageIO.write(image, type, new FileOutputStream(file));
 		} catch (Exception e) {
