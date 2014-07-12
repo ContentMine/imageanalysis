@@ -6,7 +6,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.image.geom.DouglasPeucker;
 
 public class PixelEdge {
@@ -145,6 +148,15 @@ public class PixelEdge {
 			}
 		}
 		return midPixel;
+	}
+
+	public SVGG getSVG(String colour) {
+		SVGG g = new SVGG();
+		for (Pixel pixel : pixelList) {
+			SVGRect rect = pixel.getSVGRect(1, colour);
+			g.appendChild(rect);
+		}
+		return g;
 	}
 
 }

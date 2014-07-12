@@ -20,12 +20,31 @@ public class PixelIslandComparator implements Comparator<PixelIsland>{
 	private Real2Range r2r1;
 	private PixelIsland island1;
 	private PixelIsland island0;
+	private double deltaMajor = 0.0;
 	
 	public PixelIslandComparator(ComparatorType major) {
-		this(major, null);
+		this(major, (ComparatorType) null);
 	}
 	
+	/**
+	 * 
+	 * @param major
+	 * @param minor
+	 */
 	public PixelIslandComparator(ComparatorType major, ComparatorType minor) {
+		this.major = major;
+		this.minor = minor;
+	}
+	
+	/** compares on major allowing for error, then minor.
+	 * 
+	 * equality is defined as within +- deltaMajor
+	 * @param major
+	 * @param minor
+	 * @param deltaMajor
+	 */
+	public PixelIslandComparator(ComparatorType major, ComparatorType minor, double deltaMajor) {
+		this.deltaMajor = Math.abs(deltaMajor);
 		this.major = major;
 		this.minor = minor;
 	}
@@ -74,7 +93,7 @@ public class PixelIslandComparator implements Comparator<PixelIsland>{
 
 	private int compare(double a, double b) {
 		double delta = a - b;
-		return delta == 0.0 ? 0 : (int) Math.signum(delta);
+		return (Math.abs(delta) < deltaMajor)  ? 0 : (int) Math.signum(delta);
 	}
 
 

@@ -295,8 +295,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public void sortX() {
-		Collections.sort(list, new PixelIslandComparator(ComparatorType.LEFT,
-				ComparatorType.TOP));
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.LEFT, ComparatorType.TOP));
+	}
+
+	/** sorts Y first, then X.
+	 * 
+	 */
+	public void sortYX() {
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP, ComparatorType.LEFT));
 	}
 
 	public void sortSize() {
@@ -434,6 +440,19 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			pixelGraphList.add(graph);
 		}
 		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
+		return pixelGraphList;
+	}
+
+	public List<PixelGraph> createGraphList() throws IOException {
+		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
+		removeStepsSortAndReverse();
+		// main tree
+		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
+			PixelIsland island = get(i);
+			PixelGraph graph = island.createGraphNew();
+			graph.createEdgesNew();
+			pixelGraphList.add(graph);
+		}
 		return pixelGraphList;
 	}
 

@@ -3,7 +3,9 @@ package org.xmlcml.image.pixel;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.alg.feature.detect.edge.EdgeSegment;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGG;
 
 public abstract class PixelNode implements Comparable<PixelNode> {
 
@@ -74,5 +76,12 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 
 	public boolean removeEdge(PixelEdge edge) {
 		return edgeList.remove(edge);
+	}
+
+	public SVGG getSVG(double rad) {
+		SVGG g = new SVGG();
+		SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()), rad);
+		g.appendChild(circle);
+		return g;
 	}
 }
