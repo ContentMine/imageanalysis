@@ -26,6 +26,7 @@ public class PixelGraphTest {
 	private final static Logger LOG = Logger.getLogger(PixelGraphTest.class);
 	
 	@Test
+	@Ignore
 	public void testSingleCycle() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
