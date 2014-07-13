@@ -385,9 +385,11 @@ public class PixelGraph {
 			Iterator<Pixel> iterator = twoConnectedSet.iterator();
 			Pixel current = iterator.next();
 			PixelEdge edge = getEdgeFrom2ConnectedPixels(current);
-			edges.add(edge);
-			SVGLine line = drawLine(edge);
-			g.appendChild(line);
+			if (!edge.isZeroCircular()) {
+				edges.add(edge);
+				SVGLine line = drawLine(edge);
+				g.appendChild(line);
+			}
 		}
 		LOG.trace("edges "+edges.size());
 
@@ -1085,7 +1087,7 @@ public class PixelGraph {
 			PixelNode node = nodes.get(i);
 			SVGG nodeG = node.getSVG(1.0);
 			nodeG.setStroke(col);
-			nodeG.setStrokeWidth(0.3);
+			nodeG.setStrokeWidth(0.1);
 			nodeG.setOpacity(0.5);
 			nodeG.setFill("none");
 			g.appendChild(nodeG);

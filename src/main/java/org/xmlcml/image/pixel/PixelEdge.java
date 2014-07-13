@@ -159,4 +159,27 @@ public class PixelEdge {
 		return g;
 	}
 
+	/** some edges are zero or one pixels and return to same node.
+	 * 
+	 * (Algorithm needs mending)
+	 * 
+	 * examples:
+	 * {(19,48)}/[(19,48), (19,48)]
+	 * {(22,36)}/[(23,36), (23,36)]
+	 * {(29,30)}/[(29,31), (29,31)]
+	 * {(29,29)}/[(29,31), (29,31)]
+	 * 
+	 * 
+	 * @return
+	 */
+	public boolean isZeroCircular() {
+		boolean circular = false;
+		if (nodes.size() == 0) {
+			circular = pixelList.size() <= 1;
+		} else if (nodes.size() == 2) {
+			circular = pixelList.size() <= 1;
+		}
+		return circular;
+	}
+
 }
