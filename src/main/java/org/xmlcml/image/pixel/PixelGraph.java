@@ -1073,8 +1073,10 @@ public class PixelGraph {
 	}
 
 	public SVGG drawEdgesAndNodes() {
-		String[] colour = {"red", "green", "pink", "cyan", "orange", "blue", "gray", "yellow"};
+		String[] colour = {"red", "green", "pink", "cyan", "orange", "blue", "yellow"};
 		SVGG g = new SVGG();
+		SVGG rawPixelG = pixelList.plotPixels("black");
+		g.appendChild(rawPixelG);
 		for (int i = 0; i < edges.size(); i++) {
 			String col = colour[i % colour.length];
 			PixelEdge edge = edges.get(i);
