@@ -8,6 +8,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.image.geom.DouglasPeucker;
@@ -79,11 +80,23 @@ public class PixelEdge {
 	 * @return null if no list or i is outside range
 	 */
 	public Pixel get(int i) {
-		return pixelList.size() == 0 ? null : pixelList.get(i);
+		return (pixelList == null || size() == 0 || i < 0 || i >= size()) ? null : pixelList.get(i);
+	}
+	
+	public Pixel getFirst() {
+		return get(0);
+	}
+
+	public Pixel getLast() {
+		return get(size() - 1);
+	}
+	
+	public int size() {
+		return (pixelList == null) ? 0 : pixelList.size();
 	}
 
 	public PixelNode getPixelNode(int i) {
-		return (i < 0 || i >= nodes.size()) ? null : nodes.get(i);
+		return (nodes == null || i < 0 || i >= nodes.size()) ? null : nodes.get(i);
 	}
 	
 	public void removeNodes() {
@@ -150,7 +163,7 @@ public class PixelEdge {
 		return midPixel;
 	}
 
-	public SVGG getSVG(String colour) {
+	public SVGG createPixelSVG(String colour) {
 		SVGG g = new SVGG();
 		for (Pixel pixel : pixelList) {
 			SVGRect rect = pixel.getSVGRect(1, colour);
@@ -180,6 +193,18 @@ public class PixelEdge {
 			circular = pixelList.size() <= 1;
 		}
 		return circular;
+	}
+
+	public SVGG createLineSVG() {
+		SVGG g = new SVGG();
+		if (getFirst() != null && getLast() != null) {
+			Real2 firstXY = new Real2(getFirst().getInt2()).plus(new Real2(0.5, 0.5));
+			Real2 lastXY = new Real2(getLast().getInt2()).plus(new Real2(0.5, 0.5));
+			SVGLine line = new SVGLine(firstXY, lastXY);
+			line.setWidth(0.5);
+			g.appendChild(line);
+		}
+		return g;
 	}
 
 }

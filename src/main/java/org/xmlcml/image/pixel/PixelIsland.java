@@ -1146,9 +1146,23 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public PixelGraph createGraphNew() {
-		PixelGraph graph = new PixelGraph(getPixelList(), this);
+		PixelGraph graph = new PixelGraph(this);
 		graph.createNodesAndEdges();
 		return graph;
+	}
+
+	/** sets all pixels in island to black in image
+	 * 
+	 * subtracts offset
+	 * 
+	 * @param image
+	 * @param xy0 offest to subtract
+	 * @param y0
+	 */
+	void setToBlack(BufferedImage image, Int2 xy0) {
+		for (Pixel pixel : getPixelList()) {
+			pixel.setToBlack(image, xy0);
+		}
 	}
 
 //	/** create rings of pixels starting at the outside.

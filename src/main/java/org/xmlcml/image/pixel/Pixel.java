@@ -1,6 +1,7 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -319,6 +320,21 @@ public class Pixel {
 			next = (neighbours.get(0) == last) ? neighbours.get(1) : neighbours.get(0);
 		}
 		return next;
+	}
+
+	/** sets pixel in image to black.
+	 * 
+	 * subtracts offset
+	 * 
+	 * @param image
+	 * @param x0 x offset 
+	 * @param y0 y offset
+	 */
+	public void setToBlack(BufferedImage image, Int2 xy0) {
+		Int2 int2 = getInt2();
+		int i = int2.getX() - xy0.getX();
+		int j = int2.getY() - xy0.getY();
+		image.setRGB(i, j, 0x00000000);
 	}
 
 

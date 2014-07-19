@@ -1,16 +1,12 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
@@ -21,9 +17,10 @@ import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
-import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.ImageUtil;
+import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
+import org.xmlcml.image.processing.Thinning;
+import org.xmlcml.image.processing.ZhangSuenThinning;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -269,22 +266,17 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	}
 
-	// public BufferedImage createImageAtOrigin(Real2Range bbox) {
-
 	public BufferedImage createImageAtOrigin(Real2Range bbox) {
-		int x0 = (int) (double) bbox.getXMin();
-		int y0 = (int) (double) bbox.getYMin();
-		int width = (int) bbox.getXRange().getRange() + 1;
-		int height = (int) bbox.getYRange().getRange() + 1;
-		BufferedImage image = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_RGB);
-		clearImage(width, height, image);
-		for (PixelIsland pixelIsland : this) {
-			for (Pixel pixel : pixelIsland.getPixelList()) {
-				Int2 int2 = pixel.getInt2();
-				int i = int2.getX() - x0;
-				int j = int2.getY() - y0;
-				image.setRGB(i, j, 0x00000000);
+		BufferedImage image = null;
+		if (bbox.getXRange() != null || bbox.getYRange() != null) {
+			int x0 = (int) (double) bbox.getXMin();
+			int y0 = (int) (double) bbox.getYMin();
+			int width = (int) bbox.getXRange().getRange() + 1;
+			int height = (int) bbox.getYRange().getRange() + 1;
+			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			clearImage(width, height, image);
+			for (PixelIsland pixelIsland : this) {
+				pixelIsland.setToBlack(image, new Int2(x0, y0));
 			}
 		}
 		return image;
@@ -393,7 +385,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
 			PixelIsland island = get(i);
 			PixelGraph graph = island.createGraphNew();
-			graph.createEdgesNew();
+			graph.createEdges();
 			pixelGraphList.add(graph);
 		}
 		return pixelGraphList;
@@ -401,6 +393,27 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public void debug() {
 //		System.err.println("maxIsland:    "+this.maxIsland);
+	}
+
+	/** create PixelIslandList from String.
+	 * 
+	 * @param size of font
+	 * @param string to write
+	 * @param font font
+	 * @return
+	 */
+	public static PixelIslandList createPixelIslandListFromString(double size, String string, String font) {
+		SVGText text = new SVGText(new Real2(size/2., 3.*size/2.), string);
+		text.setFontFamily(font);
+		text.setFontSize(size);
+		int height = (int) ( text.getFontSize() * 2.);
+		int width = (int) ( text.getFontSize() * 2.);
+		BufferedImage image = text.createImage(width, height);
+		Thinning thinning = new ZhangSuenThinning(image);
+		thinning.doThinning();
+		image = thinning.getThinnedImage();
+		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
+		return pixelIslandList;
 	}
 
 

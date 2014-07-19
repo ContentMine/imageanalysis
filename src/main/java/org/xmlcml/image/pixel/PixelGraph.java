@@ -57,20 +57,22 @@ public class PixelGraph {
 	private Set<Pixel> zeroConnectedSet;
 
 	private Map<PixelNucleus, PixelNode> nodeByNucleusMap;
-	
 	private SVGG svgGraph;
 
 	private PixelGraph() {
 		
 	}
 	
-	public PixelGraph(PixelList pixelList, PixelIsland island) {
+	public PixelGraph(PixelIsland island) {
+		this(island.getPixelList(), island);
+	}
+	
+	private PixelGraph(PixelList pixelList, PixelIsland island) {
 		if (pixelList == null) {
 			throw new RuntimeException("null pixelList");
 		}
 		this.pixelList = pixelList;
 		this.island = island;
-//		this.createEdgesNew();
 		this.createNodesAndEdges();
 	}
 
@@ -142,22 +144,25 @@ public class PixelGraph {
 			getJunctionSet();
 			makeNucleusMap();
 			usedNonNodePixelSet = new HashSet<Pixel>();
-			createEdgesNew();
+			createEdges();
 			createNodes();
 			addMissedPixels();
 		}
 	}
 
 	private void addMissedPixels() {
-		LOG.debug("addMissedPixels NYI");
+		int missedPixels = pixelList.size() - usedNonNodePixelSet.size();
+		LOG.debug("addMissedPixels NYI "+ +missedPixels);
 	}
 
 	private void createNodes() {
 		Set<PixelNode> nodeSet = new HashSet<PixelNode>();
 		nodeByNucleusMap = new HashMap<PixelNucleus, PixelNode>();
 		for (PixelEdge edge : edges) {
-			createAndAddNode(nodeSet, edge, edge.getPixelList().get(0), 0);
-			createAndAddNode(nodeSet, edge, edge.getPixelList().last(), 1);
+			Pixel pixel0 = edge.getPixelList().get(0);
+			createAndAddNode(nodeSet, edge, pixel0, 0);
+			Pixel pixelLast = edge.getPixelList().last();
+			createAndAddNode(nodeSet, edge, pixelLast, 1);
 		}
 		nodes.addAll(nodeSet);
 	}
@@ -170,6 +175,7 @@ public class PixelGraph {
 		} else {
 			edge.addNode(node, end);
 			nodeSet.add(node);
+			usedNonNodePixelSet.add(node.getCentrePixel());
 		}
 	}
 
@@ -403,28 +409,32 @@ public class PixelGraph {
 	/** creates edges without drawing
 	 * 
 	 */
-	void createEdgesNew() {
+	void createEdges() {
 		createConnectedPixelSets();
 		edges = new ArrayList<PixelEdge>();
 		while (!twoConnectedSet.isEmpty()) {
 			Iterator<Pixel> iterator = twoConnectedSet.iterator();
 			Pixel current = iterator.next();
+			LOG.debug("current "+current.toString() + " 2con: " + twoConnectedSet);
 			PixelEdge edge = getEdgeFrom2ConnectedPixels(current);
+			LOG.debug("added "+edge.toString());
 			edges.add(edge);
+			usedNonNodePixelSet.addAll(edge.getPixelList().getList());
 		}
+		
 	}
 
-	private SVGLine drawLine(PixelEdge edge) {
-		PixelList pixelList = edge.getPixelList();
-		LOG.trace("PIXELS: "+pixelList.size());
-		Int2 xy0 = pixelList.get(0).getInt2();
-		Int2 xy1 = pixelList.get(pixelList.size() - 1).getInt2();
-		SVGLine line = new SVGLine(new Real2(xy0), new Real2(xy1));
-		line.setWidth(2.0);
-		line.setStroke("magenta");
-		line.setFill("red");
-		return line;
-	}
+//	private SVGLine drawLine(PixelEdge edge) {
+//		PixelList pixelList = edge.getPixelList();
+//		LOG.trace("PIXELS: "+pixelList.size());
+//		Int2 xy0 = pixelList.get(0).getInt2();
+//		Int2 xy1 = pixelList.get(pixelList.size() - 1).getInt2();
+//		SVGLine line = new SVGLine(new Real2(xy0), new Real2(xy1));
+//		line.setWidth(2.0);
+//		line.setStroke("magenta");
+//		line.setFill("red");
+//		return line;
+//	}
 
 	/** starts at 2-connected pixel in twoConnectedSet and traverses chain in both directions.
 	 * 
@@ -1078,26 +1088,29 @@ public class PixelGraph {
 		}
 	}
 
-	public SVGG getSVG() {
-		return svgGraph;
-	}
+//	public SVGG getSVG() {
+//		return svgGraph;
+//	}
 
 	public SVGG drawEdgesAndNodes() {
 		String[] colour = {"red", "green", "pink", "cyan", "orange", "blue", "yellow"};
 		SVGG g = new SVGG();
-		SVGG rawPixelG = pixelList.plotPixels("black");
+		SVGG rawPixelG = pixelList.plotPixels("magenta");
 		g.appendChild(rawPixelG);
 		for (int i = 0; i < edges.size(); i++) {
 			String col = colour[i % colour.length];
 			PixelEdge edge = edges.get(i);
-			SVGG edgeG = edge.getSVG(col);
+			SVGG edgeG = edge.createPixelSVG(col);
 			edgeG.setFill(col);
 			g.appendChild(edgeG);
+			SVGG lineG = edge.createLineSVG();
+			lineG.setFill(col);
+			g.appendChild(lineG);
 		}
 		for (int i = 0; i < nodes.size(); i++) {
 			String col = colour[i % colour.length];
 			PixelNode node = nodes.get(i);
-			SVGG nodeG = node.getSVG(1.0);
+			SVGG nodeG = node.createSVG(1.0);
 			nodeG.setStroke(col);
 			nodeG.setStrokeWidth(0.1);
 			nodeG.setOpacity(0.5);

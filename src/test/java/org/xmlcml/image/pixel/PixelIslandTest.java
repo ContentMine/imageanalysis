@@ -1,5 +1,6 @@
 package org.xmlcml.image.pixel;
 
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -946,6 +947,16 @@ public class PixelIslandTest {
 		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
 
+	@Test
+	public void testCreatePixelIslandListFromString() {
+		double size = 30.;
+		String string = "4";
+		String font = Font.SANS_SERIF;
+		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandListFromString(size, string, font);
+		PixelGraph graph = new PixelGraph(pixelIslandList.get(0));
+		SVGSVG.wrapAndWriteAsSVG(graph.drawEdgesAndNodes(), new File("target/glyph/char4.svg"));
+		
+	}
 	// =====================================================
 
 	private void debug(List<Real2Array> segmentArrayList) {

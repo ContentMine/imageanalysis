@@ -78,9 +78,9 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 		return edgeList.remove(edge);
 	}
 
-	public SVGG getSVG(double rad) {
+	public SVGG createSVG(double rad) {
 		SVGG g = new SVGG();
-		SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()), rad);
+		SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), rad);
 		g.appendChild(circle);
 		circle.setFill("none");
 		return g;
