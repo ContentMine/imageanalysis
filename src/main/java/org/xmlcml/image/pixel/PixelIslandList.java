@@ -91,66 +91,6 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list;
 	}
 
-//	/**
-//	 * creates islands
-//	 * 
-//	 * @param file
-//	 *            of image
-//	 * @param operations
-//	 *            BINARIZE and THIN
-//	 * @return island list
-//	 * @throws IOException
-//	 */
-//	public static PixelIslandList createPixelIslandList(File file,
-//			Operation... operations) throws IOException {
-//		BufferedImage image = ImageIO.read(file);
-//		return createPixelIslandList(image, operations);
-//	}
-
-//	/**
-//	 * creates PixelIslands ffrom iamge using floodfill.
-//	 * 
-//	 * @param image
-//	 * @param operations
-//	 *            optionally BINARIZE and THIN (maybe better done elsewhere)
-//	 * @return
-//	 * @throws IOException
-//	 */
-//	public static PixelIslandList createPixelIslandList(BufferedImage image,
-//			Operation... operations) {
-//		List<Operation> opList = Arrays.asList(operations);
-//		LOG.trace("pre-bin");
-//		if (opList.contains(Operation.BINARIZE)) {
-//			image = ImageUtil.binarize(image);
-//			LOG.trace("postbin ");
-//		}
-//		if (opList.contains(Operation.THIN)) {
-//			image = ImageUtil.zhangSuenThin(image);
-//		}
-//		LOG.trace("postbin ");
-//		PixelIslandList islands = PixelIslandList.createPixelIslandList(image);
-//		LOG.trace("islands " + islands.size());
-//		return islands;
-//	}
-
-//	/**
-//	 * find all separated islands.
-//	 * 
-//	 * creates a FloodFill and extracts Islands from it. diagonal set to true
-//	 * 
-//	 * @param image
-//	 * @return
-//	 * @throws IOException
-//	 */
-//	public static PixelIslandList createPixelIslandList(BufferedImage image) {
-//		FloodFill floodFill = new FloodFill(image);
-//		floodFill.setDiagonal(true);
-//		floodFill.fill();
-//		PixelIslandList islandList = floodFill.getPixelIslandList();
-////		islandList.setImage(image);
-//		return islandList;
-//	}
-
 	/**
 	 * find all separated islands.
 	 * 
@@ -261,37 +201,39 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return pixelList;
 	}
 
-	/**
-	 * create a list of list of rings.
-	 * 
-	 * @param outputFile
-	 *            if not null file to write SVG to
-	 * @return
-	 */
-	public List<PixelRingList> createRingListList(File outputFile) {
+//	/**
+//	 * create a list of list of rings.
+//	 * 
+//	 * @param outputFile
+//	 *            if not null file to write SVG to
+//	 * @return
+//	 */
+//	@Deprecated
+//	public List<PixelRingList> createRingListList(File outputFile) {
+//		List<PixelRingList> ringListList = new ArrayList<PixelRingList>();
+//		SVGG gg = null;
+//		if (outputFile != null) {
+//			gg = new SVGG();
+//		}
+//		for (PixelIsland island : this) {
+//			PixelRingList ringList = island.createOnionRings();
+//			ringListList.add(ringList);
+//			ringList.plotPixels(gg, new String[] {
+//					"orange", "green", "blue", "red", "cyan" });
+//		}
+//		if (outputFile != null) {
+//			SVGSVG.wrapAndWriteAsSVG(gg, outputFile);
+//		}
+//		return ringListList;
+//	}
+
+	public List<PixelRingList> createRingListList() {
 		List<PixelRingList> ringListList = new ArrayList<PixelRingList>();
-		SVGG gg = null;
-		if (outputFile != null) {
-			gg = new SVGG();
-		}
 		for (PixelIsland island : this) {
-			PixelRingList ringList = island.createRingsAndPlot(gg, new String[] {
-					"orange", "green", "blue", "red", "cyan" });
+			PixelRingList ringList = island.createOnionRings();
 			ringListList.add(ringList);
 		}
-		if (outputFile != null) {
-			SVGSVG.wrapAndWriteAsSVG(gg, outputFile);
-		}
 		return ringListList;
-	}
-
-	/**
-	 * creates list of rings.
-	 * 
-	 * @return list of rings
-	 */
-	public List<PixelRingList> createRingListList() {
-		return createRingListList(null);
 	}
 
 	public void sortX() {
@@ -420,28 +362,29 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
-		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
-		removeStepsSortAndReverse();
-		File outputDir = pixelProcessor.getOutputDir();
-		outputDir.mkdirs();
-		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
-		// main tree
-		SVGG g = new SVGG();
-		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
-			LOG.debug("============ island "+i+"=============");
-			PixelIsland island = get(i);
-			BufferedImage image1 = island.createImage();
-			if (image1 == null) continue;
-			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
-			g.appendChild(island.createSVG());
-			PixelGraph graph = island.createGraphNew();
-			graph.createAndDrawGraphEdges(g);
-			pixelGraphList.add(graph);
-		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
-		return pixelGraphList;
-	}
+//	@Deprecated
+//	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
+//		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
+//		removeStepsSortAndReverse();
+//		File outputDir = pixelProcessor.getOutputDir();
+//		outputDir.mkdirs();
+//		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
+//		// main tree
+//		SVGG g = new SVGG();
+//		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
+//			LOG.debug("============ island "+i+"=============");
+//			PixelIsland island = get(i);
+//			BufferedImage image1 = island.createImage();
+//			if (image1 == null) continue;
+//			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
+//			g.appendChild(island.createSVG());
+//			PixelGraph graph = island.createGraphNew();
+//			graph.createAndDrawGraphEdges(g);
+//			pixelGraphList.add(graph);
+//		}
+//		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
+//		return pixelGraphList;
+//	}
 
 	public List<PixelGraph> createGraphList() throws IOException {
 		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();

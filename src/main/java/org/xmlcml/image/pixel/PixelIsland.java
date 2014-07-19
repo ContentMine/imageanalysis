@@ -1038,33 +1038,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		return onionRings;
 	}
 
-	/**
-	 * creates a list of onion rings.
-	 * 
-	 * the pixels are organized as 1-pixel-thick rings from the outside
-	 * 
-	 * @param gg
-	 *            if not null plots the rings within gg
-	 * @param colours
-	 * @return
-	 */
-	public PixelRingList createRingsAndPlot(SVGG gg, String[] colours) {
-		SVGG g = new SVGG();
-		PixelRingList rings = createOnionRings();
-		if (gg != null) {
-			int i = 0;
-			for (PixelList ring : rings) {
-				ring.plotPixels(g, colours[i]);
-				if (g.getParent() != null) {
-					g.detach();
-				}
-				gg.appendChild(g);
-				i = (i + 1) % colours.length;
-			}
-		}
-		return rings;
-	}
-
 	public Pixel get(int i) {
 		return pixelList == null || i < 0 || i >= pixelList.size() ? null
 				: pixelList.get(i);

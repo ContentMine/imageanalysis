@@ -96,4 +96,30 @@ public class PixelRingList implements Iterable<PixelList> {
 		return plotPixels(null, null);
 	}
 
+//	/**
+//	 * creates a list of onion rings.
+//	 * 
+//	 * the pixels are organized as 1-pixel-thick rings from the outside
+//	 * 
+//	 * @param gg
+//	 *            if not null plots the rings within gg
+//	 * @param colours
+//	 * @return
+//	 */
+//	@Deprecated
+//	public void createRingsAndPlot(SVGG gg, String[] colours) {
+//		SVGG g = new SVGG();
+//		if (gg != null) {
+//			int i = 0;
+//			for (PixelList ring : this) {
+//				ring.plotPixels(g, colours[i]);
+//				if (g.getParent() != null) {
+//					g.detach();
+//				}
+//				gg.appendChild(g);
+//				i = (i + 1) % colours.length;
+//			}
+//		}
+//	}
+
 }
