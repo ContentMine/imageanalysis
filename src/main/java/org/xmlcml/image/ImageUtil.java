@@ -3,6 +3,7 @@ package org.xmlcml.image;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -21,10 +22,15 @@ import org.xmlcml.euclid.RealMatrix;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.processing.HilditchThinning;
-import org.xmlcml.image.processing.OtsuBinarize;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
+
+import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.core.image.ConvertBufferedImage;
+import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.struct.image.ImageUInt8;
 
 public class ImageUtil {
 	private final static Logger LOG = Logger.getLogger(ImageUtil.class);
@@ -50,24 +56,17 @@ public class ImageUtil {
 		return image;
 	}
 
-
-	public static BufferedImage binarize(BufferedImage image) {
-		OtsuBinarize otsuBinarize = new OtsuBinarize();
-		otsuBinarize.setImage(image);
-		otsuBinarize.toGray();
-		otsuBinarize.binarize();
-		image = otsuBinarize.getBinarizedImage();
-		return image;
-	}
-
-	public static BufferedImage binarizeToGray(BufferedImage image) {
-		OtsuBinarize otsuBinarize = new OtsuBinarize();
-		otsuBinarize.setImage(image);
-		otsuBinarize.toGray();
-		image = otsuBinarize.getGrayImage();
-		return image;
-	}
 	
+	public static BufferedImage boofCVBinarization(BufferedImage image, int threshold) {
+		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
+		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
+		ThresholdImageOps.threshold(input, binary, threshold, true);
+		BufferedImage outputImage = VisualizeBinaryData.renderBinary(binary,null);
+		ColorUtilities.flipWhiteBlack(outputImage);
+		return outputImage;
+	}
+
+
 	/** extracts a subimage translated to 0,0.
 	 * 
 	 * @param image
@@ -248,6 +247,7 @@ public class ImageUtil {
 
 	/** makes parent directly if not exists.
 	 * 
+	 * selectes type from extension; chooses ".png" if none 
 	 * @param image
 	 * @param file
 	 */
@@ -258,6 +258,9 @@ public class ImageUtil {
 		try {
 			// DONT EDIT!
 			String type = FilenameUtils.getExtension(file.getName());
+			if (type == null || type.equals("")) {
+				type ="png";
+			}
 			file.getParentFile().mkdirs();
 			ImageIO.write(image, type, new FileOutputStream(file));
 		} catch (Exception e) {
@@ -310,5 +313,69 @@ public class ImageUtil {
 		return image;
 	}
 
+	/** flatten colours in image.
+	 * 
+	 * uses ImageUtil.flattenPixel
+	 * 
+	 * creates nvalues of single colour with min 0 and max 255. thus  
+	 * 
+	 * @param image
+	 * @param nvalues number of discrete (integer) values of r or g or b. 
+ 	 *        currently 2, 4, 8, 16, 32, 64, 128 (maybe alter this later)
+ 	 * @return new BufferedImage
+	 */
+	public static BufferedImage flattenImage(BufferedImage image, int nvalues) {
+
+		if (nvalues != 2 && nvalues != 4 && nvalues != 8 && nvalues != 16 &&
+		    nvalues != 32 && nvalues != 64 && nvalues != 128) {
+			throw new RuntimeException("Bad value of nvalues, should be power of 2 within 2 - 128");
+		}
+		int delta = 256 / nvalues;
+		int width = image.getWidth();
+		int height = image.getHeight();
+		BufferedImage image1 = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				image1.setRGB(i, j, 0);
+				flattenPixel(image, i, j, delta, image1);
+			}
+		}
+		return image1;
+	}
+
+	/** flattens pixel to range of values.
+	 * 
+	 * @param image
+	 * @param i
+	 * @param j
+	 * @param delta distance between values (power of 2)
+	 */
+	public static void flattenPixel(BufferedImage image, int i, int j, int delta, BufferedImage image1) {
+		int rgb = image.getRGB(i, j);
+		int r = (rgb & 0x00ff0000) >> 16;
+		int g = (rgb & 0x0000ff00) >> 8;
+		int b = (rgb & 0x000000ff);
+		
+		r = flattenChannel(r, delta);
+		g = flattenChannel(g, delta);
+		b = flattenChannel(b, delta);
+		
+		int col = (r << 16) | (g << 8) | b;
+		image1.setRGB(i, j, col);
+	}
+
+	/**
+	 * 
+	 * @param r r/g/b channel (0-255)
+	 * @param delta distance between allowed values (power of 2)
+	 * @return nearest fencepost value (0 - 255) at intervals of delta
+	 */
+	public static int flattenChannel(int r, int delta) {
+		int rr = r + delta/2; // round to nearest fencepost
+		rr = (rr / delta) * delta;
+		return rr == 0 ? 0 : rr - 1;
+	}
+
+	
 
 }

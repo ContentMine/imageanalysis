@@ -4,8 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.colour.ColorUtilities;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -14,14 +18,17 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageUInt8;
 
 public class BoofCVTest {
 
-	private static final String IMAGE_PROCESSING = "src/test/resources/org/xmlcml/image/processing/";
+	private static Logger LOG = Logger.getLogger(BoofCVTest.class);
+
 	private File BOOFCV_OUT_DIR;
+	
 	
 	@Before
 	public void setUp() {
@@ -29,8 +36,9 @@ public class BoofCVTest {
 		BOOFCV_OUT_DIR.mkdirs();
 	}
 	@Test
+	@Ignore // takes 3 secs
 	public void testInt2() {
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 imageInt2 = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		BufferedImage outImage = ConvertBufferedImage.convertTo(imageInt2,null);
 		UtilImageIO.saveImage(outImage, new File(BOOFCV_OUT_DIR, "postermol.png").toString());
@@ -38,12 +46,12 @@ public class BoofCVTest {
 
 	@Test
 	public void testBinarize() {
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
 		BufferedImage binaryImage = null;
-		for (int i = 10; i < 150; i+= 10) {
+		for (int i = 50; i < 130; i+= 20) {
 			ThresholdImageOps.threshold(input, binary, i, true);
 			binaryImage = VisualizeBinaryData.renderBinary(binary,null);
 			UtilImageIO.saveImage(binaryImage, new File(BOOFCV_OUT_DIR, "postermolBinary"+i+".png").toString());
@@ -51,17 +59,17 @@ public class BoofCVTest {
 		int best = 70;
 		ThresholdImageOps.threshold(input, binary, best, true);
 //		Apply an erode operation on the binary image, writing over the original image reference.
-		ImageUInt8 erode8 = BinaryImageOps.erode8(binary,null);
-		erode8 = BinaryImageOps.erode8(erode8,null);
-		output(erode8, new File(BOOFCV_OUT_DIR, "postermolErode"+best+"_8.png"));
+		ImageUInt8 erode8 = BinaryImageOps.erode8(binary,1,null);
+		erode8 = BinaryImageOps.erode8(erode8,1,null);
+		outputBinary(erode8, new File(BOOFCV_OUT_DIR, "postermolErode"+best+"_8.png"));
 		
 		ImageUInt8 output = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Apply an erode operation on the binary image, saving results to the output binary image.
 //		BinaryImageOps.erode8(binary,output);
 //		Apply an erode operation with a 4-connect rule.
-		BinaryImageOps.erode4(binary,output);
-		ImageUInt8 erode4 = BinaryImageOps.erode4(binary,null);
-		output(erode4, new File(BOOFCV_OUT_DIR, "postermolErode"+best+"_4.png"));
+		BinaryImageOps.erode4(binary,1,output);
+		ImageUInt8 erode4 = BinaryImageOps.erode4(binary,1,null);
+		outputBinary(erode4, new File(BOOFCV_OUT_DIR, "postermolErode"+best+"_4.png"));
 //		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
 //		Detect and label blobs in the binary image using a 4-connect rule. blobs is an image of type ImageSInt32.
 //		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);
@@ -73,8 +81,7 @@ public class BoofCVTest {
 	@Test
 	public void testMoreBinary() {
 		// load and convert the image into a usable format
-//		BufferedImage image = UtilImageIO.loadImage("../data/applet/particles01.jpg");
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
  
 		// convert into a usable format
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
@@ -90,23 +97,23 @@ public class BoofCVTest {
 		// remove small blobs through erosion and dilation
 		// The null in the input indicates that it should internally declare the work image it needs
 		// this is less efficient, but easier to code.
-		ImageUInt8 filtered = BinaryImageOps.erode8(binary,null);
-		filtered = BinaryImageOps.dilate8(filtered, null);
-		output(filtered, new File(BOOFCV_OUT_DIR, "dilate8.png"));
+		ImageUInt8 filtered = BinaryImageOps.erode8(binary,1,null);
+		filtered = BinaryImageOps.dilate8(filtered,1,null);
+		outputBinary(filtered, new File(BOOFCV_OUT_DIR, "dilate8.png"));
  
 		// Detect blobs inside the image using an 8-connect rule
-		List<Contour> contours = BinaryImageOps.contour(filtered, 8, label);
+		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, label);
  
 		// colors of contours
 		int colorExternal = 0xFFFFFF;
 		int colorInternal = 0xFF2020;
  
 		// display the results
-		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
-		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
-		BufferedImage visualLabel = VisualizeBinaryData.renderLabeled(label, contours.size(), null);
-		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
-				input.width,input.height,null);
+//		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, null);
+//		BufferedImage visualFiltered = VisualizeBinaryData.renderBinary(filtered, null);
+//		BufferedImage visualLabel = VisualizeBinaryData.renderLabeled(label, contours.size(), null);
+//		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours,colorExternal,colorInternal,
+//				input.width,input.height,null);
  
 		// these are not suitable for tests
 		
@@ -117,8 +124,9 @@ public class BoofCVTest {
 	}
  
 	@Test
+	@Ignore
 	public void testBlobs() {
-		BufferedImage image = UtilImageIO.loadImage(IMAGE_PROCESSING+"postermol.png");
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
@@ -130,17 +138,32 @@ public class BoofCVTest {
 		}
 		int best = 70;
 		ThresholdImageOps.threshold(input, binary, best, true);
-		ImageSInt32 blobs = new ImageSInt32();
+//		ImageSInt32 blobs = new ImageSInt32();
 //		??
 //		int numBlobs = BinaryImageOps.labelBlobs4(binary,blobs);
 //		Detect and label blobs in the binary image using a 4-connect rule. blobs is an image of type ImageSInt32.
 //		BufferedImage visualized = VisualizeBinaryData.renderLabeled(blobs, numBlobs, null);	
 	}
 	
-	private static void output(ImageUInt8 image, File file) {
+	@Test
+	public void testNatprod() {
+		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "natprod1.png").toString());
+		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
+		ImageUInt8 binary = new ImageUInt8(image.getWidth(), input.getHeight());
+		for (int i = 70; i <= 130; i+= 20) {
+			ThresholdImageOps.threshold(input, binary, i, true);
+			BufferedImage binaryImage = VisualizeBinaryData.renderBinary(binary,null);
+			ColorUtilities.flipWhiteBlack(binaryImage);
+			UtilImageIO.saveImage(binaryImage, new File(BOOFCV_OUT_DIR, "natprod1_"+i+".png").toString());
+		}
+	}
+	
+	private static void outputBinary(ImageUInt8 image, File file) {
 		BufferedImage binaryImage = VisualizeBinaryData.renderBinary(image,null);
 		UtilImageIO.saveImage(binaryImage, file.toString());
 	}
+	
+	
 	
 	
 

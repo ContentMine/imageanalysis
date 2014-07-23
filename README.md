@@ -15,3 +15,7 @@ diagonal pixels. There is a flag for this but it's not systematic. Many islands 
 of a graph of PixelEdges and PixelNodes (subclassed as TerminalNode and NucleusNode). (We had a lot of struggle with 
 different type of JunctionNode and are gradually abandong this - it depends on the thhhing success).
 
+== PixelGraph ==
+Routines which extract the topology of the pixels
+
+
