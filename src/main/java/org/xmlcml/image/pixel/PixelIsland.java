@@ -964,6 +964,12 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixelColor;
 	}
 
+	public List<PixelIsland> findPixelLakes() {
+		Real2Range bbox = this.getBoundingBox();
+		Real2Range bboxPlus = bbox.getReal2RangeExtendedInX(1, 1).getReal2RangeExtendedInY(1, 1);
+		throw new RuntimeException("NYI");
+	}
+	
 	public void findRidge() {
 		markEdges();
 	}

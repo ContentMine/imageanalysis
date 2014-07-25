@@ -152,7 +152,9 @@ public class PixelGraph {
 
 	private void addMissedPixels() {
 		int missedPixels = pixelList.size() - usedNonNodePixelSet.size();
-		LOG.debug("addMissedPixels NYI "+ +missedPixels);
+		if (missedPixels != 0) {
+			LOG.trace("addMissedPixels NYI "+ +missedPixels);
+		}
 	}
 
 	private void createNodes() {
@@ -415,9 +417,9 @@ public class PixelGraph {
 		while (!twoConnectedSet.isEmpty()) {
 			Iterator<Pixel> iterator = twoConnectedSet.iterator();
 			Pixel current = iterator.next();
-			LOG.debug("current "+current.toString() + " 2con: " + twoConnectedSet);
+			LOG.trace("current "+current.toString() + " 2con: " + twoConnectedSet);
 			PixelEdge edge = getEdgeFrom2ConnectedPixels(current);
-			LOG.debug("added "+edge.toString());
+			LOG.trace("added "+edge.toString());
 			edges.add(edge);
 			usedNonNodePixelSet.addAll(edge.getPixelList().getList());
 		}
@@ -789,7 +791,8 @@ public class PixelGraph {
 		}
 		return junctionSet;
 	}
-
+	
+	
 	public TerminalNodeSet getTerminalNodeSet() {
 		createNodesAndEdges();
 		if (terminalNodeSet == null) {
