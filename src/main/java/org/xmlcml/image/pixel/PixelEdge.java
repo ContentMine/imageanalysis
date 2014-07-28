@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolyline;
@@ -152,7 +152,7 @@ public class PixelEdge {
 				midPixelXY = new Real2(midPixel.getInt2());
 			} else {
 				Real2 xy = new Real2(pixel.getInt2());
-				double dist = midPixelXY.getDistance(xy);
+				double dist = midPoint.getDistance(xy);
 				if (dist < distMin) {
 					midPixelXY = xy;
 					distMin = dist;
@@ -205,6 +205,21 @@ public class PixelEdge {
 			g.appendChild(line);
 		}
 		return g;
+	}
+
+	public Real2 getMidPoint() {
+		Pixel first = getFirst();
+		Real2 firstXY = first == null ? null : new Real2(first.getInt2());
+		Pixel last = getLast();
+		Real2 lastXY = last == null ? null : new Real2(last.getInt2());
+		Real2 mid = (lastXY == null || firstXY == null) ? null : firstXY.getMidPoint(lastXY);
+		return mid;
+	}
+
+	public Pixel getNearestPixelToMidPoint() {
+		Real2 midPoint = getMidPoint();
+		return midPoint == null ? null : getNearestPixelToMidPoint(midPoint);
+		
 	}
 
 }

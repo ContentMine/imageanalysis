@@ -205,4 +205,48 @@ public class PixelList implements Iterable<Pixel> {
 		return points;
 	}
 
+	/** finds all pixels in list Before pixel.
+	 * 
+	 * produces list in reverse order including both ends
+	 * 
+	 * @param pixel
+	 * @return null if no list or pixel not in list
+	 */
+	public PixelList getPixelsBefore(Pixel pixel) {
+		int mid = this.indexOf(pixel);
+		PixelList pixelList = getPixelList(mid, -1, -1);
+		return pixelList;
+	}
+
+	/** finds all pixels in list After pixel.
+	 * 
+	 * produces list in same order including both ends
+	 * 
+	 * @param pixel
+	 * @return null if no list or pixel not in list
+	 */
+	public PixelList getPixelsAfter(Pixel pixel) {
+		int mid = this.indexOf(pixel);
+		PixelList pixelList = getPixelList(mid, size(), 1);
+		return pixelList;
+	}
+
+	private PixelList getPixelList(int start, int end, int delta) {
+		PixelList pixelList = new PixelList();
+		for (int i = start; i != end; i += delta) {
+			Pixel pixel = this.get(i);
+			pixelList.add(pixel);
+		}
+		return pixelList;
+	}
+
+	/** gets index of pixel in list;
+	 * 
+	 * @param pixel
+	 * @return -1 if not found 
+	 */
+	public int indexOf(Pixel pixel) {
+		return list == null ? -1 : list.indexOf(pixel);
+	}
+
 }

@@ -1,6 +1,7 @@
 package org.xmlcml.image.pixel;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
-import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Angle.Units;
+import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Vector2;
@@ -20,6 +22,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
 
 
 /**
@@ -34,6 +37,8 @@ import org.xmlcml.graphics.svg.SVGSVG;
 public class PixelGraph {
 
 	private final static Logger LOG = Logger.getLogger(PixelGraph.class);
+
+	private static final Angle ANGLE_EPS = new Angle(0.03, Units.RADIANS);
 
 	private List<PixelEdge> edges;
 	private List<PixelNode> nodes;
@@ -411,7 +416,7 @@ public class PixelGraph {
 	/** creates edges without drawing
 	 * 
 	 */
-	void createEdges() {
+	public List<PixelEdge> createEdges() {
 		createConnectedPixelSets();
 		edges = new ArrayList<PixelEdge>();
 		while (!twoConnectedSet.isEmpty()) {
@@ -423,7 +428,7 @@ public class PixelGraph {
 			edges.add(edge);
 			usedNonNodePixelSet.addAll(edge.getPixelList().getList());
 		}
-		
+		return edges;
 	}
 
 //	private SVGLine drawLine(PixelEdge edge) {
@@ -949,20 +954,115 @@ public class PixelGraph {
 		return pixelNodeList;
 	}
 
-	public List<PixelNode> getPossibleRootNodes3() {
-		List<PixelNode> pixelNodeList = new ArrayList<PixelNode>();
-		for (PixelNode node : nodes) {
-			List<PixelEdge> edgeList = node.getEdges();
-			if (edgeList.size() == 3) {
-//				if (allVectorProductsParallel(node, edgeList)) {
-//					pixelNodeList.add(node);
-//				}
-				if (allInOneSemicircle(node, edgeList)) {
-					pixelNodeList.add(node);
+	/** get root pixel as middle of leftmost internode edge.
+	 * 
+	 *  where mid edge is vertical.
+	 *  
+	 * @return
+	 */
+	public PixelNode getPossibleRootPixelNode(ComparatorType comparatorType) {
+		PixelEdge extremeEdge = getExtremeEdge(comparatorType);
+		LOG.debug("extreme "+extremeEdge);
+		Pixel midPixel = extremeEdge.getNearestPixelToMidPoint();
+		PixelNode rootNode = new JunctionNode(midPixel, null);
+		PixelList neighbours = midPixel.getNeighbours(island);
+		if (neighbours.size() != 2) {
+			throw new RuntimeException("Should have exactly 2 neighbours "+neighbours.size());
+		}
+
+		List<PixelEdge> pixelEdgeList = splitEdge(extremeEdge, midPixel, rootNode);
+		this.addEdge(pixelEdgeList.get(0));
+		this.addEdge(pixelEdgeList.get(1));
+		this.addNode(rootNode);
+		this.removeEdge(extremeEdge);
+				
+		return rootNode;
+	}
+
+	private void removeEdge(PixelEdge edge) {
+		edges.remove(edge);
+		
+	}
+
+	private List<PixelEdge> splitEdge(PixelEdge edge, Pixel midPixel,
+			PixelNode rootNode) {
+//		LOG.debug(extremeEdge);
+		for (PixelEdge edge0 : edges) {
+//			edge0.addNearestNodes();
+			LOG.debug(edge0.getPixelNodes().size());
+		}
+//		List<PixelNode> extremeNodes = extremeEdge.getPixelNodes();
+//		if (extremeNodes.size() != 2) {
+//			throw new RuntimeException("Should have exactly 2 extremeNodes found "+extremeNodes.size());
+//		}
+		PixelList edgePixelList = edge.getPixelList();
+		List<PixelEdge> pixelEdgeList = new ArrayList<PixelEdge>();
+
+//		PixelNode node0 = extremeNodes.get(0);
+		Pixel pixel0 = edgePixelList.get(0);
+		PixelNode node0 = terminalNodeByPixelMap.get(pixel0);
+		LOG.debug("node0 "+node0+"/"+terminalNodeByPixelMap.size());
+		PixelList beforePixelList = edgePixelList.getPixelsBefore(midPixel);
+		PixelEdge edge0 = createEdge(rootNode, node0, beforePixelList);
+		pixelEdgeList.add(edge0);
+		
+		
+//		PixelNode node1 = extremeNodes.get(1);
+		PixelNode node1 = terminalNodeByPixelMap.get(edgePixelList.last());
+		PixelList afterPixelList = edgePixelList.getPixelsAfter(midPixel);
+		PixelEdge edge1 = createEdge(rootNode, node1, afterPixelList);
+		pixelEdgeList.add(edge1);
+		
+		return pixelEdgeList;
+	}
+
+	private PixelEdge createEdge(PixelNode splitNode, PixelNode newEndNode, PixelList pixelList) {
+		PixelEdge edge = new PixelEdge(island);
+		edge.addNode(splitNode, 0);
+		edge.addNode(newEndNode, 1);
+		edge.addPixelList(pixelList);
+		return edge;
+	}
+
+	private PixelEdge getExtremeEdge(ComparatorType comparatorType) {
+		PixelEdge extremeEdge = null;
+		double extreme = Double.MAX_VALUE;
+		for (PixelEdge edge : edges) {
+			SVGPolyline polyLine = edge.getOrCreateSegmentedPolyline();
+			// look for goal post edge
+			if (polyLine.size() != 3) {
+				continue;
+			}
+			Line2 crossbar = polyLine.createLineList().get(1).getEuclidLine();
+			Real2 midPoint = crossbar.getMidPoint();
+			// LHS
+			if (ComparatorType.LEFT.equals(comparatorType) && crossbar.isVertical(ANGLE_EPS)) {
+				if (midPoint.getX() < extreme) {
+					extreme = midPoint.getX();
+					extremeEdge = edge;
+					LOG.debug("edge "+midPoint);
+				}
+			// RHS
+			} else if (ComparatorType.RIGHT.equals(comparatorType) && crossbar.isVertical(ANGLE_EPS)) {
+				if (midPoint.getX() > extreme) {
+					extreme = midPoint.getX();
+					extremeEdge = edge;
+				}
+			// TOP
+			} else if (ComparatorType.TOP.equals(comparatorType) && crossbar.isHorizontal(ANGLE_EPS)) {
+				if (midPoint.getY() < extreme) {
+					extreme = midPoint.getY();
+					extremeEdge = edge;
+				}
+			// BOTTOM
+			} else if (ComparatorType.BOTTOM.equals(comparatorType) && crossbar.isHorizontal(ANGLE_EPS)) {
+				if (midPoint.getY() > extreme) {
+					extreme = midPoint.getY();
+					extremeEdge = edge;
 				}
 			}
 		}
-		return pixelNodeList;
+		return extremeEdge;
 	}
 
 	/** assume node in middle of 3-segment path.
@@ -1113,12 +1213,14 @@ public class PixelGraph {
 		for (int i = 0; i < nodes.size(); i++) {
 			String col = colour[i % colour.length];
 			PixelNode node = nodes.get(i);
-			SVGG nodeG = node.createSVG(1.0);
-			nodeG.setStroke(col);
-			nodeG.setStrokeWidth(0.1);
-			nodeG.setOpacity(0.5);
-			nodeG.setFill("none");
-			g.appendChild(nodeG);
+			if (node != null) {
+				SVGG nodeG = node.createSVG(1.0);
+				nodeG.setStroke(col);
+				nodeG.setStrokeWidth(0.1);
+				nodeG.setOpacity(0.5);
+				nodeG.setFill("none");
+				g.appendChild(nodeG);
+			}
 		}
 		return g;
 	}
