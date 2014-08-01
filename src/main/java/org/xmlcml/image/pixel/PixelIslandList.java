@@ -1,6 +1,7 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +18,9 @@ import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
+import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
@@ -354,29 +357,32 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-//	@Deprecated
-//	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
-//		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
-//		removeStepsSortAndReverse();
-//		File outputDir = pixelProcessor.getOutputDir();
-//		outputDir.mkdirs();
-//		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
-//		// main tree
-//		SVGG g = new SVGG();
-//		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
-//			LOG.debug("============ island "+i+"=============");
-//			PixelIsland island = get(i);
-//			BufferedImage image1 = island.createImage();
-//			if (image1 == null) continue;
-//			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
-//			g.appendChild(island.createSVG());
-//			PixelGraph graph = island.createGraphNew();
-//			graph.createAndDrawGraphEdges(g);
-//			pixelGraphList.add(graph);
-//		}
-//		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
-//		return pixelGraphList;
-//	}
+	@Deprecated
+	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
+		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
+		removeStepsSortAndReverse();
+		File outputDir = pixelProcessor.getOutputDir();
+		outputDir.mkdirs();
+		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
+		// main tree
+		SVGG g = new SVGG();
+		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
+			LOG.debug("============ island "+i+"=============");
+			PixelIsland island = get(i);
+			BufferedImage image1 = island.createImage();
+			if (image1 == null) continue;
+			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
+			g.appendChild(island.createSVG());
+			PixelGraph graph = island.createGraphNew();
+			List<PixelEdge> edgeList = graph.createEdges();
+			for (PixelEdge edge : edgeList) {
+				g.appendChild(edge.createPixelSVG("red"));
+			}
+			pixelGraphList.add(graph);
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
+		return pixelGraphList;
+	}
 
 	public List<PixelGraph> createGraphList() throws IOException {
 		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();

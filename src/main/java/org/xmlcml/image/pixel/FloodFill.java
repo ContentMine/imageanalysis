@@ -17,17 +17,33 @@ public class FloodFill {
 	private boolean[][] painted;
 	private boolean diagonal = false;
 	private PixelIslandList pixelIslandList;
+	private Integer width;
+	private Integer height;
 
 	public FloodFill(BufferedImage image) {
 		this.image = image;
+		this.width = image.getWidth();
+		this.height = image.getHeight();
+	}
+
+	// NOT YET WRITTEN
+	// FIXME
+	public FloodFill(PixelIslandList islandList) {
+		this.width = image.getWidth();
+		this.height = image.getHeight();
+		throw new RuntimeException("NYI");
 	}
 
 	private boolean isBlack(int posX, int posY) {
-		int color = image.getRGB(posX, posY);
-		int brightness = (color & 0xFF) + ((color >> 2) & 0xFF)
-				+ ((color >> 4) & 0xFF);
-		brightness /= 3;
-		return brightness < 128;
+		if (image != null) {
+			int color = image.getRGB(posX, posY);
+			int brightness = (color & 0xFF) + ((color >> 2) & 0xFF)
+					+ ((color >> 4) & 0xFF);
+			brightness /= 3;
+			return brightness < 128;
+		} else {
+			return false;
+		}
 	}
 
 	public static void main(String[] args) throws Exception {

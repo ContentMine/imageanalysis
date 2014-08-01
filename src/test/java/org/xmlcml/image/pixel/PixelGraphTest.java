@@ -1,25 +1,24 @@
 package org.xmlcml.image.pixel;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.image.pixel.JunctionNode;
-import org.xmlcml.image.pixel.JunctionSet;
-import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelCycle;
-import org.xmlcml.image.pixel.PixelEdge;
-import org.xmlcml.image.pixel.PixelGraph;
-import org.xmlcml.image.pixel.PixelIsland;
-import org.xmlcml.image.pixel.PixelList;
-import org.xmlcml.image.pixel.PixelNode;
-import org.xmlcml.image.pixel.PixelNucleus;
-import org.xmlcml.image.pixel.TerminalNode;
-import org.xmlcml.image.pixel.TerminalNodeSet;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageUtil;
+import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
+import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class PixelGraphTest {
 
@@ -299,5 +298,28 @@ public class PixelGraphTest {
 		Set<PixelNucleus> nucleusSet = graph.getNucleusSet();
 		Assert.assertEquals(2, nucleusSet.size());
 	}
+	
+	@Test
+	public void testExtremeEdge() throws IOException {
+		BufferedImage image = ImageIO.read(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2.png"));
+		image = ImageUtil.boofCVBinarization(image, 160);
+		image = ImageUtil.thin(image, new ZhangSuenThinning());
+		ImageUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
+		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
+		LOG.debug("islands: "+pixelIslandList.size());
+		pixelIslandList.sortSize();
+		pixelIslandList.reverse();
+		PixelIsland island = pixelIslandList.get(0); // the tree
+		PixelGraph graph = PixelGraph.createGraph(island);
+		LOG.debug("edges "+graph.getEdges().size());
+		PixelNode pixelNode = graph.getPossibleRootPixelNode(ComparatorType.LEFT);
+		LOG.debug("pixel "+pixelNode);
+		SVGG g = new SVGG();
+		graph.createAndDrawGraph(g);
+		SVGG gg = graph.drawEdgesAndNodes();
+		g.appendChild(gg);
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/edge/94172.svg"));
+	}
+	
 
 }

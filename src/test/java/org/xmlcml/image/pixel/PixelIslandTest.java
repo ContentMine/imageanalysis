@@ -870,6 +870,19 @@ public class PixelIslandTest {
 		}
 	}
 
+	@Test
+	public void testCreatePixelIslandListFromString() {
+		double size = 30.;
+		String string = "4";
+		String font = Font.SANS_SERIF;
+		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandListFromString(size, string, font);
+		PixelGraph graph = new PixelGraph(pixelIslandList.get(0));
+		SVGSVG.wrapAndWriteAsSVG(graph.drawEdgesAndNodes(), new File("target/glyph/char4.svg"));
+		
+	}
+
+	// =============================================================
+
 	private void extractCharactersAndCorrelate(BufferedImage rawImage,
 			PixelIslandList islands, String charname, double correlationCutoff)
 			throws IOException {
@@ -926,8 +939,6 @@ public class PixelIslandTest {
 		return islandsA;
 	}
 
-	// =============================================================
-
 	private void plotBoxes(PixelIslandList islands, File file) {
 		SVGG g = new SVGG();
 		for (PixelIsland island : islands) {
@@ -946,18 +957,6 @@ public class PixelIslandTest {
 		file.getParentFile().mkdirs();
 		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
-
-	@Test
-	public void testCreatePixelIslandListFromString() {
-		double size = 30.;
-		String string = "4";
-		String font = Font.SANS_SERIF;
-		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandListFromString(size, string, font);
-		PixelGraph graph = new PixelGraph(pixelIslandList.get(0));
-		SVGSVG.wrapAndWriteAsSVG(graph.drawEdgesAndNodes(), new File("target/glyph/char4.svg"));
-		
-	}
-	// =====================================================
 
 	private void debug(List<Real2Array> segmentArrayList) {
 		for (Real2Array coords : segmentArrayList) {
