@@ -57,6 +57,7 @@ public class ImageProcessor {
 	private File inputFile;
 	private File outputDir;
 	private PixelProcessor pixelProcessor;
+	private ImageParameters parameters;
 
 	public ImageProcessor() {
 		setDefaults();
@@ -288,16 +289,26 @@ public class ImageProcessor {
 	public PixelIslandList getOrCreatePixelIslandList() {
 		ensurePixelProcessor();
 		// this is messy - the super thinning should have been done earlier
-		return pixelProcessor.getOrCreatePixelIslandList(thinning != null);
+		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList(thinning != null);
+		pixelIslandList.setParameters(this.parameters);
+		return pixelIslandList;
 	}
 
 	public PixelProcessor ensurePixelProcessor() {
+		ensureParameterObject();
 		if (pixelProcessor == null) {
 			pixelProcessor = new PixelProcessor(this);
+			pixelProcessor.setParameters(this.parameters);
 		}
 		return pixelProcessor;
 	}
 	
+	private void ensureParameterObject() {
+		if (this.parameters == null) {
+			parameters = new ImageParameters();
+		}
+	}
+
 	public static File getDefaultOutputDirectory() {
 		return new File(TARGET);
 	}
@@ -441,6 +452,14 @@ public class ImageProcessor {
 	public void parseArgsAndRun(String[] args) {
 		this.parseArgs(args);
 		this.runCommands();
+	}
+
+	public ImageParameters getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(ImageParameters parameters) {
+		this.parameters = parameters;
 	}
 
 }

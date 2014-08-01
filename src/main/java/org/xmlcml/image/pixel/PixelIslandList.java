@@ -20,6 +20,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
+import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
 import org.xmlcml.image.processing.Thinning;
@@ -48,6 +49,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private SVGG svgg;
 	private boolean debug = false;
 	private PixelProcessor pixelProcessor;
+	private ImageParameters parameters;
 	
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -373,7 +375,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			if (image1 == null) continue;
 			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
 			g.appendChild(island.createSVG());
-			PixelGraph graph = island.createGraphNew();
+			PixelGraph graph = island.createGraph();
 			List<PixelEdge> edgeList = graph.createEdges();
 			for (PixelEdge edge : edgeList) {
 				g.appendChild(edge.createPixelSVG("red"));
@@ -390,8 +392,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		// main tree
 		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
 			PixelIsland island = get(i);
-			PixelGraph graph = island.createGraphNew();
-			graph.createEdges();
+			PixelGraph graph = island.createGraph();
+			graph.setParameters(parameters);
 			pixelGraphList.add(graph);
 		}
 		return pixelGraphList;
@@ -420,6 +422,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		image = thinning.getThinnedImage();
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
 		return pixelIslandList;
+	}
+
+	public ImageParameters getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(ImageParameters parameters) {
+		this.parameters = parameters;
 	}
 
 

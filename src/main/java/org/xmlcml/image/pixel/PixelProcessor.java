@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.image.ArgIterator;
+import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.processing.Thinning;
 
@@ -28,6 +29,7 @@ public class PixelProcessor {
 
 	public static final String ISLAND = "-y";
 	public static final String ISLAND1 = "--island";
+	public final static String TOLERANCE1 = "--tolerance";
 
 	private PixelIslandList pixelIslandList;
 	private int maxIsland;
@@ -37,11 +39,13 @@ public class PixelProcessor {
 	private ImageProcessor imageProcessor;
 	private BufferedImage image;
 	private File outputDir;
-	private int island;
+	private int selectedIsland;
+	private ImageParameters parameters;
 
 	
 	public PixelProcessor(ImageProcessor imageProcessor) {
 		this.imageProcessor = imageProcessor;
+		this.parameters = imageProcessor.getParameters();
 		setDefaults();
 	}
 	
@@ -50,7 +54,6 @@ public class PixelProcessor {
 	}
 
 	public void setDefaults() {
-//		outputDir = new File("target/misc1/");
 		this.setMaxIsland(getDefaultMaxIsland());
 		this.setIsland(-1); // because 0 is a valid island
 	}
@@ -143,6 +146,11 @@ public class PixelProcessor {
 			
 		} else if (arg.equals(ImageProcessor.DEBUG) || arg.equals(ImageProcessor.DEBUG1)) {
 			this.debug = true;
+		} else if (arg.equals(TOLERANCE1)) {
+			Double value = argIterator.getDoubleValue();
+			if (value != null) {
+				this.parameters.setSegmentTolerance(value);
+			}
 		} else if (arg.equals(PixelProcessor.ISLAND) || arg.equals(PixelProcessor.ISLAND1)) {
 			Integer value = argIterator.getSingleIntegerValue();
 			if (value != null) {
@@ -156,17 +164,21 @@ public class PixelProcessor {
 	}
 
 	private void setIsland(int island) {
-		this.island = island;
+		this.selectedIsland = island;
 	}
 
-	public int getIsland() {
-		return island;
+	public int getSelectedIsland() {
+		return selectedIsland;
 	}
 
 	public void debug() {
 		System.err.println("pixelIslandList   "+pixelIslandList);
 		System.err.println("maxIsland         "+maxIsland);
 		System.err.println("pixelGraphList    "+pixelGraphList);
+	}
+
+	public void setParameters(ImageParameters parameters) {
+		this.parameters = parameters;
 	}
 
 }

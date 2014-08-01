@@ -12,6 +12,7 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 	Pixel centrePixel; // pixel 1
 	private List<PixelEdge> edgeList;
 	private String label;
+	private String id;
 
 	protected PixelNode() {
 	}
@@ -84,5 +85,13 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 		g.appendChild(circle);
 		circle.setFill("none");
 		return g;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
 	}
 }
