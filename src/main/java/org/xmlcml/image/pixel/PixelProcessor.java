@@ -34,7 +34,6 @@ public class PixelProcessor {
 	private PixelIslandList pixelIslandList;
 	private int maxIsland;
 	private List<PixelGraph> pixelGraphList;
-//	private boolean superThinning;
 	private boolean debug;
 	private ImageProcessor imageProcessor;
 	private BufferedImage image;
@@ -56,8 +55,15 @@ public class PixelProcessor {
 	public void setDefaults() {
 		this.setMaxIsland(getDefaultMaxIsland());
 		this.setIsland(-1); // because 0 is a valid island
+		
 	}
 	
+	public void clearVariables() {
+		pixelIslandList = null;
+		pixelGraphList = null;
+		image = null;
+	}
+
 	private int getDefaultMaxIsland() {
 		return 3;
 	}
@@ -165,6 +171,7 @@ public class PixelProcessor {
 
 	private void setIsland(int island) {
 		this.selectedIsland = island;
+		LOG.trace("PPxx "+this.hashCode()+" "+island);
 	}
 
 	public int getSelectedIsland() {

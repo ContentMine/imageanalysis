@@ -61,15 +61,17 @@ public class ImageProcessor {
 
 	public ImageProcessor() {
 		setDefaults();
+		clearVariables();
 	}
 	
 	public ImageProcessor(BufferedImage image) {
+		this();
 		this.image = image;
-		setDefaults();
 	}
 
 	public void setDefaults() {
 		ensurePixelProcessor();
+		
 		pixelProcessor.setDefaults();
 		this.setThreshold(getDefaultThreshold());
 		this.setThinning(new ZhangSuenThinning());
@@ -77,7 +79,14 @@ public class ImageProcessor {
 		this.setBinarize(true);
 		this.setThreshold(DEFAULT_THRESHOLD);
 	}
-	
+
+	public void clearVariables() {
+		pixelProcessor.clearVariables();
+		
+		image = null;
+		inputFile = null;
+//		outputDir = null;
+	}
 
 	public void setBase(String base) {
 		this.base = base;
@@ -252,6 +261,7 @@ public class ImageProcessor {
 			}
 			try {
 				image = ImageIO.read(inputFile);
+				LOG.trace("read image "+image);
 			} catch (Exception e) {
 				throw new RuntimeException("Cannot find/read imagefile: "+inputFile, e);
 			}
@@ -259,6 +269,7 @@ public class ImageProcessor {
 		if (image != null) {
 			image = processImage(image);
 		}
+		LOG.trace("image "+image);
 		return image;
 	}
 
@@ -291,6 +302,7 @@ public class ImageProcessor {
 		// this is messy - the super thinning should have been done earlier
 		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList(thinning != null);
 		pixelIslandList.setParameters(this.parameters);
+		LOG.trace("pil "+pixelIslandList);
 		return pixelIslandList;
 	}
 
@@ -298,6 +310,7 @@ public class ImageProcessor {
 		ensureParameterObject();
 		if (pixelProcessor == null) {
 			pixelProcessor = new PixelProcessor(this);
+//			new Exception("ppex ").printStackTrace();
 			pixelProcessor.setParameters(this.parameters);
 		}
 		return pixelProcessor;

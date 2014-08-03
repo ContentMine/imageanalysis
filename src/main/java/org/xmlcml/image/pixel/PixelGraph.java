@@ -619,9 +619,9 @@ public class PixelGraph {
 		PixelEdge extremeEdge = null;
 		double extreme = Double.MAX_VALUE;
 		for (PixelEdge edge : edges) {
-			LOG.debug(edge);
+			LOG.trace(edge);
 			SVGPolyline polyLine = edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
-			LOG.debug("PL "+polyLine.size()+"  /  "+polyLine.getReal2Array());
+			LOG.trace("PL "+polyLine.size()+"  /  "+polyLine.getReal2Array());
 			// look for goal post edge
 			if (polyLine.size() != 3) {
 				continue;
@@ -633,7 +633,7 @@ public class PixelGraph {
 				if (midPoint.getX() < extreme) {
 					extreme = midPoint.getX();
 					extremeEdge = edge;
-					LOG.debug("edge "+midPoint);
+					LOG.trace("edge "+midPoint);
 				}
 			// RHS
 			} else if (ComparatorType.RIGHT.equals(comparatorType) && crossbar.isVertical(ANGLE_EPS)) {
