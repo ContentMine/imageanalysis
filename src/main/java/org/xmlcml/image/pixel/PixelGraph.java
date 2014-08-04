@@ -2,6 +2,7 @@ package org.xmlcml.image.pixel;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,7 +62,6 @@ public class PixelGraph {
 
 	private Map<PixelNucleus, PixelNode> nodeByNucleusMap;
 	private SVGG svgGraph;
-//	private double segmentTolerance = 2.0;
 	private ImageParameters parameters;
 
 
@@ -534,7 +534,8 @@ public class PixelGraph {
 			List<PixelEdge> edgeList = node.getEdges();
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
-				if (edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance()).size() == 1) {
+				SVGPolyline polyline = edge == null ? new SVGPolyline() : edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
+				if (polyline.size() == 1) {
 					pixelNodeList.add(node);
 				}
 			}
@@ -788,16 +789,12 @@ public class PixelGraph {
 		SVGG g = new SVGG();
 		SVGG rawPixelG = pixelList.plotPixels("magenta");
 		g.appendChild(rawPixelG);
-		for (int i = 0; i < edges.size(); i++) {
-			String col = colours[i % colours.length];
-			PixelEdge edge = edges.get(i);
-			SVGG edgeG = edge.createPixelSVG(col);
-			edgeG.setFill(col);
-			g.appendChild(edgeG);
-			SVGG lineG = edge.createLineSVG();
-			lineG.setFill(col);
-			g.appendChild(lineG);
-		}
+		drawEdges(colours, g);
+		drawNodes(colours, g);
+		return g;
+	}
+
+	public void drawNodes(String[] colours, SVGG g) {
 		for (int i = 0; i < nodes.size(); i++) {
 			String col = colours[i % colours.length];
 			PixelNode node = nodes.get(i);
@@ -810,11 +807,63 @@ public class PixelGraph {
 				g.appendChild(nodeG);
 			}
 		}
-		return g;
+	}
+
+	public void drawEdges(String[] colours, SVGG g) {
+		for (int i = 0; i < edges.size(); i++) {
+			String col = colours[i % colours.length];
+			PixelEdge edge = edges.get(i);
+			SVGG edgeG = edge.createPixelSVG(col);
+			edgeG.setFill(col);
+			g.appendChild(edgeG);
+			SVGG lineG = edge.createLineSVG();
+			lineG.setFill(col);
+			g.appendChild(lineG);
+		}
 	}
 
 	public void setParameters(ImageParameters parameters) {
 		this.parameters = parameters;
+	}
+
+	public PixelNode createRootNodeEmpirically(ComparatorType rootPosition) {
+		PixelNode rootNode = null;
+		List<PixelNode> rootNodes = getPossibleRootNodes1();
+		Collections.sort(rootNodes);
+		if (rootNodes.size() > 0) {
+			rootNode = rootNodes.get(0);
+	//			if (debug) {
+	//				LOG.trace("found root: " + rootNode);
+	//			}
+		} else {
+			try {
+				rootNode = getRootPixelNodeFromExtremeEdge(rootPosition);
+			} catch (RuntimeException e) {
+					throw(e);
+			}
+		}
+		return rootNode;
+	}
+
+	public ImageParameters getParameters() {
+		return parameters;
+	}
+
+	/** creates segmented lines from pixels adds them to edges and draws them.
+	 *  
+	 *  uses parameters to 
+	 * @return
+	 */
+	public SVGG createSegmentedEdges() {
+		SVGG g = new SVGG();
+		for (PixelEdge edge: edges) {
+			SVGPolyline segments = edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
+			segments.setStroke(parameters.getStroke());
+			segments.setWidth(parameters.getLineWidth());
+			segments.setFill(parameters.getFill());
+			g.appendChild(segments);
+		}
+		return g;
 	}
 
 }
