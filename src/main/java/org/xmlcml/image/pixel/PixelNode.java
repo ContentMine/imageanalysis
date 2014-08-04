@@ -40,7 +40,9 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 	
 	public String toString() {
 		getCentrePixel();
-		return (centrePixel == null) ? "?" : String.valueOf(centrePixel);
+		StringBuilder sb = new StringBuilder((id == null) ? "" : id+" ");
+		sb.append((centrePixel == null) ? "?" : String.valueOf(centrePixel));
+		return sb.toString();
 	}
 
 	public PixelList getDiagonalNeighbours(PixelIsland island) {

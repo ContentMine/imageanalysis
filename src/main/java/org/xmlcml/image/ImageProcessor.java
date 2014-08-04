@@ -301,6 +301,9 @@ public class ImageProcessor {
 		ensurePixelProcessor();
 		// this is messy - the super thinning should have been done earlier
 		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList(thinning != null);
+		if (pixelIslandList == null) {
+			throw new RuntimeException("Could not create pixelIslandList");
+		}
 		pixelIslandList.setParameters(this.parameters);
 		LOG.trace("pil "+pixelIslandList);
 		return pixelIslandList;

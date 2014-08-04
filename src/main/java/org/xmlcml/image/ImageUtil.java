@@ -247,7 +247,7 @@ public class ImageUtil {
 
 	/** makes parent directly if not exists.
 	 * 
-	 * selectes type from extension; chooses ".png" if none 
+	 * selects type from extension; chooses ".png" if none 
 	 * @param image
 	 * @param file
 	 */
