@@ -877,7 +877,7 @@ public class PixelIslandTest {
 		String font = Font.SANS_SERIF;
 		PixelIslandList pixelIslandList = PixelIslandList.createPixelIslandListFromString(size, string, font);
 		PixelGraph graph = new PixelGraph(pixelIslandList.get(0));
-		SVGSVG.wrapAndWriteAsSVG(graph.drawEdgesAndNodes(), new File("target/glyph/char4.svg"));
+		SVGSVG.wrapAndWriteAsSVG(graph.drawEdgesAndNodes(PixelGraph.COLOURS), new File("target/glyph/char4.svg"));
 		
 	}
 

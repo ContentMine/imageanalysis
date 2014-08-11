@@ -52,7 +52,7 @@ public class ArgIterator {
 		return value;
 	}
 
-	private List<String> getValues() {
+	public List<String> getValues() {
 		pointer++;
 		List<String> stringList = new ArrayList<String>();
 		while (pointer < size()) {
@@ -74,6 +74,19 @@ public class ArgIterator {
 				value = new Integer(vv);
 			} catch (Exception e) {
 				LOG.error("Bad integer value: "+vv);
+			}
+		}
+		return value;
+	}
+
+	public Double getDoubleValue() {
+		Double value = null;
+		String vv = getSingleValue();
+		if (vv != null) {
+			try {
+				value = new Double(vv);
+			} catch (Exception e) {
+				LOG.error("Bad double value: "+vv);
 			}
 		}
 		return value;

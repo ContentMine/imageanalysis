@@ -1,7 +1,6 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
-import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -25,6 +23,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.ImageUtil;
 
 /**
@@ -78,6 +77,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelGraph connectionTable;
 
 	private Set<Pixel> cornerSet;
+
+	private ImageParameters parameters;
 
 	public PixelIsland() {
 		this.pixelList = new PixelList();
@@ -1151,8 +1152,9 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
-	public PixelGraph createGraphNew() {
+	public PixelGraph createGraph() {
 		PixelGraph graph = new PixelGraph(this);
+		graph.setParameters(this.parameters);
 		graph.createNodesAndEdges();
 		return graph;
 	}

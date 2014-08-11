@@ -57,18 +57,21 @@ public class ImageProcessor {
 	private File inputFile;
 	private File outputDir;
 	private PixelProcessor pixelProcessor;
+	private ImageParameters parameters;
 
 	public ImageProcessor() {
 		setDefaults();
+		clearVariables();
 	}
 	
 	public ImageProcessor(BufferedImage image) {
+		this();
 		this.image = image;
-		setDefaults();
 	}
 
 	public void setDefaults() {
 		ensurePixelProcessor();
+		
 		pixelProcessor.setDefaults();
 		this.setThreshold(getDefaultThreshold());
 		this.setThinning(new ZhangSuenThinning());
@@ -76,7 +79,14 @@ public class ImageProcessor {
 		this.setBinarize(true);
 		this.setThreshold(DEFAULT_THRESHOLD);
 	}
-	
+
+	public void clearVariables() {
+		pixelProcessor.clearVariables();
+		
+		image = null;
+		inputFile = null;
+//		outputDir = null;
+	}
 
 	public void setBase(String base) {
 		this.base = base;
@@ -251,6 +261,7 @@ public class ImageProcessor {
 			}
 			try {
 				image = ImageIO.read(inputFile);
+				LOG.trace("read image "+image);
 			} catch (Exception e) {
 				throw new RuntimeException("Cannot find/read imagefile: "+inputFile, e);
 			}
@@ -258,6 +269,7 @@ public class ImageProcessor {
 		if (image != null) {
 			image = processImage(image);
 		}
+		LOG.trace("image "+image);
 		return image;
 	}
 
@@ -288,16 +300,31 @@ public class ImageProcessor {
 	public PixelIslandList getOrCreatePixelIslandList() {
 		ensurePixelProcessor();
 		// this is messy - the super thinning should have been done earlier
-		return pixelProcessor.getOrCreatePixelIslandList(thinning != null);
+		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList(thinning != null);
+		if (pixelIslandList == null) {
+			throw new RuntimeException("Could not create pixelIslandList");
+		}
+		pixelIslandList.setParameters(this.parameters);
+		LOG.trace("pil "+pixelIslandList);
+		return pixelIslandList;
 	}
 
 	public PixelProcessor ensurePixelProcessor() {
+		ensureParameterObject();
 		if (pixelProcessor == null) {
 			pixelProcessor = new PixelProcessor(this);
+//			new Exception("ppex ").printStackTrace();
+			pixelProcessor.setParameters(this.parameters);
 		}
 		return pixelProcessor;
 	}
 	
+	private void ensureParameterObject() {
+		if (this.parameters == null) {
+			parameters = new ImageParameters();
+		}
+	}
+
 	public static File getDefaultOutputDirectory() {
 		return new File(TARGET);
 	}
@@ -441,6 +468,14 @@ public class ImageProcessor {
 	public void parseArgsAndRun(String[] args) {
 		this.parseArgs(args);
 		this.runCommands();
+	}
+
+	public ImageParameters getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(ImageParameters parameters) {
+		this.parameters = parameters;
 	}
 
 }

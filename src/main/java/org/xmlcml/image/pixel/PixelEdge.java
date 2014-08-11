@@ -22,6 +22,8 @@ public class PixelEdge {
 	private PixelIsland island;
 	private SVGPolyline polyline;
 
+	private String id;
+
 	public PixelEdge(PixelIsland island) {
 		this.island = island;
 		this.pixelList = new PixelList();
@@ -120,9 +122,9 @@ public class PixelEdge {
 		return equals;
 	}
 
-	public SVGPolyline getOrCreateSegmentedPolyline() {
+	public SVGPolyline getOrCreateSegmentedPolyline(double tolerance) {
 		if (polyline == null) {
-			DouglasPeucker douglasPeucker = new DouglasPeucker(2.0);
+			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array points = pixelList.getReal2Array();
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
 			polyline = new SVGPolyline(pointArray);
@@ -222,4 +224,11 @@ public class PixelEdge {
 		
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getId() {
+		return id;
+	}
 }
