@@ -101,8 +101,8 @@ public class PixelProcessor {
 	 * 
 	 * if not existing, do floodfill on pixels
 	 * 
-	 * if superthinning (ie. cleaning thisck edges and pixelNuclei) is required carry it
-	 * out here. Ideally it shold be with the Z-S thinning, but the code is written for pixels after 
+	 * if superthinning (i.e. cleaning thick edges and pixelNuclei) is required carry it
+	 * out here. Ideally it should be with the Z-S thinning, but the code is written for pixels after 
 	 * pixelIslands are created.
 	 * 
 	 * @param superThinning 

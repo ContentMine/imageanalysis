@@ -14,7 +14,7 @@ import org.xmlcml.graphics.svg.SVGG;
  *  ..4
  *  </code>
  *  
- *  where 1 is exactly 3-connected and 4 is 3- or 4- connected and 1 and 3 are 2- or 3-connected
+ *  where 1 is exactly 3-connected and 4 is 3- or 4-connected and 2 and 3 are 2- or 3-connected
  *  
  *  This logic is probably obsolete
  *  

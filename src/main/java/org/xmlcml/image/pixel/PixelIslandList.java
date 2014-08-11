@@ -57,11 +57,12 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public PixelIslandList(List<PixelIsland> newList) {
-		this.list = newList;
+		list = newList;
 		init();
 	}
 	
 	private void init() {
+		
 	}
 
 	public PixelIslandList(Collection<PixelIsland> collection) {
@@ -412,11 +413,11 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * @return
 	 */
 	public static PixelIslandList createPixelIslandListFromString(double size, String string, String font) {
-		SVGText text = new SVGText(new Real2(size/2., 3.*size/2.), string);
+		SVGText text = new SVGText(new Real2(size / 2.0, 3.0 * size / 2.0), string);
 		text.setFontFamily(font);
 		text.setFontSize(size);
-		int height = (int) ( text.getFontSize() * 2.);
-		int width = (int) ( text.getFontSize() * 2.);
+		int height = (int) (text.getFontSize() * 2.0);
+		int width = (int) (text.getFontSize() * 2.0);
 		BufferedImage image = text.createImage(width, height);
 		Thinning thinning = new ZhangSuenThinning(image);
 		thinning.doThinning();
@@ -432,6 +433,5 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public void setParameters(ImageParameters parameters) {
 		this.parameters = parameters;
 	}
-
 
 }
