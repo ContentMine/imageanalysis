@@ -34,6 +34,8 @@ import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
  */
 public class PixelGraph {
 
+	private static final String NODE_PREFIX = "zn";
+
 	private final static Logger LOG = Logger.getLogger(PixelGraph.class);
 
 	private static final Angle ANGLE_EPS = new Angle(0.03, Units.RADIANS);
@@ -779,7 +781,7 @@ public class PixelGraph {
 		int i = 0;
 		for (PixelNode node : getNodes()) {
 			if (node instanceof TerminalNode) {
-				node.setLabel("n" + i);
+				node.setLabel(NODE_PREFIX + i);
 			}
 			i++;
 		}
