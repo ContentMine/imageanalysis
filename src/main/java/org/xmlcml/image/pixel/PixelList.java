@@ -249,4 +249,5 @@ public class PixelList implements Iterable<Pixel> {
 		return list == null ? -1 : list.indexOf(pixel);
 	}
 
+
 }

@@ -28,9 +28,7 @@ public class PixelNucleus {
 	private PixelIsland island;
 
 	private Real2 centre;
-
 	private Pixel centrePixel;
-
 	private PixelList pixelList;
 
 	public PixelNucleus(PixelIsland island) {
@@ -365,6 +363,44 @@ public class PixelNucleus {
 			}
 		}
 		return centrePixel;
+	}
+
+	public void add(Pixel pixel) {
+		ensurePixelList();
+		if (!pixelList.contains(pixel)) {
+			pixelList.add(pixel);
+		}
+	}
+
+	private void ensurePixelList() {
+		if (pixelList == null) {
+			pixelList = new PixelList();
+		}
+	}
+
+	public boolean canTouch(Pixel pix) {
+		for (Pixel pixel : this.pixelList) {
+			if (pixel.isDiagonalNeighbour(pix) || pixel.isOrthogonalNeighbour(pix)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** list of pixels which can be removed as part of superthinning of nuclei.
+	 * 
+	 * @return
+	 */
+	public PixelList getSuperthinRemovablePixelList() {
+		PixelList removableList = new PixelList();
+		for (Pixel pixel : pixelList) {
+			if (pixel.isTjunctionCentre(island)) {
+				removableList.add(pixel);
+			} else {
+				
+			} 
+		}
+		return removableList;
 	}
 
 }

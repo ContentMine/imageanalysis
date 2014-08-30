@@ -7,7 +7,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 
-public abstract class PixelNode implements Comparable<PixelNode> {
+public class PixelNode implements Comparable<PixelNode> {
 
 	Pixel centrePixel; // pixel 1
 	private List<PixelEdge> edgeList;
@@ -17,7 +17,7 @@ public abstract class PixelNode implements Comparable<PixelNode> {
 	protected PixelNode() {
 	}
 	
-	protected PixelNode(Pixel pixel) {
+	public PixelNode(Pixel pixel) {
 		this.centrePixel = pixel;
 	}
 	

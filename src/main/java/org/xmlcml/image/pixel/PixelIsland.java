@@ -81,11 +81,17 @@ public class PixelIsland implements Iterable<Pixel> {
 	private ImageParameters parameters;
 
 	public PixelIsland() {
-		this.pixelList = new PixelList();
+		ensurePixelList();
 	}
 
 	public PixelIsland(PixelList pixelList) {
 		this(pixelList, false);
+	}
+
+	private void ensurePixelList() {
+		if (pixelList == null) {
+			this.pixelList = new PixelList();
+		}
 	}
 
 	/**
@@ -100,11 +106,13 @@ public class PixelIsland implements Iterable<Pixel> {
 		indexPixelsAndUpdateMetadata();
 	}
 
-	public PixelIsland(PixelIsland axes) {
-		this(axes.getPixelList());
+	public PixelIsland(PixelIsland island) {
+		this(island.getPixelList());
+		this.allowDiagonal = island.allowDiagonal;
 	}
 
 	public Real2Range getBoundingBox() {
+		ensurePixelList();
 		Real2Range r2r = new Real2Range();
 		for (Pixel pixel : pixelList) {
 			r2r.add(new Real2(pixel.getInt2()));
@@ -113,6 +121,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public Int2Range getIntBoundingBox() {
+		ensurePixelList();
 		Int2Range i2r = new Int2Range();
 		for (Pixel pixel : pixelList) {
 			i2r.add(pixel.getInt2());
@@ -121,11 +130,13 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public void addPixel(Pixel pixel) {
+		ensurePixelList();
 		this.pixelList.add(pixel);
 		addPixelMetadata(pixel);
 	}
 
 	private void indexPixelsAndUpdateMetadata() {
+		ensurePixelList();
 		for (Pixel pixel : pixelList) {
 			addPixelMetadata(pixel);
 		}
@@ -150,6 +161,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public int size() {
+		ensurePixelList();
 		return this.pixelList.size();
 	}
 
@@ -165,11 +177,12 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public PixelList getPixelList() {
+		ensurePixelList();
 		return pixelList;
 	}
 
 	public PixelList getTerminalPixels() {
-		terminalPixels = getNodesWithNeighbours(1);
+		terminalPixels = getPixelsWithNeighbours(1);
 		PixelList terminalSpikedList = getTerminalSpikes();
 		if (terminalSpikedList.size() > 0) {
 			terminalPixels.addAll(terminalSpikedList);
@@ -223,15 +236,15 @@ public class PixelIsland implements Iterable<Pixel> {
 		return terminal;
 	}
 
-	public PixelList getNodesWithNeighbours(int neighbourCount) {
-		PixelList nodePixels = new PixelList();
+	public PixelList getPixelsWithNeighbours(int neighbourCount) {
+		PixelList pixels = new PixelList();
 		for (Pixel pixel : pixelList) {
 			int nCount = getNeighbourCount(pixel);
 			if (neighbourCount == nCount) {
-				nodePixels.add(pixel);
+				pixels.add(pixel);
 			}
 		}
-		return nodePixels;
+		return pixels;
 	}
 
 	private int getNeighbourCount(Pixel pixel) {
@@ -350,7 +363,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * 
 	 * @param pixel
 	 */
-	private void remove(Pixel pixel) {
+	public void remove(Pixel pixel) {
 		if (pixelList.remove(pixel)) {
 			// leaves int2range and laftmostCoord dirty
 			int2range = null;
@@ -434,7 +447,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		nucleusMap = new HashMap<Pixel, Nucleus>();
 		Set<Pixel> multiplyConnectedPixels = new HashSet<Pixel>();
 		for (int i = 3; i <= 8; i++) {
-			multiplyConnectedPixels.addAll(getNodesWithNeighbours(i).getList());
+			multiplyConnectedPixels.addAll(getPixelsWithNeighbours(i).getList());
 		}
 		while (multiplyConnectedPixels.size() > 0) {
 			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
@@ -1171,6 +1184,71 @@ public class PixelIsland implements Iterable<Pixel> {
 		for (Pixel pixel : getPixelList()) {
 			pixel.setToBlack(image, xy0);
 		}
+	}
+
+	/** get all pixels which could be nodes.
+	 * 
+	 * At preset this is all except those with 2 connections
+	 * 
+	 * @return
+	 */
+	public PixelList getNodePixelList() {
+		PixelList pixels = new PixelList();
+		for (Pixel pixel : pixelList) {
+			int neighbourCount = getNeighbourCount(pixel);
+			if (neighbourCount != 2) {
+				pixels.add(pixel);
+			}
+		}
+		return pixels;
+	}
+
+	/** get pixelNodes.
+	 * 
+	 * At preset this is all except those with 2 connections
+	 * 
+	 * @return
+	 */
+	public PixelNodeList getNodeList() {
+		PixelList pixels = getNodePixelList();
+		PixelNodeList nodeList = new PixelNodeList();
+		for (Pixel pixel : pixels) {
+			PixelNode node = new PixelNode(pixel);
+			nodeList.add(node);
+		}
+		return nodeList;
+	}
+
+	public PixelNucleusList createNucleusList() {
+		PixelNucleusList pixelNucleusList = new PixelNucleusList();
+		for (Pixel pixel : this.getPixelList()) {
+			boolean added = false;
+			if (pixel.getNeighbours(this).size() > 2) {
+				for (PixelNucleus nucleus : pixelNucleusList) {
+					if (nucleus.canTouch(pixel)) {
+						nucleus.add(pixel);
+						added = true;
+						break;
+					}
+				}
+				if (!added) {
+					PixelNucleus nucleus = new PixelNucleus(this);
+					nucleus.add(pixel);
+					pixelNucleusList.add(nucleus);
+				}
+			}
+		}
+		return pixelNucleusList;
+	}
+
+	/** superthin the nucleus by removing 3-coordinated and higher pixels.
+	 * 
+	 * @return the removed pixels
+	 */
+	public PixelNucleusList superthin() {
+		PixelNucleusList nucleusList = createNucleusList();
+		nucleusList.superthin(this);
+		return nucleusList;
 	}
 
 //	/** create rings of pixels starting at the outside.

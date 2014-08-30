@@ -337,5 +337,9 @@ public class Pixel {
 		image.setRGB(i, j, 0x00000000);
 	}
 
+	public boolean isTjunctionCentre(PixelIsland island) {
+		return this.getOrthogonalNeighbours(island).size() == 3 && 
+				this.getDiagonalNeighbours(island).size() == 0;
+	}
 
 }

@@ -361,13 +361,13 @@ public class PixelIslandTest {
 			Assert.assertEquals("terminal " + i, terminals[i], island
 					.getTerminalPixels().size());
 			Assert.assertEquals("2-nodes " + i, count2[i], island
-					.getNodesWithNeighbours(2).size());
+					.getPixelsWithNeighbours(2).size());
 			Assert.assertEquals("3-nodes " + i, count3[i], island
-					.getNodesWithNeighbours(3).size());
+					.getPixelsWithNeighbours(3).size());
 			Assert.assertEquals("4-nodes " + i, count4[i], island
-					.getNodesWithNeighbours(4).size());
+					.getPixelsWithNeighbours(4).size());
 			Assert.assertEquals("5-nodes " + i, count5[i], island
-					.getNodesWithNeighbours(5).size());
+					.getPixelsWithNeighbours(5).size());
 		}
 	}
 
