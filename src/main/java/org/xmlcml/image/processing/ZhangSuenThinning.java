@@ -1,16 +1,10 @@
 package org.xmlcml.image.processing;
 
 	 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.xmlcml.image.ImageUtil;
  
 /**
  *

@@ -378,7 +378,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			g.appendChild(island.createSVG());
 			PixelGraph graph = island.createGraph();
 			graph.setParameters(parameters);
-			List<PixelEdge> edgeList = graph.createEdges();
+			PixelEdgeList edgeList = graph.createEdges();
 			for (PixelEdge edge : edgeList) {
 				g.appendChild(edge.createPixelSVG("red"));
 			}

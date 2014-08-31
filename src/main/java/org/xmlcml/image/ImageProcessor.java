@@ -2,7 +2,6 @@ package org.xmlcml.image;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 

@@ -3,20 +3,10 @@ package org.xmlcml.image.pixel;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.graphics.svg.SVGCircle;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelIsland;
-import org.xmlcml.image.pixel.PixelList;
 
 public class JunctionTest {
 

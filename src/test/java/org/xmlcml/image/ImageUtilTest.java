@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
-import org.xmlcml.euclid.Real2;
 
 public class ImageUtilTest {
 

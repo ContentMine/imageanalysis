@@ -48,10 +48,10 @@ public class Pixel {
 		return neighbourList;
 	}
 
-	public List<Pixel> getNeighbours(Marked marked) {
+	public PixelList getNeighbours(Marked marked) {
 		ensureNeighbours();
 //		LOG.debug("neighbours "+neighbourList.size());
-		List<Pixel> markedList = new ArrayList<Pixel>();
+		PixelList markedList = new PixelList();
 		for (Pixel pixel : neighbourList) {
 			if (pixel.isMarked(marked) || Marked.ALL.equals(marked)) {
 				markedList.add(pixel);
@@ -103,10 +103,6 @@ public class Pixel {
 	}
 
 	/**
-	Point point;
-	private List<Pixel> neighbourList;
-	PixelIsland island;
-	private Marked marked = null;
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

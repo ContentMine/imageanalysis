@@ -1,10 +1,6 @@
 package org.xmlcml.image.pixel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
@@ -17,7 +13,7 @@ public class PixelEdge {
 
 	private final static Logger LOG = Logger.getLogger(PixelEdge.class);
 	
-	private List<PixelNode> nodes;
+	private PixelNodeList nodes;
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
 	private SVGPolyline polyline;
@@ -27,7 +23,7 @@ public class PixelEdge {
 	public PixelEdge(PixelIsland island) {
 		this.island = island;
 		this.pixelList = new PixelList();
-		this.nodes = new ArrayList<PixelNode>();
+		this.nodes = new PixelNodeList();
 	}
 
 	/** adds node and pixel contained within it.
@@ -50,7 +46,7 @@ public class PixelEdge {
 	
 	private void ensureNodes() {
 		if (nodes == null) {
-			nodes = new ArrayList<PixelNode>();
+			nodes = new PixelNodeList();
 		}
 	}
 
@@ -72,7 +68,7 @@ public class PixelEdge {
 	 * 
 	 * @return
 	 */
-	public List<PixelNode> getPixelNodes() {
+	public PixelNodeList getPixelNodes() {
 		return nodes;
 	}
 	

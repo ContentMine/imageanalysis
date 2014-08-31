@@ -1,21 +1,6 @@
 package org.xmlcml.image.general;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.xmlcml.euclid.Real2Array;
-import org.xmlcml.euclid.RealArray;
-import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelIslandList;
-import org.xmlcml.image.pixel.PixelList;
-import org.xmlcml.image.pixel.PixelProcessor;
 
 public class ZernikeTest {
 

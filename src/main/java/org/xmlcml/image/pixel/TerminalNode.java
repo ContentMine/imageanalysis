@@ -1,7 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;

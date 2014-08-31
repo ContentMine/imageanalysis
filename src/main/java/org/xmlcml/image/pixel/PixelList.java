@@ -249,5 +249,17 @@ public class PixelList implements Iterable<Pixel> {
 		return list == null ? -1 : list.indexOf(pixel);
 	}
 
+	public Pixel getOther(Pixel pixel) {
+		Pixel other = null;
+		if (this.size() == 2) {
+			if (this.get(0).equals(pixel)) {
+				other = this.get(1);
+			} else if (this.get(1).equals(pixel)) {
+				other = this.get(0);
+			}
+		}
+		return other;
+	}
+
 
 }

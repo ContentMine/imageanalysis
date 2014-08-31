@@ -75,10 +75,9 @@ public class PixelIsland implements Iterable<Pixel> {
 	private String pixelColor = "red";
 	private Set<PixelCycle> circleSet;
 	private PixelGraph connectionTable;
-
 	private Set<Pixel> cornerSet;
-
 	private ImageParameters parameters;
+	private PixelNodeList pixelNodeList;
 
 	public PixelIsland() {
 		ensurePixelList();
@@ -1209,14 +1208,14 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * 
 	 * @return
 	 */
-	public PixelNodeList getNodeList() {
+	public PixelNodeList createNodeList() {
 		PixelList pixels = getNodePixelList();
-		PixelNodeList nodeList = new PixelNodeList();
+		pixelNodeList = new PixelNodeList();
 		for (Pixel pixel : pixels) {
-			PixelNode node = new PixelNode(pixel);
-			nodeList.add(node);
+			PixelNode node = new PixelNode(pixel, this);
+			pixelNodeList.add(node);
 		}
-		return nodeList;
+		return pixelNodeList;
 	}
 
 	public PixelNucleusList createNucleusList() {
@@ -1249,6 +1248,72 @@ public class PixelIsland implements Iterable<Pixel> {
 		PixelNucleusList nucleusList = createNucleusList();
 		nucleusList.superthin(this);
 		return nucleusList;
+	}
+
+	public PixelEdge createEdge(PixelNode node) {
+		PixelEdge edge = null;
+		if (node.hasMoreUnusedNeighbours()) {
+			Pixel neighbour = node.getNextUnusedNeighbour();
+			edge = createEdge(node, neighbour);
+		}
+		return edge;
+	}
+
+	public PixelEdge createEdge(PixelNode node, Pixel next) {
+		PixelEdge edge = new PixelEdge(this);
+		Pixel current = node.getCentrePixel();
+		edge.addNode(node, 0);
+		LOG.trace("start "+node);
+		node.removeUnusedNeighbour(next);
+		edge.addPixel(current);
+		edge.addPixel(next);
+		while (true) {
+			PixelList neighbours = next.getNeighbours(this);
+			if (neighbours.size() != 2) {
+				break;
+			}
+			Pixel next0 = neighbours.getOther(current);
+			edge.addPixel(next0);
+			current = next;
+			next = next0;
+			LOG.trace(current);
+		}
+		LOG.trace("end "+next);
+		PixelNode node2 = getNode(next);
+		if (node2 == null) {
+			throw new RuntimeException("cannot find node for pixel: "+next);
+		}
+		node2.removeUnusedNeighbour(current);
+		edge.addNode(node2, 1);
+		return edge;
+	}
+
+	private PixelNode getNode(Pixel next) {
+		for (PixelNode node0 : pixelNodeList) {
+			if (next.equals(node0.getCentrePixel())) {
+				return node0;
+			}
+		}
+		return null;
+	}
+
+	public PixelEdgeList createEdges() {
+		PixelEdgeList pixelEdgeList = new PixelEdgeList();
+		boolean moreToDo = true;
+		while (moreToDo) {
+			moreToDo = false;
+			for (PixelNode node : pixelNodeList) {
+				if (node.getUnusedNeighbours().size() > 0) {
+					LOG.trace("node with unused neighbours: "+node);
+					PixelEdge edge = createEdge(node);
+					pixelEdgeList.add(edge);
+					LOG.trace("============== "+edge);
+					moreToDo = true;
+					break;
+				}
+			}
+		}
+		return pixelEdgeList;
 	}
 
 //	/** create rings of pixels starting at the outside.

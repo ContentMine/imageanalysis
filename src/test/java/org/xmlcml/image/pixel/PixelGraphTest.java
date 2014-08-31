@@ -3,7 +3,6 @@ package org.xmlcml.image.pixel;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class PixelGraphTest {
 		PixelList list = edge.getPixelList();
 		Assert.assertNotNull(list);
 		Assert.assertEquals("cycle", "{(1,0)(0,1)(-1,0)(0,-1)}", list.toString());
-		List<PixelNode> nodes = edge.getPixelNodes();
+		PixelNodeList nodes = edge.getPixelNodes();
 		Assert.assertEquals(0, nodes.size());
 		// text zero junctions
 		JunctionSet junctionSet = graph.getJunctionSet();
@@ -90,7 +89,7 @@ public class PixelGraphTest {
 		Assert.assertEquals("(0,3)", pixel1.toString());
 		Assert.assertEquals(node1, graph.getPixelNode(pixel1));
 		// 
-		List<PixelEdge> edges = graph.getEdges();
+		PixelEdgeList edges = graph.getEdges();
 		Assert.assertEquals(1, edges.size());
 		PixelEdge edge = edges.get(0);
 		Assert.assertTrue(edge.equalsIgnoreOrder("{(1,0)(0,1)(-1,2)(0,3)}"));
@@ -116,7 +115,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(island);
 		PixelCycle cycle = graph.getCycle();
 		Assert.assertNull(cycle);
-		List<PixelEdge> edgeList = graph.getEdges();
+		PixelEdgeList edgeList = graph.getEdges();
 		Assert.assertEquals(3, edgeList.size()); 
 		Assert.assertEquals("{(-3,-3)(-2,-2)(-1,-1)(0,0)}/[(-3,-3), (0,0)]", edgeList.get(0).toString());
 		Assert.assertEquals("{(3,-3)(2,-2)(1,-1)(0,0)}/[(3,-3), (0,0)]", edgeList.get(1).toString());
@@ -156,7 +155,7 @@ public class PixelGraphTest {
 		island.addPixel(new Pixel(3,-5));
 		island.addPixel(new Pixel(-3,-5));
 		PixelGraph graph = PixelGraph.createGraph(island);
-		List<PixelEdge> edgeList = graph.getEdges();
+		PixelEdgeList edgeList = graph.getEdges();
 		Assert.assertEquals(5, edgeList.size()); 
 		Assert.assertEquals("{(-3,-5)(-2,-4)(-1,-3)(0,-2)}/[(-3,-5), (0,-2)]", edgeList.get(0).toString());
 		Assert.assertEquals("{(3,-5)(2,-4)(1,-3)(0,-2)}/[(3,-5), (0,-2)]", edgeList.get(1).toString());
@@ -204,7 +203,7 @@ public class PixelGraphTest {
 		island.addPixel(new Pixel(-4,7));
 		island.addPixel(new Pixel(4,7));
 		PixelGraph graph = PixelGraph.createGraph(island);
-		List<PixelEdge> edgeList = graph.getEdges();
+		PixelEdgeList edgeList = graph.getEdges();
 		Assert.assertEquals(6, edgeList.size()); 
 		Assert.assertEquals("{(0,0)(0,1)(0,2)}/[(0,0), (0,2)]", edgeList.get(0).toString());
 		Assert.assertEquals("{(0,2)(-1,3)(-1,4)}/[(0,2), (-1,4)]", edgeList.get(1).toString());

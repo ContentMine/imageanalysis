@@ -1,7 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.util.Collection;
-import java.util.List;
 
 /** set of junctions
  * 

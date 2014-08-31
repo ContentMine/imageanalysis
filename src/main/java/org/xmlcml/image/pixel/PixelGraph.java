@@ -41,8 +41,8 @@ public class PixelGraph {
 	private static final Angle ANGLE_EPS = new Angle(0.03, Units.RADIANS);
 	public static String[] COLOURS = new String[] {"red", "green", "pink", "cyan", "orange", "blue", "yellow"};
 
-	private List<PixelEdge> edges;
-	private List<PixelNode> nodes;
+	private PixelEdgeList edges;
+	private PixelNodeList nodes;
 	private PixelCycle cycle;
 	private PixelList pixelList;
 	private JunctionSet junctionSet;
@@ -116,8 +116,8 @@ public class PixelGraph {
 
 	void createNodesAndEdges() {
 		if (edges == null) {
-			edges = new ArrayList<PixelEdge>();
-			nodes = new ArrayList<PixelNode>();
+			edges = new PixelEdgeList();
+			nodes = new PixelNodeList();
 			getTerminalNodeSet();
 			getJunctionSet();
 			makeNucleusMap();
@@ -239,9 +239,9 @@ public class PixelGraph {
 	/** creates edges without drawing
 	 * 
 	 */
-	public List<PixelEdge> createEdges() {
+	public PixelEdgeList createEdges() {
 		createConnectedPixelSets();
-		edges = new ArrayList<PixelEdge>();
+		edges = new PixelEdgeList();
 		int serial = 0;
 		while (!twoConnectedSet.isEmpty()) {
 			Iterator<Pixel> iterator = twoConnectedSet.iterator();
@@ -463,11 +463,11 @@ public class PixelGraph {
 		return terminalNodeSet;
 	}
 
-	public List<PixelEdge> getEdges() {
+	public PixelEdgeList getEdges() {
 		return edges;
 	}
 
-	public List<PixelNode> getNodes() {
+	public PixelNodeList getNodes() {
 		return nodes;
 	}
 
@@ -530,10 +530,10 @@ public class PixelGraph {
 		return nucleusSet;
 	}
 
-	public List<PixelNode> getPossibleRootNodes1() {
-		List<PixelNode> pixelNodeList = new ArrayList<PixelNode>();
+	public PixelNodeList getPossibleRootNodes1() {
+		PixelNodeList pixelNodeList = new PixelNodeList();
 		for (PixelNode node : nodes) {
-			List<PixelEdge> edgeList = node.getEdges();
+			PixelEdgeList edgeList = node.getEdges();
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
 				SVGPolyline polyline = edge == null ? new SVGPolyline() : edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
@@ -565,7 +565,7 @@ public class PixelGraph {
 			throw new RuntimeException("Should have exactly 2 neighbours "+neighbours.size());
 		}
 
-		List<PixelEdge> pixelEdgeList = splitEdge(extremeEdge, midPixel, rootNode);
+		PixelEdgeList pixelEdgeList = splitEdge(extremeEdge, midPixel, rootNode);
 		this.addEdge(pixelEdgeList.get(0));
 		this.addEdge(pixelEdgeList.get(1));
 		this.addNode(rootNode);
@@ -579,11 +579,11 @@ public class PixelGraph {
 		
 	}
 
-	private List<PixelEdge> splitEdge(PixelEdge edge, Pixel midPixel,
+	private PixelEdgeList splitEdge(PixelEdge edge, Pixel midPixel,
 			PixelNode rootNode) {
 		
-		List<PixelEdge> pixelEdgeList = new ArrayList<PixelEdge>();
-		List<PixelNode> nodes = edge.getPixelNodes();
+		PixelEdgeList pixelEdgeList = new PixelEdgeList();
+		PixelNodeList nodes = edge.getPixelNodes();
 		if (nodes.size() != 2) {
 			LOG.error("Should have exactly 2 extremeNodes found "+nodes.size());
 			return pixelEdgeList;
@@ -665,8 +665,8 @@ public class PixelGraph {
 	 * 
 	 * @return
 	 */
-	public List<PixelNode> getPossibleRootNodes2() {
-		List<PixelNode> pixelNodeList = new ArrayList<PixelNode>();
+	public PixelNodeList getPossibleRootNodes2() {
+		PixelNodeList pixelNodeList = new PixelNodeList();
 		PixelEdge rootEdge = null;
 		PixelNode midNode = null;
 		for (PixelEdge edge : edges) {
@@ -717,38 +717,6 @@ public class PixelGraph {
 		edges.remove(edge);
 	}
 
-//	private boolean allInOneSemicircle(PixelNode node, List<PixelEdge> edgeList) {
-//		Vector3[] vector3 = create3Vector3s(node, edgeList);
-//		Angle[] angle = new Angle[3];
-//		for (int i = 0; i < 3; i++) {
-//			angle[i] = vector3[i].getAngleMadeWith(vector3[(i + 1) % 3]);
-//		}
-//		Integer ii = null;
-//		if (Real.isEqual(angle[0].getRadian() + angle[1].getRadian(),  angle[2].getRadian(), 0.01)) {
-//			ii = 2;
-//		} else if (Real.isEqual(angle[0].getRadian() + angle[2].getRadian(),  angle[1].getRadian(), 0.01)) {
-//			ii = 1;
-//		} else if (Real.isEqual(angle[1].getRadian() + angle[2].getRadian(),  angle[0].getRadian(), 0.01)) {
-//			ii = 0;
-//		}
-//		if (ii != null) {
-//			LOG.trace(angle[0]+"/"+angle[1]+"/"+angle[2]);
-//		}
-//		return ii != null;
-//	}
-
-//	private Vector3[] create3Vector3s(PixelNode node, List<PixelEdge> edgeList) {
-//		Real2 xy0 = new Real2(node.getCentrePixel().getInt2());
-//		Vector3 vector3[] = new Vector3[3];
-//		for (int i = 0; i < 3; i++) {
-//			PixelNode otherNode = edgeList.get(i).getOtherNode(node);
-//			Real2 otherxy = new Real2(otherNode.getCentrePixel().getInt2());
-//			Vector2 vector = new Vector2(otherxy.subtract(xy0));
-//			vector3[i] = new Vector3(vector.getX(), vector.getY(), 0.0);
-//		}
-//		return vector3;
-//	}
-
 	public void addNode(PixelNode node) {
 		ensureNodes();
 		if (!nodes.contains(node)) {
@@ -767,13 +735,13 @@ public class PixelGraph {
 
 	private void ensureNodes() {
 		if (nodes == null) {
-			nodes = new ArrayList<PixelNode>();
+			nodes = new PixelNodeList();
 		}
 	}
 
 	private void ensureEdges() {
 		if (edges == null) {
-			edges = new ArrayList<PixelEdge>();
+			edges = new PixelEdgeList();
 		}
 	}
 
@@ -830,8 +798,8 @@ public class PixelGraph {
 
 	public PixelNode createRootNodeEmpirically(ComparatorType rootPosition) {
 		PixelNode rootNode = null;
-		List<PixelNode> rootNodes = getPossibleRootNodes1();
-		Collections.sort(rootNodes);
+		PixelNodeList rootNodes = getPossibleRootNodes1();
+		Collections.sort(rootNodes.getList());
 		if (rootNodes.size() > 0) {
 			rootNode = rootNodes.get(0);
 	//			if (debug) {

@@ -3,6 +3,7 @@ package org.xmlcml.image.pixel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
@@ -42,6 +43,17 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		}
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for (PixelNode node : this) {
+			sb.append(node.toString());
+		}
+		sb.append("]");
+		return sb.toString();
+	}
 
 	public void add(PixelNode node) {
 		ensureList();
@@ -51,6 +63,31 @@ public class PixelNodeList implements Iterable<PixelNode> {
 	public int size() {
 		ensureList();
 		return nodeList.size();
+	}
+
+	public PixelNode get(int i) {
+		ensureList();
+		return nodeList.get(i);
+	}
+
+	public void remove(int i) {
+		ensureList();
+		nodeList.remove(i);
+	}
+
+	public void addAll(Set<PixelNode> nodeSet) {
+		ensureList();
+		nodeList.addAll(nodeSet);
+	}
+
+	public boolean contains(PixelNode node) {
+		ensureList();
+		return nodeList.contains(node);
+	}
+
+	public List<PixelNode> getList() {
+		ensureList();
+		return nodeList;
 	}
 
 }

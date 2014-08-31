@@ -1,13 +1,11 @@
 package org.xmlcml.image.pixel;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.euclid.Int2;
 
 /** finds nodes by connectivity after super thinning/
  * 
@@ -15,7 +13,7 @@ import org.xmlcml.euclid.Int2;
  *
  */
 public class NeighbourPixelTest {
-	private final static Logger LOG = Logger.getLogger(NeighbourPixelTest.class);
+	public final static Logger LOG = Logger.getLogger(NeighbourPixelTest.class);
 
 	private static PixelIsland DOT1;
 	private static PixelIsland LINE2; // 2-pixel Line
@@ -674,7 +672,7 @@ public class NeighbourPixelTest {
 	 */
 	@Test
 	public void testNodes() {
-		PixelNodeList nodeList = A12.getNodeList();//  getNodes();
+		PixelNodeList nodeList = A12.createNodeList();//  getNodes();
 		Assert.assertEquals("nodes", 4, nodeList.size());
 		Set<String> nodeStringSet = new HashSet<String>();
 		for (PixelNode node : nodeList) {
@@ -689,12 +687,27 @@ public class NeighbourPixelTest {
 
 	@Test
 	public void testCreateEdge() {
-		PixelNodeList nodeList = A12.getNodeList();//  getNodes();
-		PixelNode node00 = nodeList.getPixelNode(new Int2(0,0));
-//		PixelEdge edge0 = A12.getEdge(node00);
-		
-		PixelNode node40 = nodeList.getPixelNode(new Int2(4,0));
+		PixelIsland island = A12;
+		PixelNodeList nodeList = island.createNodeList();//  getNodes()
+		Assert.assertEquals("nodes", 4, nodeList.size());
+		PixelEdgeList edgeList = island.createEdges();
+		Assert.assertEquals("edges", 4, edgeList.size());
+		PixelEdgeList edges = edgeList.getEdges(new Pixel(0,0), new Pixel(1,2));
+		Assert.assertEquals(1, edges.size());
+		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edges.get(0).toString());
+		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edgeList.getEdges(new Pixel(1,2), new Pixel(0,0)).get(0).toString());
+		Assert.assertEquals("{(3,2)(4,1)(4,0)}/[(3,2)(4,0)]", edgeList.getEdges(new Pixel(3,2), new Pixel(4,0)).get(0).toString());
+		Assert.assertEquals("", 2, edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).size());
+		String s = edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).toString();
+		Assert.assertTrue(
+				s.contains("{(1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2)}/[(1,2)(3,2)]") &&
+				s.contains("{(1,2)(2,2)(3,2)}/[(1,2)(3,2)]"));
+		for (PixelEdge edge : edgeList) {
+			LOG.debug(edge);
+		}
 	}
+
+	
 
 	
 	

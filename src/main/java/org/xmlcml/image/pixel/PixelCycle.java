@@ -1,8 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
 /** a cyclic set of pixels without defined nodes.

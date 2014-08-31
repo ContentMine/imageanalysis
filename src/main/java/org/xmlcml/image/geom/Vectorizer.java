@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.pixel.FloodFill;
-import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.PixelPath;
 

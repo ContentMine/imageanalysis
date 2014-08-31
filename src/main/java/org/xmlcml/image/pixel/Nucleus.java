@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
 
 
 /** a group of 3- or more- connected pixels.
@@ -25,7 +24,7 @@ public class Nucleus {
 	private Set<Pixel> spikeSet;
 	private PixelIsland island;
 	private Set<Pixel> thinnedSet;
-	private List<Pixel> centrePixelList;
+	private PixelList centrePixelList;
 	private Real2 centre;
 	private List<PixelShell> shellList;
 	

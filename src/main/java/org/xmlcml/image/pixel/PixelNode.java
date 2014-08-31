@@ -1,24 +1,38 @@
 package org.xmlcml.image.pixel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 
 public class PixelNode implements Comparable<PixelNode> {
 
+	private final static Logger LOG = Logger.getLogger(PixelNode.class);
+	
 	Pixel centrePixel; // pixel 1
-	private List<PixelEdge> edgeList;
+	private PixelEdgeList edgeList;
 	private String label;
 	private String id;
+	private Set<Pixel> unusedNeighbours;
 
 	protected PixelNode() {
 	}
 	
 	public PixelNode(Pixel pixel) {
 		this.centrePixel = pixel;
+	}
+	
+	public PixelNode(Pixel pixel, PixelIsland island) {
+		this(pixel);
+		addNeighboursToUnusedSet(pixel, island);
+	}
+
+	private void addNeighboursToUnusedSet(Pixel pixel, PixelIsland island) {
+		ensureUnusedNeighbours();
+		unusedNeighbours.addAll(pixel.getNeighbours(island).getList());
 	}
 	
 	public Pixel getCentrePixel() {
@@ -61,11 +75,11 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	private void ensureEdgeList() {
 		if (edgeList == null) {
-			edgeList = new ArrayList<PixelEdge>();
+			edgeList = new PixelEdgeList();
 		}
 	}
 
-	public List<PixelEdge> getEdges() {
+	public PixelEdgeList getEdges() {
 		ensureEdgeList();
 		return edgeList;
 	}
@@ -96,5 +110,37 @@ public class PixelNode implements Comparable<PixelNode> {
 	
 	public String getId() {
 		return id;
+	}
+
+	public Set<Pixel> getUnusedNeighbours() {
+		ensureUnusedNeighbours();
+		return unusedNeighbours;
+	}
+
+	private void ensureUnusedNeighbours() {
+		if (unusedNeighbours == null) {
+			unusedNeighbours = new HashSet<Pixel>();
+		}
+	}
+
+	public boolean hasMoreUnusedNeighbours() {
+		return getUnusedNeighbours().size() > 0;
+	}
+
+	/** gets an unusued neighbour and removes from unusedNeighbours set.
+	 * 
+	 * @return
+	 */
+	public Pixel getNextUnusedNeighbour() {
+		ensureUnusedNeighbours();
+		Pixel nextUnused = unusedNeighbours.iterator().next();
+		unusedNeighbours.remove(nextUnused);
+		return nextUnused;
+	}
+
+	public void removeUnusedNeighbour(Pixel neighbour) {
+		ensureUnusedNeighbours();
+		unusedNeighbours.remove(neighbour);
+		LOG.trace(this+" removed: "+neighbour+" unused: "+unusedNeighbours);
 	}
 }
