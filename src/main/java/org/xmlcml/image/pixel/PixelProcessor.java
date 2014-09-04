@@ -116,7 +116,7 @@ public class PixelProcessor {
 			pixelIslandList = floodFill.getPixelIslandList();
 			LOG.trace("after floodfill islands: "+pixelIslandList.size());
 			if (superThinning) {
-				pixelIslandList.removeStepsSortAndReverse();
+				pixelIslandList.thinThickStepsOld();
 			}
 			pixelIslandList.setPixelProcessor(this);
 		}

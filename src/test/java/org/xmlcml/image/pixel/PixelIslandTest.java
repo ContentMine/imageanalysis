@@ -361,13 +361,13 @@ public class PixelIslandTest {
 			Assert.assertEquals("terminal " + i, terminals[i], island
 					.getTerminalPixels().size());
 			Assert.assertEquals("2-nodes " + i, count2[i], island
-					.getPixelsWithNeighbours(2).size());
+					.getPixelsWithNeighbourCount(2).size());
 			Assert.assertEquals("3-nodes " + i, count3[i], island
-					.getPixelsWithNeighbours(3).size());
+					.getPixelsWithNeighbourCount(3).size());
 			Assert.assertEquals("4-nodes " + i, count4[i], island
-					.getPixelsWithNeighbours(4).size());
+					.getPixelsWithNeighbourCount(4).size());
 			Assert.assertEquals("5-nodes " + i, count5[i], island
-					.getPixelsWithNeighbours(5).size());
+					.getPixelsWithNeighbourCount(5).size());
 		}
 	}
 
@@ -880,9 +880,83 @@ public class PixelIslandTest {
 		SVGSVG.wrapAndWriteAsSVG(graph.drawEdgesAndNodes(PixelGraph.COLOURS), new File("target/glyph/char4.svg"));
 		
 	}
+	
+	@Test
+	public void testFillSingleHoles() {
+		PixelIsland island = new PixelIsland();
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,-1));
+		island.addPixel(new Pixel(1,0));
+		island.addPixel(new Pixel(-1,0));
+		Pixel centre = new Pixel(0,0);
+		PixelList filled = island.fillSingleHoles();
+		Assert.assertEquals("filled", 1, filled.size());
+	}
+
+	@Test
+	public void testFindEmptyPixels() {
+		PixelIsland island = new PixelIsland();
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,-1));
+		island.addPixel(new Pixel(1,0));
+		PixelList empty = island.getEmptyPixels();
+		Assert.assertEquals("empty", 2, empty.size());
+	}
+
+	@Test
+	public void testFindStubPixels() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,-1));
+		island.addPixel(new Pixel(1,0));
+		PixelList stubs = island.getOrCreateOrthogonalStubList();
+		Assert.assertEquals("empty", 1, stubs.size());
+	}
+
+	@Test
+	public void testTrimStubs() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,-1));
+		island.addPixel(new Pixel(1,0));
+		PixelList stubs = island.trimOrthogonalStubs();
+		Assert.assertEquals("stubs ", 1, stubs.size());
+		Assert.assertEquals("after trimming ", 3, island.size());
+	}
+
+	@Test
+	public void testGetOrCreateYJunctionList() {
+		PixelIsland largeY = createLargeY();
+		PixelNucleusList yjunctionList = largeY.getOrCreateYJunctionList();
+		Assert.assertEquals("junctions ", 1, yjunctionList.size());
+		Assert.assertEquals("y junction", "{(0,0)(0,1)(1,0)}", yjunctionList.toString());
+	}
+
+	@Test
+	public void testRearrangeYJunction() {
+		PixelIsland largeY = createLargeY();
+		largeY.rearrangeYJunctions();
+	}
 
 	// =============================================================
 
+	private PixelIsland createLargeY() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(-1,-1));
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,2));
+		island.addPixel(new Pixel(1,0));
+		island.addPixel(new Pixel(2,0));
+		return island;
+	}
+	
 	private void extractCharactersAndCorrelate(BufferedImage rawImage,
 			PixelIslandList islands, String charname, double correlationCutoff)
 			throws IOException {

@@ -31,11 +31,18 @@ public class PixelNucleus {
 	private Pixel centrePixel;
 	private PixelList pixelList;
 
+	private int rightAngleCorner;
+
 	public PixelNucleus(PixelIsland island) {
 		junctionSet = new JunctionSet();
 		externallyConnectedJunctionSet = new JunctionSet();
 		externalPixelSet = new HashSet<Pixel>();
 		this.island = island;
+		setDefaults();
+	}
+
+	private void setDefaults() {
+		this.rightAngleCorner = -1;
 	}
 
 	public void add(JunctionNode junction) {
@@ -47,14 +54,6 @@ public class PixelNucleus {
 		}
 	}
 
-//	public PixelList getPixelList() {
-//		if (pixelList == null) {
-//			for (PixelNode junction : junctionSet) {
-//				PixelList junctionPixels = junction.getCentrePixel()
-//			}
-//		}
-//	}
-	
 	public boolean contains(PixelNode junction) {
 		return junctionSet.contains(junction);
 	}
@@ -337,11 +336,13 @@ public class PixelNucleus {
 	}
 	
 	public String toString() {
-		String s = "";
+		StringBuilder sb = new StringBuilder();
 		for (PixelNode junction : junctionSet) {
-			s += junction + "; ";
+			sb.append(junction + "; ");
 		}
-		return s;
+//		sb.append(""+centre+"; "+pixelList);
+		if (pixelList != null) sb.append(pixelList.toString());
+		return sb.toString();
 	}
 
 	public JunctionSet getJunctionSet() {
@@ -401,6 +402,76 @@ public class PixelNucleus {
 			} 
 		}
 		return removableList;
+	}
+
+	void doTJunctionThinning(PixelIsland island) {
+		PixelList removables = getSuperthinRemovablePixelList();
+		island.removePixels(removables);
+	}
+
+	public boolean isYJunction() {
+		boolean isY = false;
+		if (pixelList.size() == 3) {
+			int corner = getRightAngleCorner();
+			isY = corner != -1;
+		}
+		return isY;
+	}
+
+	private int getRightAngleCorner() {
+		rightAngleCorner = -1;
+		for (int i = 0; i < 3; i++) {
+			int j = (i + 1) % 3;
+			int k = (j + 1) % 3;
+			if (Pixel.isRightAngle(pixelList.get(i), pixelList.get(j), pixelList.get(k))) {
+				rightAngleCorner = i;
+				break;
+			}
+		}
+		return rightAngleCorner;
+	}
+
+	public boolean rearrangeYJunction(PixelIsland island) {
+		Pixel rightAnglePixel = pixelList.get(rightAngleCorner);
+		int p0 = (rightAngleCorner + 1) % 3;
+		Pixel startPixel0 = pixelList.get(p0);
+		int p1 = (p0 + 1) % 3;
+		Pixel startPixel1 = pixelList.get(p1);
+		LOG.trace("pixel0 "+startPixel0+" neighbours "+startPixel0.getNeighbours(island));
+		LOG.trace("pixel1 "+startPixel1+" neighbours "+startPixel1.getNeighbours(island));
+		LOG.trace("right angle "+rightAnglePixel+" neighbours "+rightAnglePixel.getNeighbours(island));
+		if (movePixel(startPixel0, startPixel1, rightAnglePixel, island)) {
+			return true;
+		}
+		if (movePixel(startPixel1, startPixel0, rightAnglePixel, island)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean movePixel(Pixel pixel0, Pixel pixel1, Pixel rightAnglePixel, PixelIsland island) {
+		Int2 right = rightAnglePixel.getInt2();
+		Int2 p0 = pixel0.getInt2();
+		Int2 p1 = pixel1.getInt2();
+		Int2 vector = right.subtract(p0);
+		Int2 new2 = p1.plus(vector);
+		Pixel newPixel = new Pixel(new2.getX(), new2.getY());
+		PixelList neighbours = newPixel.getNeighbours(island);
+		LOG.trace("new "+newPixel+"neighbours: "+neighbours);
+		if (neighbours.size() != 3) return false; // we still have to remove old pixel 
+		
+		PixelList oldNeighbours = pixel1.getNeighbours(island); // before removal
+		island.remove(pixel1);
+		newPixel.clearNeighbours();
+		island.addPixel(newPixel);
+		PixelList newPixelNeighbours = newPixel.getNeighbours(island);
+		LOG.debug("new "+newPixel+"neighbours: "+newPixelNeighbours);
+		for (Pixel oldNeighbour : oldNeighbours) {
+			oldNeighbour.clearNeighbours();
+			PixelList oldNeighbourNeighbours = oldNeighbour.getNeighbours(island);
+			LOG.debug("old "+oldNeighbour+"neighbours: "+oldNeighbourNeighbours);
+		}
+		return true;
 	}
 
 }

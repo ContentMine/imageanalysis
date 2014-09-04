@@ -338,4 +338,30 @@ public class Pixel {
 				this.getDiagonalNeighbours(island).size() == 0;
 	}
 
+	/** do 3 pixels form a right angle of neighbours.
+	 * 
+	 * @param pixel pixel at right angle
+	 * @param pixel1
+	 * @param pixel2
+	 * @return
+	 */
+	public static boolean isRightAngle(Pixel pixel, Pixel pixel1, Pixel pixel2) {
+		return pixel.isOrthogonalNeighbour(pixel1) &&
+		pixel.isOrthogonalNeighbour(pixel2) &&
+		pixel1.isDiagonalNeighbour(pixel2);
+	}
+
+	public void computeNeighbours(PixelIsland pixelIsland) {
+		this.neighbourList = null;
+		getNeighbours(pixelIsland);
+	}
+
+	void recomputeNeighbours(PixelIsland island) {
+		PixelList neighbourList = getNeighbours(island);
+		for (Pixel neighbour : neighbourList) {
+			neighbour.computeNeighbours(island);
+		}
+		computeNeighbours(island);
+	}
+
 }

@@ -32,12 +32,9 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 		}
 	}
 
-	public void superthin(PixelIsland island) {
+	public void doTJunctionThinning(PixelIsland island) {
 		for (PixelNucleus nucleus : this) {
-			PixelList removables = nucleus.getSuperthinRemovablePixelList();
-			LOG.trace("remove "+removables);
-			island.removePixels(removables);
-//			removables.removeFrom(island);
+			nucleus.doTJunctionThinning(island);
 		}
 	}
 
@@ -46,6 +43,16 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 		return list.size();
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		for (PixelNucleus nucleus : this) {
+			sb.append(nucleus.toString());
+		}
+		sb.append("}");
+		return sb.toString();
+	}
 	
 
 }

@@ -50,6 +50,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private boolean debug = false;
 	private PixelProcessor pixelProcessor;
 	private ImageParameters parameters;
+	private boolean diagonal;
 	
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -103,11 +104,92 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PixelIslandList createSuperThinnedPixelIslandList(BufferedImage image) {
+	public static PixelIslandList createSuperThinnedPixelIslandListNew(BufferedImage image) {
 		PixelProcessor pixelProcessor = new PixelProcessor(image);
 		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
-		islandList.removeStepsSortAndReverse();
+		islandList.doSuperThinning();
 		return islandList;
+	}
+
+	/**
+	 * find all separated islands.
+	 * 
+	 * creates a FloodFill and extracts Islands from it. diagonal set to true
+	 * 
+	 * @param image
+	 * @return
+	 * @throws IOException
+	 */
+	public static PixelIslandList createSuperThinnedPixelIslandList(BufferedImage image) {
+		
+//		Pixel pixel2324 = new Pixel(23, 24);
+
+		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
+		islandList.setDiagonal(true);
+//		checkforFalse("thick", islandList);
+		islandList.thinThickStepsOld();
+		islandList.fillSingleHoles();
+		islandList.trimOrthogonalStubs();
+		islandList.doTJunctionThinning();
+		
+		Pixel pixel2324 = islandList.getPixelByCoord(new Int2(23,24));
+
+		PixelIsland island2324 = islandList.getIslandByPixel(pixel2324);
+		LOG.debug("PIXEL0 "+pixel2324+"; "+pixel2324.getNeighbours(island2324));
+		PixelTestUtils.debugPixelsWithNeighbourCount(island2324, 4);
+
+		islandList.rearrangeYJunctions();
+
+		island2324 = islandList.getIslandByPixel(pixel2324);
+		LOG.debug("PIXEL1 "+pixel2324+"; "+pixel2324.getNeighbours(island2324));
+
+		PixelTestUtils.debugPixelsWithNeighbourCount(island2324, 3);
+		return islandList;
+	}
+
+	public Pixel getPixelByCoord(Int2 coord) {
+		Pixel pixel = null;
+		for (PixelIsland island : this) {
+			Pixel pixel1 = island.getPixelByCoord(coord);
+			if (pixel1 != null) {
+				if (pixel == null) {
+					pixel = pixel1;
+				} else {
+					throw new RuntimeException("Pixel occurs in two island: "+coord);
+				}
+			}
+		}
+		return pixel;
+	}
+
+	private void recomputeNeighbours() {
+		for (PixelIsland island : this) {
+			island.recomputeNeighbours();
+		}
+	}
+	
+	public PixelIsland getIslandByPixel(Pixel pixel) {
+//		ensureIslandByPixelMap();
+		for (PixelIsland island : this) {
+			if (island.contains(pixel)) {
+				return island;
+			}
+		}
+		return null;
+	}
+
+	private void rearrangeYJunctions() {
+		for (PixelIsland island : this) {
+			island.rearrangeYJunctions();
+		}
+	}
+
+	private void setDiagonal(boolean b) {
+		this.diagonal = b;
+		for (PixelIsland island : this) {
+			island.setDiagonal(b);
+		}
 	}
 
 	public PixelIslandList smallerThan(Real2 box) {
@@ -204,32 +286,6 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return pixelList;
 	}
 
-//	/**
-//	 * create a list of list of rings.
-//	 * 
-//	 * @param outputFile
-//	 *            if not null file to write SVG to
-//	 * @return
-//	 */
-//	@Deprecated
-//	public List<PixelRingList> createRingListList(File outputFile) {
-//		List<PixelRingList> ringListList = new ArrayList<PixelRingList>();
-//		SVGG gg = null;
-//		if (outputFile != null) {
-//			gg = new SVGG();
-//		}
-//		for (PixelIsland island : this) {
-//			PixelRingList ringList = island.createOnionRings();
-//			ringListList.add(ringList);
-//			ringList.plotPixels(gg, new String[] {
-//					"orange", "green", "blue", "red", "cyan" });
-//		}
-//		if (outputFile != null) {
-//			SVGSVG.wrapAndWriteAsSVG(gg, outputFile);
-//		}
-//		return ringListList;
-//	}
-
 	public List<PixelRingList> createRingListList() {
 		List<PixelRingList> ringListList = new ArrayList<PixelRingList>();
 		for (PixelIsland island : this) {
@@ -248,6 +304,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 */
 	public void sortYX() {
 		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP, ComparatorType.LEFT));
+	}
+
+	/** sorts Y first, then X.
+	 * 
+	 * @param tolerance error allowed (especially in Y)
+	 */
+	public void sortYX(double tolerance) {
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP, ComparatorType.LEFT, tolerance));
 	}
 
 	public void sortSize() {
@@ -318,12 +382,23 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * removes all unnecessary steps while keeping minimum connectivity.
 	 * 
 	 */
+	@Deprecated // use removeCorners()
 	public void removeStepsIteratively() {
 		for (PixelIsland island : list) {
 //			island.removeStepsIteratively();
 			// may be better...
 			island.removeCorners();
 			LOG.trace("after remove corners "+island.size());
+		}
+	}
+
+	/**
+	 * removes all unnecessary steps while keeping minimum connectivity.
+	 * 
+	 */
+	public void removeCorners() {
+		for (PixelIsland island : list) {
+			island.removeCorners();
 		}
 	}
 
@@ -340,21 +415,48 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return array;
 	}
 
-	public void removeStepsSortAndReverse() {
+	/** thin all "thick steps".
+	 * 
+	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with "steps".
+	 * 
+	 * remove all thick steps to preserve 2-connectivity (including diagonal) except at branches.
+	 * 
+	 */
+	public void thinThickStepsOld() {
 		LOG.trace("removing steps; current Pixel size()"+this.getPixelList().size());
 		removeStepsIteratively();
+//		checkforFalse("before clean", this);
 		createCleanIslandList();
-		this.
+//		checkforFalse("after clean", this);
 		LOG.trace("sort and reverse");
 		sortSize();
 		reverse();
+//		checkforFalse("after thick", this);
 		LOG.trace("finish");
+	}
+
+	/** thin all "thick steps".
+	 * 
+	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with "steps".
+	 * 
+	 * remove all thick steps to preserve 2-connectivity (including diagonal) except at branches.
+	 * 
+	 */
+	public void doSuperThinning() {
+		List<PixelIsland> newIslandList = new ArrayList<PixelIsland>();
+		for (PixelIsland island : this) {
+			PixelIsland newIsland = new PixelIsland(island.getPixelList());
+			newIsland.doSuperThinning();
+			newIslandList.add(newIsland);
+		}
+		this.list = newIslandList;
 	}
 
 	private void createCleanIslandList() {
 		List<PixelIsland> newIslandList = new ArrayList<PixelIsland>();
 		for (PixelIsland island : this) {
 			PixelIsland newIsland = new PixelIsland(island.getPixelList());
+			newIsland.setDiagonal(diagonal);
 			newIslandList.add(newIsland);
 			this.list = newIslandList;
 		}
@@ -363,7 +465,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	@Deprecated
 	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
 		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
-		removeStepsSortAndReverse();
+		thinThickStepsOld();
 		File outputDir = pixelProcessor.getOutputDir();
 		outputDir.mkdirs();
 		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
@@ -390,7 +492,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public List<PixelGraph> createGraphList() {
 		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
-		removeStepsSortAndReverse();
+		thinThickStepsOld();
 		// main tree
 		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
 			PixelIsland island = get(i);
@@ -432,6 +534,57 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public void setParameters(ImageParameters parameters) {
 		this.parameters = parameters;
+	}
+
+	/** fill holes with 4 orthogonal neighbours
+	 * 
+	 */
+	public void fillSingleHoles() {
+		for (PixelIsland island : this) {
+			island.fillSingleHoles();
+		}
+	}
+
+	/** remove 3 connected single pixels on "surface" of island
+	 * 
+	 */
+	public PixelList trimOrthogonalStubs() {
+		PixelList stubs = new PixelList();
+		for (PixelIsland island : this) {
+			PixelList stubs0 = getOrCreateOrthogonalStubList();
+			island.trimOrthogonalStubs();
+			stubs.addAll(stubs0);
+		}
+		return stubs;
+	}
+
+	private PixelList getOrCreateOrthogonalStubList() {
+		PixelList stubs = new PixelList();
+		for (PixelIsland island : this) {
+			PixelList stubs0 = island.getOrCreateOrthogonalStubList();
+			stubs.addAll(stubs0);
+		}
+		return stubs;
+	}
+
+	/** do TJunction thinning on all islands.
+	 * 
+	 */
+	public void doTJunctionThinning() {
+		for (PixelIsland island : this) {
+			island.doTJunctionThinning();
+		}
+	}
+
+	public void sortBySizeDescending() {
+		sortSize();
+		reverse();
+	}
+
+	public PixelIsland getLargestIsland() {
+		sortBySizeDescending();
+		PixelIsland island = get(0); // the tree
+		return island;
 	}
 
 }

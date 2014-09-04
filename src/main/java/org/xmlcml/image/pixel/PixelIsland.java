@@ -78,6 +78,13 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Set<Pixel> cornerSet;
 	private ImageParameters parameters;
 	private PixelNodeList pixelNodeList;
+	private PixelList emptyPixelList;
+	private PixelList singleHoleList;
+	private PixelList orthogonalStubList;
+
+	private PixelNucleusList pixelNucleusList;
+
+	private PixelNucleusList yJunctions;
 
 	public PixelIsland() {
 		ensurePixelList();
@@ -164,6 +171,11 @@ public class PixelIsland implements Iterable<Pixel> {
 		return this.pixelList.size();
 	}
 
+	public Pixel getPixelByCoord(Int2 coord) {
+		Pixel pixel = getPixelByCoordMap().get(coord);
+		return pixel;
+	}
+	
 	public Map<Int2, Pixel> getPixelByCoordMap() {
 		ensurePixelByCoordMap();
 		return pixelByCoordMap;
@@ -181,7 +193,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public PixelList getTerminalPixels() {
-		terminalPixels = getPixelsWithNeighbours(1);
+		terminalPixels = getPixelsWithNeighbourCount(1);
 		PixelList terminalSpikedList = getTerminalSpikes();
 		if (terminalSpikedList.size() > 0) {
 			terminalPixels.addAll(terminalSpikedList);
@@ -235,7 +247,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		return terminal;
 	}
 
-	public PixelList getPixelsWithNeighbours(int neighbourCount) {
+	public PixelList getPixelsWithNeighbourCount(int neighbourCount) {
 		PixelList pixels = new PixelList();
 		for (Pixel pixel : pixelList) {
 			int nCount = getNeighbourCount(pixel);
@@ -274,88 +286,6 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	/**
-	 * this may be obsolete.
-	 * 
-	 * @param removePixels
-	 */
-	// private void findNucleiAndMarkToRemove(boolean removePixels) {
-	// List<Triangle> lastTriangleList = null;
-	// Type type = null;
-	// Type lastType = null;
-	// removeList = new ArrayList<Pixel>();
-	// for (Pixel pixel : pixelList) {
-	// type = Type.NULL;
-	// List<Pixel> neighbourList = pixel.getNeighbours(Marked.ALL);
-	// List<Triangle> triangleList = scanTriangles(pixel, neighbourList);
-	// if (neighbourList.size() == 1) {
-	// type = Type.TERMINAL;
-	// } else if (neighbourList.size() == 2) {
-	// type = Type.CHAIN2;
-	// if (triangleList.size() == 1) {
-	// type = Type.BEND2;
-	// }
-	// } else if (neighbourList.size() == 3) {
-	// if (triangleList.size() == 1) {
-	// type = Type.CHAIN3;
-	// } else if (triangleList.size() == 2) {
-	// type = Type.DEMILOZENGE;
-	// if (lastType.equals(Type.DEMILOZENGE)) {
-	// tidyLozenge(lastTriangleList, triangleList);
-	// }
-	// } else if (triangleList.size() == 3) {
-	// type = Type.IMPOSSIBLE;
-	// }
-	// } else if (neighbourList.size() == 4) {
-	// if (triangleList.size() == 1) {
-	// type = Type.NODE4;
-	// } else if (triangleList.size() == 2) {
-	// type = Type.BILOZENGE;
-	// } else if (triangleList.size() == 3) {
-	// type = Type.IMPOSSIBLE;
-	// } else if (triangleList.size() == 4) {
-	// type = Type.NODE4;
-	// } else if (triangleList.size() >= 5) {
-	// type = Type.IMPOSSIBLE;
-	// }
-	// } else if (neighbourList.size() >= 5) {
-	// type = Type.NODE5;
-	// }
-	// LOG.trace(type);
-	// lastType = type;
-	// lastTriangleList = triangleList;
-	// }
-	// if (removePixels) {
-	// this.removePixels();
-	// }
-	//
-	// }
-
-	// private void tidyLozenge(List<Triangle> lastTriangleList, List<Triangle>
-	// triangleList) {
-	// Set<Pixel> lastUnion = getUnion(lastTriangleList);
-	// Set<Pixel> thisUnion = getUnion(triangleList);
-	// if (!lastUnion.equals(thisUnion)) {
-	// throw new RuntimeException("mismatched union");
-	// }
-	// if (lastUnion.size() != 4) {
-	// throw new RuntimeException("bad union size: "+lastUnion.size());
-	// }
-	// Set<Pixel> lastIntersection = getIntersection(lastTriangleList);
-	// Set<Pixel> thisIntersection = getIntersection(triangleList);
-	// if (!lastIntersection.equals(thisIntersection)) {
-	// throw new RuntimeException("mismatched intersection");
-	// }
-	// if (lastIntersection.size() != 2) {
-	// throw new
-	// RuntimeException("bad intersection size: "+lastIntersection.size());
-	// }
-	// LOG.trace("Lozenge");
-	// Pixel toRemove = lastIntersection.iterator().next();
-	// LOG.trace(toRemove);
-	// removeList.add(toRemove);
-	// }
-
-	/**
 	 * private List<Pixel> pixelList; boolean allowDiagonal = false; private
 	 * Int2Range int2range; private Int2 leftmostCoord; Map<Int2, Pixel>
 	 * pixelByCoordMap;
@@ -367,86 +297,44 @@ public class PixelIsland implements Iterable<Pixel> {
 			// leaves int2range and laftmostCoord dirty
 			int2range = null;
 			leftmostCoord = null;
-			pixelByCoordMap.remove(pixelByCoordMap.get(pixel.getInt2()));
+			Int2 coord = pixel.getInt2();
+			boolean debug2324 = coord.equals(new Int2(23,23));
+			pixelByCoordMap.remove(coord);
 			removeFromNeighbourNeighbourList(pixel);
+			if (debug2324) {
+				Pixel pixel2324 = this.getPixelByCoord(new Int2(23,24));
+				LOG.debug(" removed "+pixel.toString());
+//				PixelTestUtils.debugPixelsWithNeighbourCount(this, 3);
+				LOG.debug("REM "+pixel+"; "+pixel.getNeighbours(this));
+				LOG.debug("NEIG "+pixel2324+"; "+pixel2324.getNeighbours(this));
+			}
+			pixel.clearNeighbours();
+			
 		}
 	}
 
 	private void removeFromNeighbourNeighbourList(Pixel pixel) {
 		PixelList neighbours = pixel.getNeighbours(this);
+		boolean debug = false;
+		if (pixel.getInt2().equals(new Int2(23, 23))) {
+			LOG.debug("removing "+pixel+" with neighbours "+neighbours);
+			debug = true;
+		}
 		for (Pixel neighbour : neighbours) {
-			neighbour.getNeighbours(this).remove(pixel);
+			PixelList neighbourList = neighbour.getNeighbours(this);
+			if (debug) LOG.debug("removing "+pixel+" from "+neighbourList);
+			boolean removed = neighbourList.remove(pixel);
+			if (debug) LOG.debug(" to give neighbour "+neighbour+" with neighbours "+neighbourList);
+			
 		}
 	}
-
-	// private Set<Pixel> getUnion(List<Triangle> triangleList) {
-	// Set<Pixel> unionSet = triangleList.get(0).addAll(triangleList.get(1));
-	// return unionSet;
-	// }
-	//
-	// private Set<Pixel> getIntersection(List<Triangle> triangleList) {
-	// Set<Pixel> intersectionSet =
-	// triangleList.get(0).retainAll(triangleList.get(1));
-	// return intersectionSet;
-	// }
-
-	// private List<Triangle> scanTriangles(Pixel pixel, List<Pixel>
-	// neighbourList) {
-	// List<Triangle> triangleList = new ArrayList<Triangle>();
-	// int count = neighbourList.size();
-	// for (int i = 0; i < count - 1; i++) {
-	// for (int j = i+1; j < count; j++ ) {
-	// if (scanTriangle(neighbourList, i, j)) {
-	// triangleList.add(new Triangle(pixel, neighbourList.get(i),
-	// neighbourList.get(j)));
-	// }
-	// }
-	// }
-	// return triangleList;
-	// }
-
-	/*
-	 * look for two neighbours that form a triangle.
-	 * 
-	 * @param neighbourList
-	 * 
-	 * @param i first neighbour pixel
-	 * 
-	 * @param j second neighbour pixel
-	 * 
-	 * @return Int2(i,j) if they form a triangle, else null
-	 */
-	// private boolean scanTriangle(List<Pixel> neighbourList, int i, int j) {
-	// if (i >= 0 && i < neighbourList.size() &&
-	// j >= 0 && j < neighbourList.size() &&
-	// i != j) {
-	// Pixel pixeli = neighbourList.get(i);
-	// Pixel pixelj = neighbourList.get(j);
-	// if (pixeli.getNeighbours(Marked.ALL).contains(pixelj)) {
-	// return true;
-	// }
-	// }
-	// return false;
-	// }
-
-	// private void removePixels() {
-	// for (Pixel pixel : removeList) {
-	// LOG.trace("remove: "+pixel.getInt2());
-	// remove(pixel);
-	// }
-	// }
-
-	// private void cleanChains() {
-	// this.findNucleiAndMarkToRemove(true);
-	// this.findNucleiAndMarkToRemove(false);
-	// }
 
 	public List<Nucleus> getNucleusList() {
 		nucleusList = new ArrayList<Nucleus>();
 		nucleusMap = new HashMap<Pixel, Nucleus>();
 		Set<Pixel> multiplyConnectedPixels = new HashSet<Pixel>();
 		for (int i = 3; i <= 8; i++) {
-			multiplyConnectedPixels.addAll(getPixelsWithNeighbours(i).getList());
+			multiplyConnectedPixels.addAll(getPixelsWithNeighbourCount(i).getList());
 		}
 		while (multiplyConnectedPixels.size() > 0) {
 			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
@@ -1218,35 +1106,148 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixelNodeList;
 	}
 
-	public PixelNucleusList createNucleusList() {
-		PixelNucleusList pixelNucleusList = new PixelNucleusList();
-		for (Pixel pixel : this.getPixelList()) {
-			boolean added = false;
-			if (pixel.getNeighbours(this).size() > 2) {
-				for (PixelNucleus nucleus : pixelNucleusList) {
-					if (nucleus.canTouch(pixel)) {
-						nucleus.add(pixel);
-						added = true;
-						break;
+	public PixelNucleusList getOrCreatePixelNucleusList() {
+		if (pixelNucleusList == null) {
+			pixelNucleusList = new PixelNucleusList();
+			for (Pixel pixel : this.getPixelList()) {
+				boolean added = false;
+				if (pixel.getNeighbours(this).size() > 2) {
+					for (PixelNucleus nucleus : pixelNucleusList) {
+						if (nucleus.canTouch(pixel)) {
+							nucleus.add(pixel);
+							added = true;
+							break;
+						}
 					}
-				}
-				if (!added) {
-					PixelNucleus nucleus = new PixelNucleus(this);
-					nucleus.add(pixel);
-					pixelNucleusList.add(nucleus);
+					if (!added) {
+						PixelNucleus nucleus = new PixelNucleus(this);
+						nucleus.add(pixel);
+						pixelNucleusList.add(nucleus);
+					}
 				}
 			}
 		}
 		return pixelNucleusList;
 	}
 
+	/** remove orthogonal stub
+	 *
+	 * single pixel on a surface
+	 * 
+	 * @return list of pixels removed
+	 */
+	public PixelList trimOrthogonalStubs() {
+		getOrCreateOrthogonalStubList();
+		for (Pixel stub : orthogonalStubList) {
+			remove(stub);
+		}
+		return orthogonalStubList;
+	}
+	
+	public PixelList getOrCreateOrthogonalStubList() {
+		if (orthogonalStubList == null) {
+			orthogonalStubList = new PixelList();
+			for (Pixel pixel : this) {
+				if (isOrthogonalStub(pixel)) {
+					orthogonalStubList.add(pixel);
+					LOG.debug("orthogonal "+pixel);
+				}
+			}
+		}
+		return orthogonalStubList;
+	}
+
+	private boolean isOrthogonalStub(Pixel pixel) {
+		PixelList neighbours = pixel.getNeighbours(this);
+		if (neighbours.size() == 3) {
+			if (neighbours.hasSameCoords(0) || neighbours.hasSameCoords(1)) {
+				LOG.debug("orthogonal stub "+pixel+"; "+neighbours);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** fill empty single pixel.
+	 *
+	 * "hole" must have 4 orthogonal neighbours
+	 */
+	public PixelList fillSingleHoles() {
+		if (singleHoleList == null) {
+			singleHoleList = new PixelList();
+			PixelList emptyList = getEmptyPixels();
+			for (Pixel pixel : emptyList) {
+				PixelList neighbours = this.getFilledOrthogonalNeighbourPixels(pixel);
+				if (neighbours.size() == 4) {
+					singleHoleList.add(pixel);
+					this.addPixel(pixel);
+				}
+			}
+		}
+		return singleHoleList;
+	}
+
+	private PixelList getFilledOrthogonalNeighbourPixels(Pixel pixel) {
+		Int2 coord = pixel == null ? null : pixel.getInt2();
+		PixelList filledList = null;
+		if (coord != null) {
+			filledList = new PixelList();
+			ensurePixelByCoordMap();
+			addPixel(filledList, pixelByCoordMap.get(coord.subtract(new Int2(1,0))));
+			addPixel(filledList, pixelByCoordMap.get(coord.subtract(new Int2(0,1))));
+			addPixel(filledList, pixelByCoordMap.get(coord.plus(new Int2(1,0))));
+			addPixel(filledList, pixelByCoordMap.get(coord.plus(new Int2(0,1))));
+
+		}
+		if (filledList.size() > 0) {
+			LOG.trace("filled "+filledList.size());
+		}
+		return filledList;
+	}
+
+	/** add pixel if not null
+	 * 
+	 * @param list
+	 * @param pixel
+	 */
+	private void addPixel(PixelList list, Pixel pixel) {
+		if (pixel != null) {
+			list.add(pixel);
+		}
+		
+	}
+
+	public PixelList getEmptyPixels() {
+		if (emptyPixelList == null) {
+			emptyPixelList = new PixelList();
+			Int2Range box = this.getIntBoundingBox();
+			IntRange xRange = box.getXRange();
+			int xmin = xRange.getMin();
+			int xmax = xRange.getMax();
+			IntRange yRange = box.getYRange();
+			int ymin = yRange.getMin();
+			int ymax = yRange.getMax();
+			Map<Int2, Pixel> pixelByCoordMap = getPixelByCoordMap();
+			for (int i = xmin; i <= xmax; i++) {
+				for (int j = ymin; j <= ymax; j++) {
+					Pixel pixel = pixelByCoordMap.get(new Int2(i, j));
+					if (pixel == null) {
+						emptyPixelList.add(new Pixel(i, j));
+					}
+				}
+			}
+			LOG.trace("empty "+emptyPixelList.size());
+		}
+		return emptyPixelList;
+	}
+
 	/** superthin the nucleus by removing 3-coordinated and higher pixels.
 	 * 
 	 * @return the removed pixels
 	 */
-	public PixelNucleusList superthin() {
-		PixelNucleusList nucleusList = createNucleusList();
-		nucleusList.superthin(this);
+	public PixelNucleusList doTJunctionThinning() {
+		PixelNucleusList nucleusList = getOrCreatePixelNucleusList();
+		nucleusList.doTJunctionThinning(this);
 		return nucleusList;
 	}
 
@@ -1314,6 +1315,61 @@ public class PixelIsland implements Iterable<Pixel> {
 			}
 		}
 		return pixelEdgeList;
+	}
+
+	public void doSuperThinning() {
+		removeSteps();
+		doTJunctionThinning();
+	}
+
+	public boolean getDiagonal() {
+		return allowDiagonal;
+	}
+
+	public void rearrangeYJunctions() {
+		this.getOrCreateYJunctionList();
+		for (PixelNucleus yJunction : yJunctions) {
+			LOG.trace("rearrange Y "+yJunction);
+			if (yJunction.rearrangeYJunction(this)) {
+				LOG.trace("rearranged Y junction: "+yJunction);
+			}
+		}
+	}
+
+	public PixelNucleusList getOrCreateYJunctionList() {
+		if (yJunctions == null) {
+			yJunctions = new PixelNucleusList();
+			getOrCreatePixelNucleusList();
+			for (PixelNucleus pixelNucleus : pixelNucleusList) {
+				if (pixelNucleus.isYJunction()) {
+					yJunctions.add(pixelNucleus);
+				}
+			}
+		}
+		return yJunctions;
+	}
+
+	public void recomputeNeighbours() {
+		for (Pixel pixel : this) {
+			pixel.recomputeNeighbours(this);
+		}
+	}
+
+	/** does island contain a pixel?
+	 * 
+	 * crude
+	 * 
+	 * @param pixel
+	 * @return
+	 */
+	public boolean contains(Pixel pixel) {
+		ensurePixelList();
+		for (Pixel pixel0 : pixelList) {
+			if (pixel.equals(pixel0)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 //	/** create rings of pixels starting at the outside.

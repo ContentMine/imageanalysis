@@ -308,9 +308,7 @@ public class PixelGraphTest {
 		ImageUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
 		LOG.debug("islands: "+pixelIslandList.size());
-		pixelIslandList.sortSize();
-		pixelIslandList.reverse();
-		PixelIsland island = pixelIslandList.get(0); // the tree
+		PixelIsland island = pixelIslandList.getLargestIsland();
 		PixelGraph graph = PixelGraph.createGraph(island);
 		LOG.debug("edges "+graph.getEdges().size());
 		PixelNode pixelNode = graph.getRootPixelNodeFromExtremeEdge(ComparatorType.LEFT);

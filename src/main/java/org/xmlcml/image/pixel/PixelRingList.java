@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGRect;
 
 public class PixelRingList implements Iterable<PixelList> {
 

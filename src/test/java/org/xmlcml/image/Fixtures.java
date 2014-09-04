@@ -9,12 +9,12 @@ import org.xmlcml.image.pixel.PixelList;
 
 public class Fixtures {
 
-	public final static File RESOURCE_DIR = new File("src/test/resources");
-	public final static File IMAGE_DIR = new File(RESOURCE_DIR, "org/xmlcml/image");
+	public final static File TEST_RESOURCE_DIR = new File("src/test/resources");
+	public final static File TEST_IMAGE_DIR = new File(TEST_RESOURCE_DIR, "org/xmlcml/image");
 	
-	public final static File JOURNAL_HTML = new File(IMAGE_DIR, "journal.html");
+	public final static File JOURNAL_HTML = new File(TEST_IMAGE_DIR, "journal.html");
 	
-	public final static File LINES_DIR = new File(IMAGE_DIR, "lines");
+	public final static File LINES_DIR = new File(TEST_IMAGE_DIR, "lines");
 	public final static File TREE_PNG = new File(LINES_DIR, "tree.png");
 	public final static File TREE1_PNG = new File(LINES_DIR, "tree1.png");
 	public static final File ETHANE_PNG = new File(LINES_DIR, "ethane.png");
@@ -31,7 +31,7 @@ public class Fixtures {
 	public static final File MOLECULE_BINARY_CANNY_1_PNG = new File(LINES_DIR, "moleculeBinaryCanny1.png");
 	public static final File MOLECULE_BINARY_CANNY_1_BMP = new File(LINES_DIR, "moleculeBinaryCanny1.bmp");
 	
-	public final static File PROCESSING_DIR = new File(IMAGE_DIR, "processing");
+	public final static File PROCESSING_DIR = new File(TEST_IMAGE_DIR, "processing");
 	public static final File HISTOGRAM_JPG = new File(PROCESSING_DIR, "300px-Unequalized_Hawkes_Bay_NZ.jpg");
 	public static final File HISTOGRAM_PNG = new File(PROCESSING_DIR, "300px-Unequalized_Hawkes_Bay_NZ.png");
 	public static final File MOLECULE_20131119_JPG = new File(PROCESSING_DIR, "IMG_20131119_180112.jpg");
@@ -49,7 +49,7 @@ public class Fixtures {
 	public static final File ZIGZAG_PNG = new File(PROCESSING_DIR, "zigzag.png");
 
 
-	public final static File TEXT_DIR = new File(IMAGE_DIR, "text");
+	public final static File TEXT_DIR = new File(TEST_IMAGE_DIR, "text");
 	public static final File NRRL_PNG = new File(TEXT_DIR, "NRRL.png");
 	public static final File NO2 = new File(TEXT_DIR, "NO2.png");
 	public static final File GIBBONS_PNG = new File(TEXT_DIR, "gibbons.png");
@@ -61,11 +61,15 @@ public class Fixtures {
 	public static final File TIMES_GIF = new File(TEXT_DIR, "times.gif");
 	public static final File LARGE_PHYLO_JPG = new File(Fixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
 
-	public static final File GENERAL_DIR = new File(IMAGE_DIR, "general");
+	public static final File GENERAL_DIR = new File(TEST_IMAGE_DIR, "general");
 	public static final File REFFONT_DIR = new File(GENERAL_DIR, "refFont");
-	public static final File COMPOUND_DIR = new File(IMAGE_DIR, "compound");
+	public static final File COMPOUND_DIR = new File(TEST_IMAGE_DIR, "compound");
 
+	private static final File IMAGE_MAIN_DIR = new File("src/main/resources/org/xmlcml/image");
+	public static final File FONTS_MAIN_DIR = new File(IMAGE_MAIN_DIR, "text/fonts");
+	public static final File HELVETICA_MAIN_DIR = new File(FONTS_MAIN_DIR, "helvetica");
 
+	public static final File TEST_HELVETICA = new File(Fixtures.TEST_IMAGE_DIR, "text/fonts/helvetica");
 	
 	public static PixelList LINE_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 

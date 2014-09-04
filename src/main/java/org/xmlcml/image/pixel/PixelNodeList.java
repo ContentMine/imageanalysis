@@ -44,6 +44,20 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		return null;
 	}
 	
+	/**  gets node by pixel.
+	 * 
+	 * @param pixel
+	 * @return node or null
+	 */
+	public PixelNode getPixelNode(Pixel pixel) {
+		if (pixel != null) {
+			for (PixelNode node : nodeList) {
+				if (pixel.equals(node.getCentrePixel())) return node;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

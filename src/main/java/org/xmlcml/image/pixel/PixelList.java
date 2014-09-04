@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
@@ -259,6 +260,27 @@ public class PixelList implements Iterable<Pixel> {
 			}
 		}
 		return other;
+	}
+
+	/** do all pixels have the same X-or-Y coordinate?
+	 * 
+	 * @param xy if 0 use X else Y
+	 * @return true if list is empty else reports identity of coordinates
+	 */
+	public boolean hasSameCoords(int xy) {
+		if (size() > 1) {
+			int coord0 = getCoordinate(list.get(0), xy);
+			for (Pixel pixel : this) {
+				int coord = getCoordinate(pixel, xy);
+				if (coord != coord0) return false;
+			}
+		}
+		return true;
+	}
+
+	private int getCoordinate(Pixel pixel, int xy) {
+		Int2 int2 = pixel.getInt2();
+		return (xy == 0) ? int2.getX() : int2.getY();
 	}
 
 
