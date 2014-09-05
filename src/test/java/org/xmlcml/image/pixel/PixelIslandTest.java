@@ -67,15 +67,15 @@ public class PixelIslandTest {
 	public void testAddPixel() {
 		PixelList longTList = Fixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList);
-		PixelList n0 = longTList.get(0).getNeighbours(island);
+		PixelList n0 = longTList.get(0).getOrCreateNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
-		PixelList n1 = longTList.get(1).getNeighbours(island);
+		PixelList n1 = longTList.get(1).getOrCreateNeighbours(island);
 		Assert.assertEquals("1", 2, n1.size());
-		PixelList n2 = longTList.get(2).getNeighbours(island);
+		PixelList n2 = longTList.get(2).getOrCreateNeighbours(island);
 		Assert.assertEquals("2", 3, n2.size());
-		PixelList n3 = longTList.get(3).getNeighbours(island);
+		PixelList n3 = longTList.get(3).getOrCreateNeighbours(island);
 		Assert.assertEquals("3", 1, n3.size());
-		PixelList n4 = longTList.get(4).getNeighbours(island);
+		PixelList n4 = longTList.get(4).getOrCreateNeighbours(island);
 		Assert.assertEquals("3", 1, n4.size());
 	}
 
@@ -93,15 +93,15 @@ public class PixelIslandTest {
 		boolean diagonal = true;
 		PixelList longTList = Fixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList, diagonal);
-		PixelList n0 = longTList.get(0).getNeighbours(island);
+		PixelList n0 = longTList.get(0).getOrCreateNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
-		PixelList n1 = longTList.get(1).getNeighbours(island);
+		PixelList n1 = longTList.get(1).getOrCreateNeighbours(island);
 		Assert.assertEquals("1", 2, n1.size());
-		PixelList n2 = longTList.get(2).getNeighbours(island);
+		PixelList n2 = longTList.get(2).getOrCreateNeighbours(island);
 		Assert.assertEquals("2", 3, n2.size());
-		PixelList n3 = longTList.get(3).getNeighbours(island);
+		PixelList n3 = longTList.get(3).getOrCreateNeighbours(island);
 		Assert.assertEquals("3", 1, n3.size());
-		PixelList n4 = longTList.get(4).getNeighbours(island);
+		PixelList n4 = longTList.get(4).getOrCreateNeighbours(island);
 		Assert.assertEquals("4", 1, n4.size());
 	}
 
@@ -523,7 +523,7 @@ public class PixelIslandTest {
 				PixelIslandComparator.ComparatorType.SIZE));
 		Assert.assertTrue(islands.size() > 1000);
 		Assert.assertEquals(1950, islands.size());
-		SVGSVG.wrapAndWriteAsSVG(islands.getSVGG(), new File(phyloDir, "largePhyloBoxes.svg"));
+		SVGSVG.wrapAndWriteAsSVG(islands.getOrCreateSVGG(), new File(phyloDir, "largePhyloBoxes.svg"));
 	}
 
 	/** large JPG with small fonts. 
@@ -934,7 +934,7 @@ public class PixelIslandTest {
 		PixelIsland largeY = createLargeY();
 		PixelNucleusList yjunctionList = largeY.getOrCreateYJunctionList();
 		Assert.assertEquals("junctions ", 1, yjunctionList.size());
-		Assert.assertEquals("y junction", "{(0,0)(0,1)(1,0)}", yjunctionList.toString());
+		Assert.assertEquals("y junction", "{{(0,0)(0,1)(1,0)}}", yjunctionList.toString());
 	}
 
 	@Test

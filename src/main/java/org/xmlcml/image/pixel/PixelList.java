@@ -11,11 +11,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+
+import boofcv.alg.feature.associate.EnsureUniqueAssociation;
 
 /**
  * container for a lit of pixels. 
@@ -95,7 +98,7 @@ public class PixelList implements Iterable<Pixel> {
 		if (list1 != null && list1.size() > 0) {
 			int value = list1.get(0).getValue();
 			for (Pixel pixel : list) {
-				PixelList neighbours = pixel.getNeighbours(island);
+				PixelList neighbours = pixel.getOrCreateNeighbours(island);
 				for (Pixel neighbour : neighbours) {
 					if (neighbour.getValue() == value && !used.contains(neighbour)) {
 						used.add(neighbour);
@@ -281,6 +284,21 @@ public class PixelList implements Iterable<Pixel> {
 	private int getCoordinate(Pixel pixel, int xy) {
 		Int2 int2 = pixel.getInt2();
 		return (xy == 0) ? int2.getX() : int2.getY();
+	}
+
+	/** create bounding box of list.
+	 * 
+	 * @return null if empty list;
+	 */
+	public Int2Range getIntBoundingBox() {
+		Int2Range box = null;
+		if (list != null && list.size() > 0) {
+			box = new Int2Range();
+			for (Pixel pixel : this) {
+				box.add(pixel.getInt2());
+			}
+		}
+		return box;
 	}
 
 

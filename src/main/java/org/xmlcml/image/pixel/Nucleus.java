@@ -56,9 +56,9 @@ public class Nucleus {
 		Iterator<Pixel> iterator = pixelSet.iterator();
 		while (iterator.hasNext()) {
 			Pixel pixel = iterator.next();
-			PixelList neighbourList = pixel.getNeighbours(island);
+			PixelList neighbourList = pixel.getOrCreateNeighbours(island);
 			for (Pixel neighbour : neighbourList) {
-				if (neighbour.getNeighbours(island).size() == 2) {
+				if (neighbour.getOrCreateNeighbours(island).size() == 2) {
 					spikeSet.add(neighbour);
 				}
 			}
@@ -111,7 +111,7 @@ public class Nucleus {
 	}
 
 	boolean areNeighbours(int i, int j) {
-		return centrePixelList.get(i).getNeighbours(island).contains(centrePixelList.get(j));
+		return centrePixelList.get(i).getOrCreateNeighbours(island).contains(centrePixelList.get(j));
 	}
 
 	private List<PixelShell> createShellListFromSpikeSet() {

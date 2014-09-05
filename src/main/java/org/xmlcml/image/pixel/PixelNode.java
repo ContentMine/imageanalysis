@@ -32,7 +32,7 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	private void addNeighboursToUnusedSet(Pixel pixel, PixelIsland island) {
 		ensureUnusedNeighbours();
-		unusedNeighbours.addAll(pixel.getNeighbours(island).getList());
+		unusedNeighbours.addAll(pixel.getOrCreateNeighbours(island).getList());
 	}
 	
 	public Pixel getCentrePixel() {

@@ -52,7 +52,7 @@ public class NeighbourPixelTest {
 		makeT4();
 		makeT7();
 		makeT10();
-		makeX5();
+		makeXORTH5();
 		makeXORTH9();
 		makeXDIAG5();
 		makeTT6();
@@ -167,7 +167,7 @@ public class NeighbourPixelTest {
 		T10.addPixel(new Pixel(-3, 0));
 	}
 
-	private static void makeX5() {
+	private static void makeXORTH5() {
 		XORTH5 = new PixelIsland();      // Orthogonal cross
 		XORTH5.setDiagonal(true);
 		XORTH5.addPixel(new Pixel(0, 0)); // centre of X
@@ -407,6 +407,7 @@ public class NeighbourPixelTest {
 
 	@Test
 	public void testDot() {
+		makeDOT1();
 		Assert.assertEquals(1, DOT1.getPixelList().size());
 		Assert.assertEquals(1, DOT1.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals(0, DOT1.getPixelsWithNeighbourCount(1).size());
@@ -414,12 +415,13 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testLine2Size() {
+		makeLINE2();
 		Assert.assertEquals(2, LINE2.getPixelList().size());
 	}
 	
 	@Test
 	public void testLine2Connections() {
-		//debug(LINE2);
+		makeLINE2();
 		Assert.assertEquals("LINE2 0 neighbours", 0, LINE2.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("LINE2 1 neighbours", 2, LINE2.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("LINE2 2 neighbours", 0, LINE2.getPixelsWithNeighbourCount(2).size());
@@ -427,7 +429,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testLINE4() {
-		//debug(LINE4);
+		makeLINE4();
 		Assert.assertEquals("LINE4 1 neighbours", 2, LINE4.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("LINE4 2 neighbours", 2, LINE4.getPixelsWithNeighbourCount(2).size());
 	}
@@ -435,7 +437,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testYORTH4() {
-		//debug(YORTH4);
+		makeYORTH4();
 		Assert.assertEquals("YORTH4 0 neighbours", 0, YORTH4.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("YORTH4 1 neighbours", 3, YORTH4.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("YORTH4 2 neighbours", 0, YORTH4.getPixelsWithNeighbourCount(2).size());
@@ -445,7 +447,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testYORTH7() {
-		//debug(YORTH7);
+		makeYORTH7();
 		Assert.assertEquals("YORTH7 0 neighbours", 0, YORTH7.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("YORTH7 1 neighbours", 3, YORTH7.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("YORTH7 2 neighbours", 3, YORTH7.getPixelsWithNeighbourCount(2).size());
@@ -455,7 +457,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testYDIAG4() {
-		//debug(YDIAG4);
+		makeYDIAG4();
 		Assert.assertEquals("YDIAG4 0 neighbours", 0, YDIAG4.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("YDIAG4 1 neighbours", 1, YDIAG4.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("YDIAG4 2 neighbours", 2, YDIAG4.getPixelsWithNeighbourCount(2).size());
@@ -465,7 +467,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testYDIAG7() {
-		//debug(YDIAG7);
+		makeYDIAG7();
 		Assert.assertEquals("YDIAG7 0 neighbours", 0, YDIAG7.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("YDIAG7 1 neighbours", 3, YDIAG7.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("YDIAG7 2 neighbours", 1, YDIAG7.getPixelsWithNeighbourCount(2).size());
@@ -475,7 +477,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testT4() {
-		//debug(T4);
+		makeT4();
 		Assert.assertEquals("T4 0 neighbours", 0, T4.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("T4 1 neighbours", 0, T4.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("T4 2 neighbours", 2, T4.getPixelsWithNeighbourCount(2).size());
@@ -485,7 +487,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testT7() {
-		//debug(T7);
+		makeT7();
 		Assert.assertEquals("T7 0 neighbours", 0, T7.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("T7 1 neighbours", 3, T7.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("T7 2 neighbours", 0, T7.getPixelsWithNeighbourCount(2).size());
@@ -495,7 +497,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testT10() {
-		//debug(T10);
+		makeT10();
 		Assert.assertEquals("T10 0 neighbours", 0, T10.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("T10 1 neighbours", 3, T10.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("T10 2 neighbours", 3, T10.getPixelsWithNeighbourCount(2).size());
@@ -505,7 +507,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testXORTH5() {
-		//debug(XORTH5);
+		makeXORTH5();
 		Assert.assertEquals("XORTH5 0 neighbours", 0, XORTH5.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("XORTH5 1 neighbours", 0, XORTH5.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("XORTH5 2 neighbours", 0, XORTH5.getPixelsWithNeighbourCount(2).size());
@@ -514,7 +516,7 @@ public class NeighbourPixelTest {
 	}
 
 	public void testXORTH9() {
-		//debug(XORTH9);
+		makeXORTH9();
 		Assert.assertEquals("XORTH9 0 neighbours", 0, XORTH9.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("XORTH9 1 neighbours", 4, XORTH9.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("XORTH9 2 neighbours", 0, XORTH9.getPixelsWithNeighbourCount(2).size());
@@ -524,7 +526,7 @@ public class NeighbourPixelTest {
 
 	@Test
 	public void testXDIAG5() {
-		//debug(XDIAG5);
+		makeXDIAG5();
 		Assert.assertEquals("XDIAG5 0 neighbours", 0, XDIAG5.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("XDIAG5 1 neighbours", 4, XDIAG5.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("XDIAG5 2 neighbours", 0, XDIAG5.getPixelsWithNeighbourCount(2).size());
@@ -534,7 +536,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testTT6() {
-		//debug(TT6);
+		makeTT6();
 		Assert.assertEquals("TT6 0 neighbours", 0, TT6.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("TT6 1 neighbours", 0, TT6.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("TT6 2 neighbours", 2, TT6.getPixelsWithNeighbourCount(2).size());
@@ -544,7 +546,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testTT10() {
-		//debug(TT10);
+		makeTT10();
 		Assert.assertEquals("TT10 0 neighbours", 0, TT10.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("TT10 1 neighbours", 4, TT10.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("TT10 2 neighbours", 0, TT10.getPixelsWithNeighbourCount(2).size());
@@ -554,7 +556,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testA12() {
-		//debug(A12);
+		makeA12();
 		Assert.assertEquals("A12 0 neighbours", 0, A12.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("A12 1 neighbours", 2, A12.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("A12 2 neighbours", 8, A12.getPixelsWithNeighbourCount(2).size());
@@ -564,7 +566,7 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testA14() {
-		//debug(A14);
+		makeA14();
 		Assert.assertEquals("A14 0 neighbours", 0, A14.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("A14 1 neighbours", 2, A14.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("A14 2 neighbours", 4, A14.getPixelsWithNeighbourCount(2).size());
@@ -574,17 +576,17 @@ public class NeighbourPixelTest {
 	
 	@Test
 	public void testB16() {
-		//debug(B16);
-		Assert.assertEquals("B16 0 neighbours", 0, B15.getPixelsWithNeighbourCount(0).size());
-		Assert.assertEquals("B16 1 neighbours", 0, B15.getPixelsWithNeighbourCount(1).size());
-		Assert.assertEquals("B16 2 neighbours", 10, B15.getPixelsWithNeighbourCount(2).size());
-		Assert.assertEquals("B16 3 neighbours", 4, B15.getPixelsWithNeighbourCount(3).size());
-		Assert.assertEquals("B16 4 neighbours", 1, B15.getPixelsWithNeighbourCount(4).size());
+		makeB15();
+		Assert.assertEquals("B15 0 neighbours", 0, B15.getPixelsWithNeighbourCount(0).size());
+		Assert.assertEquals("B15 1 neighbours", 0, B15.getPixelsWithNeighbourCount(1).size());
+		Assert.assertEquals("B15 2 neighbours", 10, B15.getPixelsWithNeighbourCount(2).size());
+		Assert.assertEquals("B15 3 neighbours", 4, B15.getPixelsWithNeighbourCount(3).size());
+		Assert.assertEquals("B15 4 neighbours", 1, B15.getPixelsWithNeighbourCount(4).size());
 	}
 	
 	@Test
 	public void testE14() {
-		//debug(E14);
+		makeE14();
 		Assert.assertEquals("E14 0 neighbours", 0, E14.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("E14 1 neighbours", 3, E14.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("E14 2 neighbours", 7, E14.getPixelsWithNeighbourCount(2).size());
@@ -593,7 +595,7 @@ public class NeighbourPixelTest {
 	}
 	
 	public void testH16() {
-		//debug(H16);
+		makeH16();
 		Assert.assertEquals("H16 0 neighbours", 0, H16.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("H16 1 neighbours", 4, H16.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("H16 2 neighbours", 4, H16.getPixelsWithNeighbourCount(2).size());
@@ -602,7 +604,7 @@ public class NeighbourPixelTest {
 	}
 	
 	public void testO16() {
-		//debug(O16);
+		makeO16();
 		Assert.assertEquals("O16 0 neighbours", 0, O16.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("O16 1 neighbours", 0, O16.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("O16 2 neighbours", 16, O16.getPixelsWithNeighbourCount(2).size());
@@ -611,7 +613,7 @@ public class NeighbourPixelTest {
 	}
 	
 	public void testP12() {
-		//debug(P12);
+		makeP12();
 		Assert.assertEquals("P12 0 neighbours", 0, P12.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("P12 1 neighbours", 1, P12.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("P12 2 neighbours", 7, P12.getPixelsWithNeighbourCount(2).size());
@@ -620,7 +622,7 @@ public class NeighbourPixelTest {
 	}
 	
 	public void testQ19() {
-		//debug(Q19);
+		makeQ19();
 		Assert.assertEquals("Q19 0 neighbours", 0, Q19.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("Q19 1 neighbours", 2, Q19.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("Q19 2 neighbours", 16, Q19.getPixelsWithNeighbourCount(2).size());
@@ -629,7 +631,7 @@ public class NeighbourPixelTest {
 	}
 	
 	public void testR15() {
-		//debug(R15);
+		makeR15();
 		Assert.assertEquals("R15 0 neighbours", 0, R15.getPixelsWithNeighbourCount(0).size());
 		Assert.assertEquals("R15 1 neighbours", 2, R15.getPixelsWithNeighbourCount(1).size());
 		Assert.assertEquals("R15 2 neighbours", 8, R15.getPixelsWithNeighbourCount(2).size());
@@ -642,7 +644,7 @@ public class NeighbourPixelTest {
 	
 	private void debug(PixelIsland island) {
 		for (Pixel node : island.getPixelList()) {
-			LOG.debug(" "+node+" : "+node.getNeighbours(island));
+			LOG.debug(" "+node+" : "+node.getOrCreateNeighbours(island));
 		}
 	}
 	

@@ -27,7 +27,7 @@ public class PixelShell {
 	public void expandOnePixelFromCurrent() {
 		PixelList shellPixelList = new PixelList(expandedShell);
 		for (Pixel pixel : shellPixelList) {
-			PixelList neightbourList = pixel.getNeighbours(island);
+			PixelList neightbourList = pixel.getOrCreateNeighbours(island);
 			for (Pixel neighbour  : neightbourList) {
 				expandedShell.add(neighbour);
 			}

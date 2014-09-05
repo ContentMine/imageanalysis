@@ -39,9 +39,9 @@ public class PixelTriangle {
 	private boolean createSet() {
 		boolean created = false;
 		// we must set up neighbours
-		PixelList neighbours0 = pixel[0].getNeighbours(island);
-		PixelList neighbours1 = pixel[1].getNeighbours(island);
-		PixelList neighbours2 = pixel[2].getNeighbours(island);
+		PixelList neighbours0 = pixel[0].getOrCreateNeighbours(island);
+		PixelList neighbours1 = pixel[1].getOrCreateNeighbours(island);
+		PixelList neighbours2 = pixel[2].getOrCreateNeighbours(island);
 		boolean n01 = neighbours0.contains(pixel[1]);
 		boolean n02 = neighbours0.contains(pixel[2]);
 		boolean n12 = neighbours1.contains(pixel[2]);
@@ -123,8 +123,8 @@ public class PixelTriangle {
 		getDiagonal();
 		Pixel pixel0 = diagonal.get(0);
 		Pixel pixel1 = diagonal.get(1);
-		pixel0.getNeighbours(island).remove(pixel1);
-		pixel1.getNeighbours(island).remove(pixel0);
+		pixel0.getOrCreateNeighbours(island).remove(pixel1);
+		pixel1.getOrCreateNeighbours(island).remove(pixel0);
 	}
 	
 	public String toString() {

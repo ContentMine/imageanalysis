@@ -267,7 +267,7 @@ public class PixelGraph {
 	private PixelEdge getEdgeFrom2ConnectedPixels(Pixel current) {
 		twoConnectedSet.remove(current);
 		PixelEdge edge = new PixelEdge(island);
-		PixelList neighbours = current.getNeighbours(island);
+		PixelList neighbours = current.getOrCreateNeighbours(island);
 		PixelList list0 = traverseTillNon2Connected(neighbours.get(0), current);
 		if (list0.isCycle()) {
 			edge.addPixelList(list0);
@@ -398,7 +398,7 @@ public class PixelGraph {
 	static Pixel getNextUnusedInEdge(Pixel current, Pixel last,
 			PixelIsland island) {
 		Pixel next = null;
-		PixelList neighbours = current.getNeighbours(island);
+		PixelList neighbours = current.getOrCreateNeighbours(island);
 		neighbours.remove(last);
 		next = neighbours.size() == 1 ? neighbours.get(0) : null;
 		Long time3 = System.currentTimeMillis();
@@ -451,7 +451,7 @@ public class PixelGraph {
 			terminalNodeSet = new TerminalNodeSet();
 			terminalNodeByPixelMap = new HashMap<Pixel, TerminalNode>();
 			for (Pixel pixel : pixelList) {
-				PixelList neighbours = pixel.getNeighbours(island);
+				PixelList neighbours = pixel.getOrCreateNeighbours(island);
 				if (neighbours.size() == 1) {
 					TerminalNode endNode = new TerminalNode(pixel,
 							neighbours.get(0));
@@ -560,7 +560,7 @@ public class PixelGraph {
 		
 		Pixel midPixel = extremeEdge.getNearestPixelToMidPoint();
 		PixelNode rootNode = new JunctionNode(midPixel, null);
-		PixelList neighbours = midPixel.getNeighbours(island);
+		PixelList neighbours = midPixel.getOrCreateNeighbours(island);
 		if (neighbours.size() != 2) {
 			throw new RuntimeException("Should have exactly 2 neighbours "+neighbours.size());
 		}

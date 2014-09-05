@@ -68,24 +68,32 @@ public class ImageUtil {
 
 	/** extracts a subimage translated to 0,0.
 	 * 
-	 * @param image
-	 * @return
+	 * clip to bounding box inclusive? or edge of image
+	 * 
+	 * @param image 
+	 * @return null if clip is ouside size of image
 	 */
 	public static BufferedImage clipSubImage(BufferedImage image, Int2Range boundingBox) {
+		BufferedImage subImage = null;
 		IntRange xRange = boundingBox.getXRange();
 		IntRange yRange = boundingBox.getYRange();
+		int imageWidth = image.getWidth();
+		int imageHeight = image.getHeight();
 		int xMin = xRange.getMin();
 		int yMin = yRange.getMin();
-		int w = xRange.getRange();
-		int h = yRange.getRange();
-		Rectangle rect = new Rectangle(xMin, yMin, w, h);
-//		Raster r = image.getData(rect);
-		BufferedImage subImage = new BufferedImage(w, h, image.getType());
-//		subImage.setData(r);
-		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < h; j++) {
-				int rgb = image.getRGB(i + xMin, j + yMin);
-				subImage.setRGB(i, j,  rgb);
+		int clipWidth = xRange.getRange();
+		clipWidth = Math.min(clipWidth, imageWidth - xMin);
+		int clipHeight = yRange.getRange();
+		clipHeight = Math.min(clipHeight, imageHeight - yMin);
+		if (clipWidth > 0 && clipHeight > 0) {
+			subImage = new BufferedImage(clipWidth, clipHeight, image.getType());
+			for (int i = 0; i < clipWidth; i++) {
+				int xx = i + xMin;
+				for (int j = 0; j < clipHeight; j++) {
+					int yy = j + yMin;
+					int rgb = image.getRGB(xx, yy);
+					subImage.setRGB(i, j,  rgb);
+				}
 			}
 		}
 		return subImage;

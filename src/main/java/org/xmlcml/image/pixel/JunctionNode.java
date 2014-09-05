@@ -56,7 +56,7 @@ public class JunctionNode extends PixelNode {
 	public static JunctionNode createJunction(Pixel centre, PixelIsland island) {
 		JunctionNode junction = null;
 		if (centre != null) {
-			PixelList neighbours = new PixelList(centre.getNeighbours(island));
+			PixelList neighbours = new PixelList(centre.getOrCreateNeighbours(island));
 			if (neighbours.size() == 3) {
 				Pixel stem = JunctionNode.getStem(centre, neighbours, island);
 				junction = new JunctionNode(centre, stem);

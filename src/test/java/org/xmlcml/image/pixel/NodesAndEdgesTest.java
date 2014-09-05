@@ -7,7 +7,9 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntArray;
+import org.xmlcml.euclid.IntRange;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageProcessor;
@@ -107,14 +109,14 @@ public class NodesAndEdgesTest {
 		island.setDiagonal(true);
 		SVGSVG.wrapAndWriteAsSVG(island.getSVGG(), new File("target/nodesEdges/character65.svg"));
 		Assert.assertEquals("node 0", 0, island.getPixelsWithNeighbourCount(0).size());
-		Assert.assertEquals("node 1", 4, island.getPixelsWithNeighbourCount(1).size()); //?
-		Assert.assertEquals("node 2", 66, island.getPixelsWithNeighbourCount(2).size());
-		Assert.assertEquals("node 3", 14, island.getPixelsWithNeighbourCount(3).size());
-		Assert.assertEquals("node 4", 4, island.getPixelsWithNeighbourCount(4).size());
+		Assert.assertEquals("node 1", 0, island.getPixelsWithNeighbourCount(1).size()); //?
+		Assert.assertEquals("node 2", 189, island.getPixelsWithNeighbourCount(2).size());
+		Assert.assertEquals("node 3", 6, island.getPixelsWithNeighbourCount(3).size());
+		Assert.assertEquals("node 4", 0, island.getPixelsWithNeighbourCount(4).size());
 		Assert.assertEquals("node 5", 0, island.getPixelsWithNeighbourCount(5).size());
 		PixelNodeList nodeList = island.createNodeList();
 		for (PixelNode node : nodeList) {
-			LOG.debug(node);
+			LOG.debug("c65 "+node);
 		}
 	}
 
@@ -124,7 +126,7 @@ public class NodesAndEdgesTest {
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
-		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getSVGG(), new File("target/nodesEdges/helvetica.svg"));
+		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/nodesEdges/helvetica.svg"));
 		pixelIslandList.sortYX(5.0);
 		Assert.assertEquals("islands", 96, pixelIslandList.size());
 		for (int i = 1; i < 96; i++) {
@@ -221,7 +223,7 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{77, 0,1,75,1,0,0,0,0,0}), // 6 // 81
 				new IntArray(new int[]{45, 0,2,43,0,0,0,0,0,0}), // 7 // 82
 				new IntArray(new int[]{84, 0,0,82,2,0,0,0,0,0}), // 8 // 83
-				new IntArray(new int[]{79, 0,1,74,3,0,0,1,0,0}), // 9 // 84 // mess, correct it
+				new IntArray(new int[]{78, 0,1,76,1,0,0,0,0,0}), // 9 // 84 // mess, correct it
 				new IntArray(new int[]{71, 0,0,71,0,0,0,0,0,0}), // 0 // 85
 				new IntArray(new int[]{41, 0,2,39,0,0,0,0,0,0}), // ( // 86
 				new IntArray(new int[]{106, 0,4,86,6,10,0,0,0,0}), // $ // 87
@@ -237,6 +239,87 @@ public class NodesAndEdgesTest {
 			}
 		);
 	}
+	
+	/*
+0,0,88,0,0, // D
+0,0,85,0,0, // O
+0,0,58,0,0, // o // 60
+0,0,71,0,0, // 0 // 85
+
+0,0,100,2,0, // B
+0,0,82,2,0, // 8 // 83
+
+0,1,68,1,0, // b // 37 
+0,1,68,1,0, // d // 38
+0,1,82,1,0, // g  //48
+0,1,75,1,0, // 6 // 81
+0,1,76,1,0, // 9 // 84
+
+0,2,66,0,0, // C
+0,2,26,0,0, // I // no serif
+0,2,43,0,0, // J // 10
+0,2,43,0,0, // L
+0,2,106,0,0, // M
+0,2,75,0,0, // S  // 20
+0,2,68,0,0, // U
+0,2,56,0,0, // V
+0,2,64,0,0, // Z
+0,2,27,0,0, // l // 44 
+0,2,46,0,0, // c // 46
+0,2,18,0,0, // i // 49
+0,2,29,0,0, // j // 50
+0,2,39,0,0, // ( // 86
+0,2,38,0,0, // ) // 91
+0,2,7,0,0, // , // 93
+0,2,19,0,0, // shriek // 89
+0,2,34,0,0, // query // 90
+0,2,61,0,0, // 2 // 77
+0,2,65,0,0, // 5 // 80
+0,2,53,0,0, // s // 64
+0,2,38,0,0, // v // 66
+0,2,45,0,0, // z // 70
+
+0,2,66,2,0, // A // 
+0,2,88,2,0, // Q  // 18
+0,2,90,2,0, // R
+0,2,66,2,0, // a // 45
+0,2,66,2,0, // e // 47
+0,2,68,2,0, // p // 61
+0,2,67,2,0, // q // 62
+
+0,2,82,4,0, // ampersand // 59
+
+0,3,23,1,0, // r // 63
+0,3,48,1,0, // u // 65
+0,3,69,1,0, // w // 67
+0,3,49,1,0, // y // 69
+
+0,3,62,1,0, // 3 // 78
+0,3,80,1,0, // E  // 5
+0,3,60,1,0, // F
+0,3,84,1,0, // G
+0,3,77,1,0, // N
+0,3,46,1,0, // T
+0,3,102,1,0, // W // small tail on central peak
+0,3,44,1,0, // Y
+0,3,57,1,0, // h // 40
+
+0,3,53,1,5, // 4 // 79
+
+0,4,29,0,5, // f // 39
+0,4,27,0,5, // t // 56 // one cross
+
+0,4,70,2,0, // H
+0,4,65,2,0, // K 2 Y-junctions
+0,4,54,2,0, // X 
+0,4,40,2,0, // x // 68
+0,4,53,2,0, // k // 43 
+0,4,76,2,0, // m // 51
+0,4,62,2,0, // pound // 88
+
+0,4,86,6,10, // $ // 87
+
+	 */
 
 	@Test
 	public void testCharacterHelveticaNodeCounts() {
@@ -356,11 +439,15 @@ public class NodesAndEdgesTest {
 	@Test
 	public void testTrimStubs() {
 		// too large
-		File helvetica = new File(Fixtures.TEST_HELVETICA, "char57.png");
+		File helvetica = new File(Fixtures.FONTS_MAIN_DIR, "_helvetica.png");
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
-		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
-		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getSVGG(), new File("target/nodesEdges/char57.svg"));
+		BufferedImage image57 = ImageUtil.clipSubImage(image, new Int2Range(new IntRange(205, 230), new IntRange(210, 260)));
+		if (image57 == null) {
+			throw new RuntimeException("null clip");
+		}
+		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image57);
+		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/nodesEdges/char57.svg"));
 	}
 
 	// ==============================
@@ -371,7 +458,7 @@ public class NodesAndEdgesTest {
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
-		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getSVGG(), new File("target/nodesEdges/minihelveticatj.svg"));
+		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/nodesEdges/minihelveticatj.svg"));
 	}
 
 	@Test
@@ -380,7 +467,7 @@ public class NodesAndEdgesTest {
 		Assert.assertTrue(timesRoman.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(timesRoman);
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
-		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getSVGG(), new File("target/nodesEdges/timesNewRoman.svg"));
+		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/nodesEdges/timesNewRoman.svg"));
 	}
 
 	

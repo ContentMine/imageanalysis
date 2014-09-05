@@ -61,9 +61,9 @@ public class PixelTestUtils {
 
 	public static void debugPixelsWithNeighbourCount(PixelIsland island, int neighbourCount) {
 		PixelList pixelsWithNNeighbours = island.getPixelsWithNeighbourCount(neighbourCount);
-		LOG.debug("Pixels with "+neighbourCount+" neighbours; "+pixelsWithNNeighbours);
+		LOG.trace("Pixels with "+neighbourCount+" neighbours; "+pixelsWithNNeighbours);
 		for (Pixel pixelWithNNeighbours : pixelsWithNNeighbours) {
-			LOG.debug("..."+pixelWithNNeighbours.getNeighbours(island));
+			LOG.trace("..."+pixelWithNNeighbours.getOrCreateNeighbours(island));
 		}
 	}
 

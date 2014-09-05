@@ -157,11 +157,11 @@ public class PixelNucleus {
 		for (int i = 0; i < junctionNodes.size() - 1; i++) {
 			PixelNode nodei = junctionNodes.get(i);
 			Set<Pixel> neighboursi = new HashSet<Pixel>(nodei.getCentrePixel()
-					.getNeighbours(island).getList());
+					.getOrCreateNeighbours(island).getList());
 			for (int j = i + 1; j < junctionNodes.size(); j++) {
 				PixelNode nodej = junctionNodes.get(j);
 				Set<Pixel> neighboursj = new HashSet<Pixel>(nodej
-						.getCentrePixel().getNeighbours(island).getList());
+						.getCentrePixel().getOrCreateNeighbours(island).getList());
 				if (neighboursj.retainAll(neighboursi)) {
 					commonNeighbourSet.addAll(neighboursj);
 				}
@@ -437,9 +437,9 @@ public class PixelNucleus {
 		Pixel startPixel0 = pixelList.get(p0);
 		int p1 = (p0 + 1) % 3;
 		Pixel startPixel1 = pixelList.get(p1);
-		LOG.trace("pixel0 "+startPixel0+" neighbours "+startPixel0.getNeighbours(island));
-		LOG.trace("pixel1 "+startPixel1+" neighbours "+startPixel1.getNeighbours(island));
-		LOG.trace("right angle "+rightAnglePixel+" neighbours "+rightAnglePixel.getNeighbours(island));
+		LOG.trace("pixel0 "+startPixel0+" neighbours "+startPixel0.getOrCreateNeighbours(island));
+		LOG.trace("pixel1 "+startPixel1+" neighbours "+startPixel1.getOrCreateNeighbours(island));
+		LOG.trace("right angle "+rightAnglePixel+" neighbours "+rightAnglePixel.getOrCreateNeighbours(island));
 		if (movePixel(startPixel0, startPixel1, rightAnglePixel, island)) {
 			return true;
 		}
@@ -456,20 +456,20 @@ public class PixelNucleus {
 		Int2 vector = right.subtract(p0);
 		Int2 new2 = p1.plus(vector);
 		Pixel newPixel = new Pixel(new2.getX(), new2.getY());
-		PixelList neighbours = newPixel.getNeighbours(island);
+		PixelList neighbours = newPixel.getOrCreateNeighbours(island);
 		LOG.trace("new "+newPixel+"neighbours: "+neighbours);
 		if (neighbours.size() != 3) return false; // we still have to remove old pixel 
 		
-		PixelList oldNeighbours = pixel1.getNeighbours(island); // before removal
+		PixelList oldNeighbours = pixel1.getOrCreateNeighbours(island); // before removal
 		island.remove(pixel1);
 		newPixel.clearNeighbours();
 		island.addPixel(newPixel);
-		PixelList newPixelNeighbours = newPixel.getNeighbours(island);
-		LOG.debug("new "+newPixel+"neighbours: "+newPixelNeighbours);
+		PixelList newPixelNeighbours = newPixel.getOrCreateNeighbours(island);
+		LOG.trace("new "+newPixel+"neighbours: "+newPixelNeighbours);
 		for (Pixel oldNeighbour : oldNeighbours) {
 			oldNeighbour.clearNeighbours();
-			PixelList oldNeighbourNeighbours = oldNeighbour.getNeighbours(island);
-			LOG.debug("old "+oldNeighbour+"neighbours: "+oldNeighbourNeighbours);
+			PixelList oldNeighbourNeighbours = oldNeighbour.getOrCreateNeighbours(island);
+			LOG.trace("old "+oldNeighbour+"neighbours: "+oldNeighbourNeighbours);
 		}
 		return true;
 	}

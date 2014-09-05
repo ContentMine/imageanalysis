@@ -49,9 +49,9 @@ public class TriangleTest {
 		Assert.assertEquals(2, diagonal.size());
 		Assert.assertTrue(diagonal.contains(pixel[1]));
 		Assert.assertTrue(diagonal.contains(pixel[2]));
-		PixelList neighbours0 = pixel[0].getNeighbours(island);
-		PixelList neighbours1 = pixel[1].getNeighbours(island);
-		PixelList neighbours2 = pixel[2].getNeighbours(island);
+		PixelList neighbours0 = pixel[0].getOrCreateNeighbours(island);
+		PixelList neighbours1 = pixel[1].getOrCreateNeighbours(island);
+		PixelList neighbours2 = pixel[2].getOrCreateNeighbours(island);
 		Assert.assertTrue("n0 ", neighbours0.contains(pixel[1]) && neighbours0.contains(pixel[2]));
 		Assert.assertTrue("n1 ", neighbours1.contains(pixel[0]) && neighbours0.contains(pixel[2]));
 		Assert.assertTrue("n2 ", neighbours2.contains(pixel[0]) && neighbours0.contains(pixel[1]));
@@ -67,9 +67,9 @@ public class TriangleTest {
 		LOG.trace("p1 "+pixel[1]);
 		LOG.trace("p2 "+pixel[2]);
 		triangle.removeDiagonalNeighbours();
-		PixelList neighbours0 = pixel[0].getNeighbours(island);
-		PixelList neighbours1 = pixel[1].getNeighbours(island);
-		PixelList neighbours2 = pixel[2].getNeighbours(island);
+		PixelList neighbours0 = pixel[0].getOrCreateNeighbours(island);
+		PixelList neighbours1 = pixel[1].getOrCreateNeighbours(island);
+		PixelList neighbours2 = pixel[2].getOrCreateNeighbours(island);
 		LOG.trace("n0 "+neighbours0);
 		LOG.trace("n1 "+neighbours1);
 		LOG.trace("n2 "+neighbours2);
@@ -85,7 +85,7 @@ public class TriangleTest {
 		pixel[2].setInt2(new Int2(1,-1));
 		pixel[0].clearNeighbours();
 		pixel[1].clearNeighbours();
-		pixel[2].getNeighbours(island);
+		pixel[2].getOrCreateNeighbours(island);
 		PixelTriangle triangle = PixelTriangle.createTriangle(pixel[0], pixel[1], pixel[2], island);
 		LOG.trace("triangle: "+triangle);
 		List<Pixel> diagonal = triangle.getDiagonal();

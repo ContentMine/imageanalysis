@@ -139,6 +139,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		ensurePixelList();
 		this.pixelList.add(pixel);
 		addPixelMetadata(pixel);
+		pixel.createNeighbourNeighbourList(this);
 	}
 
 	private void indexPixelsAndUpdateMetadata() {
@@ -223,7 +224,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			for (Nucleus nucleus : nucleusList) {
 				Set<Pixel> spikeSet = nucleus.getSpikeSet();
 				for (Pixel spike : spikeSet) {
-					PixelList spikeNeighbours = spike.getNeighbours(this);
+					PixelList spikeNeighbours = spike.getOrCreateNeighbours(this);
 					if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
 						terminalList.add(spike);
 					}
@@ -259,7 +260,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	private int getNeighbourCount(Pixel pixel) {
-		return pixel.getNeighbours(this).size();
+		return pixel.getOrCreateNeighbours(this).size();
 	}
 
 	/**
@@ -298,33 +299,9 @@ public class PixelIsland implements Iterable<Pixel> {
 			int2range = null;
 			leftmostCoord = null;
 			Int2 coord = pixel.getInt2();
-			boolean debug2324 = coord.equals(new Int2(23,23));
 			pixelByCoordMap.remove(coord);
-			removeFromNeighbourNeighbourList(pixel);
-			if (debug2324) {
-				Pixel pixel2324 = this.getPixelByCoord(new Int2(23,24));
-				LOG.debug(" removed "+pixel.toString());
-//				PixelTestUtils.debugPixelsWithNeighbourCount(this, 3);
-				LOG.debug("REM "+pixel+"; "+pixel.getNeighbours(this));
-				LOG.debug("NEIG "+pixel2324+"; "+pixel2324.getNeighbours(this));
-			}
+			pixel.removeFromNeighbourNeighbourList(this);
 			pixel.clearNeighbours();
-			
-		}
-	}
-
-	private void removeFromNeighbourNeighbourList(Pixel pixel) {
-		PixelList neighbours = pixel.getNeighbours(this);
-		boolean debug = false;
-		if (pixel.getInt2().equals(new Int2(23, 23))) {
-			LOG.debug("removing "+pixel+" with neighbours "+neighbours);
-			debug = true;
-		}
-		for (Pixel neighbour : neighbours) {
-			PixelList neighbourList = neighbour.getNeighbours(this);
-			if (debug) LOG.debug("removing "+pixel+" from "+neighbourList);
-			boolean removed = neighbourList.remove(pixel);
-			if (debug) LOG.debug(" to give neighbour "+neighbour+" with neighbours "+neighbourList);
 			
 		}
 	}
@@ -354,7 +331,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			pixel = pixelStack.pop();
 			nucleus.add(pixel);
 			nucleusMap.put(pixel, nucleus);
-			PixelList neighbours = pixel.getNeighbours(this);
+			PixelList neighbours = pixel.getOrCreateNeighbours(this);
 			for (Pixel neighbour : neighbours) {
 				if (!nucleus.contains(neighbour)
 						&& multiplyConnectedPixels.contains(neighbour)) {
@@ -463,7 +440,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			if (removed.contains(pixel)) {
 				continue;
 			}
-			PixelList pixelNeighbours = pixel.getNeighbours(this);
+			PixelList pixelNeighbours = pixel.getOrCreateNeighbours(this);
 			if (pixelNeighbours.size() == 3) { // could be step or tJunction
 				for (int i = 0; i < pixelNeighbours.size(); i++) {
 					Pixel pi = pixelNeighbours.get(i);
@@ -526,7 +503,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private Pixel getNextPixel(Pixel pixel) {
 		LOG.trace(pixel);
-		PixelList neighbours = pixel.getNeighbours(this);
+		PixelList neighbours = pixel.getOrCreateNeighbours(this);
 		PixelList unusedPixels = new PixelList();
 		for (Pixel neighbour : neighbours) {
 			if (!usedPixels.contains(neighbour)) {
@@ -569,7 +546,7 @@ public class PixelIsland implements Iterable<Pixel> {
 				LOG.trace("BUG: should have removed pixel");
 			}
 			nextPixel = spikeSetCopy.iterator().next();
-			for (Pixel neighbour : nextPixel.getNeighbours(this)) {
+			for (Pixel neighbour : nextPixel.getOrCreateNeighbours(this)) {
 				if (nucleus.contains(neighbour)) {
 					usedPixels.add(neighbour);
 				}
@@ -579,7 +556,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		} else {
 			// treat as terminal
 			if (!nucleus.getSpikeSet().removeAll(
-					currentPixel.getNeighbours(this).getList())) {
+					currentPixel.getOrCreateNeighbours(this).getList())) {
 				LOG.error("Failed to remove");
 			}
 			nextPixel = null;
@@ -589,7 +566,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private Set<Pixel> getUsedNeighbours(Pixel currentPixel) {
 		Set<Pixel> usedNeighbours = new HashSet<Pixel>();
-		PixelList neighbours = currentPixel.getNeighbours(this);
+		PixelList neighbours = currentPixel.getOrCreateNeighbours(this);
 		for (Pixel neighbour : neighbours) {
 			if (usedPixels.contains(neighbour)) {
 				usedNeighbours.add(neighbour);
@@ -883,7 +860,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	public void markEdges() {
 		for (Pixel pixel : pixelList) {
 			pixel.setValue(NEIGHBOUR8);
-			PixelList neighbours = pixel.getNeighbours(this);
+			PixelList neighbours = pixel.getOrCreateNeighbours(this);
 			int size = neighbours.size();
 			if (size < 8) {
 				pixel.setValue(1);
@@ -918,7 +895,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			if (start.getValue() != v) {
 				throw new RuntimeException("bad pixel " + start.getValue());
 			}
-			PixelList neighbours = start.getNeighbours(this);
+			PixelList neighbours = start.getOrCreateNeighbours(this);
 			for (Pixel neighbour : neighbours) {
 				if (neighbour.getValue() == NEIGHBOUR8) {
 					neighbour.setValue(v + 1);
@@ -1036,7 +1013,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		ensureCornerSet();
 		while (!cornerSet.isEmpty()) {
 			Pixel pixel = cornerSet.iterator().next();
-			PixelList neighbours = pixel.getNeighbours(this);
+			PixelList neighbours = pixel.getOrCreateNeighbours(this);
 			// remove neighbours from set - if they are corners, if not no-op
 			for (Pixel neighbour : neighbours) {
 				cornerSet.remove(neighbour);
@@ -1111,7 +1088,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			pixelNucleusList = new PixelNucleusList();
 			for (Pixel pixel : this.getPixelList()) {
 				boolean added = false;
-				if (pixel.getNeighbours(this).size() > 2) {
+				if (pixel.getOrCreateNeighbours(this).size() > 2) {
 					for (PixelNucleus nucleus : pixelNucleusList) {
 						if (nucleus.canTouch(pixel)) {
 							nucleus.add(pixel);
@@ -1158,10 +1135,11 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	private boolean isOrthogonalStub(Pixel pixel) {
-		PixelList neighbours = pixel.getNeighbours(this);
+		PixelList neighbours = pixel.getOrCreateNeighbours(this);
 		if (neighbours.size() == 3) {
+			LOG.trace("3 neighbours "+pixel+"; neighbours "+neighbours);
 			if (neighbours.hasSameCoords(0) || neighbours.hasSameCoords(1)) {
-				LOG.debug("orthogonal stub "+pixel+"; "+neighbours);
+				LOG.trace("orthogonal stub "+pixel+"; "+neighbours);
 				return true;
 			}
 		}
@@ -1179,8 +1157,9 @@ public class PixelIsland implements Iterable<Pixel> {
 			for (Pixel pixel : emptyList) {
 				PixelList neighbours = this.getFilledOrthogonalNeighbourPixels(pixel);
 				if (neighbours.size() == 4) {
-					singleHoleList.add(pixel);
-					this.addPixel(pixel);
+					Pixel newPixel = new Pixel(pixel.getInt2().getX(), pixel.getInt2().getY());
+					singleHoleList.add(newPixel);
+					this.addPixel(newPixel);
 				}
 			}
 		}
@@ -1269,7 +1248,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		edge.addPixel(current);
 		edge.addPixel(next);
 		while (true) {
-			PixelList neighbours = next.getNeighbours(this);
+			PixelList neighbours = next.getOrCreateNeighbours(this);
 			if (neighbours.size() != 2) {
 				break;
 			}
@@ -1370,6 +1349,18 @@ public class PixelIsland implements Iterable<Pixel> {
 			}
 		}
 		return false;
+	}
+
+	public void trimCornerPixels() {
+		boolean a = allowDiagonal;
+		PixelList connected5List = getPixelsWithNeighbourCount(5);
+		if (connected5List .size() > 0) {
+			for (Pixel pixel : connected5List) {
+				if (pixel.form5Corner(this)) {
+					this.remove(pixel);
+				}
+			}
+		}
 	}
 
 //	/** create rings of pixels starting at the outside.

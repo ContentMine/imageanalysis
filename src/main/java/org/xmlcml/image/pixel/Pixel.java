@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGRect;
@@ -42,14 +43,20 @@ public class Pixel {
 		return point == null ? null : new Int2(point.x, point.y);
 	}
 
-	public PixelList getNeighbours(PixelIsland island) {
+	public PixelList getOrCreateNeighbours(PixelIsland island) {
 		this.island = island;
-		ensureNeighbours();
+		getOrCreateNeighbourList(island);
+		return neighbourList;
+	}
+
+	public PixelList createNeighbours(PixelIsland island) {
+//		this.island = island;
+		createNeighbours(island);
 		return neighbourList;
 	}
 
 	public PixelList getNeighbours(Marked marked) {
-		ensureNeighbours();
+		getOrCreateNeighbourList(null);
 //		LOG.debug("neighbours "+neighbourList.size());
 		PixelList markedList = new PixelList();
 		for (Pixel pixel : neighbourList) {
@@ -68,20 +75,32 @@ public class Pixel {
 		this.marked = m;
 	}
 
-	private void ensureNeighbours() {
+	private void getOrCreateNeighbourList(PixelIsland island) {
 		if (neighbourList == null) {
-			neighbourList = new PixelList();
-			List<Int2> coordList = calculateNeighbourCoordList();
-			for (Int2 coord : coordList) {
-				Pixel pixel = island.getPixelByCoordMap().get(coord);
-				if (pixel != null) {
-					neighbourList.add(pixel);
-				}
-			}
+			createNeighbourList(island);
 		}
 	}
 
-	private List<Int2> calculateNeighbourCoordList() {
+	public PixelList createNeighbourList(PixelIsland island) {
+		neighbourList = new PixelList();
+		List<Int2> coordList = calculateNeighbourCoordList(island);
+		for (Int2 coord : coordList) {
+			Pixel pixel = island.getPixelByCoordMap().get(coord);
+			if (pixel != null) {
+				neighbourList.add(pixel);
+			}
+		}
+		return neighbourList;
+	}
+	
+	public void createNeighbourNeighbourList(PixelIsland island) {
+		PixelList neighbourList = createNeighbourList(island);
+		for (Pixel neighbour : neighbourList) {
+			neighbour.createNeighbourList(island);
+		}
+	}
+
+	private List<Int2> calculateNeighbourCoordList(PixelIsland island) {
 		List<Int2> coordList = new ArrayList<Int2>();
 		coordList.add(new Int2(point.x + 1, point.y));
 		coordList.add(new Int2(point.x - 1, point.y));
@@ -155,8 +174,8 @@ public class Pixel {
 		return true;
 	}
 
-	public void remove() {
-		throw new RuntimeException("remove pixel NYI");
+	public void remove(PixelIsland island) {
+		island.remove(this);
 	}
 
 	public void setInt2(Int2 int2) {
@@ -165,7 +184,7 @@ public class Pixel {
 
 	public Set<PixelTriangle> getTriangles(PixelIsland island) {
 		Set<PixelTriangle> triangleSet = new HashSet<PixelTriangle>();
-		PixelList neighbours = this.getNeighbours(island);
+		PixelList neighbours = this.getOrCreateNeighbours(island);
 		for (int i = 0; i < neighbours.size() - 1; i++) {
 			for (int j = i+1; j < neighbours.size(); j++) {
 				PixelTriangle triangle = PixelTriangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
@@ -253,7 +272,7 @@ public class Pixel {
 	}
 	
 	PixelList getDiagonalNeighbours(PixelIsland island) {
-		PixelList neighbours = getNeighbours(island);
+		PixelList neighbours = getOrCreateNeighbours(island);
 		PixelList pixelList = new PixelList();
 		for (Pixel neighbour : neighbours) {
 			if (isDiagonalNeighbour(neighbour)) {
@@ -264,7 +283,7 @@ public class Pixel {
 	}
 
 	PixelList getOrthogonalNeighbours(PixelIsland island) {
-		PixelList neighbours = getNeighbours(island);
+		PixelList neighbours = getOrCreateNeighbours(island);
 		PixelList pixelList = new PixelList();
 		for (Pixel neighbour : neighbours) {
 			if (isOrthogonalNeighbour(neighbour)) {
@@ -275,19 +294,19 @@ public class Pixel {
 	}
 
 	boolean isConnectedAny(PixelIsland island, int neighbourCount) {
-		PixelList neighbours = getNeighbours(island);
+		PixelList neighbours = getOrCreateNeighbours(island);
 		boolean connected = (neighbours.size() != neighbourCount) ? false : true;
 		return connected;
 	}
 
 	boolean is1ConnectedAny(PixelIsland island) {
-		PixelList neighbours = getNeighbours(island);
+		PixelList neighbours = getOrCreateNeighbours(island);
 		boolean connected = (neighbours.size() != 1) ? false : true;
 		return connected;
 	}
 
 	boolean is2ConnectedAny(PixelIsland island) {
-		PixelList neighbours = getNeighbours(island);
+		PixelList neighbours = getOrCreateNeighbours(island);
 		boolean connected = (neighbours.size() != 2) ? false : true;
 		return connected;
 	}
@@ -312,7 +331,7 @@ public class Pixel {
 	public Pixel getNextNeighbourIn2ConnectedChain(Pixel last) {
 		Pixel next = null;
 		if (this.is2ConnectedAny(island)) {
-			PixelList neighbours = this.getNeighbours(island);
+			PixelList neighbours = this.getOrCreateNeighbours(island);
 			next = (neighbours.get(0) == last) ? neighbours.get(1) : neighbours.get(0);
 		}
 		return next;
@@ -353,15 +372,70 @@ public class Pixel {
 
 	public void computeNeighbours(PixelIsland pixelIsland) {
 		this.neighbourList = null;
-		getNeighbours(pixelIsland);
+		getOrCreateNeighbours(pixelIsland);
 	}
 
 	void recomputeNeighbours(PixelIsland island) {
-		PixelList neighbourList = getNeighbours(island);
+		PixelList neighbourList = getOrCreateNeighbours(island);
 		for (Pixel neighbour : neighbourList) {
 			neighbour.computeNeighbours(island);
 		}
 		computeNeighbours(island);
+	}
+
+	void removeFromNeighbourNeighbourList(PixelIsland pixelIsland) {
+		PixelList neighbours = getOrCreateNeighbours(pixelIsland);
+		for (Pixel neighbour : neighbours) {
+			PixelList neighbourList = neighbour.getOrCreateNeighbours(pixelIsland);
+			boolean removed = neighbourList.remove(this);
+		}
+	}
+
+	/**
+	 * for pixels of type 
+	 * 
+	 * XXX
+	 * Xo
+	 * X
+	 * 
+	 * remove o
+	 * 
+	 * @return
+	 */
+	boolean form5Corner(PixelIsland island) {
+		boolean corner = false;
+		PixelList neighbours = this.getOrCreateNeighbours(island);
+		Int2Range box = neighbours.getIntBoundingBox();
+		int xmin = box.getXRange().getMin();
+		int xmax = box.getXRange().getMax();
+		int ymin = box.getYRange().getMin();
+		int ymax = box.getYRange().getMax();
+		if (xmax - xmin == 2 && ymax - ymin == 2) {
+			int xminCount = 0;
+			int xmaxCount = 0;
+			int yminCount = 0;
+			int ymaxCount = 0;
+			for (Pixel neighbour : neighbours) {
+				Int2 xy = neighbour.getInt2();
+				int x = xy.getX();
+				if (x == xmin) {
+					xminCount++;
+				} else if (x == xmax) {
+					xmaxCount++;
+				}
+				int y = xy.getY();
+				if (y == ymin) {
+					yminCount++;
+				} else if (y == ymax) {
+					ymaxCount++;
+				}
+			}
+			int dx = Math.abs(xminCount - xmaxCount);
+			int dy = Math.abs(yminCount - ymaxCount);
+			corner = dx == 2 && dy == 2;
+		}
+		return corner;
+		
 	}
 
 }

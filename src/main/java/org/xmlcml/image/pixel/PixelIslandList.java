@@ -117,34 +117,31 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * creates a FloodFill and extracts Islands from it. diagonal set to true
 	 * 
 	 * @param image
-	 * @return
+	 * @return null if image is null
 	 * @throws IOException
 	 */
 	public static PixelIslandList createSuperThinnedPixelIslandList(BufferedImage image) {
 		
-//		Pixel pixel2324 = new Pixel(23, 24);
-
-		PixelProcessor pixelProcessor = new PixelProcessor(image);
-		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
-		islandList.setDiagonal(true);
-//		checkforFalse("thick", islandList);
-		islandList.thinThickStepsOld();
-		islandList.fillSingleHoles();
-		islandList.trimOrthogonalStubs();
-		islandList.doTJunctionThinning();
-		
-		Pixel pixel2324 = islandList.getPixelByCoord(new Int2(23,24));
-
-		PixelIsland island2324 = islandList.getIslandByPixel(pixel2324);
-		LOG.debug("PIXEL0 "+pixel2324+"; "+pixel2324.getNeighbours(island2324));
-		PixelTestUtils.debugPixelsWithNeighbourCount(island2324, 4);
-
-		islandList.rearrangeYJunctions();
-
-		island2324 = islandList.getIslandByPixel(pixel2324);
-		LOG.debug("PIXEL1 "+pixel2324+"; "+pixel2324.getNeighbours(island2324));
-
-		PixelTestUtils.debugPixelsWithNeighbourCount(island2324, 3);
+		PixelIslandList islandList = null;
+		if (image != null) {
+			PixelProcessor pixelProcessor = new PixelProcessor(image);
+			islandList = pixelProcessor.getOrCreatePixelIslandList();
+			islandList.setDiagonal(true);
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/original.svg"));
+			islandList.thinThickStepsOld();
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterDeThick57.svg"));
+			islandList.fillSingleHoles();
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterFillHoles.svg"));
+			islandList.thinThickStepsOld();
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterDeThick57a.svg"));
+			islandList.trimOrthogonalStubs();
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterTrimStubs.svg"));
+			islandList.doTJunctionThinning();
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterTJunctThin.svg"));
+			// ensures 3-way but perhaps skip later
+			islandList.rearrangeYJunctions();
+			SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(), new File("target/nodesEdges/afterYJunction.svg"));
+		}
 		return islandList;
 	}
 
@@ -360,12 +357,17 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-	public SVGG getSVGG() {
+	public SVGG getOrCreateSVGG() {
 		if (this.svgg == null) {
-			this.svgg = new SVGG();
-			for (PixelIsland pixelIsland : list) {
-				svgg.appendChild(pixelIsland.getSVGG());
-			}
+			createSVGG();
+		}
+		return svgg;
+	}
+
+	private SVGG createSVGG() {
+		this.svgg = new SVGG();
+		for (PixelIsland pixelIsland : list) {
+			svgg.appendChild(pixelIsland.getSVGG());
 		}
 		return svgg;
 	}
@@ -425,13 +427,10 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public void thinThickStepsOld() {
 		LOG.trace("removing steps; current Pixel size()"+this.getPixelList().size());
 		removeStepsIteratively();
-//		checkforFalse("before clean", this);
 		createCleanIslandList();
-//		checkforFalse("after clean", this);
 		LOG.trace("sort and reverse");
 		sortSize();
 		reverse();
-//		checkforFalse("after thick", this);
 		LOG.trace("finish");
 	}
 
@@ -542,6 +541,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public void fillSingleHoles() {
 		for (PixelIsland island : this) {
 			island.fillSingleHoles();
+			island.trimCornerPixels();
 		}
 	}
 
