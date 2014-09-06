@@ -4,6 +4,7 @@
 ^.settings/
 ^.classpath$
 ^.hgignore~$
+maven-status/
 ^target/.*
 /target/
 ^\.idea/
