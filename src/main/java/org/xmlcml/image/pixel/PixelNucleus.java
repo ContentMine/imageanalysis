@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGCircle;
@@ -22,6 +23,13 @@ public class PixelNucleus {
 
 	private static Logger LOG = Logger.getLogger(PixelNucleus.class);
 
+	public enum PixelJunctionType {
+		CROSS,
+		DOUBLEY,
+		FILLEDT,
+		NICKEDT,
+		Y,
+	}
 	private JunctionSet junctionSet;
 	private JunctionSet externallyConnectedJunctionSet;
 	private Set<Pixel> externalPixelSet;
@@ -32,6 +40,7 @@ public class PixelNucleus {
 	private PixelList pixelList;
 
 	private int rightAngleCorner;
+	private PixelJunctionType junctionType;
 
 	public PixelNucleus(PixelIsland island) {
 		junctionSet = new JunctionSet();
@@ -224,6 +233,7 @@ public class PixelNucleus {
 	 * @param centreJunction
 	 * @return
 	 */
+	@Deprecated
 	private List<JunctionNode> processYJunctions() {
 		List<JunctionNode> removedJunctionList = new ArrayList<JunctionNode>();
 		List<PixelNode> junctionList = junctionSet.getList();
@@ -350,7 +360,8 @@ public class PixelNucleus {
 		return junctionSet;
 	}
 
-	public Pixel getCentrePixel() {
+	@Deprecated
+	public Pixel getCentrePixelOld() {
 		centrePixel = null;
 		PixelList pixelList = island.getPixelList();
 		if (pixelList.size() > 0) {
@@ -364,6 +375,10 @@ public class PixelNucleus {
 				}
 			}
 		}
+		return centrePixel;
+	}
+	
+	public Pixel getCentrePixel() {
 		return centrePixel;
 	}
 
@@ -413,12 +428,15 @@ public class PixelNucleus {
 	}
 
 	public boolean isCrossJunction() {
-		boolean isCross = false;
-		if (pixelList.size() == 5) {
-			int corner = getCrossCentre();
-			isCross = corner != -1;
+		if (junctionType == null) {
+			if (pixelList.size() == 5) {
+				int corner = getCrossCentre();
+				if (corner != -1) {
+					junctionType = PixelJunctionType.CROSS;
+				}
+			}
 		}
-		return isCross;
+		return PixelJunctionType.CROSS.equals(junctionType);
 	}
 
 	private int getCrossCentre() {
@@ -438,31 +456,111 @@ public class PixelNucleus {
 	}
 
 	public boolean isTJunction() {
+		if (junctionType == null) {
+			if (pixelList.size() == 1) {
+				if(isNickedT()) {
+					junctionType = PixelJunctionType.NICKEDT; 
+				}
+			} else if (pixelList.size() == 4) {
+				if (isFilledT()) {
+					junctionType = PixelJunctionType.FILLEDT; 
+				}
+			}
+		}
+		return PixelJunctionType.NICKEDT.equals(junctionType) ||
+				PixelJunctionType.FILLEDT.equals(junctionType);
+	}
+
+	/** symmetric about vertical stem.
+	 * 
+	 * @return
+	 */
+	private boolean isNickedT() {
 		boolean isT = false;
-		if (pixelList.size() == 1) {
-			centrePixel = pixelList.get(0);
-			PixelList diagonalNeighbours = centrePixel
-					.getDiagonalNeighbours(island);
-			PixelList orthogonalNeighbours = centrePixel
-					.getOrthogonalNeighbours(island);
-			if (diagonalNeighbours.size() == 2
-					&& orthogonalNeighbours.size() == 1) {
+		if (centrePixel == null) {
+			if (pixelList.size() == 1) {
+				centrePixel = pixelList.get(0);
+				LOG.trace("nicked T "+centrePixel);
+			}
+		}
+		if (centrePixel != null) {
+			PixelList diagonalNeighbours = centrePixel.getDiagonalNeighbours(island);
+			PixelList orthogonalNeighbours = centrePixel.getOrthogonalNeighbours(island);
+			if (diagonalNeighbours.size() == 2 && orthogonalNeighbours.size() == 1) {
 				isT = true;
 			}
 		}
 		return isT;
 	}
 
-	public boolean isYJunction() {
-		boolean isY = false;
-		if (pixelList.size() == 3) {
-			int corner = getRightAngleCorner();
-			if (corner != -1) {
-				isY = true;
-				centrePixel = pixelList.get(corner);
+	private boolean isFilledT() {
+		boolean isT = false;
+		centrePixel = null;
+		for (Pixel pixel : pixelList) {
+			if (pixel.getOrthogonalNeighbours(island).size() == 3) {
+				if (centrePixel != null) {
+					throw new RuntimeException("Not a filled TJunction "+this);
+				}
+				centrePixel = pixel;
 			}
 		}
-		return isY;
+		if (centrePixel != null) {
+			isT = true;
+			LOG.trace("Filled T: "+centrePixel);
+		}
+		return isT;
+	}
+
+	/** 3 connected pixels in rightangle.
+	 * 
+	 * The first cross is the corner returned by getRightAngleCorner();
+	 * 
+	 * + +
+	 * +
+	 * 
+	 * @return
+	 */
+	public boolean isYJunction() {
+		if (junctionType == null) {
+			if (pixelList.size() == 3) {
+				int corner = getRightAngleCorner();
+				if (corner != -1) {
+					centrePixel = pixelList.get(corner);
+					junctionType = PixelJunctionType.Y;
+				}
+			}
+		}
+		return PixelJunctionType.Y.equals(junctionType);
+	}
+	
+	/** two diagonal Y's joined by stems.
+	 * 
+	 *  +
+	 * ++
+	 *   ++
+	 *   +
+	 *   
+	 *   centre pixel will be randomly one of the two central pixels
+	 * @return
+	 */
+	public boolean isDoubleYJunction() {
+		if (junctionType == null) {
+			if (pixelList.size() == 6) {
+				PixelList centres = new PixelList();
+				for (Pixel pixel : pixelList) {
+					PixelList orthNeighbours = pixel.getOrthogonalNeighbours(island);
+					if (orthNeighbours.size() == 2 && 
+							orthNeighbours.get(0).isDiagonalNeighbour(orthNeighbours.get(1)))  {
+						centres.add(pixel);
+					}
+				}
+				if (centres.size() == 2 && centres.get(0).isDiagonalNeighbour(centres.get(1))) {
+					centrePixel = centres.get(0); // arbitrary but?
+					junctionType = PixelJunctionType.DOUBLEY;
+				}
+			}
+		}
+		return PixelJunctionType.DOUBLEY.equals(junctionType);
 	}
 
 	private int getRightAngleCorner() {

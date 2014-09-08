@@ -163,9 +163,11 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			islandList.trimOrthogonalStubs();
 			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
 					"target/nodesEdges/afterTrimStubs.svg"));
-			islandList.doTJunctionThinning();
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+			if (control.contains("T")) {
+				islandList.doTJunctionThinning();
+				SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
 					"target/nodesEdges/afterTJunctThin.svg"));
+			}
 			if (control.contains("Y")) {
 				islandList.rearrangeYJunctions();
 				SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(),

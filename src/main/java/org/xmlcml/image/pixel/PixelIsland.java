@@ -85,8 +85,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelNucleusList yJunctions;
 	private PixelNucleusList crossJunctions;
 	private PixelNucleusList tJunctions;
+	private PixelNucleusList doubleYJunctions;
 	private Map<Pixel, PixelNucleus> pixelNucleusByPixelMap;
-
 
 	public PixelIsland() {
 		ensurePixelList();
@@ -1072,23 +1072,35 @@ public class PixelIsland implements Iterable<Pixel> {
 	public PixelList getNodePixelList() {
 		PixelList nodePixelList = new PixelList();
 		ensurePixelNucleusByPixelMap();
+		LOG.trace("Nucleus "+pixelNucleusByPixelMap.size());
 		indexYJunctions();
+		indexDoubleYJunctions();
 		indexTJunctions(); // must come after Y junctions
 		indexCrossJunctions();
+		Set<PixelNucleus> pixelNucleusSet = new HashSet<PixelNucleus>();
 		for (Pixel pixel : pixelList) {
 			int neighbourCount = getNeighbourCount(pixel);
 			if (neighbourCount == 0) {
 				nodePixelList.add(pixel);
 			} else if (neighbourCount == 1) {
-					nodePixelList.add(pixel);
+				nodePixelList.add(pixel);
 			} else if (neighbourCount != 2) {
-				if (pixelNucleusByPixelMap.get(pixel) == null) {
+				PixelNucleus pixelNucleus = pixelNucleusByPixelMap.get(pixel);
+				if (pixelNucleus == null) {
 					throw new RuntimeException("Unindexed pixel "+pixel+"; "+pixel.getOrCreateNeighbours(this));
 				} else {
-					nodePixelList.add(pixel);
+					pixelNucleusSet.add(pixelNucleus);
+					Pixel centrePixel = pixelNucleus.getCentrePixel();
+					if (centrePixel == null) {
+						throw new RuntimeException("null centre pixel");
+					}
+					if (pixel.equals(centrePixel)) {
+						nodePixelList.add(pixel);
+					}
 				}
 			}
 		}
+		LOG.trace("nucleus set "+pixelNucleusSet.size()+"; "+pixelNucleusSet.toString());
 		return nodePixelList;
 	}
 
@@ -1107,14 +1119,15 @@ public class PixelIsland implements Iterable<Pixel> {
 			tJunctions = new PixelNucleusList();
 			getOrCreatePixelNucleusList();
 			for (PixelNucleus pixelNucleus : pixelNucleusList) {
-				LOG.debug("cross "+pixelNucleus.isCrossJunction()+"; Y "+pixelNucleus.isYJunction()+"; T "+pixelNucleus.isTJunction()+"; "+pixelNucleus.toString());
+				LOG.trace("testing nucleus "+pixelNucleus);
 				if (pixelNucleus.isTJunction()) {
 					tJunctions.add(pixelNucleus);
+					LOG.trace("added nucleus "+pixelNucleus);
 				}
 			}
-			LOG.debug("NUCLEUS "+pixelNucleusList.size()+" TJUNCTIONS: "+tJunctions.size());
-			if (tJunctions.size() > 0) {
-				LOG.debug("TJ "+tJunctions.get(0));
+			LOG.trace("NUCLEUS "+pixelNucleusList.size()+" TJUNCTIONS: "+tJunctions.size());
+			for (PixelNucleus tJunction : tJunctions) {
+				LOG.trace("TJ "+tJunction.toString());
 			}
 		}
 		return tJunctions;
@@ -1128,6 +1141,16 @@ public class PixelIsland implements Iterable<Pixel> {
 			PixelList yPixels = yJunction.getPixelList();
 			for (Pixel yPixel : yPixels) {
 				pixelNucleusByPixelMap.put(yPixel, yJunction);
+			}
+		}
+	}
+	
+	private void indexDoubleYJunctions() {
+		this.getOrCreateDoubleYJunctionList();
+		for (PixelNucleus doubleYJunction : doubleYJunctions) {
+			PixelList doubleYPixels = doubleYJunction.getPixelList();
+			for (Pixel doubleYPixel : doubleYPixels) {
+				pixelNucleusByPixelMap.put(doubleYPixel, doubleYJunction);
 			}
 		}
 	}
@@ -1167,7 +1190,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	public PixelNucleusList getOrCreatePixelNucleusList() {
 		if (pixelNucleusList == null) {
 			pixelNucleusList = new PixelNucleusList();
-			for (Pixel pixel : this.getPixelList()) {
+			pixelList = this.getPixelList();
+			for (Pixel pixel : this.pixelList) {
 				boolean added = false;
 				if (pixel.getOrCreateNeighbours(this).size() > 2) {
 					for (PixelNucleus nucleus : pixelNucleusList) {
@@ -1180,10 +1204,13 @@ public class PixelIsland implements Iterable<Pixel> {
 					if (!added) {
 						PixelNucleus nucleus = new PixelNucleus(this);
 						nucleus.add(pixel);
+						LOG.trace("created nucleus: "+pixel+"; "+nucleus);
 						pixelNucleusList.add(nucleus);
 					}
 				}
 			}
+			
+			LOG.trace("Created nucleusList: "+pixelNucleusList.toString());
 		}
 		return pixelNucleusList;
 	}
@@ -1409,6 +1436,19 @@ public class PixelIsland implements Iterable<Pixel> {
 		return yJunctions;
 	}
 
+	public PixelNucleusList getOrCreateDoubleYJunctionList() {
+		if (doubleYJunctions == null) {
+			doubleYJunctions = new PixelNucleusList();
+			getOrCreatePixelNucleusList();
+			for (PixelNucleus pixelNucleus : pixelNucleusList) {
+				if (pixelNucleus.isDoubleYJunction()) {
+					doubleYJunctions.add(pixelNucleus);
+				}
+			}
+		}
+		return doubleYJunctions;
+	}
+
 	public PixelNucleusList getOrCreateCrossJunctionList() {
 		if (crossJunctions == null) {
 			crossJunctions = new PixelNucleusList();
@@ -1419,7 +1459,7 @@ public class PixelIsland implements Iterable<Pixel> {
 				}
 			}
 		}
-		return yJunctions;
+		return crossJunctions;
 	}
 
 	public void recomputeNeighbours() {

@@ -871,6 +871,7 @@ public class PixelIslandTest {
 	}
 
 	@Test
+	@Ignore // graphs may not be support
 	public void testCreatePixelIslandListFromStringChar4() {
 		double size = 30.;
 		String string = "4";
