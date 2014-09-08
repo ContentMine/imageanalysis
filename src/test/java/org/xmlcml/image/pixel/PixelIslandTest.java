@@ -871,7 +871,7 @@ public class PixelIslandTest {
 	}
 
 	@Test
-	public void testCreatePixelIslandListFromString() {
+	public void testCreatePixelIslandListFromStringChar4() {
 		double size = 30.;
 		String string = "4";
 		String font = Font.SANS_SERIF;
@@ -934,7 +934,7 @@ public class PixelIslandTest {
 		PixelIsland largeY = createLargeY();
 		PixelNucleusList yjunctionList = largeY.getOrCreateYJunctionList();
 		Assert.assertEquals("junctions ", 1, yjunctionList.size());
-		Assert.assertEquals("y junction", "{{(0,0)(0,1)(1,0)}}", yjunctionList.toString());
+		Assert.assertEquals("y junction", "{{{(0,0)(0,1)(1,0)}}}", yjunctionList.toString());
 	}
 
 	@Test

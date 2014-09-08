@@ -16,6 +16,7 @@ import org.xmlcml.euclid.Real2;
  * @author pm286
  *
  */
+@Deprecated // use PixelNucleus
 public class Nucleus {
 	
 	private final static Logger LOG = Logger.getLogger(Nucleus.class);

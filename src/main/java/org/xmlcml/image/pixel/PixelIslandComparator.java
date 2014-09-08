@@ -12,6 +12,7 @@ public class PixelIslandComparator implements Comparator<PixelIsland>{
 		RIGHT,
 		SIZE,
 		TOP,
+//		TOP_TEXT, // take maximum Y of box, and 
 	}
 
 	private ComparatorType major;
@@ -84,6 +85,9 @@ public class PixelIslandComparator implements Comparator<PixelIsland>{
 		if (type.equals(ComparatorType.TOP)) {
 			return compare(r2r0.getYMin(), r2r1.getYMin());
 		}
+//		if (type.equals(ComparatorType.TOP_TEXT)) {
+//			return compare(r2r0.getYMax(), r2r1.getYMax());
+//		}
 		if (type.equals(ComparatorType.BOTTOM)) {
 			return compare(r2r0.getYMax(), r2r1.getYMax());
 		}

@@ -53,6 +53,11 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 		sb.append("}");
 		return sb.toString();
 	}
+
+	public PixelNucleus get(int i) {
+		ensureList();
+		return list.get(0);
+	}
 	
 
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ArgIterator;
 import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.ImageProcessor;
@@ -114,6 +115,7 @@ public class PixelProcessor {
 			floodFill.setDiagonal(true);
 			floodFill.fill();
 			pixelIslandList = floodFill.getPixelIslandList();
+//			SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/rawPixelIsland.svg"));
 			LOG.trace("after floodfill islands: "+pixelIslandList.size());
 			if (superThinning) {
 				pixelIslandList.thinThickStepsOld();

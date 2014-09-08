@@ -51,7 +51,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private PixelProcessor pixelProcessor;
 	private ImageParameters parameters;
 	private boolean diagonal;
-	
+
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
 		init();
@@ -61,15 +61,15 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		list = newList;
 		init();
 	}
-	
+
 	private void init() {
-		
+
 	}
 
 	public PixelIslandList(Collection<PixelIsland> collection) {
 		this(new ArrayList<PixelIsland>(collection));
 	}
-	
+
 	public void setPixelProcessor(PixelProcessor pixelProcessor) {
 		this.pixelProcessor = pixelProcessor;
 	}
@@ -104,9 +104,11 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * @return
 	 * @throws IOException
 	 */
-	public static PixelIslandList createSuperThinnedPixelIslandListNew(BufferedImage image) {
+	public static PixelIslandList createSuperThinnedPixelIslandListNew(
+			BufferedImage image) {
 		PixelProcessor pixelProcessor = new PixelProcessor(image);
-		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
+		PixelIslandList islandList = pixelProcessor
+				.getOrCreatePixelIslandList();
 		islandList.doSuperThinning();
 		return islandList;
 	}
@@ -116,31 +118,59 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * 
 	 * creates a FloodFill and extracts Islands from it. diagonal set to true
 	 * 
+	 * defaults to control = ""
+	 * 
 	 * @param image
 	 * @return null if image is null
 	 * @throws IOException
 	 */
-	public static PixelIslandList createSuperThinnedPixelIslandList(BufferedImage image) {
-		
+	public static PixelIslandList createSuperThinnedPixelIslandList(
+			BufferedImage image) {
+		return createSuperThinnedPixelIslandList(image, "");
+	}
+
+	/**
+	 * find all separated islands.
+	 * 
+	 * creates a FloodFill and extracts Islands from it. diagonal set to true
+	 * 
+	 * if control contains" "Y" - normalizeYjunctions
+	 * 
+	 * @param image
+	 * @param control
+	 * @return null if image is null
+	 * @throws IOException
+	 */
+	public static PixelIslandList createSuperThinnedPixelIslandList(
+			BufferedImage image, String control) {
+
 		PixelIslandList islandList = null;
 		if (image != null) {
 			PixelProcessor pixelProcessor = new PixelProcessor(image);
 			islandList = pixelProcessor.getOrCreatePixelIslandList();
 			islandList.setDiagonal(true);
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/original.svg"));
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+					"target/nodesEdges/original.svg"));
 			islandList.thinThickStepsOld();
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterDeThick57.svg"));
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+					"target/nodesEdges/afterDeThick57.svg"));
 			islandList.fillSingleHoles();
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterFillHoles.svg"));
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+					"target/nodesEdges/afterFillHoles.svg"));
 			islandList.thinThickStepsOld();
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterDeThick57a.svg"));
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+					"target/nodesEdges/afterDeThick57a.svg"));
 			islandList.trimOrthogonalStubs();
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterTrimStubs.svg"));
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+					"target/nodesEdges/afterTrimStubs.svg"));
 			islandList.doTJunctionThinning();
-			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File("target/nodesEdges/afterTJunctThin.svg"));
-			// ensures 3-way but perhaps skip later
-			islandList.rearrangeYJunctions();
-			SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(), new File("target/nodesEdges/afterYJunction.svg"));
+			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+					"target/nodesEdges/afterTJunctThin.svg"));
+			if (control.contains("Y")) {
+				islandList.rearrangeYJunctions();
+				SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(),
+						new File("target/nodesEdges/afterYJunction.svg"));
+			}
 		}
 		return islandList;
 	}
@@ -153,7 +183,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 				if (pixel == null) {
 					pixel = pixel1;
 				} else {
-					throw new RuntimeException("Pixel occurs in two island: "+coord);
+					throw new RuntimeException("Pixel occurs in two island: "
+							+ coord);
 				}
 			}
 		}
@@ -165,9 +196,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			island.recomputeNeighbours();
 		}
 	}
-	
+
 	public PixelIsland getIslandByPixel(Pixel pixel) {
-//		ensureIslandByPixelMap();
+		// ensureIslandByPixelMap();
 		for (PixelIsland island : this) {
 			if (island.contains(pixel)) {
 				return island;
@@ -293,22 +324,41 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public void sortX() {
-		Collections.sort(list, new PixelIslandComparator(ComparatorType.LEFT, ComparatorType.TOP));
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.LEFT,
+				ComparatorType.TOP));
 	}
 
-	/** sorts Y first, then X.
+	/**
+	 * sorts Y first, then X.
 	 * 
 	 */
 	public void sortYX() {
-		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP, ComparatorType.LEFT));
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP,
+				ComparatorType.LEFT));
 	}
 
-	/** sorts Y first, then X.
+	/**
+	 * sorts Y first, then X.
 	 * 
-	 * @param tolerance error allowed (especially in Y)
+	 * @param tolerance
+	 *            error allowed (especially in Y)
 	 */
 	public void sortYX(double tolerance) {
-		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP, ComparatorType.LEFT, tolerance));
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.TOP,
+				ComparatorType.LEFT, tolerance));
+	}
+
+	/**
+	 * attempts to sort on bottom of text boxes.
+	 * 
+	 * this may get corrupted by characters with descenders
+	 * 
+	 * @param d
+	 */
+	public void sortYXText(double tolerance) {
+		Collections.sort(list, new PixelIslandComparator(ComparatorType.BOTTOM,
+				ComparatorType.RIGHT, tolerance));
+		// Collections.reverse(list);
 	}
 
 	public void sortSize() {
@@ -384,13 +434,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * removes all unnecessary steps while keeping minimum connectivity.
 	 * 
 	 */
-	@Deprecated // use removeCorners()
+	@Deprecated
+	// use removeCorners()
 	public void removeStepsIteratively() {
 		for (PixelIsland island : list) {
-//			island.removeStepsIteratively();
+			// island.removeStepsIteratively();
 			// may be better...
 			island.removeCorners();
-			LOG.trace("after remove corners "+island.size());
+			LOG.trace("after remove corners " + island.size());
 		}
 	}
 
@@ -417,15 +468,19 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return array;
 	}
 
-	/** thin all "thick steps".
+	/**
+	 * thin all "thick steps".
 	 * 
-	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with "steps".
+	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with
+	 * "steps".
 	 * 
-	 * remove all thick steps to preserve 2-connectivity (including diagonal) except at branches.
+	 * remove all thick steps to preserve 2-connectivity (including diagonal)
+	 * except at branches.
 	 * 
 	 */
 	public void thinThickStepsOld() {
-		LOG.trace("removing steps; current Pixel size()"+this.getPixelList().size());
+		LOG.trace("removing steps; current Pixel size()"
+				+ this.getPixelList().size());
 		removeStepsIteratively();
 		createCleanIslandList();
 		LOG.trace("sort and reverse");
@@ -434,11 +489,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		LOG.trace("finish");
 	}
 
-	/** thin all "thick steps".
+	/**
+	 * thin all "thick steps".
 	 * 
-	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with "steps".
+	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with
+	 * "steps".
 	 * 
-	 * remove all thick steps to preserve 2-connectivity (including diagonal) except at branches.
+	 * remove all thick steps to preserve 2-connectivity (including diagonal)
+	 * except at branches.
 	 * 
 	 */
 	public void doSuperThinning() {
@@ -467,15 +525,18 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		thinThickStepsOld();
 		File outputDir = pixelProcessor.getOutputDir();
 		outputDir.mkdirs();
-		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir, "cleaned.png"));
+		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir,
+				"cleaned.png"));
 		// main tree
 		SVGG g = new SVGG();
 		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
-			LOG.debug("============ island "+i+"=============");
+			LOG.debug("============ island " + i + "=============");
 			PixelIsland island = get(i);
 			BufferedImage image1 = island.createImage();
-			if (image1 == null) continue;
-			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"+i+".png"));
+			if (image1 == null)
+				continue;
+			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"
+					+ i + ".png"));
 			g.appendChild(island.createSVG());
 			PixelGraph graph = island.createGraph();
 			graph.setParameters(parameters);
@@ -485,7 +546,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			}
 			pixelGraphList.add(graph);
 		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir,"graphAndChars.svg"));
+		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir, "graphAndChars.svg"));
 		return pixelGraphList;
 	}
 
@@ -503,18 +564,26 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public void debug() {
-//		System.err.println("maxIsland:    "+this.maxIsland);
+		// System.err.println("maxIsland:    "+this.maxIsland);
 	}
 
-	/** create PixelIslandList from String.
+	/**
+	 * create PixelIslandList from String.
 	 * 
-	 * @param size of font
-	 * @param string to write
-	 * @param font font
+	 * @param size
+	 *            of font
+	 * @param string
+	 *            to write
+	 * @param font
+	 *            font
+	 * @param control
+	 *            of thinning
 	 * @return
 	 */
-	public static PixelIslandList createPixelIslandListFromString(double size, String string, String font) {
-		SVGText text = new SVGText(new Real2(size / 2.0, 3.0 * size / 2.0), string);
+	public static PixelIslandList createPixelIslandListFromString(double size,
+			String string, String font) {
+		SVGText text = new SVGText(new Real2(size / 2.0, 3.0 * size / 2.0),
+				string);
 		text.setFontFamily(font);
 		text.setFontSize(size);
 		int height = (int) (text.getFontSize() * 2.0);
@@ -523,7 +592,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		Thinning thinning = new ZhangSuenThinning(image);
 		thinning.doThinning();
 		image = thinning.getThinnedImage();
-		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
+		PixelIslandList pixelIslandList = PixelIslandList
+				.createSuperThinnedPixelIslandList(image);
 		return pixelIslandList;
 	}
 
@@ -535,7 +605,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		this.parameters = parameters;
 	}
 
-	/** fill holes with 4 orthogonal neighbours
+	/**
+	 * fill holes with 4 orthogonal neighbours
 	 * 
 	 */
 	public void fillSingleHoles() {
@@ -545,7 +616,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-	/** remove 3 connected single pixels on "surface" of island
+	/**
+	 * remove 3 connected single pixels on "surface" of island
 	 * 
 	 */
 	public PixelList trimOrthogonalStubs() {
@@ -567,7 +639,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return stubs;
 	}
 
-	/** do TJunction thinning on all islands.
+	/**
+	 * do TJunction thinning on all islands.
 	 * 
 	 */
 	public void doTJunctionThinning() {

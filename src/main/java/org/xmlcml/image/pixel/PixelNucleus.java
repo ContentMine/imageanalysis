@@ -62,7 +62,8 @@ public class PixelNucleus {
 		return junctionSet.size();
 	}
 
-	public static void drawNucleusSet(Set<PixelNucleus> nucleusSet, SVGG g, double rad) {
+	public static void drawNucleusSet(Set<PixelNucleus> nucleusSet, SVGG g,
+			double rad) {
 		for (PixelNucleus nucleus : nucleusSet) {
 			nucleus.drawCentre(g, rad);
 		}
@@ -80,7 +81,7 @@ public class PixelNucleus {
 		if (centre == null) {
 			Real2Array real2Array = new Real2Array();
 			for (PixelNode junction : junctionSet) {
-				Pixel pixel = ((JunctionNode)junction).getCentrePixel();
+				Pixel pixel = ((JunctionNode) junction).getCentrePixel();
 				real2Array.add(new Real2(pixel.getInt2()));
 			}
 			centre = real2Array.getMean();
@@ -123,7 +124,7 @@ public class PixelNucleus {
 			junctionList.addAll(tidyTJunction());
 		} else if (size() == 5) { // corner?
 		} else {
-			LOG.trace("Cannot tidy large nucleus "+this);
+			LOG.trace("Cannot tidy large nucleus " + this);
 		}
 		return junctionList;
 	}
@@ -138,21 +139,18 @@ public class PixelNucleus {
 		Set<Pixel> neighbours = getCommonNeighbours(junctionNodes);
 		LOG.debug(island.size());
 		island.removePixels(new PixelList(neighbours));
-		LOG.debug("after: "+island.size());
+		LOG.debug("after: " + island.size());
 		return neighbours;
 	}
 
 	/**
-	 * find any nodes which bridge an isolated junction pair. 
-	 * A X
-	 *   B
-	 * // remove X
+	 * find any nodes which bridge an isolated junction pair. A X B // remove X
 	 * 
 	 * @param junctionNodes
 	 * @return
 	 */
 	private Set<Pixel> getCommonNeighbours(List<PixelNode> junctionNodes) {
-		
+
 		Set<Pixel> commonNeighbourSet = new HashSet<Pixel>();
 		for (int i = 0; i < junctionNodes.size() - 1; i++) {
 			PixelNode nodei = junctionNodes.get(i);
@@ -161,7 +159,8 @@ public class PixelNucleus {
 			for (int j = i + 1; j < junctionNodes.size(); j++) {
 				PixelNode nodej = junctionNodes.get(j);
 				Set<Pixel> neighboursj = new HashSet<Pixel>(nodej
-						.getCentrePixel().getOrCreateNeighbours(island).getList());
+						.getCentrePixel().getOrCreateNeighbours(island)
+						.getList());
 				if (neighboursj.retainAll(neighboursi)) {
 					commonNeighbourSet.addAll(neighboursj);
 				}
@@ -171,7 +170,7 @@ public class PixelNucleus {
 	}
 
 	private void tidyNucleus3() {
-		LOG.trace("3-Nucleus NYI "+this);
+		LOG.trace("3-Nucleus NYI " + this);
 	}
 
 	/**
@@ -196,7 +195,7 @@ public class PixelNucleus {
 		List<JunctionNode> removedJunctionList = new ArrayList<JunctionNode>();
 		LOG.trace("YJunction");
 		removedJunctionList = processYJunctions();
-		LOG.trace("removed junctions: "+removedJunctionList.size());
+		LOG.trace("removed junctions: " + removedJunctionList.size());
 		return removedJunctionList;
 	}
 
@@ -208,31 +207,19 @@ public class PixelNucleus {
 			LOG.debug("YJunctions should not be here");
 		} else {
 			removedJunctionList = processTJunctions(centreJunction);
-			LOG.trace("removed: "+removedJunctionList.size());
+			LOG.trace("removed: " + removedJunctionList.size());
 		}
 		return removedJunctionList;
 	}
 
-	/** process all Y-junctions in nucleus.
-	 * normally only one.
+	/**
+	 * process all Y-junctions in nucleus. normally only one.
 	 * 
 	 * there are two types:
 	 * 
-	 * axial
-	 *   +     +
-	 *    +   +
-	 *     + +
-	 *      +
-	 *      +
-	 *      +
-	 *      
-	 * diag
-	 *   +     
-	 *    +   
-	 *     + 
-	 *      +++
-	 *      +
-	 *      +
+	 * axial + + + + + + + + +
+	 * 
+	 * diag + + + +++ + +
 	 * 
 	 * @param centreJunction
 	 * @return
@@ -241,13 +228,19 @@ public class PixelNucleus {
 		List<JunctionNode> removedJunctionList = new ArrayList<JunctionNode>();
 		List<PixelNode> junctionList = junctionSet.getList();
 		for (PixelNode junction0 : junctionList) {
-			JunctionNode junction = (JunctionNode) junction0; // should use better generics :-(
+			JunctionNode junction = (JunctionNode) junction0; // should use
+																// better
+																// generics :-(
 			PixelList diagonalPixels = junction.getDiagonalNeighbours(island);
-			PixelList orthogonalPixels = junction.getOrthogonalNeighbours(island);
+			PixelList orthogonalPixels = junction
+					.getOrthogonalNeighbours(island);
 			if (diagonalPixels.size() == 1 && orthogonalPixels.size() == 2) {
-				junction.processDiagonal(diagonalPixels.get(0), orthogonalPixels);
-			} else if (diagonalPixels.size() == 2 && orthogonalPixels.size() == 1) {
-				junction.processOrthogonal(orthogonalPixels.get(0), diagonalPixels);
+				junction.processDiagonal(diagonalPixels.get(0),
+						orthogonalPixels);
+			} else if (diagonalPixels.size() == 2
+					&& orthogonalPixels.size() == 1) {
+				junction.processOrthogonal(orthogonalPixels.get(0),
+						diagonalPixels);
 			} else {
 				LOG.debug("not a Y-junction");
 			}
@@ -258,8 +251,8 @@ public class PixelNucleus {
 		return removedJunctionList;
 	}
 
-	/** process all T-junctions in nucleus.
-	 * normally only one.
+	/**
+	 * process all T-junctions in nucleus. normally only one.
 	 * 
 	 * @param centreJunction
 	 * @return
@@ -270,9 +263,11 @@ public class PixelNucleus {
 		for (PixelNode junction : junctionList) {
 			if (!junction.equals(centreJunction)) {
 				Int2 i2 = junction.getCentrePixel().getInt2();
-				if (i2 == null) continue;
+				if (i2 == null)
+					continue;
 				Int2 inext = centreJunction.getCentrePixel().getInt2();
-				if (inext == null) continue;
+				if (inext == null)
+					continue;
 				Int2 dist = i2.subtract(inext);
 				int manhattan = Math.abs(dist.getX()) + Math.abs(dist.getY());
 				if (manhattan != 1) {
@@ -280,43 +275,43 @@ public class PixelNucleus {
 					removedJunctionList = new ArrayList<JunctionNode>();
 					break;
 				}
-				LOG.trace("removed Junction "+junction);
+				LOG.trace("removed Junction " + junction);
 				junctionSet.remove(junction);
-				removedJunctionList.add((JunctionNode)junction);
+				removedJunctionList.add((JunctionNode) junction);
 			}
 		}
 		return removedJunctionList;
 	}
 
-//	/** process all Y-junctions in nucleus.
-//	 * normally only one.
-//	 * 
-//	 * @param centreJunction
-//	 * @return
-//	 */
-//	private List<Junction> processYJunctions(Junction centreJunction) {
-//		List<Junction> removedJunctionList = new ArrayList<Junction>();
-//		List<PixelNode> junctionList = junctionSet.getList();
-//		for (PixelNode junction : junctionList) {
-//			if (!junction.equals(centreJunction)) {
-//				Int2 i2 = junction.getCentrePixel().getInt2();
-//				if (i2 == null) continue;
-//				Int2 inext = centreJunction.getCentrePixel().getInt2();
-//				if (inext == null) continue;
-//				Int2 dist = i2.subtract(inext);
-//				int manhattan = Math.abs(dist.getX()) + Math.abs(dist.getY());
-//				if (manhattan != 1) {
-//					LOG.debug("not T-junction");
-//					removedJunctionList = new ArrayList<Junction>();
-//					break;
-//				}
-//				LOG.trace("removed Junction "+junction);
-//				junctionSet.remove(junction);
-//				removedJunctionList.add((Junction)junction);
-//			}
-//		}
-//		return removedJunctionList;
-//	}
+	// /** process all Y-junctions in nucleus.
+	// * normally only one.
+	// *
+	// * @param centreJunction
+	// * @return
+	// */
+	// private List<Junction> processYJunctions(Junction centreJunction) {
+	// List<Junction> removedJunctionList = new ArrayList<Junction>();
+	// List<PixelNode> junctionList = junctionSet.getList();
+	// for (PixelNode junction : junctionList) {
+	// if (!junction.equals(centreJunction)) {
+	// Int2 i2 = junction.getCentrePixel().getInt2();
+	// if (i2 == null) continue;
+	// Int2 inext = centreJunction.getCentrePixel().getInt2();
+	// if (inext == null) continue;
+	// Int2 dist = i2.subtract(inext);
+	// int manhattan = Math.abs(dist.getX()) + Math.abs(dist.getY());
+	// if (manhattan != 1) {
+	// LOG.debug("not T-junction");
+	// removedJunctionList = new ArrayList<Junction>();
+	// break;
+	// }
+	// LOG.trace("removed Junction "+junction);
+	// junctionSet.remove(junction);
+	// removedJunctionList.add((Junction)junction);
+	// }
+	// }
+	// return removedJunctionList;
+	// }
 
 	private JunctionNode findCentreJunction(Real2 centre) {
 		JunctionNode centreJunction = null;
@@ -332,16 +327,22 @@ public class PixelNucleus {
 	}
 
 	private void tidyNucleusLarge() {
-		LOG.trace("large-Nucleus NYI "+this);
+		LOG.trace("large-Nucleus NYI " + this);
 	}
-	
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (PixelNode junction : junctionSet) {
 			sb.append(junction + "; ");
 		}
-//		sb.append(""+centre+"; "+pixelList);
-		if (pixelList != null) sb.append(pixelList.toString());
+		sb.append("{");
+		if (centre != null) {
+			sb.append(centre + ";");
+		}
+		if (pixelList != null) {
+			sb.append(pixelList.toString());
+		}
+		sb.append("}");
 		return sb.toString();
 	}
 
@@ -381,14 +382,16 @@ public class PixelNucleus {
 
 	public boolean canTouch(Pixel pix) {
 		for (Pixel pixel : this.pixelList) {
-			if (pixel.isDiagonalNeighbour(pix) || pixel.isOrthogonalNeighbour(pix)) {
+			if (pixel.isDiagonalNeighbour(pix)
+					|| pixel.isOrthogonalNeighbour(pix)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	/** list of pixels which can be removed as part of superthinning of nuclei.
+	/**
+	 * list of pixels which can be removed as part of superthinning of nuclei.
 	 * 
 	 * @return
 	 */
@@ -398,8 +401,8 @@ public class PixelNucleus {
 			if (pixel.isTjunctionCentre(island)) {
 				removableList.add(pixel);
 			} else {
-				
-			} 
+
+			}
 		}
 		return removableList;
 	}
@@ -409,11 +412,55 @@ public class PixelNucleus {
 		island.removePixels(removables);
 	}
 
+	public boolean isCrossJunction() {
+		boolean isCross = false;
+		if (pixelList.size() == 5) {
+			int corner = getCrossCentre();
+			isCross = corner != -1;
+		}
+		return isCross;
+	}
+
+	private int getCrossCentre() {
+		centrePixel = null;
+		int pixelNumber = -1;
+		for (int i = 0; i < 5; i++) {
+			Pixel pixel = pixelList.get(i);
+			if (pixel.getOrthogonalNeighbours(island).size() == 4) {
+				if (centrePixel != null) {
+					throw new RuntimeException("Bad cross: " + this);
+				}
+				centrePixel = pixel;
+				pixelNumber = i;
+			}
+		}
+		return pixelNumber;
+	}
+
+	public boolean isTJunction() {
+		boolean isT = false;
+		if (pixelList.size() == 1) {
+			centrePixel = pixelList.get(0);
+			PixelList diagonalNeighbours = centrePixel
+					.getDiagonalNeighbours(island);
+			PixelList orthogonalNeighbours = centrePixel
+					.getOrthogonalNeighbours(island);
+			if (diagonalNeighbours.size() == 2
+					&& orthogonalNeighbours.size() == 1) {
+				isT = true;
+			}
+		}
+		return isT;
+	}
+
 	public boolean isYJunction() {
 		boolean isY = false;
 		if (pixelList.size() == 3) {
 			int corner = getRightAngleCorner();
-			isY = corner != -1;
+			if (corner != -1) {
+				isY = true;
+				centrePixel = pixelList.get(corner);
+			}
 		}
 		return isY;
 	}
@@ -423,7 +470,8 @@ public class PixelNucleus {
 		for (int i = 0; i < 3; i++) {
 			int j = (i + 1) % 3;
 			int k = (j + 1) % 3;
-			if (Pixel.isRightAngle(pixelList.get(i), pixelList.get(j), pixelList.get(k))) {
+			if (Pixel.isRightAngle(pixelList.get(i), pixelList.get(j),
+					pixelList.get(k))) {
 				rightAngleCorner = i;
 				break;
 			}
@@ -437,9 +485,12 @@ public class PixelNucleus {
 		Pixel startPixel0 = pixelList.get(p0);
 		int p1 = (p0 + 1) % 3;
 		Pixel startPixel1 = pixelList.get(p1);
-		LOG.trace("pixel0 "+startPixel0+" neighbours "+startPixel0.getOrCreateNeighbours(island));
-		LOG.trace("pixel1 "+startPixel1+" neighbours "+startPixel1.getOrCreateNeighbours(island));
-		LOG.trace("right angle "+rightAnglePixel+" neighbours "+rightAnglePixel.getOrCreateNeighbours(island));
+		LOG.trace("pixel0 " + startPixel0 + " neighbours "
+				+ startPixel0.getOrCreateNeighbours(island));
+		LOG.trace("pixel1 " + startPixel1 + " neighbours "
+				+ startPixel1.getOrCreateNeighbours(island));
+		LOG.trace("right angle " + rightAnglePixel + " neighbours "
+				+ rightAnglePixel.getOrCreateNeighbours(island));
 		if (movePixel(startPixel0, startPixel1, rightAnglePixel, island)) {
 			return true;
 		}
@@ -449,7 +500,8 @@ public class PixelNucleus {
 		return false;
 	}
 
-	private boolean movePixel(Pixel pixel0, Pixel pixel1, Pixel rightAnglePixel, PixelIsland island) {
+	private boolean movePixel(Pixel pixel0, Pixel pixel1,
+			Pixel rightAnglePixel, PixelIsland island) {
 		Int2 right = rightAnglePixel.getInt2();
 		Int2 p0 = pixel0.getInt2();
 		Int2 p1 = pixel1.getInt2();
@@ -457,21 +509,30 @@ public class PixelNucleus {
 		Int2 new2 = p1.plus(vector);
 		Pixel newPixel = new Pixel(new2.getX(), new2.getY());
 		PixelList neighbours = newPixel.getOrCreateNeighbours(island);
-		LOG.trace("new "+newPixel+"neighbours: "+neighbours);
-		if (neighbours.size() != 3) return false; // we still have to remove old pixel 
-		
-		PixelList oldNeighbours = pixel1.getOrCreateNeighbours(island); // before removal
+		LOG.trace("new " + newPixel + "neighbours: " + neighbours);
+		if (neighbours.size() != 3)
+			return false; // we still have to remove old pixel
+
+		PixelList oldNeighbours = pixel1.getOrCreateNeighbours(island); // before
+																		// removal
 		island.remove(pixel1);
 		newPixel.clearNeighbours();
 		island.addPixel(newPixel);
 		PixelList newPixelNeighbours = newPixel.getOrCreateNeighbours(island);
-		LOG.trace("new "+newPixel+"neighbours: "+newPixelNeighbours);
+		LOG.trace("new " + newPixel + "neighbours: " + newPixelNeighbours);
 		for (Pixel oldNeighbour : oldNeighbours) {
 			oldNeighbour.clearNeighbours();
-			PixelList oldNeighbourNeighbours = oldNeighbour.getOrCreateNeighbours(island);
-			LOG.trace("old "+oldNeighbour+"neighbours: "+oldNeighbourNeighbours);
+			PixelList oldNeighbourNeighbours = oldNeighbour
+					.getOrCreateNeighbours(island);
+			LOG.trace("old " + oldNeighbour + "neighbours: "
+					+ oldNeighbourNeighbours);
 		}
 		return true;
+	}
+
+	public PixelList getPixelList() {
+		ensurePixelList();
+		return pixelList;
 	}
 
 }
