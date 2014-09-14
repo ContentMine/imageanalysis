@@ -76,22 +76,13 @@ public class PixelTestUtils {
 	 */
 	public static void assertNodeCounts(String msg, PixelIsland island, IntArray nodeCounts) {
 		// compare pixel counts
-//		IntArray neighbourCountArray = new IntArray();
-//		for (int i = 1; i < nodeCounts.size(); i++) {
-//			int neighbours = i - 1;
-//			neighbourCountArray.addElement(island.getPixelsWithNeighbours(neighbours).size());
-//		}
-//		String msg0 = neighbourCountArray.toString();
-//		Assert.assertEquals(msg0+"; "+msg+"; pixels", nodeCounts.elementAt(0),island.size());
-//		// compare neighbour counts
-//		for (int i = 1; i < nodeCounts.size(); i++) {
-//			int neighbours = i - 1;
-//			int expected = nodeCounts.elementAt(i);
-//			if (expected >= 0) {
-//				Assert.assertEquals(msg0+"; "+msg+"; neighbours_"+neighbours, expected, 
-//						neighbourCountArray.elementAt(neighbours));
-//			}
-//		}
+		IntArray nodeCountArray = new IntArray();
+		for (int i = 1; i < nodeCounts.size(); i++) {
+			nodeCountArray.addElement(island.getTerminalJunctionList().size());
+			nodeCountArray.addElement(island.getThreewayJunctionList().size());
+			nodeCountArray.addElement(island.getDoubleYJunctionList().size());
+			nodeCountArray.addElement(island.getCrossJunctionList().size());
+		}
 		
 	}
 

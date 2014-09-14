@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
@@ -51,7 +52,7 @@ public class PixelGraph {
 	private Map<Pixel, JunctionNode> junctionByPixelMap;
 	private Map<Pixel, TerminalNode> terminalNodeByPixelMap;
 	private Set<Pixel> usedNonNodePixelSet;
-	private SortedPixelNodeSet activeNodeSet;
+//	private SortedPixelNodeSet activeNodeSet;
 	private Map<JunctionNode, PixelNucleus> nucleusByJunctionMap;
 	private Set<PixelNucleus> nucleusSet;
 
@@ -154,7 +155,8 @@ public class PixelGraph {
 			LOG.trace("null node");
 		} else {
 			// add serial
-			node.setId("nn"+nodeSet.size());
+//			node.setId("nn"+pixel+nodeSet.size());
+			node.setId("nn"+pixel);
 			edge.addNode(node, end);
 			nodeSet.add(node);
 			usedNonNodePixelSet.add(node.getCentrePixel());
@@ -170,9 +172,14 @@ public class PixelGraph {
 				node = new NucleusNode(nucleus);
 				nodeByNucleusMap.put(nucleus, node);
 			}
-		}
-		if (node == null) {
+		} else if (node == null) {
 			node = terminalNodeByPixelMap.get(pixel);
+			if (node == null) {
+				node = new PixelNode(pixel);
+			}
+		}
+		if (node.getCentrePixel() == null) {
+			node.setCentrePixel(pixel);
 		}
 		return node;
 	}
@@ -749,7 +756,17 @@ public class PixelGraph {
 		int i = 0;
 		for (PixelNode node : getNodes()) {
 			if (node instanceof TerminalNode) {
-				node.setLabel(NODE_PREFIX + i);
+//				node.setLabel(NODE_PREFIX + i);
+//			}
+			Pixel pixel = node.getCentrePixel();
+			Int2 int2 = pixel == null ? null : pixel.getInt2();
+			Integer x = (int2 == null) ? null : int2.getX();
+			Integer y = (int2 == null) ? null : int2.getY();
+			if (x == null || y == null) {
+				node.setLabel("N"+i);
+			} else {
+				node.setLabel(x+"_"+y);
+			}
 			}
 			i++;
 		}

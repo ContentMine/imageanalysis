@@ -12,6 +12,7 @@ import org.xmlcml.graphics.svg.SVGG;
  * @author pm286
  *
  */
+@Deprecated
 public class TerminalNode extends PixelNode {
 
 	private final static Logger LOG = Logger.getLogger(TerminalNode.class);
@@ -22,7 +23,7 @@ public class TerminalNode extends PixelNode {
 	}
 
 	public TerminalNode(Pixel pixel, Pixel neighbour) {
-		super(pixel);
+		super(pixel, null);
 		this.neighbour = neighbour;
 	}
 

@@ -562,6 +562,13 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			graph.setParameters(parameters);
 			pixelGraphList.add(graph);
 		}
+		LOG.debug("created graphs: "+pixelGraphList.size()+pixelGraphList);
+		for (PixelGraph pixelGraph : pixelGraphList) {
+			LOG.debug("graph "+pixelGraph.getEdges().size()+"; " +pixelGraph.getNodes().size() /*+": "+pixelGraph.getEdges()+"; "*/);
+			for (PixelNode pixelNode : pixelGraph.getNodes()) {
+				LOG.debug("Node "+pixelNode);
+			}
+		}
 		return pixelGraphList;
 	}
 

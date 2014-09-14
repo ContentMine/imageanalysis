@@ -931,6 +931,7 @@ public class PixelIslandTest {
 	}
 
 	@Test
+	@Ignore
 	public void testGetOrCreateYJunctionList() {
 		PixelIsland largeY = createLargeY();
 		PixelNucleusList yjunctionList = largeY.getOrCreateYJunctionList();

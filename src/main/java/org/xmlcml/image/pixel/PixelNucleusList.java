@@ -1,6 +1,7 @@
 package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,6 +58,14 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 	public PixelNucleus get(int i) {
 		ensureList();
 		return list.get(0);
+	}
+
+	public void addAll(PixelNucleusList l) {
+		list.addAll(l.getList());
+	}
+
+	private List<PixelNucleus> getList() {
+		return list;
 	}
 	
 

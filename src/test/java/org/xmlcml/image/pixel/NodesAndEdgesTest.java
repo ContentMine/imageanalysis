@@ -151,7 +151,7 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{71, 0,4,65,2,0,0,0,0,0}), // K 2 Y-junctions
 				new IntArray(new int[]{45, 0,2,43,0,0,0,0,0,0}), // L
 				new IntArray(new int[]{108, 0,2,106,0,0,0,0,0,0}), // M
-				new IntArray(new int[]{81, 0,3,77,1,0,0,0,0,0}), // N
+				new IntArray(new int[]{81, 0,3,75,3,0,0,0,0,0}), // N
 				new IntArray(new int[]{6, 0,2,4,0,0,0,0,0,0}), // accent // 15 grave
 				new IntArray(new int[]{85, 0,0,85,0,0,0,0,0,0}), // O
 				new IntArray(new int[]{76, 0,1,71,3,1,0,0,0,0}), // P
@@ -186,7 +186,7 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{29, 0,2,27,0,0,0,0,0,0}), // l // 44 
 				new IntArray(new int[]{71, 0,2,64,4,1,0,0,0,0}), // a // 45
 				new IntArray(new int[]{48, 0,2,46,0,0,0,0,0,0}), // c // 46
-				new IntArray(new int[]{71, 0,2,64,4,1,0,0,0,0}), // e // 47 // 1 Y junct
+				new IntArray(new int[]{71, 0,2,62,6,1,0,0,0,0}), // e // 47 // 1 Y junct
 				new IntArray(new int[]{85, 0,1,80,3,1,0,0,0,0}), // g  //48
 				new IntArray(new int[]{20, 0,2,18,0,0,0,0,0,0}), // i // 49
 				new IntArray(new int[]{31, 0,2,29,0,0,0,0,0,0}), // j // 50
@@ -207,13 +207,13 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{55, 0,2,53,0,0,0,0,0,0}), // s // 64
 				new IntArray(new int[]{52, 0,3,48,1,0,0,0,0,0}), // u // 65
 				new IntArray(new int[]{40, 0,2,38,0,0,0,0,0,0}), // v // 66
-				new IntArray(new int[]{73, 0,3,69,1,0,0,0,0,0}), // w // 67
+				new IntArray(new int[]{73, 0,3,67,3,0,0,0,0,0}), // w // 67
 				new IntArray(new int[]{47, 0,4,38,4,1,0,0,0,0}), // x // 68
 				new IntArray(new int[]{54, 0,3,47,3,1,0,0,0,0}), // y // 69
 				new IntArray(new int[]{47, 0,2,45,0,0,0,0,0,0}), // z // 70
 				new IntArray(new int[]{70, 0,2,63,4,1,0,0,0,0}), // a no accent // 71
 				new IntArray(new int[]{70, 0,2,63,4,1,0,0,0,0}), // a no accent // 72
-				new IntArray(new int[]{72, 0,2,65,4,1,0,0,0,0}), // e no accent // 73
+				new IntArray(new int[]{72, 0,2,63,6,1,0,0,0,0}), // e no accent // 73
 				new IntArray(new int[]{20, 0,2,18,0,0,0,0,0,0}), // i no accent // 74
 				new IntArray(new int[]{58, 0,0,58,0,0,0,0,0,0}), // o no accent // 75
 				
@@ -325,12 +325,18 @@ public class NodesAndEdgesTest {
 
 	 */
 
+	static String CHARSAB = "AB";
 	@Test
-	public void testCharacterHelveticaNodeCountsAB() {
+	public void testCharacterHelveticaNodeCounts() {
+		String CHARX = CHARS/*AB*/ ;
+		int NCHARS = CHARX.length();
+		
 		File helvetica = new File(Fixtures.FONTS_MAIN_DIR, "_helvetica.png");
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
-//		image = ImageUtil.clipSubImage(image, new Int2Range(new IntRange(2, 63), new IntRange(3, 35)));
+		if (CHARX.equals(CHARSAB)) {
+			image = ImageUtil.clipSubImage(image, new Int2Range(new IntRange(2, 63), new IntRange(3, 35)));
+		}
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
 		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/glyph/AB.svg"));
 		pixelIslandList.sortYX(5.0);
@@ -343,13 +349,23 @@ public class NodesAndEdgesTest {
 				e.printStackTrace();
 				LOG.error("**** Bad node: "+i+", "+e);
 			}
-			LOG.debug(" ==="+CHARS.charAt(i)+"==="+pixelNodeList.size()+"=== island "+i+"; pixels: "+island.size());
+			LOG.debug(" ==="+CHARX.charAt(i)+"==="+pixelNodeList.size()+"=== island "+i+"; pixels: "+island.size());
+			for (PixelNode pixelNode : pixelNodeList) {
+//				LOG.debug(pixelNode.toString());
+				PixelNucleus pixelNucleus = pixelNode.getPixelNucleus();
+				if (pixelNucleus == null) {
+					LOG.error("******** NULL pixel "+pixelNode);
+				} else {
+					LOG.debug("NUCL "+pixelNucleus+"; "+pixelNucleus.getCentrePixel()+"; "+pixelNucleus.getJunctionType());
+				}
+			}
 		}
 		
 		SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/nodesEdges/helvetica.svg"));
 		pixelIslandList.sortYX(5.0);
-		Assert.assertEquals("islands", 96, pixelIslandList.size());
-		for (int i = 1; i < 96; i++) {
+		int NN =  NCHARS-3;
+		Assert.assertEquals("islands", NN, pixelIslandList.size());
+		for (int i = 1; i < NN; i++) {
 			SVGSVG.wrapAndWriteAsSVG(pixelIslandList.get(i).getSVGG(), new File("target/nodesEdges/helvetica"+i+".svg"));
 		}
 		

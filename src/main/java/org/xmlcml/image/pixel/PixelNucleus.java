@@ -28,17 +28,16 @@ public class PixelNucleus {
 		DOUBLEY,
 		FILLEDT,
 		NICKEDT,
+		TERMINAL,
 		Y,
 	}
 	private JunctionSet junctionSet;
 	private JunctionSet externallyConnectedJunctionSet;
 	private Set<Pixel> externalPixelSet;
 	private PixelIsland island;
-
 	private Real2 centre;
 	private Pixel centrePixel;
 	private PixelList pixelList;
-
 	private int rightAngleCorner;
 	private PixelJunctionType junctionType;
 
@@ -427,6 +426,20 @@ public class PixelNucleus {
 		island.removePixels(removables);
 	}
 
+	public boolean isTerminalJunction() {
+		if (junctionType == null) {
+			if (pixelList.size() == 1) {
+				centrePixel = pixelList.get(0);
+				if (centrePixel.getOrthogonalNeighbours(island).size() 
+						+ centrePixel.getDiagonalNeighbours(island).size() == 1) {
+					junctionType = PixelJunctionType.TERMINAL;
+					LOG.trace("Terminal centre: "+centrePixel+" ; "+centrePixel.getOrCreateNeighbours(island));
+				}
+			}
+		}
+		return PixelJunctionType.TERMINAL.equals(junctionType);
+	}
+
 	public boolean isCrossJunction() {
 		if (junctionType == null) {
 			if (pixelList.size() == 5) {
@@ -631,6 +644,10 @@ public class PixelNucleus {
 	public PixelList getPixelList() {
 		ensurePixelList();
 		return pixelList;
+	}
+
+	public PixelJunctionType getJunctionType() {
+		return junctionType;
 	}
 
 }

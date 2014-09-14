@@ -6,6 +6,7 @@ package org.xmlcml.image.pixel;
  * @author pm286
  *
  */
+@Deprecated 
 public class JunctionSet extends SortedPixelNodeSet {
 
 	public JunctionSet() {

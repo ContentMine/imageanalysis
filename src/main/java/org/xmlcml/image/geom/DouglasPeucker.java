@@ -70,12 +70,12 @@ public class DouglasPeucker {
 	 * Reduce the points in shape between the specified first and last index.
 	 * Mark the points to keep in marked[]
 	 * 
-	 * @param shape
-	 *            The original shape
-	 * @param marked
-	 *            The points to keep (marked as true)
-	 * @param tolerance
-	 *            The tolerance to determine if a point is kept
+//	 * @param shape
+//	 *            The original shape
+//	 * @param marked
+//	 *            The points to keep (marked as true)
+//	 * @param tolerance
+//	 *            The tolerance to determine if a point is kept
 	 * @param firstIdx
 	 *            The index in original shape's point of the starting point for
 	 *            this line segment

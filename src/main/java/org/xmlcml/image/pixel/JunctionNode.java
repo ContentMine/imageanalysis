@@ -21,6 +21,7 @@ import org.xmlcml.graphics.svg.SVGG;
  * @author pm286
  *
  */
+@Deprecated // replaced by PixelNode
 public class JunctionNode extends PixelNode {
 	
 	private final static Logger LOG = Logger.getLogger(JunctionNode.class);
@@ -43,7 +44,7 @@ public class JunctionNode extends PixelNode {
 	}
 
 	public JunctionNode(Pixel centre, Pixel stem) {
-		super(centre);
+		super(centre, null);
 		this.stem  = stem;
 	}
 

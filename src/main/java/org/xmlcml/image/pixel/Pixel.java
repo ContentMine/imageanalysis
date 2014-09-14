@@ -28,6 +28,7 @@ public class Pixel {
 	Point point;
 	private PixelList neighbourList;
 	PixelIsland island;
+	@Deprecated
 	private Marked marked = null;
 	int value = 0;
 
@@ -55,25 +56,28 @@ public class Pixel {
 		return neighbourList;
 	}
 
-	public PixelList getNeighbours(Marked marked) {
-		getOrCreateNeighbourList(null);
-//		LOG.debug("neighbours "+neighbourList.size());
-		PixelList markedList = new PixelList();
-		for (Pixel pixel : neighbourList) {
-			if (pixel.isMarked(marked) || Marked.ALL.equals(marked)) {
-				markedList.add(pixel);
-			}
-		}
-		return markedList;
-	}
+	@Deprecated
+//	public PixelList getNeighbours(Marked marked) {
+//		getOrCreateNeighbourList(null);
+////		LOG.debug("neighbours "+neighbourList.size());
+//		PixelList markedList = new PixelList();
+//		for (Pixel pixel : neighbourList) {
+//			if (pixel.isMarked(marked) || Marked.ALL.equals(marked)) {
+//				markedList.add(pixel);
+//			}
+//		}
+//		return markedList;
+//	}
 
-	public boolean isMarked(Marked m) {
-		return this.marked == null ? false : this.marked.equals(m);
-	}
-	
-	public void setMarked(Marked m) {
-		this.marked = m;
-	}
+//	@Deprecated
+//	public boolean isMarked(Marked m) {
+//		return this.marked == null ? false : this.marked.equals(m);
+//	}
+//	
+//	@Deprecated
+//	public void setMarked(Marked m) {
+//		this.marked = m;
+//	}
 
 	private void getOrCreateNeighbourList(PixelIsland island) {
 		if (neighbourList == null) {
@@ -142,6 +146,7 @@ public class Pixel {
 		return sb.toString();
 	}
 
+	@Deprecated
 	private Marked getMarked() {
 		return marked;
 	}

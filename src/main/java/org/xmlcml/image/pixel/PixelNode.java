@@ -17,6 +17,8 @@ public class PixelNode implements Comparable<PixelNode> {
 	private String label;
 	private String id;
 	private Set<Pixel> unusedNeighbours;
+	private PixelIsland island;
+	private PixelNucleus pixelNucleus;
 
 	protected PixelNode() {
 	}
@@ -27,6 +29,7 @@ public class PixelNode implements Comparable<PixelNode> {
 	
 	public PixelNode(Pixel pixel, PixelIsland island) {
 		this(pixel);
+		this.island = island;
 		addNeighboursToUnusedSet(pixel, island);
 	}
 
@@ -54,10 +57,22 @@ public class PixelNode implements Comparable<PixelNode> {
 	
 	public String toString() {
 		getCentrePixel();
+		getPixelNucleus();
 		StringBuilder sb = new StringBuilder((id == null) ? "" : id+" ");
 		sb.append((label == null) ? "" : " "+label+" ");
 		sb.append((centrePixel == null) ? "?" : String.valueOf(centrePixel));
 		return sb.toString();
+	}
+
+	public PixelNucleus getPixelNucleus() {
+		ensurePixelNucleus();
+		return pixelNucleus;
+	}
+
+	private void ensurePixelNucleus() {
+		if (pixelNucleus == null && island != null) {
+			pixelNucleus = island.getPixelNucleusByPixelMap().get(centrePixel);
+		}
 	}
 
 	public PixelList getDiagonalNeighbours(PixelIsland island) {
@@ -142,5 +157,9 @@ public class PixelNode implements Comparable<PixelNode> {
 		ensureUnusedNeighbours();
 		unusedNeighbours.remove(neighbour);
 		LOG.trace(this+" removed: "+neighbour+" unused: "+unusedNeighbours);
+	}
+
+	public void setCentrePixel(Pixel pixel) {
+		this.centrePixel = pixel;
 	}
 }

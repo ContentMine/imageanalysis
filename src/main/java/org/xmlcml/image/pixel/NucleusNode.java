@@ -1,6 +1,6 @@
 package org.xmlcml.image.pixel;
 
-
+@Deprecated
 public class NucleusNode extends PixelNode {
 
 	private PixelNucleus nucleus;

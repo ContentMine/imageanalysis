@@ -71,10 +71,13 @@ public class PixelIsland implements Iterable<Pixel> {
 	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
+	@Deprecated
 	private Set<PixelTriangle> triangleSet;
 	private String pixelColor = "red";
+	@Deprecated
 	private Set<PixelCycle> circleSet;
 	private PixelGraph connectionTable;
+	@Deprecated
 	private Set<Pixel> cornerSet;
 	private ImageParameters parameters;
 	private PixelNodeList pixelNodeList;
@@ -82,10 +85,11 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelList singleHoleList;
 	private PixelList orthogonalStubList;
 	private PixelNucleusList pixelNucleusList;
-	private PixelNucleusList yJunctions;
-	private PixelNucleusList crossJunctions;
-	private PixelNucleusList tJunctions;
-	private PixelNucleusList doubleYJunctions;
+	private PixelNucleusList terminalJunctionList;
+	private PixelNucleusList yJunctionList;
+	private PixelNucleusList crossJunctionList;
+	private PixelNucleusList tJunctionList;
+	private PixelNucleusList doubleYJunctionList;
 	private Map<Pixel, PixelNucleus> pixelNucleusByPixelMap;
 
 	public PixelIsland() {
@@ -474,6 +478,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
+	@Deprecated
 	private PixelPath findTerminalOrBranch(Pixel terminalPixel) {
 		PixelPath pixelPath = new PixelPath();
 		usedPixels = new HashSet<Pixel>();
@@ -503,6 +508,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixelPath;
 	}
 
+	@Deprecated
 	private Pixel getNextPixel(Pixel pixel) {
 		LOG.trace(pixel);
 		PixelList neighbours = pixel.getOrCreateNeighbours(this);
@@ -535,6 +541,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * @param currentPixel
 	 * @return nextPixel far side of nucleus
 	 */
+	@Deprecated
 	private Pixel processNucleusAndGetNextPixel(Nucleus nucleus,
 			Pixel currentPixel) {
 		Pixel nextPixel = null;
@@ -566,6 +573,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		return nextPixel;
 	}
 
+	@Deprecated
 	private Set<Pixel> getUsedNeighbours(Pixel currentPixel) {
 		Set<Pixel> usedNeighbours = new HashSet<Pixel>();
 		PixelList neighbours = currentPixel.getOrCreateNeighbours(this);
@@ -756,8 +764,8 @@ public class PixelIsland implements Iterable<Pixel> {
 		Int2Range bbox = this.getIntBoundingBox();
 		int xmin = bbox.getXRange().getMin();
 		int ymin = bbox.getYRange().getMin();
-		int w = bbox.getXRange().getRange();
-		int h = bbox.getYRange().getRange();
+		int w = bbox.getXRange().getRange() + 1; // this was a bug
+		int h = bbox.getYRange().getRange() + 1; // and this
 		BufferedImage image = null;
 		if (w == 0 || h == 0) {
 			LOG.trace("zero pixel image");
@@ -778,6 +786,8 @@ public class PixelIsland implements Iterable<Pixel> {
 			if (x < w && y < h) {
 				image.setRGB(x, y, 0);
 				wrote++;
+			} else {
+				LOG.error("Tried to write pixel outside image area "+xy);
 			}
 		}
 		LOG.trace("created image, size: " + pixelList.size()+" "+wrote);
@@ -1073,6 +1083,8 @@ public class PixelIsland implements Iterable<Pixel> {
 		PixelList nodePixelList = new PixelList();
 		ensurePixelNucleusByPixelMap();
 		LOG.trace("Nucleus "+pixelNucleusByPixelMap.size());
+		indexTerminalJunctions();
+		LOG.trace("Terminal "+terminalJunctionList);
 		indexYJunctions();
 		indexDoubleYJunctions();
 		indexTJunctions(); // must come after Y junctions
@@ -1081,8 +1093,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		for (Pixel pixel : pixelList) {
 			int neighbourCount = getNeighbourCount(pixel);
 			if (neighbourCount == 0) {
-				nodePixelList.add(pixel);
-			} else if (neighbourCount == 1) {
 				nodePixelList.add(pixel);
 			} else if (neighbourCount != 2) {
 				PixelNucleus pixelNucleus = pixelNucleusByPixelMap.get(pixel);
@@ -1106,7 +1116,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private void indexTJunctions() {
 		this.getOrCreateTJunctionList();
-		for (PixelNucleus tJunction : tJunctions) {
+		for (PixelNucleus tJunction : tJunctionList) {
 			PixelList tPixels = tJunction.getPixelList();
 			for (Pixel tPixel : tPixels) {
 				pixelNucleusByPixelMap.put(tPixel, tJunction);
@@ -1114,30 +1124,35 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 	
+
 	public PixelNucleusList getOrCreateTJunctionList() {
-		if (tJunctions == null) {
-			tJunctions = new PixelNucleusList();
+		if (tJunctionList == null) {
+			tJunctionList = new PixelNucleusList();
 			getOrCreatePixelNucleusList();
 			for (PixelNucleus pixelNucleus : pixelNucleusList) {
-				LOG.trace("testing nucleus "+pixelNucleus);
 				if (pixelNucleus.isTJunction()) {
-					tJunctions.add(pixelNucleus);
-					LOG.trace("added nucleus "+pixelNucleus);
+					tJunctionList.add(pixelNucleus);
 				}
 			}
-			LOG.trace("NUCLEUS "+pixelNucleusList.size()+" TJUNCTIONS: "+tJunctions.size());
-			for (PixelNucleus tJunction : tJunctions) {
-				LOG.trace("TJ "+tJunction.toString());
-			}
 		}
-		return tJunctions;
+		return tJunctionList;
 	}
 
 
 	
+	private void indexTerminalJunctions() {
+		this.getOrCreateTerminalJunctionList();
+		for (PixelNucleus terminalJunction : terminalJunctionList) {
+			PixelList yPixels = terminalJunction.getPixelList();
+			for (Pixel yPixel : yPixels) {
+				pixelNucleusByPixelMap.put(yPixel, terminalJunction);
+			}
+		}
+	}
+	
 	private void indexYJunctions() {
 		this.getOrCreateYJunctionList();
-		for (PixelNucleus yJunction : yJunctions) {
+		for (PixelNucleus yJunction : yJunctionList) {
 			PixelList yPixels = yJunction.getPixelList();
 			for (Pixel yPixel : yPixels) {
 				pixelNucleusByPixelMap.put(yPixel, yJunction);
@@ -1147,7 +1162,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	
 	private void indexDoubleYJunctions() {
 		this.getOrCreateDoubleYJunctionList();
-		for (PixelNucleus doubleYJunction : doubleYJunctions) {
+		for (PixelNucleus doubleYJunction : doubleYJunctionList) {
 			PixelList doubleYPixels = doubleYJunction.getPixelList();
 			for (Pixel doubleYPixel : doubleYPixels) {
 				pixelNucleusByPixelMap.put(doubleYPixel, doubleYJunction);
@@ -1157,7 +1172,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	
 	private void indexCrossJunctions() {
 		this.getOrCreateCrossJunctionList();
-		for (PixelNucleus crossJunction : crossJunctions) {
+		for (PixelNucleus crossJunction : crossJunctionList) {
 			PixelList crossPixels = crossJunction.getPixelList();
 			for (Pixel crossPixel : crossPixels) {
 				pixelNucleusByPixelMap.put(crossPixel, crossJunction);
@@ -1193,7 +1208,7 @@ public class PixelIsland implements Iterable<Pixel> {
 			pixelList = this.getPixelList();
 			for (Pixel pixel : this.pixelList) {
 				boolean added = false;
-				if (pixel.getOrCreateNeighbours(this).size() > 2) {
+				if (pixel.getOrCreateNeighbours(this).size() != 2) {
 					for (PixelNucleus nucleus : pixelNucleusList) {
 						if (nucleus.canTouch(pixel)) {
 							nucleus.add(pixel);
@@ -1415,7 +1430,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public void rearrangeYJunctions() {
 		this.getOrCreateYJunctionList();
-		for (PixelNucleus yJunction : yJunctions) {
+		for (PixelNucleus yJunction : yJunctionList) {
 			LOG.trace("rearrange Y "+yJunction);
 			if (yJunction.rearrangeYJunction(this)) {
 				LOG.trace("rearranged Y junction: "+yJunction);
@@ -1423,43 +1438,56 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
+	public PixelNucleusList getOrCreateTerminalJunctionList() {
+		if (terminalJunctionList == null) {
+			terminalJunctionList = new PixelNucleusList();
+			getOrCreatePixelNucleusList();
+			for (PixelNucleus pixelNucleus : pixelNucleusList) {
+				if (pixelNucleus.isTerminalJunction()) {
+					terminalJunctionList.add(pixelNucleus);
+				}
+			}
+		}
+		return terminalJunctionList;
+	}
+
 	public PixelNucleusList getOrCreateYJunctionList() {
-		if (yJunctions == null) {
-			yJunctions = new PixelNucleusList();
+		if (yJunctionList == null) {
+			yJunctionList = new PixelNucleusList();
 			getOrCreatePixelNucleusList();
 			for (PixelNucleus pixelNucleus : pixelNucleusList) {
 				if (pixelNucleus.isYJunction()) {
-					yJunctions.add(pixelNucleus);
+					yJunctionList.add(pixelNucleus);
 				}
 			}
 		}
-		return yJunctions;
+		return yJunctionList;
 	}
 
 	public PixelNucleusList getOrCreateDoubleYJunctionList() {
-		if (doubleYJunctions == null) {
-			doubleYJunctions = new PixelNucleusList();
+		if (doubleYJunctionList == null) {
+			doubleYJunctionList = new PixelNucleusList();
 			getOrCreatePixelNucleusList();
 			for (PixelNucleus pixelNucleus : pixelNucleusList) {
 				if (pixelNucleus.isDoubleYJunction()) {
-					doubleYJunctions.add(pixelNucleus);
+					doubleYJunctionList.add(pixelNucleus);
 				}
 			}
 		}
-		return doubleYJunctions;
+		return doubleYJunctionList;
 	}
 
 	public PixelNucleusList getOrCreateCrossJunctionList() {
-		if (crossJunctions == null) {
-			crossJunctions = new PixelNucleusList();
+		if (crossJunctionList == null) {
+			crossJunctionList = new PixelNucleusList();
 			getOrCreatePixelNucleusList();
 			for (PixelNucleus pixelNucleus : pixelNucleusList) {
 				if (pixelNucleus.isCrossJunction()) {
-					crossJunctions.add(pixelNucleus);
+					crossJunctionList.add(pixelNucleus);
 				}
 			}
 		}
-		return crossJunctions;
+		return crossJunctionList;
 	}
 
 	public void recomputeNeighbours() {
@@ -1496,6 +1524,53 @@ public class PixelIsland implements Iterable<Pixel> {
 			}
 		}
 	}
+	
+	public Map<Pixel, PixelNucleus> getPixelNucleusByPixelMap() {
+		ensurePixelNucleusByPixelMap();
+		return pixelNucleusByPixelMap;
+	}
+	
+	public PixelNucleusList getTerminalJunctionList() {
+		getOrCreateTerminalJunctionList();
+		return terminalJunctionList;
+	}
+
+	public PixelNucleusList getTJunctionList() {
+		getOrCreateTJunctionList();
+		return tJunctionList;
+	}
+
+	public PixelNucleusList getYJunctionList() {
+		getOrCreateYJunctionList();
+		return yJunctionList;
+	}
+
+	public PixelNucleusList getDoubleYJunctionList() {
+		getOrCreateDoubleYJunctionList();
+		return doubleYJunctionList;
+	}
+
+	public PixelNucleusList getCrossJunctionList() {
+		getOrCreateCrossJunctionList();
+		return crossJunctionList;
+	}
+	
+	public PixelNucleusList getThreewayJunctionList() {
+		PixelNucleusList threewayList = new PixelNucleusList();
+		threewayList.addAll(getTJunctionList());
+		threewayList.addAll(getYJunctionList());
+		return crossJunctionList;
+	}
+
+	/** adds translation to all pixels
+	 * 
+	 * @param translation
+	 */
+	public PixelIsland createTranslate(Int2 translation) {
+		throw new RuntimeException("NYI");
+	}
+	
+	
 
 //	/** create rings of pixels starting at the outside.
 //	 * 
