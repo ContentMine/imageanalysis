@@ -112,20 +112,20 @@ public class JunctionNode extends PixelNode {
 		return neighbours;
 	}
 	
-	public static void drawJunctions(JunctionSet junctionSet, SVGG g, double size) {
-		for (PixelNode junction : junctionSet) {
-			LOG.trace("DrawJunctions");
-			Pixel centrePixel = junction.getCentrePixel();
-			SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), size);
-			if (((JunctionNode)junction).isYJunction()) {
-				LOG.debug("ISY");
-				circle.setStrokeWidth(1.);
-			}
-			circle.setOpacity(0.2);
-			circle.setFill("yellow");
-			g.appendChild(circle);
-		}
-	}
+//	public static void drawJunctions(JunctionSet junctionSet, SVGG g, double size) {
+//		for (PixelNode junction : junctionSet) {
+//			LOG.trace("DrawJunctions");
+//			Pixel centrePixel = junction.getCentrePixel();
+//			SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), size);
+//			if (((JunctionNode)junction).isYJunction()) {
+//				LOG.debug("ISY");
+//				circle.setStrokeWidth(1.);
+//			}
+//			circle.setOpacity(0.2);
+//			circle.setFill("yellow");
+//			g.appendChild(circle);
+//		}
+//	}
 
 	public PixelList getNonJunctionPixels() {
 		PixelList nonJunctionPixelList = new PixelList();

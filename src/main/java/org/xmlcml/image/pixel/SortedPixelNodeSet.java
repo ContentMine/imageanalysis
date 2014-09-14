@@ -67,8 +67,8 @@ public class SortedPixelNodeSet implements Iterable<PixelNode> {
 		return sortedSet.contains(node);
 	}
 	
-	public void removeAll(List<JunctionNode> junctions) {
-		sortedSet.removeAll(junctions);
+	public void removeAll(List<PixelNode> pixelNodeList) {
+		sortedSet.removeAll(pixelNodeList);
 	}
 
 	
