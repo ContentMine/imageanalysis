@@ -65,8 +65,8 @@ public class PixelGraphTest {
 		island.addPixel(new Pixel(-1,2));
 		island.addPixel(new Pixel(0, 3));
 		PixelGraph graph = PixelGraph.createGraph(island);
-		PixelCycle cycle = graph.getCycle();
-		Assert.assertNull(cycle);
+//		PixelCycle cycle = graph.getCycle();
+//		Assert.assertNull(cycle);
 //		// no junctions
 //		JunctionSet junctionSet = graph.getJunctionSet();
 //		Assert.assertNotNull(junctionSet);
@@ -95,8 +95,8 @@ public class PixelGraphTest {
 		island.addPixel(new Pixel(2, -2));
 		island.addPixel(new Pixel(3, -3));
 		PixelGraph graph = PixelGraph.createGraph(island);
-		PixelCycle cycle = graph.getCycle();
-		Assert.assertNull(cycle);
+//		PixelCycle cycle = graph.getCycle();
+//		Assert.assertNull(cycle);
 		// fails
 		PixelEdgeList edgeList = graph.getPixelEdgeList();
 //		Assert.assertEquals(3, edgeList.size()); 

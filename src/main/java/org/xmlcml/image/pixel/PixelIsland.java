@@ -71,11 +71,11 @@ public class PixelIsland implements Iterable<Pixel> {
 	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
-	@Deprecated
-	private Set<PixelTriangle> triangleSet;
+//	@Deprecated
+//	private Set<PixelTriangle> triangleSet;
 	private String pixelColor = "red";
-	@Deprecated
-	private Set<PixelCycle> circleSet;
+//	@Deprecated
+//	private Set<PixelCycle> circleSet;
 	private PixelGraph connectionTable;
 	@Deprecated
 	private Set<Pixel> cornerSet;
@@ -412,27 +412,27 @@ throw new RuntimeException("HOPEFULLY OBSOLETE");
 		}
 	}
 
-	/**
-	 * remove any diagonal neighbours where other connecting pixels exist.
-	 * 
-	 * In 1.2 ..3
-	 * 
-	 * the neighbours might be 1-2 2-3 1-3, remove the 1-3
-	 * 
-	 * in 1.2 ....3
-	 * 
-	 * the neighbours are 1-2 and 2-3 - leave them
-	 * 
-	 * Not sure this is what we want
-	 * 
-	 */
-	void removeHypotenuses() {
-		createTriangleSet();
-		LOG.trace("triangle " + triangleSet);
-		for (PixelTriangle t : triangleSet) {
-			t.removeDiagonalNeighbours();
-		}
-	}
+//	/**
+//	 * remove any diagonal neighbours where other connecting pixels exist.
+//	 * 
+//	 * In 1.2 ..3
+//	 * 
+//	 * the neighbours might be 1-2 2-3 1-3, remove the 1-3
+//	 * 
+//	 * in 1.2 ....3
+//	 * 
+//	 * the neighbours are 1-2 and 2-3 - leave them
+//	 * 
+//	 * Not sure this is what we want
+//	 * 
+//	 */
+//	void removeHypotenuses() {
+//		createTriangleSet();
+//		LOG.trace("triangle " + triangleSet);
+//		for (PixelTriangle t : triangleSet) {
+//			t.removeDiagonalNeighbours();
+//		}
+//	}
 
 	/**
 	 * remove steps and leave diagonal connections.
@@ -476,13 +476,13 @@ throw new RuntimeException("HOPEFULLY OBSOLETE");
 		return removed;
 	}
 
-	private void createTriangleSet() {
-		triangleSet = new HashSet<PixelTriangle>();
-		for (Pixel pixel : pixelList) {
-			Set<PixelTriangle> triangleSet = pixel.getTriangles(this);
-			this.triangleSet.addAll(triangleSet);
-		}
-	}
+//	private void createTriangleSet() {
+//		triangleSet = new HashSet<PixelTriangle>();
+//		for (Pixel pixel : pixelList) {
+//			Set<PixelTriangle> triangleSet = pixel.getTriangles(this);
+//			this.triangleSet.addAll(triangleSet);
+//		}
+//	}
 
 //	@Deprecated
 //	private PixelPath findTerminalOrBranch(Pixel terminalPixel) {

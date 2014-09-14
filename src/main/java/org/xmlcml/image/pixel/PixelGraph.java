@@ -44,7 +44,7 @@ public class PixelGraph {
 
 	private PixelEdgeList pixelEdgeList;
 	private PixelNodeList pixelNodeList;
-	private PixelCycle cycle;
+//	private PixelCycle cycle;
 	private PixelList pixelList;
 //	private JunctionSet junctionSet;
 //	private TerminalNodeSet terminalNodeSet;
@@ -413,18 +413,18 @@ public class PixelGraph {
 		return next;
 	}
 
-	private void add(PixelCycle cycle) {
-		if (this.cycle != null) {
-			throw new RuntimeException("Cannot add cycle twice");
-		}
-		this.cycle = cycle;
-	}
+//	private void add(PixelCycle cycle) {
+//		if (this.cycle != null) {
+//			throw new RuntimeException("Cannot add cycle twice");
+//		}
+//		this.cycle = cycle;
+//	}
 
-	public PixelCycle getCycle() {
-		this.createNodesAndEdges();
-//		createGraph();
-		return cycle;
-	}
+//	public PixelCycle getCycle() {
+//		this.createNodesAndEdges();
+////		createGraph();
+//		return cycle;
+//	}
 
 	public PixelNode getPixelNode(Pixel pixel) {
 		return pixel == null ? null : nodeByPixelMap.get(pixel);
@@ -523,7 +523,7 @@ public class PixelGraph {
 		String s = "";
 		s += "; edges: " + (pixelEdgeList == null ? "none" : pixelEdgeList.toString());
 		s += "; nodes: " + (pixelNodeList == null ? "none" : pixelNodeList.toString());
-		s += "; cycle: " + (cycle == null ? "none" : cycle.toString());
+//		s += "; cycle: " + (cycle == null ? "none" : cycle.toString());
 		return s;
 	}
 
@@ -845,6 +845,10 @@ public class PixelGraph {
 			g.appendChild(segments);
 		}
 		return g;
+	}
+
+	public void createAndDrawGraph(SVGG g) {
+		LOG.error("createAndDrawGraph NYI");
 	}
 
 }

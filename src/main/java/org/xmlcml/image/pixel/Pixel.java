@@ -187,19 +187,19 @@ public class Pixel {
 		point = new Point(int2.getX(), int2.getY());
 	}
 
-	public Set<PixelTriangle> getTriangles(PixelIsland island) {
-		Set<PixelTriangle> triangleSet = new HashSet<PixelTriangle>();
-		PixelList neighbours = this.getOrCreateNeighbours(island);
-		for (int i = 0; i < neighbours.size() - 1; i++) {
-			for (int j = i+1; j < neighbours.size(); j++) {
-				PixelTriangle triangle = PixelTriangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
-				if (triangle != null ) {
-					triangleSet.add(triangle);
-				}
-			}
-		}
-		return triangleSet;
-	}
+//	public Set<PixelTriangle> getTriangles(PixelIsland island) {
+//		Set<PixelTriangle> triangleSet = new HashSet<PixelTriangle>();
+//		PixelList neighbours = this.getOrCreateNeighbours(island);
+//		for (int i = 0; i < neighbours.size() - 1; i++) {
+//			for (int j = i+1; j < neighbours.size(); j++) {
+//				PixelTriangle triangle = PixelTriangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
+//				if (triangle != null ) {
+//					triangleSet.add(triangle);
+//				}
+//			}
+//		}
+//		return triangleSet;
+//	}
 
 	public void clearNeighbours() {
 		this.neighbourList = null;

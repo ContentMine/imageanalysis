@@ -38,15 +38,6 @@ import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.geom.DouglasPeucker;
-import org.xmlcml.image.pixel.FloodFill;
-import org.xmlcml.image.pixel.Nucleus;
-import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelIsland;
-import org.xmlcml.image.pixel.PixelIslandComparator;
-import org.xmlcml.image.pixel.PixelIslandList;
-import org.xmlcml.image.pixel.PixelList;
-import org.xmlcml.image.pixel.PixelPath;
-import org.xmlcml.image.pixel.PixelProcessor;
 import org.xmlcml.image.processing.ListComparator;
 
 import com.google.common.collect.Multimap;
