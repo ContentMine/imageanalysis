@@ -484,19 +484,19 @@ public class PixelIslandTest {
 		island.debugSVG("target/pixelIsland/branch.svg");
 	}
 
-	/**
-	 * this one has a terminal nucleus
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	@Ignore
-	public void testDehypotenuse() throws IOException {
-		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINAL_PNG);
-		island.removeHypotenuses();
-		List<Nucleus> nucleusList = island.getNucleusList();
-		LOG.trace("NUC " + nucleusList);
-	}
+//	/**
+//	 * this one has a terminal nucleus
+//	 * 
+//	 * @throws IOException
+//	 */
+//	@Test
+//	@Ignore
+//	public void testDehypotenuse() throws IOException {
+//		PixelIsland island = createFirstPixelIsland(Fixtures.TERMINAL_PNG);
+//		island.removeHypotenuses();
+//		List<Nucleus> nucleusList = island.getNucleusList();
+//		LOG.trace("NUC " + nucleusList);
+//	}
 
 	@Test
 	public void testBoundingBox2() throws IOException {

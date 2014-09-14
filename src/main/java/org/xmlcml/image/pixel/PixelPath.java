@@ -27,8 +27,8 @@ public class PixelPath {
 	private List<Real2> rawPoints;
 	private PixelList pixelList;
 	private List<Real2> segmentPoints;
-	private Nucleus finalNucleus;
-	private Nucleus startNucleus;
+//	private Nucleus finalNucleus;
+//	private Nucleus startNucleus;
 
 	public PixelPath() {
 		pixelList = new PixelList();
@@ -79,12 +79,12 @@ public class PixelPath {
 				Int2 int2 = pixel.getInt2();
 				rawPoints.add(new Real2(int2.getX(), int2.getY()));
 			}
-			if (finalNucleus != null) {
-				Real2 centre = finalNucleus.getCentre();
-				// don't add as causes instability; needs further work
-//				rawPoints.add(centre);
-				LOG.trace("CC "+centre+" "+rawPoints);
-			}
+//			if (finalNucleus != null) {
+//				Real2 centre = finalNucleus.getCentre();
+//				// don't add as causes instability; needs further work
+////				rawPoints.add(centre);
+//				LOG.trace("CC "+centre+" "+rawPoints);
+//			}
 		}
 		return rawPoints;
 	}
@@ -111,13 +111,13 @@ public class PixelPath {
 		return segmentPoints;
 	}
 
-	public void addFinalNucleus(Nucleus nucleus) {
-		this.finalNucleus = nucleus;
-	}
-
-	public void addStartNucleus(Nucleus nucleus) {
-		this.startNucleus = nucleus;
-	}
+//	public void addFinalNucleus(Nucleus nucleus) {
+//		this.finalNucleus = nucleus;
+//	}
+//
+//	public void addStartNucleus(Nucleus nucleus) {
+//		this.startNucleus = nucleus;
+//	}
 
 	public PixelList getPixelList() {
 		return this.pixelList;

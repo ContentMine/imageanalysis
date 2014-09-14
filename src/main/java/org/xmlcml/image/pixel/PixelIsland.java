@@ -63,9 +63,9 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
-	private List<Nucleus> nucleusList;
+//	private List<Nucleus> nucleusList;
 	private PixelList terminalPixels;
-	private Map<Pixel, Nucleus> nucleusMap;
+//	private Map<Pixel, Nucleus> nucleusMap;
 	private Set<Pixel> usedPixels;
 	private List<PixelPath> pixelPathList;
 	private double tolerance = 1.5;
@@ -201,58 +201,58 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public PixelList getTerminalPixels() {
 		terminalPixels = getPixelsWithNeighbourCount(1);
-		PixelList terminalSpikedList = getTerminalSpikes();
-		if (terminalSpikedList.size() > 0) {
-			terminalPixels.addAll(terminalSpikedList);
-			LOG.trace("adding pseudo-terminals: " + terminalSpikedList);
-		}
+//		PixelList terminalSpikedList = getTerminalSpikes();
+//		if (terminalSpikedList.size() > 0) {
+//			terminalPixels.addAll(terminalSpikedList);
+//			LOG.trace("adding pseudo-terminals: " + terminalSpikedList);
+//		}
 		return terminalPixels;
 	}
 
-	/**
-	 * finds spikes on nuclei that are actually terminals.
-	 * 
-	 * Example: 1 2 3 4 5 6 7
-	 * 
-	 * 1234 should be a nucleus but it may be a 3-nucleus (2,3,4) with a
-	 * pseudo-spike 1 return it to the nucleus and remove it from the spike set
-	 * and label it as a terminal.
-	 * 
-	 * Believe the algorithm is (a) find nuclei (b) find spikeset (c) see if any
-	 * spikes have 2-neighbours, both in nucleus
-	 * 
-	 * @return
-	 */
-	private PixelList getTerminalSpikes() {
-		PixelList terminalList = new PixelList();
-		// Pixel terminalSpike = null;
-		if (nucleusList != null) {
-			for (Nucleus nucleus : nucleusList) {
-				Set<Pixel> spikeSet = nucleus.getSpikeSet();
-				for (Pixel spike : spikeSet) {
-					PixelList spikeNeighbours = spike.getOrCreateNeighbours(this);
-					if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
-						terminalList.add(spike);
-					}
-				}
-			}
-		}
-		return terminalList;
-	}
-
-	private boolean has2NeighboursInNucleus(Nucleus nucleus,
-			PixelList spikeNeighbours) {
-		boolean terminal = false;
-		if (spikeNeighbours.size() == 2) {
-			terminal = true;
-			for (Pixel neighbour : spikeNeighbours) {
-				if (!nucleus.contains(neighbour)) {
-					terminal = false;
-				}
-			}
-		}
-		return terminal;
-	}
+//	/**
+//	 * finds spikes on nuclei that are actually terminals.
+//	 * 
+//	 * Example: 1 2 3 4 5 6 7
+//	 * 
+//	 * 1234 should be a nucleus but it may be a 3-nucleus (2,3,4) with a
+//	 * pseudo-spike 1 return it to the nucleus and remove it from the spike set
+//	 * and label it as a terminal.
+//	 * 
+//	 * Believe the algorithm is (a) find nuclei (b) find spikeset (c) see if any
+//	 * spikes have 2-neighbours, both in nucleus
+//	 * 
+//	 * @return
+//	 */
+//	private PixelList getTerminalSpikes() {
+//		PixelList terminalList = new PixelList();
+//		// Pixel terminalSpike = null;
+//		if (nucleusList != null) {
+//			for (Nucleus nucleus : nucleusList) {
+//				Set<Pixel> spikeSet = nucleus.getSpikeSet();
+//				for (Pixel spike : spikeSet) {
+//					PixelList spikeNeighbours = spike.getOrCreateNeighbours(this);
+//					if (has2NeighboursInNucleus(nucleus, spikeNeighbours)) {
+//						terminalList.add(spike);
+//					}
+//				}
+//			}
+//		}
+//		return terminalList;
+//	}
+//
+//	private boolean has2NeighboursInNucleus(Nucleus nucleus,
+//			PixelList spikeNeighbours) {
+//		boolean terminal = false;
+//		if (spikeNeighbours.size() == 2) {
+//			terminal = true;
+//			for (Pixel neighbour : spikeNeighbours) {
+//				if (!nucleus.contains(neighbour)) {
+//					terminal = false;
+//				}
+//			}
+//		}
+//		return terminal;
+//	}
 
 	public PixelList getPixelsWithNeighbourCount(int neighbourCount) {
 		PixelList pixels = new PixelList();
@@ -312,42 +312,42 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
-	public List<Nucleus> getNucleusList() {
-		nucleusList = new ArrayList<Nucleus>();
-		nucleusMap = new HashMap<Pixel, Nucleus>();
-		Set<Pixel> multiplyConnectedPixels = new HashSet<Pixel>();
-		for (int i = 3; i <= 8; i++) {
-			multiplyConnectedPixels.addAll(getPixelsWithNeighbourCount(i).getList());
-		}
-		while (multiplyConnectedPixels.size() > 0) {
-			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
-			nucleusList.add(nucleus);
-			LOG.trace("nucl " + nucleus.toString());
-		}
-		LOG.trace("nuclei: " + nucleusList.size());
-		return nucleusList;
-	}
-
-	private Nucleus makeNucleus(Set<Pixel> multiplyConnectedPixels) {
-		Nucleus nucleus = new Nucleus(this);
-		Stack<Pixel> pixelStack = new Stack<Pixel>();
-		Pixel pixel = multiplyConnectedPixels.iterator().next();
-		removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, pixel);
-		while (!pixelStack.isEmpty()) {
-			pixel = pixelStack.pop();
-			nucleus.add(pixel);
-			nucleusMap.put(pixel, nucleus);
-			PixelList neighbours = pixel.getOrCreateNeighbours(this);
-			for (Pixel neighbour : neighbours) {
-				if (!nucleus.contains(neighbour)
-						&& multiplyConnectedPixels.contains(neighbour)) {
-					removeFromSetAndPushOnStack(multiplyConnectedPixels,
-							pixelStack, neighbour);
-				}
-			}
-		}
-		return nucleus;
-	}
+//	public List<Nucleus> getNucleusList() {
+//		nucleusList = new ArrayList<Nucleus>();
+//		nucleusMap = new HashMap<Pixel, Nucleus>();
+//		Set<Pixel> multiplyConnectedPixels = new HashSet<Pixel>();
+//		for (int i = 3; i <= 8; i++) {
+//			multiplyConnectedPixels.addAll(getPixelsWithNeighbourCount(i).getList());
+//		}
+//		while (multiplyConnectedPixels.size() > 0) {
+//			Nucleus nucleus = makeNucleus(multiplyConnectedPixels);
+//			nucleusList.add(nucleus);
+//			LOG.trace("nucl " + nucleus.toString());
+//		}
+//		LOG.trace("nuclei: " + nucleusList.size());
+//		return nucleusList;
+//	}
+//
+//	private Nucleus makeNucleus(Set<Pixel> multiplyConnectedPixels) {
+//		Nucleus nucleus = new Nucleus(this);
+//		Stack<Pixel> pixelStack = new Stack<Pixel>();
+//		Pixel pixel = multiplyConnectedPixels.iterator().next();
+//		removeFromSetAndPushOnStack(multiplyConnectedPixels, pixelStack, pixel);
+//		while (!pixelStack.isEmpty()) {
+//			pixel = pixelStack.pop();
+//			nucleus.add(pixel);
+//			nucleusMap.put(pixel, nucleus);
+//			PixelList neighbours = pixel.getOrCreateNeighbours(this);
+//			for (Pixel neighbour : neighbours) {
+//				if (!nucleus.contains(neighbour)
+//						&& multiplyConnectedPixels.contains(neighbour)) {
+//					removeFromSetAndPushOnStack(multiplyConnectedPixels,
+//							pixelStack, neighbour);
+//				}
+//			}
+//		}
+//		return nucleus;
+//	}
 
 	private void removeFromSetAndPushOnStack(
 			Set<Pixel> multiplyConnectedPixels, Stack<Pixel> pixelStack,
@@ -377,12 +377,17 @@ public class PixelIsland implements Iterable<Pixel> {
 //		}
 //	}
 
+	/** may need refactoring
+	 * 
+	 * @return
+	 */
 	List<PixelPath> getOrCreatePixelPathList() {
 		if (pixelPathList == null) {
-			removeHypotenuses();
-			getNucleusList();
-			getTerminalPixels();
-			pixelPathList = createPixelPathListFromTerminals();
+			throw new RuntimeException("HOPEFULLY OBSOLETE");
+//			removeHypotenuses();
+//			getNucleusList();
+//			getTerminalPixels();
+//			pixelPathList = createPixelPathListFromTerminals();
 		}
 		return pixelPathList;
 	}
