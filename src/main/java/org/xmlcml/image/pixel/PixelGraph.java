@@ -199,45 +199,43 @@ public class PixelGraph {
 			if (junctionSet != null) {
 				unusedNodes.addAll(junctionSet.getList());
 			}
-			createNucleiFromJunctionSet(unusedNodes);
+			createNucleiFromPixelNodes(unusedNodes);
 		}
 		return nucleusByJunctionMap;
 	}
 
-	private void createNucleiFromJunctionSet(Set<PixelNode> unusedNodes) {
+	private void createNucleiFromPixelNodes(Set<PixelNode> unusedNodes) {
 		while (!unusedNodes.isEmpty()) {
 			LOG.trace("unused " + unusedNodes.size());
 			// new nucleus, find next unused Junction
-			JunctionNode nextNode = (JunctionNode) unusedNodes.iterator().next();
+			PixelNode nextNode = unusedNodes.iterator().next();
 			unusedNodes.remove(nextNode);
-			Set<JunctionNode> nucleusNodeSet = new HashSet<JunctionNode>();
+			Set<PixelNode> nucleusNodeSet = new HashSet<PixelNode>();
 			nucleusNodeSet.add(nextNode);
 			PixelNucleus nucleus = new PixelNucleus(island);
 			getNucleusSet().add(nucleus);
-			// do we need this?
-			addNucleustoNucleusByJunctionMap(unusedNodes, nucleusNodeSet, nucleus);
 		}
 	}
 
-	private void addNucleustoNucleusByJunctionMap(Set<PixelNode> unusedNodes,
-			Set<JunctionNode> nucleusNodeSet, PixelNucleus nucleus) {
-		JunctionNode nextNode;
-		while (!nucleusNodeSet.isEmpty()) {
-			LOG.trace("nucleus " + nucleusNodeSet.size() + " "
-					+ nucleusNodeSet);
-			nextNode = nucleusNodeSet.iterator().next();
-			nucleus.add(nextNode);
-			nucleusByJunctionMap.put(nextNode, nucleus);
-			nucleusNodeSet.remove(nextNode);
-			List<JunctionNode> neighbourJunctions = getNeighbourJunctions(nextNode);
-			for (JunctionNode neighbourJunction : neighbourJunctions) {
-				if (!nucleus.contains(neighbourJunction)) {
-					nucleusNodeSet.add(neighbourJunction);
-					unusedNodes.remove(neighbourJunction);
-				}
-			}
-		}
-	}
+//	private void addNucleustoNucleusByJunctionMap(Set<PixelNode> unusedNodes,
+//			Set<PixelNode> nucleusNodeSet, PixelNucleus nucleus) {
+//		PixelNode nextNode;
+//		while (!nucleusNodeSet.isEmpty()) {
+//			LOG.trace("nucleus " + nucleusNodeSet.size() + " "
+//					+ nucleusNodeSet);
+//			nextNode = nucleusNodeSet.iterator().next();
+//			nucleus.add(nextNode);
+//			nucleusByJunctionMap.put(nextNode, nucleus);
+//			nucleusNodeSet.remove(nextNode);
+//			List<PixelNode> neighbourJunctions = getNeighbourJunctions(nextNode);
+//			for (JunctionNode neighbourJunction : neighbourJunctions) {
+//				if (!nucleus.contains(neighbourJunction)) {
+//					nucleusNodeSet.add(neighbourJunction);
+//					unusedNodes.remove(neighbourJunction);
+//				}
+//			}
+//		}
+//	}
 
 	public Map<JunctionNode, PixelNucleus> getNucleusByJunctionMap() {
 		return nucleusByJunctionMap;
@@ -478,19 +476,19 @@ public class PixelGraph {
 		return nodes;
 	}
 
-	public List<JunctionNode> getNeighbourJunctions(JunctionNode junction) {
-		List<JunctionNode> junctionList = new ArrayList<JunctionNode>();
-		PixelList neighbours = junction.getNeighbours();
-		if (neighbours != null) {
-			for (Pixel neighbour : neighbours) {
-				PixelNode pixelNode = getPixelNode(neighbour);
-				if (pixelNode instanceof JunctionNode) {
-					junctionList.add((JunctionNode) pixelNode);
-				}
-			}
-		}
-		return junctionList;
-	}
+//	public List<JunctionNode> getNeighbourJunctions(PixelNode junction) {
+//		List<JunctionNode> junctionList = new ArrayList<JunctionNode>();
+//		PixelList neighbours = junction.getNeighbours();
+//		if (neighbours != null) {
+//			for (Pixel neighbour : neighbours) {
+//				PixelNode pixelNode = getPixelNode(neighbour);
+//				if (pixelNode instanceof JunctionNode) {
+//					junctionList.add((JunctionNode) pixelNode);
+//				}
+//			}
+//		}
+//		return junctionList;
+//	}
 
 	public PixelList getPixelList() {
 		return pixelList;
@@ -512,7 +510,7 @@ public class PixelGraph {
 		if (nucleusByPixelMap == null) {
 			nucleusByPixelMap = new HashMap<Pixel, PixelNucleus>();
 			for (PixelNucleus nucleus : getNucleusSet()) {
-				JunctionSet junctionSet = nucleus.getJunctionSet();
+				PixelNodeList junctionSet = nucleus.getPixelNodeList();
 				for (PixelNode pixelNode : junctionSet) {
 					JunctionNode junction = (JunctionNode) pixelNode;
 					for (Pixel neighbour : junction.getNeighbours()) {
