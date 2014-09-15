@@ -16,7 +16,6 @@ import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
@@ -367,8 +366,9 @@ public class PixelGraph {
 			PixelEdgeList edgeList = node.getEdges();
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
-				SVGPolyline polyline = edge == null ? new SVGPolyline() : edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
-				if (polyline.size() == 1) {
+				PixelSegmentList pixelSegmentList = (edge == null) ? new PixelSegmentList() :
+				    edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
+				if (pixelSegmentList.size() == 1) {
 					pixelNodeList.add(node);
 				}
 			}
@@ -454,13 +454,13 @@ public class PixelGraph {
 		double extreme = Double.MAX_VALUE;
 		for (PixelEdge edge : pixelEdgeList) {
 			LOG.trace(edge);
-			SVGPolyline polyLine = edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
-			LOG.trace("PL "+polyLine.size()+"  /  "+polyLine.getReal2Array());
+			PixelSegmentList pixelSegmentList = edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
+			LOG.trace("PL "+pixelSegmentList.size()+"  /  "+pixelSegmentList.getReal2Array());
 			// look for goal post edge
-			if (polyLine.size() != 3) {
+			if (pixelSegmentList.size() != 3) {
 				continue;
 			}
-			Line2 crossbar = polyLine.createLineList().get(1).getEuclidLine();
+			Line2 crossbar = pixelSegmentList.get(1).getEuclidLine();
 			Real2 midPoint = crossbar.getMidPoint();
 			// LHS
 			if (ComparatorType.LEFT.equals(comparatorType) && crossbar.isVertical(ANGLE_EPS)) {
@@ -502,12 +502,12 @@ public class PixelGraph {
 		PixelNode midNode = null;
 		for (PixelEdge edge : pixelEdgeList) {
 			LOG.trace(edge.getPixelNodes());
-			SVGPolyline polyline = edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
-			Angle deviation = polyline.getSignedAngleOfDeviation();
+			PixelSegmentList pixelSegmentList = edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
+			Angle deviation = pixelSegmentList.getSignedAngleOfDeviation();
 			if (Math.abs(deviation.getRadian()) < 2.0) continue;
-			LOG.trace("POLY "+polyline.getLineList().get(0)+"/"+polyline.getLineList().get(polyline.size() - 1)+"/"+deviation);
-			if (polyline.size() == 3) {
-				SVGLine midline = polyline.getLineList().get(1);
+			LOG.trace("POLY "+pixelSegmentList.get(0)+"/"+pixelSegmentList.getLast()+"/"+deviation);
+			if (pixelSegmentList.size() == 3) {
+				SVGLine midline = pixelSegmentList.get(1).getLine();
 				Pixel midPixel = edge.getNearestPixelToMidPoint(midline.getMidPoint());
 				midNode = new PixelNode(midPixel, null);
 				pixelNodeList.add(midNode);
@@ -668,11 +668,11 @@ public class PixelGraph {
 	public SVGG createSegmentedEdges() {
 		SVGG g = new SVGG();
 		for (PixelEdge edge: pixelEdgeList) {
-			SVGPolyline segments = edge.getOrCreateSegmentedPolyline(parameters.getSegmentTolerance());
-			segments.setStroke(parameters.getStroke());
-			segments.setWidth(parameters.getLineWidth());
-			segments.setFill(parameters.getFill());
-			g.appendChild(segments);
+			PixelSegmentList pixelSegmentList = edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
+			pixelSegmentList.setStroke(parameters.getStroke());
+			pixelSegmentList.setWidth(parameters.getLineWidth());
+			pixelSegmentList.setFill(parameters.getFill());
+			g.appendChild(pixelSegmentList.getOrCreateSVG());
 		}
 		return g;
 	}

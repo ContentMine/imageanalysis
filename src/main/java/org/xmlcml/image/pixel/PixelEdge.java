@@ -5,7 +5,6 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
-import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.image.geom.DouglasPeucker;
 
@@ -16,7 +15,7 @@ public class PixelEdge {
 	private PixelNodeList nodes;
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
-	private SVGPolyline polyline;
+	private PixelSegmentList pixelSegmentList;
 
 	private String id;
 
@@ -118,14 +117,14 @@ public class PixelEdge {
 		return equals;
 	}
 
-	public SVGPolyline getOrCreateSegmentedPolyline(double tolerance) {
-		if (polyline == null) {
+	public PixelSegmentList getOrCreatePixelSegmentList(double tolerance) {
+		if (pixelSegmentList == null) {
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array points = pixelList.getReal2Array();
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
-			polyline = new SVGPolyline(pointArray);
+			pixelSegmentList = new PixelSegmentList(pointArray);
 		}
-		return polyline;
+		return pixelSegmentList;
 	}
 
 	public PixelNode getOtherNode(PixelNode pixelNode) {

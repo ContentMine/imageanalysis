@@ -61,7 +61,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private PixelList terminalPixels;
-	private List<PixelPath> pixelPathList;
+//	private List<PixelPath> pixelPathList;
 
 	private List<Real2Array> segmentArrayList;
 	private String pixelColor = "red";
@@ -546,10 +546,10 @@ public class PixelIsland implements Iterable<Pixel> {
 		return sb.toString();
 	}
 
-	public void removePixels(PixelPath pixelPath) {
-		PixelList pixelList = pixelPath.getPixelList();
-		removePixels(pixelList);
-	}
+//	public void removePixels(PixelPath pixelPath) {
+//		PixelList pixelList = pixelPath.getPixelList();
+//		removePixels(pixelList);
+//	}
 
 	public void removePixels(PixelList pixelList) {
 		for (Pixel pixel : pixelList) {
@@ -570,9 +570,9 @@ public class PixelIsland implements Iterable<Pixel> {
 //		return polylineList;
 //	}
 
-	public void setPixelPaths(List<PixelPath> pixelPaths) {
-		this.pixelPathList = pixelPaths;
-	}
+//	public void setPixelPaths(List<PixelPath> pixelPaths) {
+//		this.pixelPathList = pixelPaths;
+//	}
 
 //	private List<SVGPolyline> createPolylinesIteratively(double dpEpsilon,
 //			int maxiter) {
