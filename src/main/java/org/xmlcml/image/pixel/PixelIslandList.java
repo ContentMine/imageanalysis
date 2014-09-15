@@ -294,16 +294,16 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		this.pixelColor = color;
 	}
 
-	public List<List<SVGPolyline>> createPolylinesIteratively(double dpEpsilon,
-			int maxiter) {
-		List<List<SVGPolyline>> polylineListList = new ArrayList<List<SVGPolyline>>();
-		for (PixelIsland island : this) {
-			List<SVGPolyline> polylineList = island.createPolylinesIteratively(
-					dpEpsilon, maxiter);
-			polylineListList.add(polylineList);
-		}
-		return polylineListList;
-	}
+//	public List<List<SVGPolyline>> createPolylinesIteratively(double dpEpsilon,
+//			int maxiter) {
+//		List<List<SVGPolyline>> polylineListList = new ArrayList<List<SVGPolyline>>();
+//		for (PixelIsland island : this) {
+//			List<SVGPolyline> polylineList = island.createPolylinesIteratively(
+//					dpEpsilon, maxiter);
+//			polylineListList.add(polylineList);
+//		}
+//		return polylineListList;
+//	}
 
 	public PixelList getPixelList() {
 		PixelList pixelList = new PixelList();

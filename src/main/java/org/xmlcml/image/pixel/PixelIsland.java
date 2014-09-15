@@ -23,6 +23,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.ImageUtil;
 
@@ -49,10 +50,6 @@ import org.xmlcml.image.ImageUtil;
  */
 public class PixelIsland implements Iterable<Pixel> {
 
-	private enum Type {
-		BEND2, BILOZENGE, CHAIN2, CHAIN3, DEMILOZENGE, IMPOSSIBLE, NODE4, NODE5, NULL, TERMINAL,
-	}
-
 	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
 
 	private static final int NEIGHBOUR8 = -1;
@@ -63,16 +60,11 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Int2Range int2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
-//	private List<Nucleus> nucleusList;
 	private PixelList terminalPixels;
-	private PixelSet usedPixels;
 	private List<PixelPath> pixelPathList;
-	private double tolerance = 1.5;
 
 	private List<Real2Array> segmentArrayList;
 	private String pixelColor = "red";
-	private PixelGraph connectionTable;
-//	@Deprecated
 	private PixelSet cornerSet;
 	private ImageParameters parameters;
 	private PixelNodeList pixelNodeList;
@@ -110,7 +102,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	public PixelIsland(PixelList pixelList, boolean diagonal) {
 		this.pixelList = pixelList;
 		this.allowDiagonal = diagonal;
-		indexPixelsAndUpdateMetadata();
+		createMapAndRanges();
 	}
 
 	public PixelIsland(PixelIsland island) {
@@ -139,18 +131,18 @@ public class PixelIsland implements Iterable<Pixel> {
 	public void addPixel(Pixel pixel) {
 		ensurePixelList();
 		this.pixelList.add(pixel);
-		addPixelMetadata(pixel);
+		createMapAndRanges(pixel);
 		pixel.createNeighbourNeighbourList(this);
 	}
 
-	private void indexPixelsAndUpdateMetadata() {
+	private void createMapAndRanges() {
 		ensurePixelList();
 		for (Pixel pixel : pixelList) {
-			addPixelMetadata(pixel);
+			createMapAndRanges(pixel);
 		}
 	}
 
-	private void addPixelMetadata(Pixel pixel) {
+	private void createMapAndRanges(Pixel pixel) {
 		ensureInt2Range();
 		ensurePixelByCoordMap();
 		Int2 int2 = pixel.getInt2();
@@ -194,13 +186,8 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixelList;
 	}
 
-	public PixelList getTerminalPixels() {
+	PixelList getTerminalPixels() {
 		terminalPixels = getPixelsWithNeighbourCount(1);
-//		PixelList terminalSpikedList = getTerminalSpikes();
-//		if (terminalSpikedList.size() > 0) {
-//			terminalPixels.addAll(terminalSpikedList);
-//			LOG.trace("adding pseudo-terminals: " + terminalSpikedList);
-//		}
 		return terminalPixels;
 	}
 
@@ -219,24 +206,24 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixel.getOrCreateNeighbours(this).size();
 	}
 
-	/**
-	 * for start of spanningTree or other traversals.
-	 * 
-	 * If there are terminal pixels get the first one. else get the first pixel.
-	 * This may not be reproducible.
-	 * 
-	 * @return first pixel or null for empty island (which shouldn't happen)
-	 */
-	public Pixel getStartPixel() {
-		Pixel start = null;
-		PixelList terminalList = getTerminalPixels();
-		if (terminalList.size() > 0) {
-			start = terminalList.get(0);
-		} else if (pixelList.size() > 0) {
-			start = pixelList.get(0);
-		}
-		return start;
-	}
+//	/**
+//	 * for start of spanningTree or other traversals.
+//	 * 
+//	 * If there are terminal pixels get the first one. else get the first pixel.
+//	 * This may not be reproducible.
+//	 * 
+//	 * @return first pixel or null for empty island (which shouldn't happen)
+//	 */
+//	public Pixel getStartPixel() {
+//		Pixel start = null;
+//		PixelList terminalList = getTerminalPixels();
+//		if (terminalList.size() > 0) {
+//			start = terminalList.get(0);
+//		} else if (pixelList.size() > 0) {
+//			start = pixelList.get(0);
+//		}
+//		return start;
+//	}
 
 	public void setDiagonal(boolean diagonal) {
 		this.allowDiagonal = diagonal;
@@ -264,40 +251,40 @@ public class PixelIsland implements Iterable<Pixel> {
 
 
 
-	/** may need refactoring
-	 * 
-	 * @return
-	 */
-	List<PixelPath> getOrCreatePixelPathList() {
-		if (pixelPathList == null) {
-			throw new RuntimeException("HOPEFULLY OBSOLETE");
-//			removeHypotenuses();
-//			getNucleusList();
-//			getTerminalPixels();
-//			pixelPathList = createPixelPathListFromTerminals();
-		}
-		return pixelPathList;
-	}
+//	/** may need refactoring
+//	 * 
+//	 * @return
+//	 */
+//	private List<PixelPath> getOrCreatePixelPathList() {
+//		if (pixelPathList == null) {
+//			throw new RuntimeException("HOPEFULLY OBSOLETE");
+////			removeHypotenuses();
+////			getNucleusList();
+////			getTerminalPixels();
+////			pixelPathList = createPixelPathListFromTerminals();
+//		}
+//		return pixelPathList;
+//	}
 
-	private List<PixelPath> createPixelPathListFromTerminals() {
-		PixelSet usedTerminalPixels = new PixelSet();
-		pixelPathList = new ArrayList<PixelPath>();
-		for (int i = 0; i < terminalPixels.size(); i++) {
-			Pixel terminal = terminalPixels.get(i);
-			addPixelPathFromTerminal(usedTerminalPixels, terminal);
-		}
-		return pixelPathList;
-	}
+//	private List<PixelPath> createPixelPathListFromTerminals() {
+//		PixelSet usedTerminalPixels = new PixelSet();
+//		pixelPathList = new ArrayList<PixelPath>();
+//		for (int i = 0; i < terminalPixels.size(); i++) {
+//			Pixel terminal = terminalPixels.get(i);
+//			addPixelPathFromTerminal(usedTerminalPixels, terminal);
+//		}
+//		return pixelPathList;
+//	}
 
-	private void addPixelPathFromTerminal(PixelSet usedTerminalPixels, Pixel terminal) {
-		if (!usedTerminalPixels.contains(terminal)) {
-			usedTerminalPixels.add(terminal);
-throw new RuntimeException("HOPEFULLY OBSOLETE");			
-//			PixelPath pixelPath = findTerminalOrBranch(terminal);
-//			usedTerminalPixels.add(pixelPath.getLastPixel());
-//			pixelPathList.add(pixelPath);
-		}
-	}
+//	private void addPixelPathFromTerminal(PixelSet usedTerminalPixels, Pixel terminal) {
+//		if (!usedTerminalPixels.contains(terminal)) {
+//			usedTerminalPixels.add(terminal);
+//throw new RuntimeException("HOPEFULLY OBSOLETE");			
+////			PixelPath pixelPath = findTerminalOrBranch(terminal);
+////			usedTerminalPixels.add(pixelPath.getLastPixel());
+////			pixelPathList.add(pixelPath);
+//		}
+//	}
 
 
 	/**
@@ -343,22 +330,22 @@ throw new RuntimeException("HOPEFULLY OBSOLETE");
 	}
 
 
-	public SVGG createSVGFromPixelPaths(boolean pixels) {
-		SVGG gg = new SVGG();
-		if (!pixels) {
-			getOrCreatePixelPathList();
-		}
-		if (pixels || pixelPathList.size() == 0) {
-			gg = plotPixels(pixelList, this.pixelColor);
-		} else {
-			for (PixelPath pixelPath : pixelPathList) {
-				SVGG g = pixelPath.createSVGG(this.pixelColor);
-				g.setStrokeWidth(0.5);
-				gg.appendChild(g);
-			}
-		}
-		return gg;
-	}
+//	private SVGG createSVGFromPixelPaths(boolean pixels) {
+//		SVGG gg = new SVGG();
+//		if (!pixels) {
+//			getOrCreatePixelPathList();
+//		}
+//		if (pixels || pixelPathList.size() == 0) {
+//			gg = plotPixels(pixelList, this.pixelColor);
+//		} else {
+//			for (PixelPath pixelPath : pixelPathList) {
+//				SVGG g = pixelPath.createSVGG(this.pixelColor);
+//				g.setStrokeWidth(0.5);
+//				gg.appendChild(g);
+//			}
+//		}
+//		return gg;
+//	}
 
 	public SVGG createSVG() {
 		SVGG g = new SVGG();
@@ -393,22 +380,22 @@ throw new RuntimeException("HOPEFULLY OBSOLETE");
 		return g;
 	}
 
-	public List<Real2Array> createSegments(double tolerance) {
-		getOrCreatePixelPathList();
-		segmentArrayList = new ArrayList<Real2Array>();
-		for (PixelPath pixelPath : pixelPathList) {
-			Real2Array segmentArray = new Real2Array(
-					pixelPath.createDouglasPeucker(tolerance));
-			segmentArrayList.add(segmentArray);
-		}
-		return segmentArrayList;
-	}
+//	public List<Real2Array> createSegments(double tolerance) {
+//		getOrCreatePixelPathList();
+//		segmentArrayList = new ArrayList<Real2Array>();
+//		for (PixelPath pixelPath : pixelPathList) {
+//			Real2Array segmentArray = new Real2Array(
+//					pixelPath.createDouglasPeucker(tolerance));
+//			segmentArrayList.add(segmentArray);
+//		}
+//		return segmentArrayList;
+//	}
 
-	public SVGG debugSVG(String filename) {
-		SVGG g = createSVGFromPixelPaths(true);
-		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
-		return g;
-	}
+//	public SVGG debugSVG(String filename) {
+//		SVGG g = createSVGFromPixelPaths(true);
+//		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
+//		return g;
+//	}
 
 	public boolean fitsWithin(RealRange xSizeRange, RealRange ySizeRange) {
 		double wmax = xSizeRange.getMax();
@@ -570,43 +557,43 @@ throw new RuntimeException("HOPEFULLY OBSOLETE");
 		}
 	}
 
-	public List<SVGPolyline> createPolylinesAndRemoveUsedPixels(double epsilon) {
-		List<PixelPath> pixelPaths = this
-				.getOrCreatePixelPathList();
-		LOG.trace("pixelPaths: " + pixelPaths.size());
-		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
-		for (PixelPath pixelPath : pixelPaths) {
-			SVGPolyline polyline = pixelPath.createPolyline(epsilon);
-			removePixels(pixelPath);
-			polylineList.add(polyline);
-		}
-		return polylineList;
-	}
+//	private List<SVGPolyline> createPolylinesAndRemoveUsedPixels(double epsilon) {
+//		List<PixelPath> pixelPaths = this
+//				.getOrCreatePixelPathList();
+//		LOG.trace("pixelPaths: " + pixelPaths.size());
+//		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
+//		for (PixelPath pixelPath : pixelPaths) {
+//			SVGPolyline polyline = pixelPath.createPolyline(epsilon);
+//			removePixels(pixelPath);
+//			polylineList.add(polyline);
+//		}
+//		return polylineList;
+//	}
 
 	public void setPixelPaths(List<PixelPath> pixelPaths) {
 		this.pixelPathList = pixelPaths;
 	}
 
-	public List<SVGPolyline> createPolylinesIteratively(double dpEpsilon,
-			int maxiter) {
-		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
-		while (maxiter-- > 0) {
-			LOG.trace("pixels: " + getPixelList().size());
-			setPixelPaths(null);
-			List<SVGPolyline> polylineList0 = createPolylinesAndRemoveUsedPixels(dpEpsilon);
-			if (polylineList0.size() == 0) {
-				// this seems to break the cycles OK on first example
-				break;
-			}
-			polylineList.addAll(polylineList0);
-			LOG.trace("pixels after: " + getPixelList().size() + " polylines "
-					+ polylineList0.size());
-		}
-		if (maxiter == 0) {
-			throw new RuntimeException("couldn't analyze pixelIsland");
-		}
-		return polylineList;
-	}
+//	private List<SVGPolyline> createPolylinesIteratively(double dpEpsilon,
+//			int maxiter) {
+//		List<SVGPolyline> polylineList = new ArrayList<SVGPolyline>();
+//		while (maxiter-- > 0) {
+//			LOG.trace("pixels: " + getPixelList().size());
+//			setPixelPaths(null);
+//			List<SVGPolyline> polylineList0 = createPolylinesAndRemoveUsedPixels(dpEpsilon);
+//			if (polylineList0.size() == 0) {
+//				// this seems to break the cycles OK on first example
+//				break;
+//			}
+//			polylineList.addAll(polylineList0);
+//			LOG.trace("pixels after: " + getPixelList().size() + " polylines "
+//					+ polylineList0.size());
+//		}
+//		if (maxiter == 0) {
+//			throw new RuntimeException("couldn't analyze pixelIsland");
+//		}
+//		return polylineList;
+//	}
 
 	public String getPixelColor() {
 		return pixelColor;
@@ -1326,6 +1313,12 @@ throw new RuntimeException("HOPEFULLY OBSOLETE");
 	 */
 	public PixelIsland createTranslate(Int2 translation) {
 		throw new RuntimeException("NYI");
+	}
+
+	public SVGG createSVGFromEdges() {
+		SVGG g = new SVGG();
+		SVGText text = new SVGText(new Real2(20., 20.), "SVG Edges NYI");
+		return g;
 	}
 	
 	
