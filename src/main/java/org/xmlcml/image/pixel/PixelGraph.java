@@ -1,12 +1,10 @@
 package org.xmlcml.image.pixel;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,8 +25,8 @@ import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
 /**
  * holds PixelNodes and PixelEdges for pixelIsland
  * 
- * a graph may either be a single PixelCycle or may be a number of PixelNodes
- * and PixelEdges
+ * a graph may be a number of PixelNodes and PixelEdges. A single cycle will have a 
+ * single PixelNode located in an arbitrary position
  * 
  * @author pm286
  * 
@@ -44,24 +42,17 @@ public class PixelGraph {
 
 	private PixelEdgeList pixelEdgeList;
 	private PixelNodeList pixelNodeList;
-//	private PixelCycle cycle;
 	private PixelList pixelList;
-//	private JunctionSet junctionSet;
-//	private TerminalNodeSet terminalNodeSet;
 	PixelIsland island;
 	private Map<Pixel, PixelNode> nodeByPixelMap;
-//	private Map<Pixel, TerminalNode> terminalNodeByPixelMap;
-//	private Set<Pixel> usedNonNodePixelSet;
-//	private SortedPixelNodeSet activeNodeSet;
 	private Map<PixelNode, PixelNucleus> nucleusByPixelNodeMap;
 	private Set<PixelNucleus> nucleusSet;
-
 	private Map<Pixel, PixelNucleus> nucleusByPixelMap;
-	private Set<Pixel> oneConnectedSet;
-	private Set<Pixel> twoConnectedSet;
-	private Set<Pixel> threeConnectedSet;
-	private Set<Pixel> multiConnectedSet;
-	private Set<Pixel> zeroConnectedSet;
+	private PixelSet oneConnectedSet;
+	private PixelSet twoConnectedSet;
+	private PixelSet threeConnectedSet;
+	private PixelSet multiConnectedSet;
+	private PixelSet zeroConnectedSet;
 
 	private Map<PixelNucleus, PixelNode> nodeByNucleusMap;
 	private SVGG svgGraph;
@@ -107,35 +98,16 @@ public class PixelGraph {
 		return pixelGraph;
 	}
 
-//	public double getSegmentTolerance() {
-//		return segmentTolerance;
-//	}
-//
-//	public void setSegmentTolerance(double segmentTolerance) {
-//		this.segmentTolerance = segmentTolerance;
-//	}
-
 	void createNodesAndEdges() {
 		if (pixelEdgeList == null) {
 			pixelEdgeList = new PixelEdgeList();
 			pixelNodeList = new PixelNodeList();
-//			getTerminalNodeSet();
-//			getJunctionSet();
-//			makeNucleusMap();
-//			usedNonNodePixelSet = new HashSet<Pixel>();
 			createEdges();
 			createNodes();
 //			addMissedPixels();
-			LOG.error("MEND THIS");
+			LOG.error("MEND createNodesAndEdges");
 		}
 	}
-
-//	private void addMissedPixels() {
-//		int missedPixels = pixelList.size() - usedNonNodePixelSet.size();
-//		if (missedPixels != 0) {
-//			LOG.trace("addMissedPixels NYI "+ +missedPixels);
-//		}
-//	}
 
 	private void createNodes() {
 		Set<PixelNode> nodeSet = new HashSet<PixelNode>();
@@ -180,59 +152,6 @@ public class PixelGraph {
 		}
 		return node;
 	}
-
-//	/**
-//	 * similar to floodfill
-//	 * 
-//	 * maybe unnecessary as we are treating nuclei as unstructured
-//	 * 
-//	 * add locally connected nodes.
-//	 */
-//	private Map<JunctionNode, PixelNucleus> getOrCreateNucleusSetAndMap() {
-//		if (nucleusSet == null) {
-//			nucleusByJunctionMap = new HashMap<JunctionNode, PixelNucleus>();
-//			Set<PixelNode> unusedNodes = new HashSet<PixelNode>();
-//			nucleusSet = new HashSet<PixelNucleus>();
-//			if (junctionSet != null) {
-//				unusedNodes.addAll(junctionSet.getList());
-//			}
-//			createNucleiFromPixelNodes(unusedNodes);
-//		}
-//		return nucleusByJunctionMap;
-//	}
-
-//	private void createNucleiFromPixelNodes(Set<PixelNode> unusedNodes) {
-//		while (!unusedNodes.isEmpty()) {
-//			LOG.trace("unused " + unusedNodes.size());
-//			// new nucleus, find next unused Junction
-//			PixelNode nextNode = unusedNodes.iterator().next();
-//			unusedNodes.remove(nextNode);
-//			Set<PixelNode> nucleusNodeSet = new HashSet<PixelNode>();
-//			nucleusNodeSet.add(nextNode);
-//			PixelNucleus nucleus = new PixelNucleus(island);
-//			getNucleusSet().add(nucleus);
-//		}
-//	}
-
-//	private void addNucleustoNucleusByJunctionMap(Set<PixelNode> unusedNodes,
-//			Set<PixelNode> nucleusNodeSet, PixelNucleus nucleus) {
-//		PixelNode nextNode;
-//		while (!nucleusNodeSet.isEmpty()) {
-//			LOG.trace("nucleus " + nucleusNodeSet.size() + " "
-//					+ nucleusNodeSet);
-//			nextNode = nucleusNodeSet.iterator().next();
-//			nucleus.add(nextNode);
-//			nucleusByJunctionMap.put(nextNode, nucleus);
-//			nucleusNodeSet.remove(nextNode);
-//			List<PixelNode> neighbourJunctions = getNeighbourJunctions(nextNode);
-//			for (JunctionNode neighbourJunction : neighbourJunctions) {
-//				if (!nucleus.contains(neighbourJunction)) {
-//					nucleusNodeSet.add(neighbourJunction);
-//					unusedNodes.remove(neighbourJunction);
-//				}
-//			}
-//		}
-//	}
 
 	private void ensureNucleusByPixelMap() {
 		if (nucleusByPixelMap == null) {
@@ -360,18 +279,20 @@ public class PixelGraph {
 		LOG.trace("Multiconnected "+multiConnectedSet.size());
 	}
 
-	private void drawPixels(int serial, String[] color, SVGG gg, int col1, Set<Pixel> set) {
+	private void drawPixels(int serial, String[] color, SVGG gg, int col1, PixelSet set) {
 		PixelList pixelList;
-		pixelList = new PixelList(set);
+		Set<String> ss;
+		pixelList = new PixelList();
+		pixelList.addAll(set);
 		if (pixelList.size() > 1) {
 			SVGG g = pixelList.draw(null, color[(serial + col1) % color.length]);
 			gg.appendChild(g);
 		}
 	}
 
-	private Set<Pixel> createConnectedDiagonalPixelSet(int neighbours) {
+	private PixelSet createConnectedDiagonalPixelSet(int neighbours) {
 		island.setDiagonal(true);
-		Set<Pixel> connectedSet = new HashSet<Pixel>();
+		PixelSet connectedSet = new PixelSet();
 		for (Pixel pixel : pixelList) {
 			pixel.clearNeighbours();
 			if (pixel.isConnectedAny(island, neighbours)) {
@@ -381,9 +302,9 @@ public class PixelGraph {
 		return connectedSet;
 	}
 	
-	private Set<Pixel> createMultiConnectedDiagonalPixelSet() {
+	private PixelSet createMultiConnectedDiagonalPixelSet() {
 		island.setDiagonal(true);
-		multiConnectedSet = new HashSet<Pixel>();
+		multiConnectedSet = new PixelSet();
 		for (Pixel pixel : pixelList) {
 			pixel.clearNeighbours();
 			for (int conn = 4; conn <= 8; conn++) {
@@ -413,56 +334,9 @@ public class PixelGraph {
 		return next;
 	}
 
-//	private void add(PixelCycle cycle) {
-//		if (this.cycle != null) {
-//			throw new RuntimeException("Cannot add cycle twice");
-//		}
-//		this.cycle = cycle;
-//	}
-
-//	public PixelCycle getCycle() {
-//		this.createNodesAndEdges();
-////		createGraph();
-//		return cycle;
-//	}
-
 	public PixelNode getPixelNode(Pixel pixel) {
 		return pixel == null ? null : nodeByPixelMap.get(pixel);
 	}
-
-//	public JunctionSet getJunctionSet() {
-//		createNodesAndEdges();
-//		if (junctionSet == null) {
-//			junctionSet = new JunctionSet();
-//			junctionByPixelMap = new HashMap<Pixel, JunctionNode>();
-//			for (Pixel pixel : pixelList) {
-//				JunctionNode junction = JunctionNode.createJunction(pixel, island);
-//				if (junction != null) {
-//					junctionSet.add(junction);
-//					junctionByPixelMap.put(pixel, junction);
-//				}
-//			}
-//		}
-//		return junctionSet;
-//	}
-//	
-//	public TerminalNodeSet getTerminalNodeSet() {
-//		createNodesAndEdges();
-//		if (terminalNodeSet == null) {
-//			terminalNodeSet = new TerminalNodeSet();
-//			terminalNodeByPixelMap = new HashMap<Pixel, TerminalNode>();
-//			for (Pixel pixel : pixelList) {
-//				PixelList neighbours = pixel.getOrCreateNeighbours(island);
-//				if (neighbours.size() == 1) {
-//					TerminalNode endNode = new TerminalNode(pixel,
-//							neighbours.get(0));
-//					terminalNodeSet.add(endNode);
-//					terminalNodeByPixelMap.put(pixel, endNode);
-//				}
-//			}
-//		}
-//		return terminalNodeSet;
-//	}
 
 	public PixelEdgeList getPixelEdgeList() {
 		return pixelEdgeList;
@@ -472,58 +346,14 @@ public class PixelGraph {
 		return pixelNodeList;
 	}
 
-//	public List<JunctionNode> getNeighbourJunctions(PixelNode junction) {
-//		List<JunctionNode> junctionList = new ArrayList<JunctionNode>();
-//		PixelList neighbours = junction.getNeighbours();
-//		if (neighbours != null) {
-//			for (Pixel neighbour : neighbours) {
-//				PixelNode pixelNode = getPixelNode(neighbour);
-//				if (pixelNode instanceof JunctionNode) {
-//					junctionList.add((JunctionNode) pixelNode);
-//				}
-//			}
-//		}
-//		return junctionList;
-//	}
-
 	public PixelList getPixelList() {
 		return pixelList;
 	}
-
-//	public void createAndDrawGraph(SVGG g) {
-//		JunctionSet junctionSet = getJunctionSet();
-//		JunctionNode.drawJunctions(junctionSet, g, 2.);
-//		TerminalNodeSet endNodeSet = getTerminalNodeSet();
-//		TerminalNode.drawEndNodes(endNodeSet, g, 1.5);
-//		if (getNucleusSet() == null) {
-//			makeNucleusMap();
-//		}
-//		PixelNucleus.drawNucleusSet(getNucleusSet(), g, 5.);
-//	}
-
-//	void makeNucleusMap() {
-//		getOrCreateNucleusSetAndMap();
-//		if (nucleusByPixelMap == null) {
-//			nucleusByPixelMap = new HashMap<Pixel, PixelNucleus>();
-//			for (PixelNucleus nucleus : getNucleusSet()) {
-//				PixelNodeList junctionSet = nucleus.getPixelNodeList();
-//				for (PixelNode pixelNode : junctionSet) {
-//					JunctionNode junction = (JunctionNode) pixelNode;
-//					for (Pixel neighbour : junction.getNeighbours()) {
-//						nucleusByPixelMap.put(neighbour, nucleus);
-//					}
-//					nucleusByPixelMap.put(junction.getCentrePixel(), nucleus);
-//				}
-//			}
-//		}
-//		LOG.trace("nucleusMap "+nucleusByPixelMap);
-//	}
 
 	public String toString() {
 		String s = "";
 		s += "; edges: " + (pixelEdgeList == null ? "none" : pixelEdgeList.toString());
 		s += "; nodes: " + (pixelNodeList == null ? "none" : pixelNodeList.toString());
-//		s += "; cycle: " + (cycle == null ? "none" : cycle.toString());
 		return s;
 	}
 

@@ -451,7 +451,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 * removes all unnecessary steps while keeping minimum connectivity.
 	 * 
 	 */
-	public void removeCorners() {
+	private void removeCorners() {
 		for (PixelIsland island : list) {
 			island.removeCorners();
 		}

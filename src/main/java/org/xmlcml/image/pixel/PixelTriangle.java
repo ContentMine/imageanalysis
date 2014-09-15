@@ -11,7 +11,7 @@ import org.xmlcml.euclid.Int2;
 public class PixelTriangle {
 
 	private Pixel[] pixel = new Pixel[3];
-	private Set<Pixel> set = new HashSet<Pixel>();
+	private PixelSet set = new PixelSet();
 	private PixelIsland island;
 	private List<Pixel> diagonal;
 
@@ -67,14 +67,14 @@ public class PixelTriangle {
 		return set.hashCode();
 	}
 	
-	public Set<Pixel> addAll(PixelTriangle triangle) {
-		Set<Pixel> union = new HashSet<Pixel>(set);
+	public PixelSet addAll(PixelTriangle triangle) {
+		PixelSet union = new PixelSet(set);
 		union.addAll(triangle.set);
 		return union;
 	}
 	
-	public Set<Pixel> retainAll(PixelTriangle triangle) {
-		Set<Pixel> retained = new HashSet<Pixel>(set);
+	public PixelSet retainAll(PixelTriangle triangle) {
+		PixelSet retained = new PixelSet(set);
 		retained.retainAll(triangle.set);
 		return retained;
 

@@ -16,7 +16,7 @@ public class PixelNode implements Comparable<PixelNode> {
 	private PixelEdgeList edgeList;
 	private String label;
 	private String id;
-	private Set<Pixel> unusedNeighbours;
+	private PixelSet unusedNeighbours;
 	private PixelIsland island;
 	private PixelNucleus pixelNucleus;
 
@@ -127,14 +127,14 @@ public class PixelNode implements Comparable<PixelNode> {
 		return id;
 	}
 
-	public Set<Pixel> getUnusedNeighbours() {
+	public PixelSet getUnusedNeighbours() {
 		ensureUnusedNeighbours();
 		return unusedNeighbours;
 	}
 
 	private void ensureUnusedNeighbours() {
 		if (unusedNeighbours == null) {
-			unusedNeighbours = new HashSet<Pixel>();
+			unusedNeighbours = new PixelSet();
 		}
 	}
 

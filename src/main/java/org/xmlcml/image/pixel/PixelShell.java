@@ -14,13 +14,13 @@ public class PixelShell {
 
 	private final static Logger LOG = Logger.getLogger(PixelShell.class);
 	private Pixel pixel;
-	private Set<Pixel> expandedShell;
+	private PixelSet expandedShell;
 	private PixelIsland island;
 
 	public PixelShell(Pixel pixel, PixelIsland island) {
 		this.pixel = pixel;
 		this.island = island;
-		expandedShell = new HashSet<Pixel>();
+		expandedShell = new PixelSet();
 		expandedShell.add(pixel);
 	}
 
@@ -35,7 +35,7 @@ public class PixelShell {
 		}
 	}
 
-	public Set<Pixel> getExpandedSet() {
+	public PixelSet getExpandedSet() {
 		return expandedShell;
 	}
 }

@@ -37,7 +37,13 @@ public class PixelList implements Iterable<Pixel> {
 	}
 
 	private void init() {
-		list = new ArrayList<Pixel>();
+		ensureList();
+	}
+	
+	private void ensureList() {
+		if (list == null) {
+			list = new ArrayList<Pixel>();
+		}
 	}
 	
 	public PixelList(Collection<Pixel> pixelCollection) {
@@ -93,7 +99,7 @@ public class PixelList implements Iterable<Pixel> {
 	}
 
 	public PixelList getPixelsTouching(PixelList list1, PixelIsland island) {
-		Set<Pixel> used = new HashSet<Pixel>();
+		PixelSet used = new PixelSet();
 		PixelList touchingList = new PixelList();
 		if (list1 != null && list1.size() > 0) {
 			int value = list1.get(0).getValue();
@@ -299,6 +305,11 @@ public class PixelList implements Iterable<Pixel> {
 			}
 		}
 		return box;
+	}
+
+	public void addAll(PixelSet set) {
+		ensureList();
+		this.list.addAll(set);
 	}
 
 
