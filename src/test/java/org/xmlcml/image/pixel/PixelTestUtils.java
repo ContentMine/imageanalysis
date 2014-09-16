@@ -77,11 +77,12 @@ public class PixelTestUtils {
 	public static void assertNodeCounts(String msg, PixelIsland island, IntArray nodeCounts) {
 		// compare pixel counts
 		IntArray nodeCountArray = new IntArray();
+		PixelNucleusCollection nucleusCollection = island.getPixelNucleusCollection();
 		for (int i = 1; i < nodeCounts.size(); i++) {
-			nodeCountArray.addElement(island.getTerminalJunctionList().size());
-			nodeCountArray.addElement(island.getThreewayJunctionList().size());
-			nodeCountArray.addElement(island.getDoubleYJunctionList().size());
-			nodeCountArray.addElement(island.getCrossJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getTerminalJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getThreewayJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getDoubleYJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getCrossJunctionList().size());
 		}
 		
 	}

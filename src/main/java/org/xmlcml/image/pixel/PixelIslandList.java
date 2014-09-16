@@ -540,9 +540,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"
 					+ i + ".png"));
 			g.appendChild(island.createSVG());
-			PixelGraph graph = island.createGraph();
+			PixelGraph graph = island.getOrCreateGraph();
 			graph.setParameters(parameters);
-			PixelEdgeList edgeList = graph.createEdges();
+			PixelEdgeList edgeList = graph.createEdgeList();
 			for (PixelEdge edge : edgeList) {
 				g.appendChild(edge.createPixelSVG("red"));
 			}
@@ -558,7 +558,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		// main tree
 		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
 			PixelIsland island = get(i);
-			PixelGraph graph = island.createGraph();
+			PixelGraph graph = island.getOrCreateGraph();
 			graph.setParameters(parameters);
 			pixelGraphList.add(graph);
 		}

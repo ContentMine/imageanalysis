@@ -19,16 +19,18 @@ public class PixelNode implements Comparable<PixelNode> {
 	private PixelSet unusedNeighbours;
 	private PixelIsland island;
 	private PixelNucleus pixelNucleus;
+	private PixelGraph pixelGraph;
 
 	protected PixelNode() {
 	}
 	
-	public PixelNode(Pixel pixel) {
+	public PixelNode(Pixel pixel, PixelGraph pixelGraph) {
 		this.centrePixel = pixel;
+		this.pixelGraph = pixelGraph;
 	}
 	
 	public PixelNode(Pixel pixel, PixelIsland island) {
-		this(pixel);
+		this(pixel, (PixelGraph) null);
 		this.island = island;
 		addNeighboursToUnusedSet(pixel, island);
 	}
@@ -71,7 +73,7 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	private void ensurePixelNucleus() {
 		if (pixelNucleus == null && island != null) {
-			pixelNucleus = island.getPixelNucleusByPixelMap().get(centrePixel);
+			pixelNucleus = island.getPixelNucleusCollection().getPixelNucleusByPixelMap().get(centrePixel);
 		}
 	}
 

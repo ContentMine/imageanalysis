@@ -16,13 +16,17 @@ public class PixelEdge {
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
 	private PixelSegmentList pixelSegmentList;
-
 	private String id;
+	private PixelGraph pixelGraph;
 
 	public PixelEdge(PixelIsland island) {
 		this.island = island;
 		this.pixelList = new PixelList();
 		this.nodes = new PixelNodeList();
+	}
+
+	public PixelEdge(PixelGraph pixelGraph) {
+		this.pixelGraph = pixelGraph;
 	}
 
 	/** adds node and pixel contained within it.

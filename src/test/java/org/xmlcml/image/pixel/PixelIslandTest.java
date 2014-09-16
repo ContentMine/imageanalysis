@@ -933,20 +933,21 @@ public class PixelIslandTest {
 		Assert.assertEquals("after trimming ", 3, island.size());
 	}
 
-	@Test
-	@Ignore
-	public void testGetOrCreateYJunctionList() {
-		PixelIsland largeY = createLargeY();
-		PixelNucleusList yjunctionList = largeY.getOrCreateYJunctionList();
-		Assert.assertEquals("junctions ", 1, yjunctionList.size());
-		Assert.assertEquals("y junction", "{{{(0,0)(0,1)(1,0)}}}", yjunctionList.toString());
-	}
+	// FIXME
+//	@Test
+//	@Ignore
+//	public void testGetOrCreateYJunctionList() {
+//		PixelIsland largeY = createLargeY();
+//		PixelNucleusList yjunctionList = largeY.getOrCreateYJunctionList();
+//		Assert.assertEquals("junctions ", 1, yjunctionList.size());
+//		Assert.assertEquals("y junction", "{{{(0,0)(0,1)(1,0)}}}", yjunctionList.toString());
+//	}
 
-	@Test
-	public void testRearrangeYJunction() {
-		PixelIsland largeY = createLargeY();
-		largeY.rearrangeYJunctions();
-	}
+//	@Test
+//	public void testRearrangeYJunction() {
+//		PixelIsland largeY = createLargeY();
+//		largeY.rearrangeYJunctions();
+//	}
 
 	// =============================================================
 

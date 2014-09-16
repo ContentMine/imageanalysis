@@ -43,6 +43,10 @@ public class Pixel {
 	public Int2 getInt2() {
 		return point == null ? null : new Int2(point.x, point.y);
 	}
+	
+	public PixelIsland getIsland() {
+		return island;
+	}
 
 	public PixelList getOrCreateNeighbours(PixelIsland island) {
 		this.island = island;

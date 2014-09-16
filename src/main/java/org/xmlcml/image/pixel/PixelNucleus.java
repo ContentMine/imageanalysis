@@ -40,7 +40,7 @@ public class PixelNucleus {
 	private PixelList pixelList;
 	private int rightAngleCorner;
 	private PixelJunctionType junctionType;
-	private PixelNodeList pixelNodeList; // should only be one normally
+	private PixelNodeList pixelNodeList; // should only be one Node normally
 
 	public PixelNucleus(PixelIsland island) {
 		this.island = island;

@@ -31,15 +31,12 @@ public class PixelList implements Iterable<Pixel> {
 
 	private List<Pixel> list;
 	private Real2Array points;
+	private PixelIsland island;
 	
 	public PixelList() {
-		init();
-	}
-
-	private void init() {
 		ensureList();
 	}
-	
+
 	private void ensureList() {
 		if (list == null) {
 			list = new ArrayList<Pixel>();
@@ -47,8 +44,11 @@ public class PixelList implements Iterable<Pixel> {
 	}
 	
 	public PixelList(Collection<Pixel> pixelCollection) {
-		init();
-		list.addAll(pixelCollection);
+		ensureList();
+		Iterator<Pixel> iterator = pixelCollection.iterator();
+		while (iterator.hasNext()) {
+			this.add(iterator.next());
+		}
 	}
 
 	public PixelList(PixelList list) {
@@ -68,11 +68,31 @@ public class PixelList implements Iterable<Pixel> {
 		return (list == null || list.size() == 0 ) ? null : list.get(list.size() - 1);
 	}
 	
+	public void addFromSameIsland(Pixel pixel) {
+		add(pixel, true);
+	}
+	
 	public void add(Pixel pixel) {
-		if (list == null) {
-			init();
+		add(pixel, false);
+	}
+	
+	private void add(Pixel pixel, boolean check) {
+		ensureList();
+		if (check) {
+			checkFromSameIsland(pixel);
 		}
 		list.add(pixel);
+	}
+
+	private void checkFromSameIsland(Pixel pixel) {
+		PixelIsland island = pixel.getIsland();
+		{
+		if (this.island == null) {
+			this.island = island;
+		} else if (island == null || !this.island.equals(island)) {
+			throw new RuntimeException("change of island not allowed: "+this.island+"=>"+island);
+		}
+		}
 	}
 	
 	public List<Pixel> getList() {
@@ -83,8 +103,18 @@ public class PixelList implements Iterable<Pixel> {
 		return list == null ? 0 : list.size();
 	}
 
+	public void addAllFromSameIsland(PixelList pixelList) {
+		ensureList();
+		for (Pixel pixel : pixelList) {
+			addFromSameIsland(pixel);
+		}
+	}
+
 	public void addAll(PixelList pixelList) {
-		this.list.addAll(pixelList.getList());
+		ensureList();
+		for (Pixel pixel : pixelList) {
+			add(pixel);
+		}
 	}
 
 	public boolean contains(Pixel pixel) {
@@ -310,6 +340,10 @@ public class PixelList implements Iterable<Pixel> {
 	public void addAll(PixelSet set) {
 		ensureList();
 		this.list.addAll(set);
+	}
+
+	public PixelIsland getPixelIsland() {
+		return island;
 	}
 
 
