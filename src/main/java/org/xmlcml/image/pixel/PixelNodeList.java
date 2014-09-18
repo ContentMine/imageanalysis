@@ -1,9 +1,9 @@
 package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
@@ -89,7 +89,7 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		nodeList.remove(i);
 	}
 
-	public void addAll(Set<PixelNode> nodeSet) {
+	public void addAll(Collection<PixelNode> nodeSet) {
 		ensureList();
 		nodeList.addAll(nodeSet);
 	}

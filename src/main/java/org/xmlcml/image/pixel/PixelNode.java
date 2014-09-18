@@ -37,6 +37,9 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	private void addNeighboursToUnusedSet(Pixel pixel, PixelIsland island) {
 		ensureUnusedNeighbours();
+		if (pixel == null) {
+			throw new RuntimeException("Null Pixel");
+		}
 		unusedNeighbours.addAll(pixel.getOrCreateNeighbours(island).getList());
 	}
 	
@@ -163,5 +166,10 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	public void setCentrePixel(Pixel pixel) {
 		this.centrePixel = pixel;
+	}
+
+	public void setIsland(PixelIsland island) {
+		this.island = island;
+		
 	}
 }

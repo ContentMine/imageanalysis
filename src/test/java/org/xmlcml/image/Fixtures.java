@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.xmlcml.image.pixel.Pixel;
+import org.xmlcml.image.pixel.PixelGraph;
+import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelList;
 
 public class Fixtures {
@@ -135,6 +137,106 @@ public class Fixtures {
 			}));
 	
 	public static File CHAR_DIR = new File(Fixtures.TEXT_DIR, "chars");
+
+	public static PixelIsland CREATE_DOUBLE_Y_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,2));
+		island.addPixel(new Pixel(1,3));
+		island.addPixel(new Pixel(-1,3));
+		island.addPixel(new Pixel(2,4));
+		island.addPixel(new Pixel(-2,4));
+		island.addPixel(new Pixel(3,5));
+		island.addPixel(new Pixel(-3,5));
+		island.addPixel(new Pixel(0,-1));
+		island.addPixel(new Pixel(0,-2));
+		island.addPixel(new Pixel(1,-3));
+		island.addPixel(new Pixel(-1,-3));
+		island.addPixel(new Pixel(2,-4));
+		island.addPixel(new Pixel(-2,-4));
+		island.addPixel(new Pixel(3,-5));
+		island.addPixel(new Pixel(-3,-5));
+		return island;
+	}
+
+	public static PixelIsland CREATE_TRISPIKED_HEXAGON_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,2));
+		island.addPixel(new Pixel(1,3));
+		island.addPixel(new Pixel(-1,3));
+		island.addPixel(new Pixel(1,4));
+		island.addPixel(new Pixel(-1,4));
+		island.addPixel(new Pixel(-2,5));
+		island.addPixel(new Pixel(0,5));
+		island.addPixel(new Pixel(2,5));
+		island.addPixel(new Pixel(-3,6));
+		island.addPixel(new Pixel(3,6));
+		island.addPixel(new Pixel(-4,7));
+		island.addPixel(new Pixel(4,7));
+		return island;
+	}
+
+	public static PixelIsland CREATE_Y_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(0,2));
+		island.addPixel(new Pixel(0,3));
+		island.addPixel(new Pixel(-1, -1));
+		island.addPixel(new Pixel(-2, -2));
+		island.addPixel(new Pixel(-3, -3));
+		island.addPixel(new Pixel(1, -1));
+		island.addPixel(new Pixel(2, -2));
+		island.addPixel(new Pixel(3, -3));
+		return island;
+	}
+
+	public static PixelIsland CREATE_DOT_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,0));
+		return island;
+	}
+
+	public static PixelIsland CREATE_LINE_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		// simple wiggly line
+		island.addPixel(new Pixel(1,0));
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(-1,2));
+		island.addPixel(new Pixel(0, 3));
+		return island;
+	}
+
+	public static PixelIsland CREATE_CYCLE_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		// simple diamond cycle
+		island.addPixel(new Pixel(1,0));
+		island.addPixel(new Pixel(0,1));
+		island.addPixel(new Pixel(-1,0));
+		island.addPixel(new Pixel(0, -1));
+		return island;
+	}
+
+	public static PixelIsland CREATE_RHOMBUS_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(1,1));
+		island.addPixel(new Pixel(2,1));
+		island.addPixel(new Pixel(2,2));
+		island.addPixel(new Pixel(3,2));
+		island.addPixel(new Pixel(4,3));
+		return island;
+	}
 
 	
 }

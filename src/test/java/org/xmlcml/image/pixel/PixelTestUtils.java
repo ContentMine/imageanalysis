@@ -77,14 +77,27 @@ public class PixelTestUtils {
 	public static void assertNodeCounts(String msg, PixelIsland island, IntArray nodeCounts) {
 		// compare pixel counts
 		IntArray nodeCountArray = new IntArray();
-		PixelNucleusCollection nucleusCollection = island.getPixelNucleusCollection();
+		PixelNucleusFactory nucleusCollection = island.getPixelNucleusCollection();
 		for (int i = 1; i < nodeCounts.size(); i++) {
-			nodeCountArray.addElement(nucleusCollection.getTerminalJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getOrCreateTerminalJunctionList().size());
 			nodeCountArray.addElement(nucleusCollection.getThreewayJunctionList().size());
-			nodeCountArray.addElement(nucleusCollection.getDoubleYJunctionList().size());
-			nodeCountArray.addElement(nucleusCollection.getCrossJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getOrCreateDoubleYJunctionList().size());
+			nodeCountArray.addElement(nucleusCollection.getOrCreateCrossJunctionList().size());
 		}
 		
+	}
+
+	/**
+	 * 
+	 * @param nodeList nodeList to test
+	 * @param expectedNodeCount 
+	 * @param expectedNodeString, e.g. "[(0,2)(3,5)(-3,5)(0,-2)(3,-5)(-3,-5)]"
+	 */
+	public static void assertNodeList(PixelNodeList nodeList, int expectedNodeCount, String expectedNodeString) {
+		Assert.assertNotNull("non-null nodeList", nodeList);
+		Assert.assertNotNull("non-null nodeString", expectedNodeString);
+		Assert.assertEquals("nodes", expectedNodeCount, nodeList.size()); 
+		Assert.assertEquals("nodeList", expectedNodeString, nodeList.toString());
 	}
 
 

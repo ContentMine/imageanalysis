@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class PixelSet implements Collection<Pixel> {
+public class PixelSet implements Set<Pixel> {
 
 	private Set<Pixel> pixelSet;
 	

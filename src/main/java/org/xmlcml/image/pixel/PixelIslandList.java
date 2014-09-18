@@ -542,7 +542,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			g.appendChild(island.createSVG());
 			PixelGraph graph = island.getOrCreateGraph();
 			graph.setParameters(parameters);
-			PixelEdgeList edgeList = graph.createEdgeList();
+			PixelEdgeList edgeList = graph.createEdgeListOld();
 			for (PixelEdge edge : edgeList) {
 				g.appendChild(edge.createPixelSVG("red"));
 			}
@@ -564,8 +564,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 		LOG.debug("created graphs: "+pixelGraphList.size()+pixelGraphList);
 		for (PixelGraph pixelGraph : pixelGraphList) {
-			LOG.debug("graph "+pixelGraph.getPixelEdgeList().size()+"; " +pixelGraph.getPixelNodeList().size() /*+": "+pixelGraph.getEdges()+"; "*/);
-			for (PixelNode pixelNode : pixelGraph.getPixelNodeList()) {
+			LOG.debug("graph "+pixelGraph.getEdgeList().size()+"; " +pixelGraph.getNodeList().size() /*+": "+pixelGraph.getEdges()+"; "*/);
+			for (PixelNode pixelNode : pixelGraph.getNodeList()) {
 				LOG.debug("Node "+pixelNode);
 			}
 		}

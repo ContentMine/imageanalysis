@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
@@ -37,30 +37,14 @@ public class PixelGraph {
 	private static final Angle ANGLE_EPS = new Angle(0.03, Units.RADIANS);
 	public static String[] COLOURS = new String[] {"red", "green", "pink", "cyan", "orange", "blue", "yellow"};
 
-	private PixelEdgeList pixelEdgeList; // keep
-	private PixelNodeList pixelNodeList; // keep
-	private PixelList pixelList;         // keep
-	PixelIsland island;                  // keep
-	private Map<Pixel, PixelNode> nodeByPixelMap;
-	private Map<PixelNode, PixelNucleus> nucleusByPixelNodeMap;
-	private Set<PixelNucleus> nucleusSet;
-	private Map<Pixel, PixelNucleus> nucleusByPixelMap;
-	// I think these will vanish
-	@Deprecated
-	private PixelSet oneConnectedSet;
-	@Deprecated
+	private PixelEdgeList edgeList; 
+	private PixelNodeList nodeList; 
+	private PixelList pixelList;
+	private PixelIsland island;
 	private PixelSet twoConnectedSet;
-	@Deprecated
-	private PixelSet threeConnectedSet;
-	@Deprecated
-	private PixelSet multiConnectedSet;
-	@Deprecated
-	private PixelSet zeroConnectedSet;
-
-	private Map<PixelNucleus, PixelNode> nodeByNucleusMap;
-	private SVGG svgGraph;
 	private ImageParameters parameters;
-
+	private Stack<PixelNode> nodeStack;
+	
 	private PixelGraph() {
 		
 	}
@@ -101,195 +85,56 @@ public class PixelGraph {
 	}
 
 	void createNodesAndEdges() {
-		if (pixelEdgeList == null) {
-			pixelEdgeList = new PixelEdgeList();
-			pixelNodeList = new PixelNodeList();
-			createEdgeList();
+		if (edgeList == null) {
+			edgeList = new PixelEdgeList();
+			nodeList = new PixelNodeList();
 			createNodeList();
-//			addMissedPixels();
-//			LOG.error("MEND createNodesAndEdges");
+			createEdgeListFromNodeList();
 		}
 	}
 
 	private void createNodeList() {
-		Set<PixelNode> nodeSet = new HashSet<PixelNode>();
-		nodeByNucleusMap = new HashMap<PixelNucleus, PixelNode>();
-		for (PixelEdge edge : pixelEdgeList) {
-			Pixel pixel0 = edge.getPixelList().get(0);
-			createAndAddNode(nodeSet, edge, pixel0, 0);
-			Pixel pixelLast = edge.getPixelList().last();
-			createAndAddNode(nodeSet, edge, pixelLast, 1);
-		}
-		pixelNodeList.addAll(nodeSet);
+		nodeList = getNucleusFactory().getOrCreateNodeList();
 	}
 
-	private void createAndAddNode(Set<PixelNode> nodeSet, PixelEdge edge,
-			Pixel pixel, int end) {
-		PixelNode node = createNode(pixel);
-		if (node == null) {
-			LOG.trace("null node");
-		} else {
-			// add serial
-//			node.setId("nn"+pixel+nodeSet.size());
-			node.setId("nn"+pixel);
-			edge.addNode(node, end);
-			nodeSet.add(node);
-//			usedNonNodePixelSet.add(node.getCentrePixel());
-		}
-	}
+//	private void createNodeListFromEdgesOld() {
+//		Set<PixelNode> nodeSet = new HashSet<PixelNode>();
+//		nodeByNucleusMap = new HashMap<PixelNucleus, PixelNode>();
+//		for (PixelEdge edge : pixelEdgeList) {
+//			Pixel pixel0 = edge.getPixelList().get(0);
+//			createAndAddNode(nodeSet, edge, pixel0, 0);
+//			Pixel pixelLast = edge.getPixelList().last();
+//			createAndAddNode(nodeSet, edge, pixelLast, 1);
+//		}
+//		pixelNodeList.addAll(nodeSet);
+//	}
 
-	private PixelNode createNode(Pixel pixel) {
-		PixelNode node = null;
-		ensureNucleusByPixelMap();
-		PixelNucleus nucleus = nucleusByPixelMap.get(pixel);
-		if (nucleus != null) {
-			node = nodeByNucleusMap.get(nucleus);
-			if (node == null) {
-				node = new PixelNode(pixel, this);
-				nodeByNucleusMap.put(nucleus, node);
-			}
-		}
-		if (node != null && node.getCentrePixel() == null) {
-			node.setCentrePixel(pixel);
-		}
-		return node;
-	}
-
-	private void ensureNucleusByPixelMap() {
-		if (nucleusByPixelMap == null) {
-			nucleusByPixelMap = new HashMap<Pixel, PixelNucleus>();
-		}
-	}
-
-	public Map<PixelNode, PixelNucleus> getNucleusByJunctionMap() {
-		return nucleusByPixelNodeMap;
-	}
-
-	/** creates edges without drawing
-	 * 
-	 */
-	public PixelEdgeList createEdgesOLD() {
-		createConnectedPixelSets();
-		pixelEdgeList = new PixelEdgeList();
-		int serial = 0;
-		while (!twoConnectedSet.isEmpty()) {
-			Iterator<Pixel> iterator = twoConnectedSet.iterator();
-			Pixel current = iterator.next();
-			LOG.trace("current "+current.toString() + " 2con: " + twoConnectedSet);
-			PixelEdge edge = getEdgeFrom2ConnectedPixels(current);
-			edge.setId("ee"+(serial++));
-			LOG.trace("added "+edge.toString());
-			pixelEdgeList.add(edge);
-//			usedNonNodePixelSet.addAll(edge.getPixelList().getList());
-		}
-		return pixelEdgeList;
-	}
-
-	/** starts at 2-connected pixel in twoConnectedSet and traverses chain in both directions.
-	 * 
-	 * starting point can be arbitrary (picked from set of 2-connected pixels).
-	 * removes pixels as they are incorporated into edges.
-	 * 
-	 * @param current
-	 * @return
-	 */
-	private PixelEdge getEdgeFrom2ConnectedPixels(Pixel current) {
-		twoConnectedSet.remove(current);
-		PixelEdge edge = new PixelEdge(island);
-		PixelList neighbours = current.getOrCreateNeighbours(island);
-		PixelList list0 = traverseTillNon2Connected(neighbours.get(0), current);
-		if (list0.isCycle()) {
-			edge.addPixelList(list0);
-			LOG.trace("CYCLE");
-			return edge;
-		} else {
-			// lists started in different directions so reverse this and add starting point
-			list0.reverse();
-			list0.add(current);
-			// go in other direction
-			PixelList list1 = traverseTillNon2Connected(neighbours.get(1), current);
-			// merge
-			list0.addAll(list1);
-			edge.addPixelList(list0);
-			// find nodes
-			/** not yet ...
-			ensureNucleusByPixelMap();
-			PixelList pixelList = edge.getPixelList();
-			PixelNucleus nucleus0 = nucleusByPixelMap.get(pixelList.get(0));
-			PixelNucleus nucleus1 = nucleusByPixelMap.get(pixelList.last());
-			LOG.debug("NUCLEI "+nucleus0+ "/" +nucleus1);
-			*/
-			
-			return edge;
-		}
-	}
-	
-	/** starts at current 2-connected pixel and traverses down chain.
-	 * 
-	 * Direction is the neighbour of current which is NOT avoidMe
-	 * 
-	 * @param current stating pixel (should be 2-connected)
-	 * @param avoidMe pixel in branch to avoid
-	 * @return ordered list of pixels starting at current.
-	 */
-	private PixelList traverseTillNon2Connected(Pixel current, Pixel avoidMe) {
-		Pixel last = avoidMe;
-		PixelList pixelList = new PixelList();
-		while (current != null) {
-			boolean stillActive = twoConnectedSet.contains(current);
-			if (current.is2ConnectedAny(island)) {
-				if (stillActive) {
-					twoConnectedSet.remove(current);
-					Pixel next = current.getNextNeighbourIn2ConnectedChain(last);
-					pixelList.add(current);
-					last = current;
-					current = next;
-				} else {
-					// a cycle without any nodes
-					pixelList.add(current);
-					break;
-				}
-			} else {
-				pixelList.add(current);
-				break;
-			}
-		}
-		return pixelList;
-	}
-
-//	private void drawConnectedPixels(int serial) {
-//		String[] color = {"red", "blue", "green", "magenta", "cyan"};
-//		createConnectedPixelSets();
-//		SVGG gg = new SVGG();
-//		drawPixels(serial, color, gg, 0, twoConnectedSet);
-//		drawPixels(serial, color, gg, 1, oneConnectedSet);
-//		drawPixels(serial, color, gg, 2, threeConnectedSet);
-//		drawPixels(serial, color, gg, 3, multiConnectedSet);
-//		SVGSVG.wrapAndWriteAsSVG(gg, new File("target/plot/onetwothree"+serial+".svg"));
+//	private void createAndAddNode(Set<PixelNode> nodeSet, PixelEdge edge,
+//			Pixel pixel, int end) {
+//		PixelNode node = createNode(pixel);
+//		if (node == null) {
+//			LOG.trace("null node");
+//		} else {
+//			// add serial
+////			node.setId("nn"+pixel+nodeSet.size());
+//			node.setId("nn"+pixel);
+//			edge.addNode(node, end);
+//			nodeSet.add(node);
+////			usedNonNodePixelSet.add(node.getCentrePixel());
+//		}
 //	}
 
 	private void createConnectedPixelSets() {
-		createMultiConnectedDiagonalPixelSet();
-		zeroConnectedSet = createConnectedDiagonalPixelSet(0);
-		oneConnectedSet = createConnectedDiagonalPixelSet(1);
+//		createMultiConnectedDiagonalPixelSet();
+//		zeroConnectedSet = createConnectedDiagonalPixelSet(0);
+//		oneConnectedSet = createConnectedDiagonalPixelSet(1);
 		twoConnectedSet = createConnectedDiagonalPixelSet(2);
-		threeConnectedSet = createConnectedDiagonalPixelSet(3);
-		LOG.trace("connected "+zeroConnectedSet.size());
-		LOG.trace("1connected "+oneConnectedSet.size());
-		LOG.trace("2connected "+twoConnectedSet.size());
-		LOG.trace("3connected "+threeConnectedSet.size());
-		LOG.trace("Multiconnected "+multiConnectedSet.size());
-	}
-
-	private void drawPixels(int serial, String[] color, SVGG gg, int col1, PixelSet set) {
-		PixelList pixelList;
-		Set<String> ss;
-		pixelList = new PixelList();
-		pixelList.addAll(set);
-		if (pixelList.size() > 1) {
-			SVGG g = pixelList.draw(null, color[(serial + col1) % color.length]);
-			gg.appendChild(g);
-		}
+//		threeConnectedSet = createConnectedDiagonalPixelSet(3);
+//		LOG.trace("connected "+zeroConnectedSet.size());
+//		LOG.trace("1connected "+oneConnectedSet.size());
+//		LOG.trace("2connected "+twoConnectedSet.size());
+//		LOG.trace("3connected "+threeConnectedSet.size());
+//		LOG.trace("Multiconnected "+multiConnectedSet.size());
 	}
 
 	private PixelSet createConnectedDiagonalPixelSet(int neighbours) {
@@ -304,19 +149,20 @@ public class PixelGraph {
 		return connectedSet;
 	}
 	
-	private PixelSet createMultiConnectedDiagonalPixelSet() {
-		island.setDiagonal(true);
-		multiConnectedSet = new PixelSet();
-		for (Pixel pixel : pixelList) {
-			pixel.clearNeighbours();
-			for (int conn = 4; conn <= 8; conn++) {
-				if (pixel.isConnectedAny(island, conn)) {
-					multiConnectedSet.add(pixel);
-				}
-			}
-		}
-		return multiConnectedSet;
-	}
+//	@Deprecated
+//	private PixelSet createMultiConnectedDiagonalPixelSet() {
+//		island.setDiagonal(true);
+//		multiConnectedSet = new PixelSet();
+//		for (Pixel pixel : pixelList) {
+//			pixel.clearNeighbours();
+//			for (int conn = 4; conn <= 8; conn++) {
+//				if (pixel.isConnectedAny(island, conn)) {
+//					multiConnectedSet.add(pixel);
+//				}
+//			}
+//		}
+//		return multiConnectedSet;
+//	}
 	
 	/**
 	 * gets next pixel in chain.
@@ -336,21 +182,23 @@ public class PixelGraph {
 		return next;
 	}
 
-	/** is this ever used?
-	 * 
-	 * @param pixel
-	 * @return
-	 */
-	public PixelNode getPixelNode(Pixel pixel) {
-		return pixel == null ? null : nodeByPixelMap.get(pixel);
+//	/** is this ever used?
+//	 * 
+//	 * @param pixel
+//	 * @return
+//	 */
+//	public PixelNode getPixelNode(Pixel pixel) {
+//		return pixel == null ? null : nodeByPixelMap.get(pixel);
+//	}
+
+	public PixelEdgeList getEdgeList() {
+		createEdgeListFromNodeList();
+		return edgeList;
 	}
 
-	public PixelEdgeList getPixelEdgeList() {
-		return pixelEdgeList;
-	}
-
-	public PixelNodeList getPixelNodeList() {
-		return pixelNodeList;
+	public PixelNodeList getNodeList() {
+		nodeList = getNucleusFactory().getOrCreateNodeList();
+		return nodeList;
 	}
 
 	public PixelList getPixelList() {
@@ -359,29 +207,25 @@ public class PixelGraph {
 
 	public String toString() {
 		String s = "";
-		s += "; edges: " + (pixelEdgeList == null ? "none" : pixelEdgeList.toString());
-		s += "; nodes: " + (pixelNodeList == null ? "none" : pixelNodeList.toString());
+		s += "; edges: " + (edgeList == null ? "none" : edgeList.toString());
+		s += "; nodes: " + (nodeList == null ? "none" : nodeList.toString());
 		return s;
 	}
 
-	public Set<PixelNucleus> getNucleusSet() {
-		return nucleusSet;
-	}
-
 	public PixelNodeList getPossibleRootNodes1() {
-		PixelNodeList pixelNodeList = new PixelNodeList();
-		for (PixelNode node : pixelNodeList) {
+		PixelNodeList nodeList = new PixelNodeList();
+		for (PixelNode node : nodeList) {
 			PixelEdgeList edgeList = node.getEdges();
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
-				PixelSegmentList pixelSegmentList = (edge == null) ? new PixelSegmentList() :
-				    edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
-				if (pixelSegmentList.size() == 1) {
-					pixelNodeList.add(node);
+				PixelSegmentList segmentList = (edge == null) ? new PixelSegmentList() :
+				    edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
+				if (segmentList.size() == 1) {
+					nodeList.add(node);
 				}
 			}
 		}
-		return pixelNodeList;
+		return nodeList;
 	}
 
 	/** get root pixel as middle of leftmost internode edge.
@@ -390,12 +234,12 @@ public class PixelGraph {
 	 *  
 	 * @return
 	 */
-	public PixelNode getRootPixelNodeFromExtremeEdge(ComparatorType comparatorType) {
+	public PixelNode getRootNodeFromExtremeEdge(ComparatorType comparatorType) {
 		PixelEdge extremeEdge = getExtremeEdge(comparatorType);
 		if (extremeEdge == null) {
 			throw new RuntimeException("Cannot find extreme edge for "+comparatorType);
 		}
-		LOG.debug("extreme "+extremeEdge+"; nodes "+extremeEdge.getPixelNodes().size());
+		LOG.debug("extreme "+extremeEdge+"; nodes "+extremeEdge.getNodes().size());
 		
 		Pixel midPixel = extremeEdge.getNearestPixelToMidPoint();
 		PixelNode rootNode = new PixelNode(midPixel, this);
@@ -404,9 +248,9 @@ public class PixelGraph {
 			throw new RuntimeException("Should have exactly 2 neighbours "+neighbours.size());
 		}
 
-		PixelEdgeList pixelEdgeList = splitEdge(extremeEdge, midPixel, rootNode);
-		this.addEdge(pixelEdgeList.get(0));
-		this.addEdge(pixelEdgeList.get(1));
+		PixelEdgeList edgeList = splitEdge(extremeEdge, midPixel, rootNode);
+		this.addEdge(edgeList.get(0));
+		this.addEdge(edgeList.get(1));
 		this.addNode(rootNode);
 		this.removeEdge(extremeEdge);
 				
@@ -414,18 +258,18 @@ public class PixelGraph {
 	}
 
 	private void removeEdge(PixelEdge edge) {
-		pixelEdgeList.remove(edge);
+		edgeList.remove(edge);
 		
 	}
 
 	private PixelEdgeList splitEdge(PixelEdge edge, Pixel midPixel,
 			PixelNode rootNode) {
 		
-		PixelEdgeList pixelEdgeList = new PixelEdgeList();
-		PixelNodeList nodes = edge.getPixelNodes();
+		PixelEdgeList edgeList = new PixelEdgeList();
+		PixelNodeList nodes = edge.getNodes();
 		if (nodes.size() != 2) {
 			LOG.error("Should have exactly 2 extremeNodes found "+nodes.size());
-			return pixelEdgeList;
+			return edgeList;
 		}
 		
 		PixelList edgePixelList = edge.getPixelList();
@@ -442,11 +286,11 @@ public class PixelGraph {
 		}
 		
 		PixelEdge edge0 = createEdge(rootNode, nodes.get(0), beforePixelList);
-		pixelEdgeList.add(edge0);
+		edgeList.add(edge0);
 		PixelEdge edge1 = createEdge(rootNode, nodes.get(1), afterPixelList);
-		pixelEdgeList.add(edge1);
+		edgeList.add(edge1);
 		
-		return pixelEdgeList;
+		return edgeList;
 	}
 
 	private PixelEdge createEdge(PixelNode splitNode, PixelNode newEndNode, PixelList pixelList) {
@@ -460,15 +304,15 @@ public class PixelGraph {
 	private PixelEdge getExtremeEdge(ComparatorType comparatorType) {
 		PixelEdge extremeEdge = null;
 		double extreme = Double.MAX_VALUE;
-		for (PixelEdge edge : pixelEdgeList) {
+		for (PixelEdge edge : edgeList) {
 			LOG.trace(edge);
-			PixelSegmentList pixelSegmentList = edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
-			LOG.trace("PL "+pixelSegmentList.size()+"  /  "+pixelSegmentList.getReal2Array());
+			PixelSegmentList segmentList = edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
+			LOG.trace("PL "+segmentList.size()+"  /  "+segmentList.getReal2Array());
 			// look for goal post edge
-			if (pixelSegmentList.size() != 3) {
+			if (segmentList.size() != 3) {
 				continue;
 			}
-			Line2 crossbar = pixelSegmentList.get(1).getEuclidLine();
+			Line2 crossbar = segmentList.get(1).getEuclidLine();
 			Real2 midPoint = crossbar.getMidPoint();
 			// LHS
 			if (ComparatorType.LEFT.equals(comparatorType) && crossbar.isVertical(ANGLE_EPS)) {
@@ -505,29 +349,29 @@ public class PixelGraph {
 	 * @return
 	 */
 	public PixelNodeList getPossibleRootNodes2() {
-		PixelNodeList pixelNodeList = new PixelNodeList();
+		PixelNodeList nodeList = new PixelNodeList();
 		PixelEdge rootEdge = null;
 		PixelNode midNode = null;
-		for (PixelEdge edge : pixelEdgeList) {
-			LOG.trace(edge.getPixelNodes());
-			PixelSegmentList pixelSegmentList = edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
-			Angle deviation = pixelSegmentList.getSignedAngleOfDeviation();
+		for (PixelEdge edge : edgeList) {
+			LOG.trace(edge.getNodes());
+			PixelSegmentList segmentList = edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
+			Angle deviation = segmentList.getSignedAngleOfDeviation();
 			if (Math.abs(deviation.getRadian()) < 2.0) continue;
-			LOG.trace("POLY "+pixelSegmentList.get(0)+"/"+pixelSegmentList.getLast()+"/"+deviation);
-			if (pixelSegmentList.size() == 3) {
-				SVGLine midline = pixelSegmentList.get(1).getLine();
+			LOG.trace("POLY "+segmentList.get(0)+"/"+segmentList.getLast()+"/"+deviation);
+			if (segmentList.size() == 3) {
+				SVGLine midline = segmentList.get(1).getLine();
 				Pixel midPixel = edge.getNearestPixelToMidPoint(midline.getMidPoint());
 				midNode = new PixelNode(midPixel, this);
-				pixelNodeList.add(midNode);
+				nodeList.add(midNode);
 				rootEdge = edge;
 			}
 		}
-		if (pixelNodeList.size() == 1) {
-			PixelNode rootNode = pixelNodeList.get(0);
+		if (nodeList.size() == 1) {
+			PixelNode rootNode = nodeList.get(0);
 			removeOldEdgeAndAddNewEdge(rootNode, rootEdge, 0);
 			removeOldEdgeAndAddNewEdge(rootNode, rootEdge, 1);
 		}
-		return pixelNodeList;
+		return nodeList;
 	}
 
 	private void removeOldEdgeAndAddNewEdge(PixelNode rootNode, PixelEdge rootEdge, int nodeNum) {
@@ -546,47 +390,47 @@ public class PixelGraph {
 			edge.addNode(node1, 1);
 			node1.addEdge(edge);
 		}
-		this.pixelEdgeList.add(edge);
+		this.edgeList.add(edge);
 	}
 
 	private void removeEdgeFromNode(PixelNode node, PixelEdge edge) {
 		if (node != null) {
 			node.removeEdge(edge);
 		}
-		pixelEdgeList.remove(edge);
+		edgeList.remove(edge);
 	}
 
 	public void addNode(PixelNode node) {
 		ensureNodes();
-		if (!pixelNodeList.contains(node)) {
-			pixelNodeList.add(node);
+		if (!nodeList.contains(node)) {
+			nodeList.add(node);
 		}
 	}
 
 	public void addEdge(PixelEdge edge) {
 		ensureEdges();
-		if (!pixelEdgeList.contains(edge)) {
-			pixelEdgeList.add(edge);
+		if (!edgeList.contains(edge)) {
+			edgeList.add(edge);
 			addNode(edge.getPixelNode(0));
 			addNode(edge.getPixelNode(1));
 		}
 	}
 
 	private void ensureNodes() {
-		if (pixelNodeList == null) {
-			pixelNodeList = new PixelNodeList();
+		if (nodeList == null) {
+			nodeList = new PixelNodeList();
 		}
 	}
 
 	private void ensureEdges() {
-		if (pixelEdgeList == null) {
-			pixelEdgeList = new PixelEdgeList();
+		if (edgeList == null) {
+			edgeList = new PixelEdgeList();
 		}
 	}
 
 	public void numberTerminalNodes() {
 		int i = 0;
-		for (PixelNode node : getPixelNodeList()) {
+		for (PixelNode node : getNodeList()) {
 //			if (node != instanceof TerminalNode) {
 				node.setLabel(NODE_PREFIX + i);
 //			}
@@ -613,9 +457,9 @@ public class PixelGraph {
 	}
 
 	public void drawNodes(String[] colours, SVGG g) {
-		for (int i = 0; i < pixelNodeList.size(); i++) {
+		for (int i = 0; i < nodeList.size(); i++) {
 			String col = colours[i % colours.length];
-			PixelNode node = pixelNodeList.get(i);
+			PixelNode node = nodeList.get(i);
 			if (node != null) {
 				SVGG nodeG = node.createSVG(1.0);
 				nodeG.setStroke(col);
@@ -628,9 +472,9 @@ public class PixelGraph {
 	}
 
 	public void drawEdges(String[] colours, SVGG g) {
-		for (int i = 0; i < pixelEdgeList.size(); i++) {
+		for (int i = 0; i < edgeList.size(); i++) {
 			String col = colours[i % colours.length];
-			PixelEdge edge = pixelEdgeList.get(i);
+			PixelEdge edge = edgeList.get(i);
 			SVGG edgeG = edge.createPixelSVG(col);
 			edgeG.setFill(col);
 			g.appendChild(edgeG);
@@ -655,7 +499,7 @@ public class PixelGraph {
 	//			}
 		} else {
 			try {
-				rootNode = getRootPixelNodeFromExtremeEdge(rootPosition);
+				rootNode = getRootNodeFromExtremeEdge(rootPosition);
 			} catch (RuntimeException e) {
 					throw(e);
 			}
@@ -674,8 +518,8 @@ public class PixelGraph {
 	 */
 	public SVGG createSegmentedEdges() {
 		SVGG g = new SVGG();
-		for (PixelEdge edge: pixelEdgeList) {
-			PixelSegmentList pixelSegmentList = edge.getOrCreatePixelSegmentList(parameters.getSegmentTolerance());
+		for (PixelEdge edge: edgeList) {
+			PixelSegmentList pixelSegmentList = edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
 			pixelSegmentList.setStroke(parameters.getStroke());
 			pixelSegmentList.setWidth(parameters.getLineWidth());
 			pixelSegmentList.setFill(parameters.getFill());
@@ -688,10 +532,10 @@ public class PixelGraph {
 		LOG.error("createAndDrawGraph NYI");
 	}
 
-	private PixelNode getNode(Pixel next) {
-		for (PixelNode node0 : pixelNodeList) {
-			if (next.equals(node0.getCentrePixel())) {
-				return node0;
+	private PixelNode getNode(Pixel pixel) {
+		for (PixelNode node : nodeList) {
+			if (pixel.equals(node.getCentrePixel())) {
+				return node;
 			}
 		}
 		return null;
@@ -735,14 +579,17 @@ public class PixelGraph {
 		return edge;
 	}
 
-	public PixelEdgeList createEdgeList() {
+	public PixelEdgeList createEdgeListOld() {
 		PixelEdgeList pixelEdgeList = new PixelEdgeList();
 		boolean moreToDo = true;
 		while (moreToDo) {
 			moreToDo = false;
-			for (PixelNode node : pixelNodeList) {
+			for (PixelNode node : nodeList) {
+				if (node == null) {
+					throw new RuntimeException("Null NODE");
+				}
 				if (node.getUnusedNeighbours().size() > 0) {
-					LOG.trace("node with unused neighbours: "+node);
+					LOG.debug("node with unused neighbours: "+node);
 					PixelEdge edge = createEdge(node);
 					pixelEdgeList.add(edge);
 					LOG.trace("============== "+edge);
@@ -752,6 +599,55 @@ public class PixelGraph {
 			}
 		}
 		return pixelEdgeList;
+	}
+	
+	// FIXME
+	public PixelEdgeList createEdgeListFromNodeList() {
+		nodeStack = new Stack<PixelNode>();
+		PixelEdgeList pixelEdgeList = new PixelEdgeList();
+		PixelNucleusList pixelNucleusList = new PixelNucleusList();
+		for (PixelNode pixelNode : nodeList) {
+			PixelNucleus nucleus = getPopulatedNucleusByPixelNodeMap().get(pixelNode);
+			pixelNucleusList.add(nucleus);
+		}
+		if (nodeList.size() > 0) {
+//			PixelNode pixelNode = pixelNodeList.get(0);
+//			nodeStack.push(pixelNode);
+//			pixelNodeSet.remove(pixelNode);
+//			while (!nodeStack.isEmpty()) {
+//				pixelNode = nodeStack.pop();
+//				
+//				// 
+//				
+//				nodeStack.push()
+//			}
+		}
+		return pixelEdgeList;
+
+	}
+
+	private Map<PixelNode, PixelNucleus> getPopulatedNucleusByPixelNodeMap() {
+		return getNucleusFactory().getPopulatedNucleusByNodeMap();
+	}
+
+	private Stack<PixelNode> createNodeStack() {
+		createNodeList();
+		nodeStack = new Stack<PixelNode>();
+		for (PixelNode node : nodeList) {
+			nodeStack.push(node);
+		}
+		return nodeStack;
+	}
+
+	private PixelNucleusFactory getNucleusFactory() {
+		if (island == null) {
+			throw new RuntimeException("Island much not be null");
+		}
+		return island.getPixelNucleusCollection();
+	}
+
+	public PixelNucleusList getPixelNucleusList() {
+		return getNucleusFactory().getOrCreatePixelNucleusList();
 	}
 
 //	/** get pixelNodes.

@@ -1,13 +1,9 @@
 package org.xmlcml.image.pixel;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
-import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGCircle;
@@ -31,16 +27,16 @@ public class PixelNucleus {
 		TERMINAL,
 		Y,
 	}
-//	private JunctionSet junctionSet;
-//	private JunctionSet externallyConnectedJunctionSet;
-//	private PixelSet externalPixelSet;
 	private PixelIsland island;
 	private Real2 centre;
 	private Pixel centrePixel;
 	private PixelList pixelList;
 	private int rightAngleCorner;
 	private PixelJunctionType junctionType;
-	private PixelNodeList pixelNodeList; // should only be one Node normally
+	private PixelNode pixelNode;  // the node that coresponds to centrePixel
+	// list of pixels protruding from nucleus // normally in edges
+	// pixles can be removed from this list (but not from the nucleus)
+	private PixelList spikePixelList;
 
 	public PixelNucleus(PixelIsland island) {
 		this.island = island;
@@ -51,19 +47,8 @@ public class PixelNucleus {
 		this.rightAngleCorner = -1;
 	}
 
-//	public void add(JunctionNode junction) {
-//		junctionSet.add(junction);
-//		PixelList externalPixels = junction.getNonJunctionPixels();
-//		if (externalPixels.size() > 0) {
-//			externalPixelSet.addAll(externalPixels.getList());
-//			externallyConnectedJunctionSet.add(junction);
-//		}
-//	}
-
 	public boolean contains(PixelNode node) {
-		ensurePixelNodeList();
-		return pixelNodeList.contains(node);
-//		return junctionSet.contains(junction);
+		return (this.pixelNode != null && pixelNode.equals(node));
 	}
 
 	/** size in pixels.
@@ -72,12 +57,6 @@ public class PixelNucleus {
 	 */
 	public int size() {
 		return pixelList.size();
-	}
-
-	private void ensurePixelNodeList() {
-		if (pixelNodeList == null) {
-			pixelNodeList = new PixelNodeList();
-		}
 	}
 
 	public static void drawNucleusSet(Set<PixelNucleus> nucleusSet, SVGG g,
@@ -95,23 +74,28 @@ public class PixelNucleus {
 		g.appendChild(circle);
 	}
 
+	/** get coordinates of centre of nucleus.
+	 * 
+	 * @return
+	 */
 	public Real2 getCentre() {
-		if (centre == null) {
+		Real2 centre = null;
+		if (centrePixel == null) {
 			Real2Array real2Array = new Real2Array();
-			for (PixelNode node : pixelNodeList) {
-				Pixel pixel = node.getCentrePixel();
+			for (Pixel pixel : pixelList) {
 				real2Array.add(new Real2(pixel.getInt2()));
 			}
 			centre = real2Array.getMean();
+		} else {
+			centre = new Real2(centrePixel.getInt2());
 		}
 		return centre;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		ensurePixelNodeList();
-		for (PixelNode node : pixelNodeList) {
-			sb.append("node: "+node + "; ");
+		if (pixelNode != null) {
+			sb.append("node: "+pixelNode + "; ");
 		}
 		sb.append("{");
 		if (centre != null) {
@@ -418,14 +402,40 @@ public class PixelNucleus {
 		return junctionType;
 	}
 
-	public void add(PixelNode node) {
-		ensurePixelNodeList();
-		pixelNodeList.add(node);
+	public void set(PixelNode node) {
+		if (this.pixelNode != null) {
+			throw new RuntimeException();
+		}
+		this.pixelNode = node;
 	}
 
-	public PixelNodeList getPixelNodeList() {
-		ensurePixelNodeList();
-		return pixelNodeList;
+	public PixelNode getPixelNode() {
+		if (pixelNode == null) {
+			if (centrePixel == null) {
+				throw new RuntimeException("Null centre pixel ; pixelList "+pixelList);
+			}
+			pixelNode = new PixelNode(centrePixel, island);
+		}
+		return pixelNode;
+	}
+
+	/** all non-nucleus pixels connected to nucleus pixels are added as neighbours.
+	 * 
+	 * This effectively creates a shell of linkable pixels suitable for edges.
+	 * 
+	 * @return
+	 */
+	public PixelList createSpikePixelList() {
+		spikePixelList = new PixelList();
+		for (Pixel pixel : pixelList) {
+			PixelList neighbours = pixel.createNeighbourList(island);
+			for (Pixel neighbour : neighbours) {
+				if (!pixelList.contains(neighbour)) {
+					spikePixelList.add(neighbour);
+				}
+			}
+		}
+		return spikePixelList;
 	}
 
 }

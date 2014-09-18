@@ -3,8 +3,6 @@ package org.xmlcml.image.pixel;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -12,11 +10,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class PixelGraphTest {
@@ -25,80 +20,27 @@ public class PixelGraphTest {
 	
 	@Test
 	public void testSingleCycle() {
-		PixelIsland island = new PixelIsland();
-		island.setDiagonal(true);
-		// simple diamond cycle
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(-1,0));
-		island.addPixel(new Pixel(0, -1));
-		PixelGraph graph = PixelGraph.createGraph(island);
+		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_CYCLE_ISLAND());
 		Assert.assertNotNull(graph);
-		// single cycle, test its properties FAILS
-//		PixelCycle cycle = graph.getCycle();
-//		Assert.assertNotNull(cycle);
-//		PixelEdge edge = cycle.getEdge();
-//		Assert.assertNotNull(edge);
-//		PixelList list = edge.getPixelList();
-//		Assert.assertNotNull(list);
-//		Assert.assertEquals("cycle", "{(1,0)(0,1)(-1,0)(0,-1)}", list.toString());
-//		PixelNodeList nodes = edge.getPixelNodes();
-//		Assert.assertEquals(0, nodes.size());
-		// text zero junctions
-//		JunctionSet junctionSet = graph.getJunctionSet();
-//		Assert.assertNotNull(junctionSet);
-//		Assert.assertEquals(0, junctionSet.size());
-//		// text zero terminals
-//		TerminalNodeSet terminalSet = graph.getTerminalNodeSet();
-//		Assert.assertNotNull(terminalSet);
-//		Assert.assertEquals(0, terminalSet.size());
+		PixelNodeList nodeList = graph.getNodeList();
+		PixelTestUtils.assertNodeList(nodeList, 0, "[]"); 
 	}
-	
+
 	@Test
 	// simple line
 	public void test2Nodes() {
-		PixelIsland island = new PixelIsland();
-		island.setDiagonal(true);
-		// simple wiggly line
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(-1,2));
-		island.addPixel(new Pixel(0, 3));
-		PixelGraph graph = PixelGraph.createGraph(island);
-//		PixelCycle cycle = graph.getCycle();
-//		Assert.assertNull(cycle);
-//		// no junctions
-//		JunctionSet junctionSet = graph.getJunctionSet();
-//		Assert.assertNotNull(junctionSet);
-//		Assert.assertEquals(0, junctionSet.size());
-//		// text 2 terminals
-//		TerminalNodeSet terminalSet = graph.getTerminalNodeSet();
-//		Assert.assertNotNull(terminalSet);
-//		Assert.assertEquals(2, terminalSet.size());
-//		// terminal 0
-//		TerminalNode node0 = (TerminalNode) terminalSet.get(0);
+		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_LINE_ISLAND());
+		PixelNodeList nodeList = graph.getNodeList();
+		PixelTestUtils.assertNodeList(nodeList, 2, "[(1,0)(0,3)]"); 
 	}
-	
+
 	@Test
 	// Y-shaped tree
 	public void test3Terminals() {
-		PixelIsland island = new PixelIsland();
-		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(0,3));
-		island.addPixel(new Pixel(-1, -1));
-		island.addPixel(new Pixel(-2, -2));
-		island.addPixel(new Pixel(-3, -3));
-		island.addPixel(new Pixel(1, -1));
-		island.addPixel(new Pixel(2, -2));
-		island.addPixel(new Pixel(3, -3));
-		PixelGraph graph = PixelGraph.createGraph(island);
-//		PixelCycle cycle = graph.getCycle();
-//		Assert.assertNull(cycle);
-		// fails
-		PixelEdgeList edgeList = graph.getPixelEdgeList();
+		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_Y_ISLAND());
+		PixelNodeList nodeList = graph.getNodeList();
+		PixelTestUtils.assertNodeList(nodeList, 4, "[(0,0)(0,3)(-3,-3)(3,-3)]"); 
+		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals(3, edgeList.size()); 
 //		Assert.assertEquals("{(-3,-3)(-2,-2)(-1,-1)(0,0)}/[(-3,-3), (0,0)]", edgeList.get(0).toString());
 //		Assert.assertEquals("{(3,-3)(2,-2)(1,-1)(0,0)}/[(3,-3), (0,0)]", edgeList.get(1).toString());
@@ -113,32 +55,27 @@ public class PixelGraphTest {
 //		Assert.assertNotNull(terminalSet);
 //		Assert.assertEquals("[(-3,-3), (3,-3), (0,3)]", terminalSet.toString()); 
 	}
-	
+
 	@Test
 	// 2 Y's joined
-	public void test1122TetramethylEthane() {
-		PixelIsland island = new PixelIsland();
-		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(1,3));
-		island.addPixel(new Pixel(-1,3));
-		island.addPixel(new Pixel(2,4));
-		island.addPixel(new Pixel(-2,4));
-		island.addPixel(new Pixel(3,5));
-		island.addPixel(new Pixel(-3,5));
-		island.addPixel(new Pixel(0,-1));
-		island.addPixel(new Pixel(0,-2));
-		island.addPixel(new Pixel(1,-3));
-		island.addPixel(new Pixel(-1,-3));
-		island.addPixel(new Pixel(2,-4));
-		island.addPixel(new Pixel(-2,-4));
-		island.addPixel(new Pixel(3,-5));
-		island.addPixel(new Pixel(-3,-5));
-		PixelGraph graph = PixelGraph.createGraph(island);
-		PixelEdgeList edgeList = graph.getPixelEdgeList();
-//		Assert.assertEquals(5, edgeList.size()); 
+	/**
+	 * +     +
+	 *  +   +
+	 *   + +
+	 *    +
+	 *    +
+	 *    +
+	 *    +
+	 *   + +
+	 *  +   +
+	 * +     +
+	 */
+	public void testDoubleYGraph() {
+		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_DOUBLE_Y_ISLAND());
+		PixelNodeList nodeList = graph.getNodeList();
+		PixelTestUtils.assertNodeList(nodeList, 6, "[(0,2)(3,5)(-3,5)(0,-2)(3,-5)(-3,-5)]"); 
+		PixelEdgeList edgeList = graph.getEdgeList();
+//		Assert.assertEquals("edges", 5, edgeList.size()); 
 //		Assert.assertEquals("{(-3,-5)(-2,-4)(-1,-3)(0,-2)}/[(-3,-5), (0,-2)]", edgeList.get(0).toString());
 //		Assert.assertEquals("{(3,-5)(2,-4)(1,-3)(0,-2)}/[(3,-5), (0,-2)]", edgeList.get(1).toString());
 //		Assert.assertEquals("{(0,-2)(0,-1)(0,0)(0,1)(0,2)}/[(0,-2), (0,2)]", edgeList.get(2).toString());
@@ -154,7 +91,8 @@ public class PixelGraphTest {
 //		Assert.assertNotNull(terminalSet);
 //		Assert.assertEquals("[(-3,-5), (3,-5), (-3,5), (3,5)]", terminalSet.toString()); 
 	}
-	
+
+
 	@Test
 	/** hexagon with 3 spikes
 	 *       X
@@ -167,24 +105,8 @@ public class PixelGraphTest {
 	 *   X       X
 	 */
 	public void test135TrimethylBenzene() {
-		PixelIsland island = new PixelIsland();
-		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(1,3));
-		island.addPixel(new Pixel(-1,3));
-		island.addPixel(new Pixel(1,4));
-		island.addPixel(new Pixel(-1,4));
-		island.addPixel(new Pixel(-2,5));
-		island.addPixel(new Pixel(0,5));
-		island.addPixel(new Pixel(2,5));
-		island.addPixel(new Pixel(-3,6));
-		island.addPixel(new Pixel(3,6));
-		island.addPixel(new Pixel(-4,7));
-		island.addPixel(new Pixel(4,7));
-		PixelGraph graph = PixelGraph.createGraph(island);
-		PixelEdgeList edgeList = graph.getPixelEdgeList();
+		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
+		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals(6, edgeList.size()); 
 //		Assert.assertEquals("{(0,0)(0,1)(0,2)}/[(0,0), (0,2)]", edgeList.get(0).toString());
 //		Assert.assertEquals("{(0,2)(-1,3)(-1,4)}/[(0,2), (-1,4)]", edgeList.get(1).toString());
@@ -199,30 +121,20 @@ public class PixelGraphTest {
 //		Assert.assertNotNull(terminalSet);
 //		Assert.assertEquals("[(0,0), (-4,7), (4,7)]", terminalSet.toString()); 
 	}
-	
+
 	@Test
+	/** rhombus has not been thinned so throws exception.
+	 * 
+	 */
 	public void testRhombus() {
-		PixelIsland island = new PixelIsland();
-		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(1,1));
-		island.addPixel(new Pixel(2,1));
-		island.addPixel(new Pixel(2,2));
-		island.addPixel(new Pixel(3,2));
-		island.addPixel(new Pixel(4,3));
-		PixelGraph graph = PixelGraph.createGraph(island);
-		Assert.assertEquals(6, graph.getPixelList().size());
-//		Assert.assertEquals(4, graph.getJunctionSet().size());
-//		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
-//		Assert.assertEquals(4, nucleusByJunctionMap.size());
-//		if (graph.getNucleusSet() == null) {
-//			graph.makeNucleusMap();
-//		}
-//		Set<PixelNucleus> nucleusSet = graph.getNucleusSet();
-//		Assert.assertEquals(1, nucleusSet.size());
-//		Assert.assertEquals(4, nucleusSet.iterator().next().size());
+		PixelIsland island = Fixtures.CREATE_RHOMBUS_ISLAND();
+		try {
+			PixelGraph graph = PixelGraph.createGraph(island);
+			Assert.fail("should throw exception");
+		} catch (RuntimeException e) {
+		}
 	}
-	
+
 	@Test
 	@Ignore // recent edge algorithms broke this
 
@@ -238,7 +150,7 @@ public class PixelGraphTest {
 		island.addPixel(new Pixel(3,3));
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(7, graph.getPixelList().size());
-		Assert.assertEquals(5, graph.getPixelNodeList().size());
+		Assert.assertEquals(5, graph.getNodeList().size());
 //		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
 //		Assert.assertEquals(5, nucleusByJunctionMap.size());
 //		if (graph.getNucleusSet() == null) {
@@ -252,6 +164,16 @@ public class PixelGraphTest {
 	@Test
 	// FIXME this gives wrong nucleus count
 	public void test2Nuclei() {
+		PixelIsland island = CREATE_TWO_NUCLEUS_ISLAND();
+		Assert.assertEquals(12, island.getPixelList().size());
+		try {
+			PixelGraph graph = PixelGraph.createGraph(island);
+			Assert.fail("Non-thinned nucleus should throw");
+		} catch (RuntimeException e) {
+		}
+	}
+
+	public static PixelIsland CREATE_TWO_NUCLEUS_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
 		island.addPixel(new Pixel(0,0));
@@ -266,16 +188,7 @@ public class PixelGraphTest {
 		island.addPixel(new Pixel(5,5));
 		island.addPixel(new Pixel(6,5));
 		island.addPixel(new Pixel(7,6));
-		PixelGraph graph = PixelGraph.createGraph(island);
-		Assert.assertEquals(12, graph.getPixelList().size());
-//		Assert.assertEquals(9, graph.getJunctionSet().size());
-//		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
-//		Assert.assertEquals(9, nucleusByJunctionMap.size());
-//		if (graph.getNucleusSet() == null) {
-//			graph.makeNucleusMap();
-//		}
-//		Set<PixelNucleus> nucleusSet = graph.getNucleusSet();
-//		Assert.assertEquals(2, nucleusSet.size());
+		return island;
 	}
 	
 	@Test
@@ -288,16 +201,14 @@ public class PixelGraphTest {
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
 		LOG.debug("islands: "+pixelIslandList.size());
 		PixelIsland island = pixelIslandList.getLargestIsland();
-		PixelGraph graph = PixelGraph.createGraph(island);
-		LOG.debug("edges "+graph.getPixelEdgeList().size());
-		// FAILS NPE
-//		PixelNode pixelNode = graph.getRootPixelNodeFromExtremeEdge(ComparatorType.LEFT);
-//		LOG.debug("pixel "+pixelNode);
-//		SVGG g = new SVGG();
-//		graph.createAndDrawGraph(g);
-//		SVGG gg = graph.drawEdgesAndNodes(PixelGraph.COLOURS);
-//		g.appendChild(gg);
-//		SVGSVG.wrapAndWriteAsSVG(g, new File("target/edge/94172.svg"));
+		PixelGraph graph = null;
+		try {
+			graph = PixelGraph.createGraph(island);
+		} catch (RuntimeException e) {
+			Assert.fail("failed "+e);
+			e.printStackTrace();
+		}
+//		LOG.debug("edges "+graph.getPixelEdgeList().size());
 	}
 	
 

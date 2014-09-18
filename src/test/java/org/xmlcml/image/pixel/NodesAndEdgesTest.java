@@ -68,7 +68,6 @@ public class NodesAndEdgesTest {
 	 * 
 	 */
 	@Test
-	@Ignore // FIXME NOW
 	public void testNodes() {
 		PixelNodeList nodeList = A12.createNodeList();//  getNodes();
 		Assert.assertEquals("nodes", 4, nodeList.size());
@@ -79,7 +78,7 @@ public class NodesAndEdgesTest {
 	}
 
 	@Test
-	@Ignore // FIXME NOW
+//	@Ignore // FIXME NOW
 	public void testCreateEdge() {
 		PixelIsland island = A12;
 		PixelNodeList nodeList = island.createNodeList();//  getNodes()

@@ -54,9 +54,16 @@ public class PixelEdge {
 	}
 
 	public void addPixel(Pixel pixel) {
+		ensurePixelList();
 		pixelList.add(pixel);
 	}
 	
+	private void ensurePixelList() {
+		if (pixelList == null) {
+			pixelList = new PixelList();
+		}
+	}
+
 	public void addPixelList(PixelList pixelList) {
 		this.pixelList.addAll(pixelList);
 	}
@@ -71,7 +78,7 @@ public class PixelEdge {
 	 * 
 	 * @return
 	 */
-	public PixelNodeList getPixelNodes() {
+	public PixelNodeList getNodes() {
 		return nodes;
 	}
 	
@@ -121,7 +128,7 @@ public class PixelEdge {
 		return equals;
 	}
 
-	public PixelSegmentList getOrCreatePixelSegmentList(double tolerance) {
+	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
 		if (pixelSegmentList == null) {
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array points = pixelList.getReal2Array();

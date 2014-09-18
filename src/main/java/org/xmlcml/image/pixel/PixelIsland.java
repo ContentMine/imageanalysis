@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -59,7 +60,6 @@ public class PixelIsland implements Iterable<Pixel> {
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private PixelList terminalPixels;
-//	private List<PixelPath> pixelPathList;
 
 	private List<Real2Array> segmentArrayList;
 	private String pixelColor = "red";
@@ -67,9 +67,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private ImageParameters parameters;
 	private PixelList emptyPixelList;
 	private PixelList singleHoleList;
-	private PixelNucleusCollection pixelNucleusCollection;
+	private PixelNucleusFactory nucleusFactory;
 	private PixelList orthogonalStubList;
-	private PixelNucleusCollection nucleusListCollection;
 	private PixelGraph pixelGraph;
 	
 	public PixelIsland() {
@@ -105,9 +104,18 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private void ensurePixelGraph() {
 		if (pixelGraph == null) {
+//			ensurePixelNucleusCollection();
 			pixelGraph = new PixelGraph(this);
 		}
 	}
+	
+	private void getOrCreatePixelGraph() {
+		ensureNucleusFactory();
+		if (pixelGraph == null) {
+			pixelGraph = new PixelGraph(this);
+		}
+	}
+	
 	public Real2Range getBoundingBox() {
 		ensurePixelList();
 		Real2Range r2r = new Real2Range();
@@ -935,8 +943,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * @return the removed pixels
 	 */
 	public PixelNucleusList doTJunctionThinning() {
-		ensurePixelNucleusCollection();
-		PixelNucleusList nucleusList = pixelNucleusCollection.getOrCreatePixelNucleusList();
+		ensureNucleusFactory();
+		PixelNucleusList nucleusList = nucleusFactory.getOrCreatePixelNucleusList();
 		nucleusList.doTJunctionThinning(this);
 		return nucleusList;
 	}
@@ -954,30 +962,31 @@ public class PixelIsland implements Iterable<Pixel> {
 		return orthogonalStubList;
 	}
 
-	public PixelNucleusCollection getPixelNucleusCollection() {
-		ensurePixelNucleusCollection();
-		return pixelNucleusCollection;
+	public PixelNucleusFactory getPixelNucleusCollection() {
+		ensureNucleusFactory();
+		return nucleusFactory;
 	}
 
-	private void ensurePixelNucleusCollection() {
-		if (pixelNucleusCollection == null) {
-			pixelNucleusCollection = new PixelNucleusCollection(pixelList);
+	private void ensureNucleusFactory() {
+		if (nucleusFactory == null) {
+			nucleusFactory = new PixelNucleusFactory(this);
+			nucleusFactory.setIsland(this);
 		}
 	}
 
 	public PixelNodeList createNodeList() {
-		ensurePixelGraph();
-		return pixelGraph.getPixelNodeList();
+		getOrCreatePixelGraph();
+		return pixelGraph.getNodeList();
 	}
 
 	public PixelEdgeList createEdgeList() {
-		ensurePixelGraph();
-		return pixelGraph.createEdgeList();
+		getOrCreatePixelGraph();
+		return pixelGraph.createEdgeListOld();
 	}
 
 	public void rearrangeYJunctions() {
-		ensurePixelNucleusCollection();
-		PixelNucleusList yJunctionList = pixelNucleusCollection.getOrCreateYJunctionList();
+		ensureNucleusFactory();
+		PixelNucleusList yJunctionList = nucleusFactory.getOrCreateYJunctionList();
 		for (PixelNucleus yJunction : yJunctionList) {
 			LOG.trace("rearrange Y "+yJunction);
 			if (yJunction.rearrangeYJunction(this)) {
@@ -996,6 +1005,17 @@ public class PixelIsland implements Iterable<Pixel> {
 			}
 		}
 		return false;
+	}
+
+	private void drawPixels(int serial, String[] color, SVGG gg, int col1, PixelSet set) {
+		PixelList pixelList;
+		Set<String> ss;
+		pixelList = new PixelList();
+		pixelList.addAll(set);
+		if (pixelList.size() > 1) {
+			SVGG g = pixelList.draw(null, color[(serial + col1) % color.length]);
+			gg.appendChild(g);
+		}
 	}
 
 
