@@ -130,8 +130,10 @@ public class PixelGraphTest {
 		PixelIsland island = Fixtures.CREATE_RHOMBUS_ISLAND();
 		try {
 			PixelGraph graph = PixelGraph.createGraph(island);
-			Assert.fail("should throw exception");
+//			Assert.fail("should throw exception");
+			// error is now logged, not thrown
 		} catch (RuntimeException e) {
+			throw e;
 		}
 	}
 
@@ -168,7 +170,8 @@ public class PixelGraphTest {
 		Assert.assertEquals(12, island.getPixelList().size());
 		try {
 			PixelGraph graph = PixelGraph.createGraph(island);
-			Assert.fail("Non-thinned nucleus should throw");
+//			Assert.fail("Non-thinned nucleus should throw");
+			// now logs rather than throwing
 		} catch (RuntimeException e) {
 		}
 	}

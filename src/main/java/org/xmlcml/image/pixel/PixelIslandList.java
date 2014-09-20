@@ -670,7 +670,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public List<PixelGraph> analyzeEdgesAndPlot() {
-		throw new RuntimeException("NYI");
+		LOG.error("NYI");
+		return new ArrayList<PixelGraph>();
 	}
 
 }

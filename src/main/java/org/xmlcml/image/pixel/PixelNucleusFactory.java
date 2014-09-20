@@ -215,10 +215,14 @@ public class PixelNucleusFactory {
 		if (nodeList == null) {
 			getOrCreateNucleusList();
 			nodeList = new PixelNodeList();
-			for (PixelNucleus pixelNucleus : allNucleusList) {
-				PixelNode nucleusNode = pixelNucleus.getNode();
-				nucleusNode.setIsland(this.island);
-				nodeList.add(nucleusNode);
+			for (PixelNucleus nucleus : allNucleusList) {
+				PixelNode nucleusNode = nucleus.getNode();
+				if (nucleusNode == null) {
+					LOG.debug("Null node for nucleus:" + nucleus);
+				} else {
+					nucleusNode.setIsland(this.island);
+					nodeList.add(nucleusNode);
+				}
 			}
 		}
 		return nodeList;

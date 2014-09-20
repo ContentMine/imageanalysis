@@ -412,9 +412,13 @@ public class PixelNucleus {
 	public PixelNode getNode() {
 		if (pixelNode == null) {
 			if (centrePixel == null) {
-				throw new RuntimeException("Null centre pixel ; pixelList "+pixelList);
+				LOG.error("Null centre pixel ; pixelList "+pixelList);
+				for (Pixel pixel : pixelList) {
+					LOG.trace(pixel+"; "+pixel.getOrCreateNeighbours(island));
+				}
+			} else {
+				pixelNode = new PixelNode(centrePixel, island);
 			}
-			pixelNode = new PixelNode(centrePixel, island);
 		}
 		return pixelNode;
 	}

@@ -89,18 +89,6 @@ public class NodesAndEdgesTest {
 				+ "{(3,2)(2,2)(1,2)}/[(3,2)(1,2)]"
 				+ "{(3,2)(4,1)(4,0)}/[(3,2)(4,0)]", edgeList.toString());
 		Assert.assertEquals(4, edgeList.size());
-		
-//		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edges.get(0).toString());
-//		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edgeList.getEdges(new Pixel(1,2), new Pixel(0,0)).get(0).toString());
-//		Assert.assertEquals("{(3,2)(4,1)(4,0)}/[(3,2)(4,0)]", edgeList.getEdges(new Pixel(3,2), new Pixel(4,0)).get(0).toString());
-//		Assert.assertEquals("", 2, edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).size());
-//		String s = edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).toString();
-//		Assert.assertTrue(
-//				s.contains("{(1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2)}/[(1,2)(3,2)]") &&
-//				s.contains("{(1,2)(2,2)(3,2)}/[(1,2)(3,2)]"));
-//		for (PixelEdge edge : edgeList) {
-//			LOG.trace(edge);
-//		}
 	}
 
 	@Test

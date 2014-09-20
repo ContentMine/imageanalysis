@@ -182,7 +182,11 @@ public class PixelGraph {
 
 
 	public PixelNodeList getNodeList() {
-		nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
+		if (island != null) {
+			nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
+		} else {
+			ensureNodes();
+		}
 		return nodeList;
 	}
 
