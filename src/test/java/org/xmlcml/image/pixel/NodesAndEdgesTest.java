@@ -78,26 +78,29 @@ public class NodesAndEdgesTest {
 	}
 
 	@Test
-//	@Ignore // FIXME NOW
 	public void testCreateEdge() {
-		PixelIsland island = A12;
-		PixelNodeList nodeList = island.createNodeList();//  getNodes()
-		Assert.assertEquals("nodes", 4, nodeList.size());
-		PixelEdgeList edgeList = island.createEdgeList();
-		Assert.assertEquals("edges", 4, edgeList.size());
-		PixelEdgeList edges = edgeList.getEdges(new Pixel(0,0), new Pixel(1,2));
-		Assert.assertEquals(1, edges.size());
-		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edges.get(0).toString());
-		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edgeList.getEdges(new Pixel(1,2), new Pixel(0,0)).get(0).toString());
-		Assert.assertEquals("{(3,2)(4,1)(4,0)}/[(3,2)(4,0)]", edgeList.getEdges(new Pixel(3,2), new Pixel(4,0)).get(0).toString());
-		Assert.assertEquals("", 2, edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).size());
-		String s = edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).toString();
-		Assert.assertTrue(
-				s.contains("{(1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2)}/[(1,2)(3,2)]") &&
-				s.contains("{(1,2)(2,2)(3,2)}/[(1,2)(3,2)]"));
-		for (PixelEdge edge : edgeList) {
-			LOG.trace(edge);
-		}
+		PixelNucleusFactory factory = new PixelNucleusFactory(A12);
+		factory.createNodesAndEdges();
+		PixelNodeList nodeList = factory.getOrCreateNodeListFromNuclei();
+		Assert.assertEquals("nodes", "[(0,0)(1,2)(3,2)(4,0)]", nodeList.toString());
+		PixelEdgeList edgeList = factory.getEdgeList();
+		Assert.assertEquals("edges", "{(1,2)(0,1)(0,0)}/[(1,2)(0,0)]"
+				+ "{(3,2)(4,3)(3,4)(2,4)(1,4)(0,3)(1,2)}/[(3,2)(1,2)]"
+				+ "{(3,2)(2,2)(1,2)}/[(3,2)(1,2)]"
+				+ "{(3,2)(4,1)(4,0)}/[(3,2)(4,0)]", edgeList.toString());
+		Assert.assertEquals(4, edgeList.size());
+		
+//		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edges.get(0).toString());
+//		Assert.assertEquals("{(0,0)(0,1)(1,2)}/[(0,0)(1,2)]", edgeList.getEdges(new Pixel(1,2), new Pixel(0,0)).get(0).toString());
+//		Assert.assertEquals("{(3,2)(4,1)(4,0)}/[(3,2)(4,0)]", edgeList.getEdges(new Pixel(3,2), new Pixel(4,0)).get(0).toString());
+//		Assert.assertEquals("", 2, edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).size());
+//		String s = edgeList.getEdges(new Pixel(1,2), new Pixel(3,2)).toString();
+//		Assert.assertTrue(
+//				s.contains("{(1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2)}/[(1,2)(3,2)]") &&
+//				s.contains("{(1,2)(2,2)(3,2)}/[(1,2)(3,2)]"));
+//		for (PixelEdge edge : edgeList) {
+//			LOG.trace(edge);
+//		}
 	}
 
 	@Test

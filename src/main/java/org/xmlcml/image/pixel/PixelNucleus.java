@@ -409,7 +409,7 @@ public class PixelNucleus {
 		this.pixelNode = node;
 	}
 
-	public PixelNode getPixelNode() {
+	public PixelNode getNode() {
 		if (pixelNode == null) {
 			if (centrePixel == null) {
 				throw new RuntimeException("Null centre pixel ; pixelList "+pixelList);
@@ -437,5 +437,6 @@ public class PixelNucleus {
 		}
 		return spikePixelList;
 	}
+
 
 }

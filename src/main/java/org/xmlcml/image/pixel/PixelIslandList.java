@@ -521,36 +521,36 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 	}
 
-	@Deprecated
-	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
-		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
-		thinThickStepsOld();
-		File outputDir = pixelProcessor.getOutputDir();
-		outputDir.mkdirs();
-		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir,
-				"cleaned.png"));
-		// main tree
-		SVGG g = new SVGG();
-		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
-			LOG.debug("============ island " + i + "=============");
-			PixelIsland island = get(i);
-			BufferedImage image1 = island.createImage();
-			if (image1 == null)
-				continue;
-			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"
-					+ i + ".png"));
-			g.appendChild(island.createSVG());
-			PixelGraph graph = island.getOrCreateGraph();
-			graph.setParameters(parameters);
-			PixelEdgeList edgeList = graph.createEdgeListOld();
-			for (PixelEdge edge : edgeList) {
-				g.appendChild(edge.createPixelSVG("red"));
-			}
-			pixelGraphList.add(graph);
-		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir, "graphAndChars.svg"));
-		return pixelGraphList;
-	}
+//	@Deprecated
+//	public List<PixelGraph> analyzeEdgesAndPlot() throws IOException {
+//		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
+//		thinThickStepsOld();
+//		File outputDir = pixelProcessor.getOutputDir();
+//		outputDir.mkdirs();
+//		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir,
+//				"cleaned.png"));
+//		// main tree
+//		SVGG g = new SVGG();
+//		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
+//			LOG.debug("============ island " + i + "=============");
+//			PixelIsland island = get(i);
+//			BufferedImage image1 = island.createImage();
+//			if (image1 == null)
+//				continue;
+//			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"
+//					+ i + ".png"));
+//			g.appendChild(island.createSVG());
+//			PixelGraph graph = island.getOrCreateGraph();
+//			graph.setParameters(parameters);
+//			PixelEdgeList edgeList = graph.createEdgeListOld();
+//			for (PixelEdge edge : edgeList) {
+//				g.appendChild(edge.createPixelSVG("red"));
+//			}
+//			pixelGraphList.add(graph);
+//		}
+//		SVGSVG.wrapAndWriteAsSVG(g, new File(outputDir, "graphAndChars.svg"));
+//		return pixelGraphList;
+//	}
 
 	public List<PixelGraph> createGraphList() {
 		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
@@ -564,7 +564,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		}
 		LOG.debug("created graphs: "+pixelGraphList.size()+pixelGraphList);
 		for (PixelGraph pixelGraph : pixelGraphList) {
-			LOG.debug("graph "+pixelGraph.getEdgeList().size()+"; " +pixelGraph.getNodeList().size() /*+": "+pixelGraph.getEdges()+"; "*/);
+//			LOG.debug("graph "+pixelGraph.getEdgeList().size()+"; " +pixelGraph.getNodeList().size() /*+": "+pixelGraph.getEdges()+"; "*/);
 			for (PixelNode pixelNode : pixelGraph.getNodeList()) {
 				LOG.debug("Node "+pixelNode);
 			}
@@ -667,6 +667,10 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		sortBySizeDescending();
 		PixelIsland island = get(0); // the tree
 		return island;
+	}
+
+	public List<PixelGraph> analyzeEdgesAndPlot() {
+		throw new RuntimeException("NYI");
 	}
 
 }

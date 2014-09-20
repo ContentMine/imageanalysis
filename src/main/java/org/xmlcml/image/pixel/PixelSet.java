@@ -13,8 +13,19 @@ public class PixelSet implements Set<Pixel> {
 		ensurePixelSet();
 	}
 
+	/** deep copy of set.
+	 * 
+	 * @param set
+	 */
 	public PixelSet(PixelSet set) {
-		this.pixelSet = set.pixelSet;
+		this.pixelSet = new HashSet<Pixel>(set.pixelSet);
+	}
+
+	public PixelSet(PixelList pixelList) {
+		this.pixelSet = new HashSet<Pixel>();
+		for (Pixel pixel : pixelList) {
+			add(pixel);
+		}
 	}
 
 	private void ensurePixelSet() {
@@ -110,5 +121,19 @@ public class PixelSet implements Set<Pixel> {
 	public void clear() {
 		ensurePixelSet();
 		pixelSet.clear();
+	}
+
+	/** get next pixel.
+	 * 
+	 * creates an iterator for non-empty set and returns the next pixel
+	 * 
+	 * @return next pixel (order will not be reproducible)
+	 */
+	public Pixel next() {
+		return (isEmpty()) ? null : iterator().next();
+	}
+	
+	public String toString() {
+		return pixelSet.toString();
 	}
 }

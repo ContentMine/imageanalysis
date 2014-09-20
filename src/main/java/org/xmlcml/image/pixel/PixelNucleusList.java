@@ -57,7 +57,7 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 
 	public PixelNucleus get(int i) {
 		ensureList();
-		return list.get(0);
+		return list.get(i);
 	}
 
 	public void addAll(PixelNucleusList l) {
@@ -67,6 +67,6 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 	private List<PixelNucleus> getList() {
 		return list;
 	}
-	
+
 
 }

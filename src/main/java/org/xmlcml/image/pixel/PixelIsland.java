@@ -2,13 +2,11 @@ package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
@@ -19,7 +17,6 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
@@ -944,7 +941,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	 */
 	public PixelNucleusList doTJunctionThinning() {
 		ensureNucleusFactory();
-		PixelNucleusList nucleusList = nucleusFactory.getOrCreatePixelNucleusList();
+		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		nucleusList.doTJunctionThinning(this);
 		return nucleusList;
 	}
@@ -975,13 +972,11 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public PixelNodeList createNodeList() {
-		getOrCreatePixelGraph();
-		return pixelGraph.getNodeList();
+		return getPixelNucleusCollection().getOrCreateNodeListFromNuclei();
 	}
 
 	public PixelEdgeList createEdgeList() {
-		getOrCreatePixelGraph();
-		return pixelGraph.createEdgeListOld();
+		return getPixelNucleusCollection().createPixelEdgeListFromNodeList();
 	}
 
 	public void rearrangeYJunctions() {

@@ -76,7 +76,7 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	private void ensurePixelNucleus() {
 		if (pixelNucleus == null && island != null) {
-			pixelNucleus = island.getPixelNucleusCollection().getPixelNucleusByPixelMap().get(centrePixel);
+			pixelNucleus = island.getPixelNucleusCollection().getNucleusByPixel(centrePixel);
 		}
 	}
 

@@ -86,15 +86,13 @@ public class PixelGraph {
 
 	void createNodesAndEdges() {
 		if (edgeList == null) {
-			edgeList = new PixelEdgeList();
-			nodeList = new PixelNodeList();
-			createNodeList();
-			createEdgeListFromNodeList();
+			edgeList = getNucleusFactory().createPixelEdgeListFromNodeList();
+			nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
 		}
 	}
 
 	private void createNodeList() {
-		nodeList = getNucleusFactory().getOrCreateNodeList();
+		nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
 	}
 
 //	private void createNodeListFromEdgesOld() {
@@ -182,22 +180,9 @@ public class PixelGraph {
 		return next;
 	}
 
-//	/** is this ever used?
-//	 * 
-//	 * @param pixel
-//	 * @return
-//	 */
-//	public PixelNode getPixelNode(Pixel pixel) {
-//		return pixel == null ? null : nodeByPixelMap.get(pixel);
-//	}
-
-	public PixelEdgeList getEdgeList() {
-		createEdgeListFromNodeList();
-		return edgeList;
-	}
 
 	public PixelNodeList getNodeList() {
-		nodeList = getNucleusFactory().getOrCreateNodeList();
+		nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
 		return nodeList;
 	}
 
@@ -579,56 +564,34 @@ public class PixelGraph {
 		return edge;
 	}
 
-	public PixelEdgeList createEdgeListOld() {
-		PixelEdgeList pixelEdgeList = new PixelEdgeList();
-		boolean moreToDo = true;
-		while (moreToDo) {
-			moreToDo = false;
-			for (PixelNode node : nodeList) {
-				if (node == null) {
-					throw new RuntimeException("Null NODE");
-				}
-				if (node.getUnusedNeighbours().size() > 0) {
-					LOG.debug("node with unused neighbours: "+node);
-					PixelEdge edge = createEdge(node);
-					pixelEdgeList.add(edge);
-					LOG.trace("============== "+edge);
-					moreToDo = true;
-					break;
-				}
-			}
-		}
-		return pixelEdgeList;
-	}
-	
-	// FIXME
-	public PixelEdgeList createEdgeListFromNodeList() {
-		nodeStack = new Stack<PixelNode>();
-		PixelEdgeList pixelEdgeList = new PixelEdgeList();
-		PixelNucleusList pixelNucleusList = new PixelNucleusList();
-		for (PixelNode pixelNode : nodeList) {
-			PixelNucleus nucleus = getPopulatedNucleusByPixelNodeMap().get(pixelNode);
-			pixelNucleusList.add(nucleus);
-		}
-		if (nodeList.size() > 0) {
-//			PixelNode pixelNode = pixelNodeList.get(0);
-//			nodeStack.push(pixelNode);
-//			pixelNodeSet.remove(pixelNode);
-//			while (!nodeStack.isEmpty()) {
-//				pixelNode = nodeStack.pop();
-//				
-//				// 
-//				
-//				nodeStack.push()
+//	public PixelEdgeList createEdgeListOld() {
+//		PixelEdgeList pixelEdgeList = new PixelEdgeList();
+//		boolean moreToDo = true;
+//		while (moreToDo) {
+//			moreToDo = false;
+//			for (PixelNode node : nodeList) {
+//				if (node == null) {
+//					throw new RuntimeException("Null NODE");
+//				}
+//				if (node.getUnusedNeighbours().size() > 0) {
+//					LOG.debug("node with unused neighbours: "+node);
+//					PixelEdge edge = createEdge(node);
+//					pixelEdgeList.add(edge);
+//					LOG.trace("============== "+edge);
+//					moreToDo = true;
+//					break;
+//				}
 //			}
-		}
-		return pixelEdgeList;
-
-	}
-
-	private Map<PixelNode, PixelNucleus> getPopulatedNucleusByPixelNodeMap() {
-		return getNucleusFactory().getPopulatedNucleusByNodeMap();
-	}
+//		}
+//		return pixelEdgeList;
+//	}
+	
+//	// FIXME
+//	public PixelEdgeList createEdgeListFromNodeList() {
+//		return getNucleusFactory().createPixelEdgeList();
+//		return pixelEdgeList;
+//
+//	}
 
 	private Stack<PixelNode> createNodeStack() {
 		createNodeList();
@@ -647,7 +610,7 @@ public class PixelGraph {
 	}
 
 	public PixelNucleusList getPixelNucleusList() {
-		return getNucleusFactory().getOrCreatePixelNucleusList();
+		return getNucleusFactory().getOrCreateNucleusList();
 	}
 
 //	/** get pixelNodes.

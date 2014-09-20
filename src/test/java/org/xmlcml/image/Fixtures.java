@@ -208,10 +208,12 @@ public class Fixtures {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
 		// simple wiggly line
+		island.addPixel(new Pixel(2,0));
 		island.addPixel(new Pixel(1,0));
 		island.addPixel(new Pixel(0,1));
 		island.addPixel(new Pixel(-1,2));
 		island.addPixel(new Pixel(0, 3));
+		island.addPixel(new Pixel(0, 4));
 		return island;
 	}
 

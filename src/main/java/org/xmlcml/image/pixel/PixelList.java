@@ -346,5 +346,15 @@ public class PixelList implements Iterable<Pixel> {
 		return island;
 	}
 
+	public void add(int i, Pixel pixel) {
+		ensureList();
+		this.list.add(i, pixel);
+	}
+
+	public Pixel penultimate() {
+		ensureList();
+		return list.size() <= 1 ? null : list.get(list.size() - 2); 
+	}
+
 
 }

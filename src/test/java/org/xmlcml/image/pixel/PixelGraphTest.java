@@ -31,7 +31,7 @@ public class PixelGraphTest {
 	public void test2Nodes() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_LINE_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 2, "[(1,0)(0,3)]"); 
+		PixelTestUtils.assertNodeList(nodeList, 2, "[(2,0)(0,4)]"); 
 	}
 
 	@Test
@@ -40,7 +40,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_Y_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 4, "[(0,0)(0,3)(-3,-3)(3,-3)]"); 
-		PixelEdgeList edgeList = graph.getEdgeList();
+//		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals(3, edgeList.size()); 
 //		Assert.assertEquals("{(-3,-3)(-2,-2)(-1,-1)(0,0)}/[(-3,-3), (0,0)]", edgeList.get(0).toString());
 //		Assert.assertEquals("{(3,-3)(2,-2)(1,-1)(0,0)}/[(3,-3), (0,0)]", edgeList.get(1).toString());
@@ -74,7 +74,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_DOUBLE_Y_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 6, "[(0,2)(3,5)(-3,5)(0,-2)(3,-5)(-3,-5)]"); 
-		PixelEdgeList edgeList = graph.getEdgeList();
+//		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals("edges", 5, edgeList.size()); 
 //		Assert.assertEquals("{(-3,-5)(-2,-4)(-1,-3)(0,-2)}/[(-3,-5), (0,-2)]", edgeList.get(0).toString());
 //		Assert.assertEquals("{(3,-5)(2,-4)(1,-3)(0,-2)}/[(3,-5), (0,-2)]", edgeList.get(1).toString());
@@ -106,7 +106,7 @@ public class PixelGraphTest {
 	 */
 	public void test135TrimethylBenzene() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
-		PixelEdgeList edgeList = graph.getEdgeList();
+//		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals(6, edgeList.size()); 
 //		Assert.assertEquals("{(0,0)(0,1)(0,2)}/[(0,0), (0,2)]", edgeList.get(0).toString());
 //		Assert.assertEquals("{(0,2)(-1,3)(-1,4)}/[(0,2), (-1,4)]", edgeList.get(1).toString());

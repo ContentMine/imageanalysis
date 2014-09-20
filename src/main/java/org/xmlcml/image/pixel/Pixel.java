@@ -54,11 +54,11 @@ public class Pixel {
 		return neighbourList;
 	}
 
-	public PixelList createNeighbours(PixelIsland island) {
-//		this.island = island;
-		createNeighbours(island);
-		return neighbourList;
-	}
+//	public PixelList createNeighbours(PixelIsland island) {
+////		this.island = island;
+//		createNeighbours(island);
+//		return neighbourList;
+//	}
 
 	@Deprecated
 //	public PixelList getNeighbours(Marked marked) {
@@ -239,6 +239,10 @@ public class Pixel {
 
 	public int getValue() {
 		return value;
+	}
+
+	public boolean isNeighbour(Pixel pixel) {
+		return isOrthogonalNeighbour(pixel) || isDiagonalNeighbour(pixel);
 	}
 
 	public boolean isOrthogonalNeighbour(Pixel pixel) {
