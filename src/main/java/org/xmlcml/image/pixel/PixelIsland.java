@@ -67,6 +67,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelNucleusFactory nucleusFactory;
 	private PixelList orthogonalStubList;
 	private PixelGraph pixelGraph;
+
+	private SVGG svgg;
 	
 	public PixelIsland() {
 		ensurePixelList();
@@ -670,8 +672,21 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * 
 	 * @return
 	 */
+	@Deprecated
 	public SVGG getSVGG() {
 		return plotPixels(pixelList, pixelColor);
+	}
+
+	/**
+	 * plots pixels onto SVGG with current (or default) colour.
+	 * 
+	 * @return
+	 */
+	public SVGG getOrCreateSVGG() {
+		if (svgg == null) {
+			svgg = plotPixels(pixelList, pixelColor);
+		}
+		return svgg;
 	}
 
 	public void removeCorners() {
@@ -1011,6 +1026,10 @@ public class PixelIsland implements Iterable<Pixel> {
 			SVGG g = pixelList.draw(null, color[(serial + col1) % color.length]);
 			gg.appendChild(g);
 		}
+	}
+
+	public void setNucleusFactory(PixelNucleusFactory factory) {
+		this.nucleusFactory = factory;
 	}
 
 

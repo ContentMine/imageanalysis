@@ -1,11 +1,11 @@
 package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2Range;
 
 public class PixelNucleusList implements Iterable<PixelNucleus> {
 
@@ -66,6 +66,32 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 
 	private List<PixelNucleus> getList() {
 		return list;
+	}
+
+	/** merges any nuclei with touching pixels.
+	 * 
+	 * normally a tidy-up after generating nuclei in random order.
+	 * may be obsoleted 
+	 * 
+	 * Not fully implemented
+	 * 
+	 */
+	@Deprecated
+	public void mergeTouchingNuclei() {
+		PixelNucleus nucleusi = null;
+		PixelNucleus nucleusj = null;
+		PixelNucleus nucleusij = null;
+		for (int i = 0; i < list.size() - 1; i++) {
+			nucleusi = list.get(i);
+			Int2Range bboxi = nucleusi.getBoundingBox();
+			for (int j = i + 1; j < list.size(); j++) {
+				nucleusj = list.get(j);
+				Int2Range bboxj = nucleusi.getBoundingBox();
+				if (bboxi.touches(bboxj)) {
+					nucleusij = nucleusi.merge(nucleusj);
+				}
+			}
+		}
 	}
 
 

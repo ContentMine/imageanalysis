@@ -1,10 +1,11 @@
 package org.xmlcml.image.pixel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntRange;
 
 /** an intermediate object which identifies and manages PixelNucleus's and PixelNodes.
  * 
@@ -50,8 +51,8 @@ public class PixelNucleusFactory {
 	
 	public PixelNucleusFactory(PixelIsland island) {
 		this.island = island;
+		island.setNucleusFactory(this);
 		indexJunctions();
-		
 	}
 	
 	public PixelIsland getPixelIsland() {
@@ -144,9 +145,10 @@ public class PixelNucleusFactory {
 		return threewayList;
 	}
 	
-	public PixelNucleusList getOrCreateNucleusList() {
+	public PixelNucleusList getOrCreateNucleusListOld() {
 		if (allNucleusList == null) {
 			allNucleusList = new PixelNucleusList();
+			LOG.debug(this.hashCode()+"; NucleusList pixelList:"+island.pixelList.size());
 			for (Pixel pixel : island.pixelList) {
 				boolean added = false;
 				if (pixel.getOrCreateNeighbours(island).size() != 2) {
@@ -160,9 +162,29 @@ public class PixelNucleusFactory {
 					if (!added) {
 						PixelNucleus nucleus = new PixelNucleus(island);
 						nucleus.add(pixel);
-						LOG.trace("created nucleus: "+pixel+"; "+nucleus+"; "+nucleus.hashCode());
+						LOG.debug("created nucleus: "+pixel+"; "+nucleus+"; "+nucleus.hashCode());
 						allNucleusList.add(nucleus);
 					}
+				}
+				allNucleusList.mergeTouchingNuclei();
+			}
+			LOG.debug("Created nucleusList: "+allNucleusList.toString());
+		}
+		return allNucleusList;
+	}
+	
+	public PixelNucleusList getOrCreateNucleusList() {
+		if (allNucleusList == null) {
+			allNucleusList = new PixelNucleusList();
+			PixelSet pixelSet = new PixelSet(island.pixelList);
+			while (!pixelSet.isEmpty()) {
+				Pixel pixel = pixelSet.next();
+				pixelSet.remove(pixel);
+				if (pixel.getOrCreateNeighbours(island).size() != 2) {
+					PixelNucleus nucleus = makeNucleusFromSeed(pixel, island);
+					allNucleusList.add(nucleus);
+					pixelSet.removeAll(nucleus.getPixelList().getList());
+					LOG.trace("created nucleus: "+pixel+"; "+nucleus+"; "+nucleus.hashCode());
 				}
 			}
 			LOG.trace("Created nucleusList: "+allNucleusList.toString());
@@ -170,6 +192,32 @@ public class PixelNucleusFactory {
 		return allNucleusList;
 	}
 	
+	private PixelNucleus makeNucleusFromSeed(Pixel seed, PixelIsland island) {
+		PixelNucleus nucleus = new PixelNucleus(island);
+		PixelSet seedSet = new PixelSet();
+		seedSet.add(seed);
+		PixelSet usedSet = new PixelSet();
+		while (!seedSet.isEmpty()) {
+			Pixel pixel = seedSet.next();
+			seedSet.remove(pixel);
+			usedSet.add(pixel);
+			PixelList neighbours = pixel.getOrCreateNeighbours(island);
+			addNeighboursWith3orMoreNeighbours(island, seedSet, usedSet, neighbours);
+		}
+		nucleus.addAll(usedSet);
+		return nucleus;
+	}
+
+	private void addNeighboursWith3orMoreNeighbours(PixelIsland island, PixelSet set, PixelSet used, PixelList neighbours) {
+		for (Pixel neighbour : neighbours) {
+			if (neighbour.getOrCreateNeighbours(island).size() > 2) {
+				if (!used.contains(neighbour)) {
+					set.add(neighbour);
+				}
+			}
+		}
+	}
+
 	private void ensureNucleusByPixelMap() {
 		if (nucleusByPixelMap == null) {
 			nucleusByPixelMap = new HashMap<Pixel, PixelNucleus>();
@@ -194,18 +242,21 @@ public class PixelNucleusFactory {
 		}
 	}
 	
-	public Map<Pixel, PixelNucleus> populateMaps() {
+	public Map<Pixel, PixelNucleus> ensurePopulatedMaps() {
 		ensureNucleusByPixelMap();
 		ensureNucleusByNodeMap();
 		ensureNodeByPixelMap();
 		ensureNodeByNucleusMap();
-		for (PixelNucleus nucleus : allNucleusList) {
-			PixelNode node = nucleus.getNode();
-			nodeByNucleusMap.put(nucleus, node);
-			nucleusByNodeMap.put(node, nucleus);
-			PixelList pixelList = nucleus.getPixelList();
-			for (Pixel pixel : pixelList) {
-				nodeByPixelMap.put(pixel, node);
+		if (nucleusByPixelMap.size() == 0) {
+			for (PixelNucleus nucleus : allNucleusList) {
+				PixelNode node = nucleus.getNode();
+				nodeByNucleusMap.put(nucleus, node);
+				nucleusByNodeMap.put(node, nucleus);
+				PixelList pixelList = nucleus.getPixelList();
+				for (Pixel pixel : pixelList) {
+					nodeByPixelMap.put(pixel, node);
+					nucleusByPixelMap.put(pixel, nucleus);
+				}
 			}
 		}
 		return nucleusByPixelMap;
@@ -233,22 +284,22 @@ public class PixelNucleusFactory {
 	}
 
 	PixelNucleus getNucleusByPixel(Pixel pixel) {
-		populateMaps();
+		ensurePopulatedMaps();
 		return this.nucleusByPixelMap.get(pixel);
 	}
 
 	PixelNucleus getNucleusByNode(PixelNode node) {
-		populateMaps();
+		ensurePopulatedMaps();
 		return this.nucleusByNodeMap.get(node);
 	}
 
 	PixelNode getNodeByPixel(Pixel pixel) {
-		populateMaps();
+		ensurePopulatedMaps();
 		return this.nodeByPixelMap.get(pixel);
 	}
 	
 	PixelNode getNodeByNucleus(PixelNucleus nucleus) {
-		populateMaps();
+		ensurePopulatedMaps();
 		return this.nodeByNucleusMap.get(nucleus);
 	}
 	
@@ -327,6 +378,7 @@ public class PixelNucleusFactory {
 	public PixelNucleus getNucleusBySpikePixel(Pixel pixel) {
 		if (nucleusBySpikePixelMap == null) {
 			createSpikePixelList();
+			LOG.trace("made spikePixelList");
 		}
 		return nucleusBySpikePixelMap.get(pixel);
 	}
@@ -340,9 +392,14 @@ public class PixelNucleusFactory {
 
 	public PixelList findLine(PixelNucleus nucleus, Pixel spike) {
 		PixelList neighbours = spike.getOrCreateNeighbours(island);
-		if (neighbours.size() != 2) {
-			throw new RuntimeException("spike must have two neighbours");
+		if (neighbours.size() > 2) {
+			LOG.debug("spike "+spike+";"+spike.getOrCreateNeighbours(island)+"; "+nucleus);
+			throw new RuntimeException("spike has too many neighbours "+neighbours);
+		} else if (neighbours.size() != 2) {
+			LOG.debug("spike "+spike+";"+spike.getOrCreateNeighbours(island)+"; "+nucleus);
+			throw new RuntimeException("spike has too few neighbours: "+neighbours);
 		}
+
 		int nucleusNeighbourIndex = -1;
 		if (getNucleusByPixel(neighbours.get(0)) != null) {
 			nucleusNeighbourIndex = 0;
@@ -351,7 +408,6 @@ public class PixelNucleusFactory {
 		} else {
 			throw new RuntimeException("No neighbour in nucleus");
 		}
-		Pixel nextPixel = neighbours.get(1 - nucleusNeighbourIndex);
 		PixelList line = findLine(neighbours.get(nucleusNeighbourIndex), spike);
 		return line;
 
@@ -405,8 +461,12 @@ public class PixelNucleusFactory {
 			}
 			node = nucleus.getNode();
 			Pixel centrePixel = node.getCentrePixel();
-			if (centrePixel == null || !pixel.isNeighbour(centrePixel)) {
-				throw new RuntimeException("node is not joined to edge: "+pixel);
+			if (centrePixel == null) {
+				throw new RuntimeException("null centrePixel for: "+node+"; "+nucleus);
+			} else if (pixel.equals(centrePixel)) {
+				// this is fine
+			} else if (!pixel.isNeighbour(centrePixel)) {
+				throw new RuntimeException("edgeEnd: "+pixel+" is not joined to node "+node);
 			}
 		}
 		return node;
@@ -431,10 +491,12 @@ public class PixelNucleusFactory {
 	public void createNodesAndEdges() {
 		PixelList spikeList = getOrCreateSpikePixelList();
 		PixelSet spikeSet = new PixelSet(spikeList);
+		LOG.trace("made spikeSet");
 		int maxCount = 1000000;
 		while (!spikeSet.isEmpty() && maxCount-- > 0) {
 			getNextSpikeTraceEdgeAndDeleteBothSpikeEnds(spikeSet);
 		}
+		LOG.trace("createdEdges");
 	}
 
 	private void getNextSpikeTraceEdgeAndDeleteBothSpikeEnds(PixelSet spikeSet) {

@@ -1,9 +1,11 @@
 package org.xmlcml.image.pixel;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGCircle;
@@ -440,6 +442,41 @@ public class PixelNucleus {
 			}
 		}
 		return spikePixelList;
+	}
+
+	/** get bounding box for nucleus.
+	 * 
+	 * @return bounding box (null if no pixels)
+	 */
+	public Int2Range getBoundingBox() {
+		Int2Range bbox = null;
+		PixelList pixelList = getPixelList();
+		if (pixelList.size() > 0) {
+			bbox = pixelList.getIntBoundingBox();
+		}
+		return bbox;
+	}
+
+	/** NYI
+	 * 
+	 * @param nucleusj
+	 * @return
+	 */
+	PixelNucleus merge(PixelNucleus nucleus) {
+		throw new RuntimeException("NYI");
+	}
+
+	/** adds all pixels.
+	 * 
+	 * pixelSet is not altered
+	 * 
+	 * @param pixelSet
+	 */
+	public void addAll(PixelSet pixelSet) {
+		Iterator<Pixel> iterator = pixelSet.iterator();
+		while (iterator.hasNext()) {
+			this.add(iterator.next());
+		}
 	}
 
 

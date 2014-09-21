@@ -197,6 +197,25 @@ public class Fixtures {
 		return island;
 	}
 
+	public static PixelIsland CREATE_T_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(-1,-1));
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(1,0));
+		island.addPixel(new Pixel(2,1));
+		island.addPixel(new Pixel(3,1));
+		island.addPixel(new Pixel(4,1));
+		island.addPixel(new Pixel(5,1));
+		island.addPixel(new Pixel(6,0));
+		island.addPixel(new Pixel(7,0));
+		island.addPixel(new Pixel(3,2));
+		island.addPixel(new Pixel(3,3));
+		island.addPixel(new Pixel(3,4));
+		island.addPixel(new Pixel(3,5));
+		return island;
+	}
+
 	public static PixelIsland CREATE_DOT_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
