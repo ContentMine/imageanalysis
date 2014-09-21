@@ -17,6 +17,27 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		ensureList();
 	}
 	
+	/**
+	 * creates from output string, such as (11,22)(33,44)
+	 * 
+	 * @param nodeListS
+	 * @param island null if cannot create
+	 * @return
+	 */
+	public static PixelNodeList createNodeList(String nodeListS, PixelIsland island) {
+		PixelNodeList nodeList = null;
+		if (nodeListS != null) {
+			PixelList pixelList = PixelList.createPixelList(nodeListS, island);
+			if (pixelList == null || pixelList.size() != 2) {
+				throw new RuntimeException("Bad coordinate string for 2 nodes: "+nodeListS);
+			}
+			nodeList = new PixelNodeList();
+			nodeList.add(new PixelNode(pixelList.get(0), island));
+			nodeList.add(new PixelNode(pixelList.get(1), island));
+		}
+		return nodeList;
+	}
+
 	private void ensureList() {
 		if (nodeList == null) {
 			nodeList = new ArrayList<PixelNode>();
@@ -103,5 +124,6 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		ensureList();
 		return nodeList;
 	}
+
 
 }

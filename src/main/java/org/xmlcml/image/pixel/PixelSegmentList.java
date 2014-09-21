@@ -1,14 +1,19 @@
 package org.xmlcml.image.pixel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.image.geom.DouglasPeucker;
 
 /** a list of PixelSegments.
  * 
@@ -19,8 +24,10 @@ import org.xmlcml.euclid.Real2Array;
  */
 public class PixelSegmentList implements List<PixelSegment> {
 
+	private final static Logger LOG = Logger.getLogger(PixelSegmentList.class);
 	private List<PixelSegment> segmentList;
 	private Real2Array real2Array;
+	private List<SVGLine> svgLineList;
 	
 	public PixelSegmentList() {
 		super();
@@ -52,7 +59,7 @@ public class PixelSegmentList implements List<PixelSegment> {
 
 	private void ensureSegmentList() {
 		if (segmentList == null) {
-			segmentList = new PixelSegmentList();
+			segmentList = new ArrayList<PixelSegment>();
 		}
 	}
 	
@@ -327,8 +334,8 @@ public class PixelSegmentList implements List<PixelSegment> {
 	public Angle getSignedAngleOfDeviation() {
 		Angle angle = new Angle(0.0);
 		if (size() > 1) {
-			Line2 line0 = get(0).getEuclidLine();
-			Line2 line1 = get(size() - 1).getEuclidLine();
+			Line2 line0 = this.get(0).getEuclidLine();
+			Line2 line1 = this.get(size() - 1).getEuclidLine();
 			angle = line0.getAngleMadeWith(line1);
 		}
 		angle.setRange(Angle.Range.SIGNED);
@@ -363,5 +370,36 @@ public class PixelSegmentList implements List<PixelSegment> {
 	public String getOrCreateSVG() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static PixelSegmentList createSegmentList(PixelList pixelList, double tolerance) {
+		PixelSegmentList segmentList = null;
+		if (pixelList != null) {
+			Real2Array points = pixelList.getReal2Array();
+			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
+			Real2Array newPoints = douglasPeucker.reduceToArray(points);
+			segmentList = new PixelSegmentList(newPoints);
+		}
+		return segmentList;
+	}
+
+	public List<SVGLine> getSVGLineList() {
+		if (svgLineList == null) {
+			svgLineList = new ArrayList<SVGLine>();
+			if (segmentList != null) {
+				for (PixelSegment segment : segmentList) {
+					svgLineList.add(segment.getSVGLine());
+				}
+			}
+		}
+		return svgLineList;
+	}
+
+	public SVGG getSVGG() {
+		SVGG g = new SVGG();
+		for (PixelSegment segment : segmentList) {
+			g.appendChild(segment.getSVGLine());
+		}
+		return g;
 	}
 }

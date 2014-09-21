@@ -1,5 +1,8 @@
 package org.xmlcml.image.pixel;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -12,6 +15,8 @@ public class PixelEdge {
 
 	private final static Logger LOG = Logger.getLogger(PixelEdge.class);
 	
+	private static Pattern EDGE_PATTERN = Pattern.compile("\\{([^\\}]*)\\}\\/\\[([^\\]]*)\\]");
+
 	private PixelNodeList nodes;
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
@@ -236,5 +241,29 @@ public class PixelEdge {
 
 	public String getId() {
 		return id;
+	}
+
+	/** creates edge from string representation.
+	 * 
+	 * {(2,0)(1,0)(0,1)(-1,2)(0,3)(0,4)}/[(2,0)(0,4)]
+	 * 
+	 * @param edge
+	 * @return
+	 */
+	public static PixelEdge createEdge(String edgeS, PixelIsland island) {
+		PixelEdge edge = null;
+		if (edgeS != null) {
+			Matcher matcher = EDGE_PATTERN.matcher(edgeS);
+			if (matcher.matches()) {
+				edge = new PixelEdge(island);
+				String pixelListS = matcher.group(1);
+				edge.pixelList = PixelList.createPixelList(pixelListS, island);
+				LOG.debug("pixelList "+edge.pixelList);
+				String nodeListS = matcher.group(2);
+				edge.nodes = PixelNodeList.createNodeList(nodeListS, island);
+				LOG.debug("nodeList "+edge.nodes);
+			}
+		}
+		return edge;
 	}
 }

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageProcessor;
@@ -90,5 +91,25 @@ public class ExamplesTest {
 		    factory.createNodesAndEdges();
 			Assert.assertEquals("edges "+i, edges[i], factory.getEdgeList().toString());
 		}
+	}
+	
+
+	@Test
+	public void testExtractBondLines() {
+		
+		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(Fixtures.MALTORYZINE_BINARY_PNG);
+		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
+		pixelIslandList.sortBySizeDescending();
+		SVGG svgg = new SVGG();
+		for (PixelIsland island : pixelIslandList) {
+			PixelNucleusFactory factory = new PixelNucleusFactory(island);
+			PixelEdgeList edgeList = factory.getEdgeList();
+			for (PixelEdge edge : edgeList) {
+				PixelSegmentList segmentList = PixelSegmentList.createSegmentList(edge.getPixelList(), 2.0);
+				SVGG g = segmentList.getSVGG();
+				svgg.appendChild(g);
+			}
+		}
+		SVGSVG.wrapAndWriteAsSVG(svgg, new File("target/examples/maltoryzine.svg"));
 	}
 }

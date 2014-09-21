@@ -106,6 +106,9 @@ public class PixelSegment {
 		return "PixelSegment [line=" + line + "]";
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -114,6 +117,9 @@ public class PixelSegment {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -131,7 +137,7 @@ public class PixelSegment {
 		return true;
 	}
 
-	public SVGLine getLine() {
+	public SVGLine getSVGLine() {
 		return line;
 	}
 
@@ -146,5 +152,6 @@ public class PixelSegment {
 	public Line2 getEuclidLine() {
 		return line == null ? null : line.getEuclidLine();
 	}
+
 	
 }

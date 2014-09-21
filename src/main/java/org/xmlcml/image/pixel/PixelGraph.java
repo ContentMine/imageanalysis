@@ -348,7 +348,7 @@ public class PixelGraph {
 			if (Math.abs(deviation.getRadian()) < 2.0) continue;
 			LOG.trace("POLY "+segmentList.get(0)+"/"+segmentList.getLast()+"/"+deviation);
 			if (segmentList.size() == 3) {
-				SVGLine midline = segmentList.get(1).getLine();
+				SVGLine midline = segmentList.get(1).getSVGLine();
 				Pixel midPixel = edge.getNearestPixelToMidPoint(midline.getMidPoint());
 				midNode = new PixelNode(midPixel, this);
 				nodeList.add(midNode);

@@ -5,10 +5,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
@@ -18,8 +18,6 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
 
-import boofcv.alg.feature.associate.EnsureUniqueAssociation;
-
 /**
  * container for a lit of pixels. 
  * can have additional attributes such as colour or value.
@@ -28,6 +26,8 @@ import boofcv.alg.feature.associate.EnsureUniqueAssociation;
  *
  */
 public class PixelList implements Iterable<Pixel> {
+
+	public final static Pattern COORD_PATTERN = Pattern.compile("\\((\\d+),(\\d+)\\)");
 
 	private List<Pixel> list;
 	private Real2Array points;
@@ -354,6 +354,30 @@ public class PixelList implements Iterable<Pixel> {
 	public Pixel penultimate() {
 		ensureList();
 		return list.size() <= 1 ? null : list.get(list.size() - 2); 
+	}
+
+	/** creates from list of coords.
+	 * 
+	 * @param pixelListS e.g. (1,2)(3,4)(4,5)
+	 * @param island
+	 * @return
+	 */
+	public static PixelList createPixelList(String pixelListS, PixelIsland island) {
+		PixelList pixelList = null;
+		if (pixelListS != null) {
+			pixelList = new PixelList();
+			Matcher matcher = COORD_PATTERN.matcher(pixelListS);
+			int start = 0;
+			while (matcher.find(start)) {
+				start = matcher.end();
+				String xs = matcher.group(1);
+				String ys = matcher.group(2);
+				Pixel pixel = new Pixel(new Integer(xs), new Integer(ys));
+				pixel.island = island;
+				pixelList.add(pixel);
+			}
+		}
+		return pixelList;
 	}
 
 

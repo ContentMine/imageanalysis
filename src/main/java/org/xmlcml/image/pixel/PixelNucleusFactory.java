@@ -485,6 +485,9 @@ public class PixelNucleusFactory {
 
 	public PixelEdgeList getEdgeList() {
 		ensureEdgeList();
+		if (edgeList.size() == 0) {
+			createNodesAndEdges();
+		}
 		return edgeList;
 	}
 

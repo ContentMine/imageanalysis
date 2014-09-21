@@ -259,5 +259,37 @@ public class Fixtures {
 		return island;
 	}
 
+	public static PixelIsland CREATE_ZIGZAG_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixel(new Pixel(0,0));
+		island.addPixel(new Pixel(1,1));
+		island.addPixel(new Pixel(2,2));
+		island.addPixel(new Pixel(3,3));
+		island.addPixel(new Pixel(4,4));
+		island.addPixel(new Pixel(5,5));
+		island.addPixel(new Pixel(6,4));
+		island.addPixel(new Pixel(7,3));
+		island.addPixel(new Pixel(8,2));
+		island.addPixel(new Pixel(9,1));
+		island.addPixel(new Pixel(10,0));
+		island.addPixel(new Pixel(11,1));
+		island.addPixel(new Pixel(12,2));
+		island.addPixel(new Pixel(13,3));
+		island.addPixel(new Pixel(14,4));
+		island.addPixel(new Pixel(15,5));
+		island.addPixel(new Pixel(16,4));
+		island.addPixel(new Pixel(17,3));
+		island.addPixel(new Pixel(18,2));
+		island.addPixel(new Pixel(19,1));
+		island.addPixel(new Pixel(20,0));
+		island.addPixel(new Pixel(20,1));
+		island.addPixel(new Pixel(20,2));
+		island.addPixel(new Pixel(20,3));
+		island.addPixel(new Pixel(20,4));
+		island.addPixel(new Pixel(20,5));
+		return island;
+	}
+
 	
 }
