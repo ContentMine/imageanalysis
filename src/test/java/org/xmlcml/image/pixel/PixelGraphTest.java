@@ -31,7 +31,7 @@ public class PixelGraphTest {
 	public void test2Nodes() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_LINE_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 2, "[(2,0)(0,4)]"); 
+		PixelTestUtils.assertNodeList(nodeList, 2, "[(0,4)(2,0)]"); 
 	}
 
 	@Test
@@ -39,21 +39,7 @@ public class PixelGraphTest {
 	public void test3Terminals() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_Y_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 4, "[(0,0)(0,3)(-3,-3)(3,-3)]"); 
-//		PixelEdgeList edgeList = graph.getEdgeList();
-//		Assert.assertEquals(3, edgeList.size()); 
-//		Assert.assertEquals("{(-3,-3)(-2,-2)(-1,-1)(0,0)}/[(-3,-3), (0,0)]", edgeList.get(0).toString());
-//		Assert.assertEquals("{(3,-3)(2,-2)(1,-1)(0,0)}/[(3,-3), (0,0)]", edgeList.get(1).toString());
-//		Assert.assertEquals("{(0,3)(0,2)(0,1)(0,0)}/[(0,3), (0,0)]", edgeList.get(2).toString());
-//		// 1 junction
-//		JunctionSet junctionSet = graph.getJunctionSet();
-//		Assert.assertNotNull(junctionSet);
-//		Assert.assertEquals("[(0,0)]", junctionSet.toString()); 
-//		// text 3 terminals
-//		TerminalNodeSet terminalSet = graph.getTerminalNodeSet();
-//		Assert.assertNotNull(terminalSet);
-//		Assert.assertNotNull(terminalSet);
-//		Assert.assertEquals("[(-3,-3), (3,-3), (0,3)]", terminalSet.toString()); 
+		PixelTestUtils.assertNodeList(nodeList, 4, "[(0,3)(0,0)(3,-3)(-3,-3)]"); 
 	}
 
 	@Test
@@ -73,7 +59,7 @@ public class PixelGraphTest {
 	public void testDoubleYGraph() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_DOUBLE_Y_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 6, "[(0,2)(3,5)(-3,5)(0,-2)(3,-5)(-3,-5)]"); 
+		PixelTestUtils.assertNodeList(nodeList, 6, "[(0,2)(-3,-5)(3,5)(0,-2)(3,-5)(-3,5)]"); 
 //		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals("edges", 5, edgeList.size()); 
 //		Assert.assertEquals("{(-3,-5)(-2,-4)(-1,-3)(0,-2)}/[(-3,-5), (0,-2)]", edgeList.get(0).toString());

@@ -52,7 +52,7 @@ public class NodesAndEdgesTest {
 		Assert.assertEquals("A12a 4 neighbours", 2, a14a.getPixelsWithNeighbourCount(4).size());
 		
 		PixelNucleusList nucleusList = a14a.doTJunctionThinning();
-		Assert.assertEquals(2, nucleusList.size());
+		Assert.assertEquals(3, nucleusList.size());
 		PixelList newPixelList = a14a.getPixelList();
 		Assert.assertEquals(12, newPixelList.size());
 //		LOG.debug("======");
@@ -82,7 +82,7 @@ public class NodesAndEdgesTest {
 		PixelNucleusFactory factory = new PixelNucleusFactory(A12);
 		factory.createNodesAndEdges();
 		PixelNodeList nodeList = factory.getOrCreateNodeListFromNuclei();
-		Assert.assertEquals("nodes", "[(0,0)(1,2)(3,2)(4,0)]", nodeList.toString());
+		Assert.assertEquals("nodes", "[(4,0)(3,2)(0,0)(1,2)]", nodeList.toString());
 		PixelEdgeList edgeList = factory.getEdgeList();
 		Assert.assertEquals("edges", "{(1,2)(0,1)(0,0)}/[(1,2)(0,0)]"
 				+ "{(3,2)(4,3)(3,4)(2,4)(1,4)(0,3)(1,2)}/[(3,2)(1,2)]"
@@ -178,7 +178,7 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{29, 0,2,27,0,0,0,0,0,0}), // l // 44 
 				new IntArray(new int[]{71, 0,2,64,4,1,0,0,0,0}), // a // 45
 				new IntArray(new int[]{48, 0,2,46,0,0,0,0,0,0}), // c // 46
-				new IntArray(new int[]{71, 0,2,62,6,1,0,0,0,0}), // e // 47 // 1 Y junct
+				new IntArray(new int[]{71, 0,2,64,4,1,0,0,0,0}), // e // 47 // 1 Y junct
 				new IntArray(new int[]{85, 0,1,80,3,1,0,0,0,0}), // g  //48
 				new IntArray(new int[]{20, 0,2,18,0,0,0,0,0,0}), // i // 49
 				new IntArray(new int[]{31, 0,2,29,0,0,0,0,0,0}), // j // 50
@@ -199,7 +199,7 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{55, 0,2,53,0,0,0,0,0,0}), // s // 64
 				new IntArray(new int[]{52, 0,3,48,1,0,0,0,0,0}), // u // 65
 				new IntArray(new int[]{40, 0,2,38,0,0,0,0,0,0}), // v // 66
-				new IntArray(new int[]{73, 0,3,67,3,0,0,0,0,0}), // w // 67
+				new IntArray(new int[]{73, 0,3,69,1,0,0,0,0,0}), // w // 67
 				new IntArray(new int[]{47, 0,4,38,4,1,0,0,0,0}), // x // 68
 				new IntArray(new int[]{54, 0,3,47,3,1,0,0,0,0}), // y // 69
 				new IntArray(new int[]{47, 0,2,45,0,0,0,0,0,0}), // z // 70

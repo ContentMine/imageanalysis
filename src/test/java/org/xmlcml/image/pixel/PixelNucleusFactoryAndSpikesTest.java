@@ -27,7 +27,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 				Fixtures.CREATE_LINE_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		Assert.assertEquals("nucleusList", 2, nucleusList.size());
-		Assert.assertEquals("nucleusList: ", "{{{(2,0)}}{{(0,4)}}}", 
+		Assert.assertEquals("nucleusList: ", "{{{(0,4)}}{{(2,0)}}}", 
 				nucleusList.toString());
 	}
 
@@ -49,7 +49,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 				Fixtures.CREATE_Y_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		Assert.assertEquals("nucleusList", 4, nucleusList.size());
-		Assert.assertEquals("nucleusList: ", "{{{(0,0)}}{{(0,3)}}{{(-3,-3)}}{{(3,-3)}}}", 
+		Assert.assertEquals("nucleusList: ", "{{{(0,3)}}{{(0,0)}}{{(3,-3)}}{{(-3,-3)}}}", 
 				nucleusList.toString());
 	}
 
@@ -60,7 +60,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 				Fixtures.CREATE_DOUBLE_Y_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		Assert.assertEquals("nucleusList", 6, nucleusList.size());
-		Assert.assertEquals("nucleusList: ", "{{{(0,2)}}{{(3,5)}}{{(-3,5)}}{{(0,-2)}}{{(3,-5)}}{{(-3,-5)}}}", 
+		Assert.assertEquals("nucleusList: ", "{{{(0,2)}}{{(-3,-5)}}{{(3,5)}}{{(0,-2)}}{{(3,-5)}}{{(-3,5)}}}", 
 				nucleusList.toString());
 	}
 
@@ -71,7 +71,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 				Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		Assert.assertEquals("nucleusList", 6, nucleusList.size());
-		Assert.assertEquals("nucleusList: ", "{{{(0,0)}}{{(0,2)}}{{(1,4)}}{{(-1,4)}}{{(-4,7)}}{{(4,7)}}}", 
+		Assert.assertEquals("nucleusList: ", "{{{(0,2)}}{{(4,7)}}{{(-1,4)}}{{(-4,7)}}{{(0,0)}}{{(1,4)}}}", 
 				nucleusList.toString());
 	}
 
@@ -90,10 +90,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		Assert.assertEquals("nucleusList", 4, nucleusList.size());
 		Assert.assertEquals("nucleusList: ", ""
-				+ "{{{(-1,-1)}}"
-				+ "{{(2,1)(3,1)(4,1)(3,2)}}"
-				+ "{{(7,0)}}"
-				+ "{{(3,5)}}}", 
+				+ "{{{(3,1)(3,2)(2,1)(4,1)}}{{(3,5)}}{{(-1,-1)}}{{(7,0)}}}", 
 				nucleusList.toString());
 	}
 
@@ -106,7 +103,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	@Test
 	public void testSpikesLine() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_LINE_ISLAND());
-		Assert.assertEquals("line", "{(1,0)(0,3)}", nucleusFactory.createSpikePixelList().toString());
+		Assert.assertEquals("line", "{(0,3)(1,0)}", nucleusFactory.createSpikePixelList().toString());
 	}
 
 	@Test
@@ -118,13 +115,13 @@ public class PixelNucleusFactoryAndSpikesTest {
 	@Test
 	public void testSpikesY() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_Y_ISLAND());
-		Assert.assertEquals("Y", "{(0,1)(1,-1)(-1,-1)(0,2)(-2,-2)(2,-2)}", nucleusFactory.createSpikePixelList().toString());
+		Assert.assertEquals("Y", "{(0,2)(0,1)(1,-1)(-1,-1)(2,-2)(-2,-2)}", nucleusFactory.createSpikePixelList().toString());
 	}
 
 	@Test
 	public void testSpikesDoubleY() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_DOUBLE_Y_ISLAND());
-		Assert.assertEquals("doubleY", "{(1,3)(-1,3)(0,1)(2,4)(-2,4)(0,-1)(1,-3)(-1,-3)(2,-4)(-2,-4)}", 
+		Assert.assertEquals("doubleY", "{(1,3)(-1,3)(0,1)(-2,-4)(2,4)(0,-1)(1,-3)(-1,-3)(2,-4)(-2,4)}", 
 				nucleusFactory.createSpikePixelList().toString());
 	}
 
@@ -132,14 +129,14 @@ public class PixelNucleusFactoryAndSpikesTest {
 	public void testSpikesSpikedHexagon() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
-		Assert.assertEquals("spikedHexagon", "{(0,1)(1,3)(-1,3)(0,1)(2,5)(0,5)(1,3)(0,5)(-2,5)(-1,3)(-3,6)(3,6)}", 
+		Assert.assertEquals("spikedHexagon", "{(1,3)(-1,3)(0,1)(3,6)(0,5)(-2,5)(-1,3)(-3,6)(0,1)(2,5)(0,5)(1,3)}", 
 				nucleusFactory.createSpikePixelList().toString());
 	}
 	
 	@Test
 	public void testSpikesT() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_T_ISLAND());
-		Assert.assertEquals("T", "{(0,0)(1,0)(5,1)(3,3)(6,0)(3,4)}",     // ?????
+		Assert.assertEquals("T", "{(3,3)(1,0)(5,1)(3,4)(0,0)(6,0)}",     // ?????
 				nucleusFactory.createSpikePixelList().toString());
 	}
 
@@ -194,12 +191,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	public void testJoinSpikesSpikedHexagon() {
 		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
 	    factory.createNodesAndEdges();
-		Assert.assertEquals("edges", "{(0,2)(0,1)(0,0)}/[(0,2)(0,0)]"
-				+ "{(-1,4)(-1,3)(0,2)}/[(-1,4)(0,2)]"
-				+ "{(1,4)(1,3)(0,2)}/[(1,4)(0,2)]"
-				+ "{(1,4)(0,5)(-1,4)}/[(1,4)(-1,4)]"
-				+ "{(4,7)(3,6)(2,5)(1,4)}/[(4,7)(1,4)]"
-				+ "{(-4,7)(-3,6)(-2,5)(-1,4)}/[(-4,7)(-1,4)]", 
+		Assert.assertEquals("edges", "{(0,2)(0,1)(0,0)}/[(0,2)(0,0)]{(-1,4)(-1,3)(0,2)}/[(-1,4)(0,2)]{(1,4)(1,3)(0,2)}/[(1,4)(0,2)]{(1,4)(0,5)(-1,4)}/[(1,4)(-1,4)]{(-4,7)(-3,6)(-2,5)(-1,4)}/[(-4,7)(-1,4)]{(4,7)(3,6)(2,5)(1,4)}/[(4,7)(1,4)]", 
 				factory.getEdgeList().toString());
 	}
 
