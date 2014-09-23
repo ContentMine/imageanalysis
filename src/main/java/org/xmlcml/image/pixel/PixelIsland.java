@@ -58,7 +58,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private PixelList terminalPixels;
 
-	private List<Real2Array> segmentArrayList;
+//	private List<Real2Array> segmentArrayList;
 	private String pixelColor = "red";
 	private PixelSet cornerSet;
 	private ImageParameters parameters;
@@ -69,6 +69,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelGraph pixelGraph;
 
 	private SVGG svgg;
+
+	private String id;
 	
 	public PixelIsland() {
 		ensurePixelList();
@@ -101,19 +103,18 @@ public class PixelIsland implements Iterable<Pixel> {
 		this.allowDiagonal = island.allowDiagonal;
 	}
 
-	private void ensurePixelGraph() {
-		if (pixelGraph == null) {
-//			ensurePixelNucleusCollection();
-			pixelGraph = new PixelGraph(this);
-		}
-	}
-	
-	private void getOrCreatePixelGraph() {
-		ensureNucleusFactory();
-		if (pixelGraph == null) {
-			pixelGraph = new PixelGraph(this);
-		}
-	}
+//	private void ensurePixelGraph() {
+//		if (pixelGraph == null) {
+//			pixelGraph = new PixelGraph(this);
+//		}
+//	}
+//	
+//	private void getOrCreatePixelGraph() {
+//		ensureNucleusFactory();
+//		if (pixelGraph == null) {
+//			pixelGraph = new PixelGraph(this);
+//		}
+//	}
 	
 	public Real2Range getBoundingBox() {
 		ensurePixelList();
@@ -211,25 +212,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		return pixel.getOrCreateNeighbours(this).size();
 	}
 
-//	/**
-//	 * for start of spanningTree or other traversals.
-//	 * 
-//	 * If there are terminal pixels get the first one. else get the first pixel.
-//	 * This may not be reproducible.
-//	 * 
-//	 * @return first pixel or null for empty island (which shouldn't happen)
-//	 */
-//	public Pixel getStartPixel() {
-//		Pixel start = null;
-//		PixelList terminalList = getTerminalPixels();
-//		if (terminalList.size() > 0) {
-//			start = terminalList.get(0);
-//		} else if (pixelList.size() > 0) {
-//			start = pixelList.get(0);
-//		}
-//		return start;
-//	}
-
 	public void setDiagonal(boolean diagonal) {
 		this.allowDiagonal = diagonal;
 	}
@@ -253,44 +235,6 @@ public class PixelIsland implements Iterable<Pixel> {
 			
 		}
 	}
-
-
-
-//	/** may need refactoring
-//	 * 
-//	 * @return
-//	 */
-//	private List<PixelPath> getOrCreatePixelPathList() {
-//		if (pixelPathList == null) {
-//			throw new RuntimeException("HOPEFULLY OBSOLETE");
-////			removeHypotenuses();
-////			getNucleusList();
-////			getTerminalPixels();
-////			pixelPathList = createPixelPathListFromTerminals();
-//		}
-//		return pixelPathList;
-//	}
-
-//	private List<PixelPath> createPixelPathListFromTerminals() {
-//		PixelSet usedTerminalPixels = new PixelSet();
-//		pixelPathList = new ArrayList<PixelPath>();
-//		for (int i = 0; i < terminalPixels.size(); i++) {
-//			Pixel terminal = terminalPixels.get(i);
-//			addPixelPathFromTerminal(usedTerminalPixels, terminal);
-//		}
-//		return pixelPathList;
-//	}
-
-//	private void addPixelPathFromTerminal(PixelSet usedTerminalPixels, Pixel terminal) {
-//		if (!usedTerminalPixels.contains(terminal)) {
-//			usedTerminalPixels.add(terminal);
-//throw new RuntimeException("HOPEFULLY OBSOLETE");			
-////			PixelPath pixelPath = findTerminalOrBranch(terminal);
-////			usedTerminalPixels.add(pixelPath.getLastPixel());
-////			pixelPathList.add(pixelPath);
-//		}
-//	}
-
 
 	/**
 	 * remove steps and leave diagonal connections.
@@ -334,24 +278,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		return removed;
 	}
 
-
-//	private SVGG createSVGFromPixelPaths(boolean pixels) {
-//		SVGG gg = new SVGG();
-//		if (!pixels) {
-//			getOrCreatePixelPathList();
-//		}
-//		if (pixels || pixelPathList.size() == 0) {
-//			gg = plotPixels(pixelList, this.pixelColor);
-//		} else {
-//			for (PixelPath pixelPath : pixelPathList) {
-//				SVGG g = pixelPath.createSVGG(this.pixelColor);
-//				g.setStrokeWidth(0.5);
-//				gg.appendChild(g);
-//			}
-//		}
-//		return gg;
-//	}
-
 	public SVGG createSVG() {
 		SVGG g = new SVGG();
 		for (Pixel pixel : pixelList) {
@@ -384,23 +310,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 		return g;
 	}
-
-//	public List<Real2Array> createSegments(double tolerance) {
-//		getOrCreatePixelPathList();
-//		segmentArrayList = new ArrayList<Real2Array>();
-//		for (PixelPath pixelPath : pixelPathList) {
-//			Real2Array segmentArray = new Real2Array(
-//					pixelPath.createDouglasPeucker(tolerance));
-//			segmentArrayList.add(segmentArray);
-//		}
-//		return segmentArrayList;
-//	}
-
-//	public SVGG debugSVG(String filename) {
-//		SVGG g = createSVGFromPixelPaths(true);
-//		SVGSVG.wrapAndWriteAsSVG(g, new File(filename));
-//		return g;
-//	}
 
 	public boolean fitsWithin(RealRange xSizeRange, RealRange ySizeRange) {
 		double wmax = xSizeRange.getMax();
@@ -551,11 +460,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		return sb.toString();
 	}
 
-//	public void removePixels(PixelPath pixelPath) {
-//		PixelList pixelList = pixelPath.getPixelList();
-//		removePixels(pixelList);
-//	}
-
 	public void removePixels(PixelList pixelList) {
 		for (Pixel pixel : pixelList) {
 			this.remove(pixel);
@@ -567,8 +471,6 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public List<PixelIsland> findPixelLakes() {
-		Real2Range bbox = this.getBoundingBox();
-		Real2Range bboxPlus = bbox.getReal2RangeExtendedInX(1, 1).getReal2RangeExtendedInY(1, 1);
 		throw new RuntimeException("NYI");
 	}
 	
@@ -576,7 +478,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		markEdges();
 	}
 
-	/** mark all pixels which have an exposre to the outside.
+	/** mark all pixels which have an exposure to the outside.
 	 * 
 	 * set value to ffffff (white) by default and 1 if < 8 neighbours
 	 * 
@@ -1030,6 +932,14 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public void setNucleusFactory(PixelNucleusFactory factory) {
 		this.nucleusFactory = factory;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
 	}
 
 

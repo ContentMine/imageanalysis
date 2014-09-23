@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.xmlcml.graphics.svg.SVGElement;
+import org.xmlcml.graphics.svg.SVGG;
+
 public class PixelEdgeList implements Iterable<PixelEdge> {
 
 	private List<PixelEdge> list;
+	private SVGG svgg;
 
 	public PixelEdgeList() {
 		ensureList();
@@ -76,6 +80,16 @@ public class PixelEdgeList implements Iterable<PixelEdge> {
 	public boolean remove(PixelEdge edge) {
 		ensureList();
 		return list.remove(edge);
+	}
+
+	public SVGElement getOrCreateSVG() {
+		if (svgg == null) {
+			svgg = new SVGG();
+			for (PixelEdge edge : this) {
+				svgg.appendChild(edge.getOrCreateSVG());
+			}
+		}
+		return svgg;
 	}
 	
 }

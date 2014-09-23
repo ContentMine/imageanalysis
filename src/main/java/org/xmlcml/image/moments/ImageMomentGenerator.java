@@ -45,7 +45,7 @@ public class ImageMomentGenerator {
 	private static final int QMAX = 2;
 	private Real2Array pixelCoords;
 	private BufferedImage image;
-	private PixelIslandList pixelIslandList;
+	private PixelIslandList islandList;
 	private PixelList pixelList;
 	private Double sumX;
 	private Double sumY;
@@ -72,12 +72,12 @@ public class ImageMomentGenerator {
 		}
 		this.image = image;
 		PixelProcessor pixelProcessor = new PixelProcessor(image);
-		pixelIslandList = pixelProcessor.getOrCreatePixelIslandList();
-		readPixelList(pixelIslandList);
+		islandList = pixelProcessor.getOrCreatePixelIslandList();
+		readPixelList(islandList);
 	}
 	
-	public void readPixelList(PixelIslandList pixelIslandList) {
-		pixelList = pixelIslandList.getPixelList();
+	public void readPixelList(PixelIslandList islandList) {
+		pixelList = islandList.getPixelList();
 		readPixels(pixelList);
 	}
 	

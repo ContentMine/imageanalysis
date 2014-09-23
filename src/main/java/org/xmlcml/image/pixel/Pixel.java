@@ -28,8 +28,6 @@ public class Pixel {
 	Point point;
 	private PixelList neighbourList;
 	PixelIsland island;
-	@Deprecated
-	private Marked marked = null;
 	int value = 0;
 
 	public Pixel(Point p) {
@@ -53,35 +51,6 @@ public class Pixel {
 		getOrCreateNeighbourList(island);
 		return neighbourList;
 	}
-
-//	public PixelList createNeighbours(PixelIsland island) {
-////		this.island = island;
-//		createNeighbours(island);
-//		return neighbourList;
-//	}
-
-	@Deprecated
-//	public PixelList getNeighbours(Marked marked) {
-//		getOrCreateNeighbourList(null);
-////		LOG.debug("neighbours "+neighbourList.size());
-//		PixelList markedList = new PixelList();
-//		for (Pixel pixel : neighbourList) {
-//			if (pixel.isMarked(marked) || Marked.ALL.equals(marked)) {
-//				markedList.add(pixel);
-//			}
-//		}
-//		return markedList;
-//	}
-
-//	@Deprecated
-//	public boolean isMarked(Marked m) {
-//		return this.marked == null ? false : this.marked.equals(m);
-//	}
-//	
-//	@Deprecated
-//	public void setMarked(Marked m) {
-//		this.marked = m;
-//	}
 
 	private void getOrCreateNeighbourList(PixelIsland island) {
 		if (neighbourList == null) {
@@ -144,22 +113,16 @@ public class Pixel {
 			sb.append("null");
 		} else {
 			for (Pixel neighbour : neighbourList) {
-				sb.append(" "+neighbour.getInt2()+" "+neighbour.getMarked());
+				sb.append(" "+neighbour.getInt2());
 			}
 		}
 		return sb.toString();
-	}
-
-	@Deprecated
-	private Marked getMarked() {
-		return marked;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((marked == null) ? 0 : marked.hashCode());
 		result = prime * result + ((point == null) ? 0 : point.hashCode());
 		return result;
 	}
@@ -173,8 +136,6 @@ public class Pixel {
 		if (getClass() != obj.getClass())
 			return false;
 		Pixel other = (Pixel) obj;
-		if (marked != other.marked)
-			return false;
 		if (point == null) {
 			if (other.point != null)
 				return false;
@@ -190,20 +151,6 @@ public class Pixel {
 	public void setInt2(Int2 int2) {
 		point = new Point(int2.getX(), int2.getY());
 	}
-
-//	public Set<PixelTriangle> getTriangles(PixelIsland island) {
-//		Set<PixelTriangle> triangleSet = new HashSet<PixelTriangle>();
-//		PixelList neighbours = this.getOrCreateNeighbours(island);
-//		for (int i = 0; i < neighbours.size() - 1; i++) {
-//			for (int j = i+1; j < neighbours.size(); j++) {
-//				PixelTriangle triangle = PixelTriangle.createTriangle(this, neighbours.get(i), neighbours.get(j), island);
-//				if (triangle != null ) {
-//					triangleSet.add(triangle);
-//				}
-//			}
-//		}
-//		return triangleSet;
-//	}
 
 	public void clearNeighbours() {
 		this.neighbourList = null;

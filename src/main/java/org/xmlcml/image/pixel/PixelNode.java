@@ -11,6 +11,9 @@ import org.xmlcml.graphics.svg.SVGG;
 public class PixelNode implements Comparable<PixelNode> {
 
 	private final static Logger LOG = Logger.getLogger(PixelNode.class);
+
+	private static final String START_STRING = "<";
+	private static final String END_STRING = ">";
 	
 	Pixel centrePixel; // pixel 1
 	private PixelEdgeList edgeList;
@@ -19,7 +22,7 @@ public class PixelNode implements Comparable<PixelNode> {
 	private PixelSet unusedNeighbours;
 	private PixelIsland island;
 	private PixelNucleus pixelNucleus;
-	private PixelGraph pixelGraph;
+	private PixelGraph pixelGraph; // is this used?
 
 	protected PixelNode() {
 	}
@@ -62,14 +65,18 @@ public class PixelNode implements Comparable<PixelNode> {
 	
 	public String toString() {
 		getCentrePixel();
-		getPixelNucleus();
-		StringBuilder sb = new StringBuilder((id == null) ? "" : id+" ");
-		sb.append((label == null) ? "" : " "+label+" ");
-		sb.append((centrePixel == null) ? "?" : String.valueOf(centrePixel));
+		getNucleus();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(START_STRING);
+		sb.append((id == null) ? "" : id);
+		sb.append((label == null) ? "" : " l:"+label);
+		sb.append((centrePixel == null) ? "" : String.valueOf(centrePixel));
+		sb.append(END_STRING);
 		return sb.toString();
 	}
 
-	public PixelNucleus getPixelNucleus() {
+	public PixelNucleus getNucleus() {
 		ensurePixelNucleus();
 		return pixelNucleus;
 	}

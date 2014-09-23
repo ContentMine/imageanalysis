@@ -17,6 +17,7 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 /**
  * container for a lit of pixels. 
@@ -26,6 +27,11 @@ import org.xmlcml.graphics.svg.SVGSVG;
  *
  */
 public class PixelList implements Iterable<Pixel> {
+
+
+	// these may not be needed
+	private static final String START_STRING = "";
+	private static final String END_STRING = "";
 
 	public final static Pattern COORD_PATTERN = Pattern.compile("\\((\\d+),(\\d+)\\)");
 
@@ -178,11 +184,12 @@ public class PixelList implements Iterable<Pixel> {
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("{");
+		StringBuilder sb = new StringBuilder();
+		sb.append(START_STRING);
 		for (Pixel pixel : this) {
 			sb.append(pixel.toString());
 		}
-		sb.append("}");
+		sb.append(END_STRING);
 		return sb.toString();
 	}
 
@@ -380,5 +387,33 @@ public class PixelList implements Iterable<Pixel> {
 		return pixelList;
 	}
 
+	public Pixel getCentralPixel() {
+		Pixel centrePixel = null;
+		Double distance = null;
+		Real2 centre = getCentreCoordinate();
+		if (centre != null) {
+			for (Pixel pixel : this) {
+				double d = centre.getDistance(new Real2(pixel.getInt2()));
+				if (distance == null || distance > d) {
+					distance = d;
+					centrePixel = pixel;
+				}
+			}
+		}
+		return centrePixel;
+	}
+
+	private Real2 getCentreCoordinate() {
+		return size() == 0 ? null : getReal2Array().getMean();
+	}
+
+
+	/**
+	 * sorts Y first, then X.
+	 * 
+	 */
+	public void sortYX() {
+		Collections.sort(list, new PixelComparator(ComparatorType.TOP, ComparatorType.LEFT));
+	}
 
 }

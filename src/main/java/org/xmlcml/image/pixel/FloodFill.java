@@ -16,21 +16,19 @@ public class FloodFill {
 	private BufferedImage image;
 	private boolean[][] painted;
 	private boolean diagonal = false;
-	private PixelIslandList pixelIslandList;
-	private Integer width;
-	private Integer height;
+	private PixelIslandList islandList;
+//	private Integer width;
+//	private Integer height;
 
 	public FloodFill(BufferedImage image) {
 		this.image = image;
-		this.width = image.getWidth();
-		this.height = image.getHeight();
+//		this.width = image.getWidth();
+//		this.height = image.getHeight();
 	}
 
 	// NOT YET WRITTEN
 	// FIXME
 	public FloodFill(PixelIslandList islandList) {
-		this.width = image.getWidth();
-		this.height = image.getHeight();
 		throw new RuntimeException("NYI");
 	}
 
@@ -90,23 +88,23 @@ public class FloodFill {
 		}
 	}
 
-	private void add(PixelIsland pixelIsland) {
-		ensurePixelIslandList();
-		pixelIslandList.add(pixelIsland);
+	private void add(PixelIsland island) {
+		ensureIslandList();
+		islandList.add(island);
 	}
 
-	private void ensurePixelIslandList() {
-		if (pixelIslandList == null) {
-			pixelIslandList = new PixelIslandList();
+	private void ensureIslandList() {
+		if (islandList == null) {
+			islandList = new PixelIslandList();
 		}
 	}
 	
-	public PixelIslandList getPixelIslandList() {
-		ensurePixelIslandList();
-		for (PixelIsland pixelIsland : pixelIslandList) {
-			pixelIsland.setDiagonal(diagonal);
+	public PixelIslandList getIslandList() {
+		ensureIslandList();
+		for (PixelIsland island : islandList) {
+			island.setDiagonal(diagonal);
 		}
-		return pixelIslandList;
+		return islandList;
 	}
 
 	private boolean isInsideImage(Point p) {

@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
@@ -17,28 +15,20 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
-import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealSquareMatrix;
-import org.xmlcml.euclid.Transform2;
 import org.xmlcml.euclid.Util;
-import org.xmlcml.euclid.Vector2;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.geom.DouglasPeucker;
-import org.xmlcml.image.processing.ListComparator;
 
 import com.google.common.collect.Multimap;
 
@@ -133,7 +123,7 @@ public class PixelIslandTest {
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
-		PixelIsland island = floodFill.getPixelIslandList().get(1);
+		PixelIsland island = floodFill.getIslandList().get(1);
 		Assert.assertEquals("size", 33, island.size());
 		// island.cleanChains();
 		// Assert.assertEquals("size", 28, island.size());
@@ -145,7 +135,7 @@ public class PixelIslandTest {
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
-		PixelIsland island = floodFill.getPixelIslandList().get(0);
+		PixelIsland island = floodFill.getIslandList().get(0);
 		Assert.assertEquals("size", 492, island.size());
 		// island.cleanChains();
 		// Assert.assertEquals("size", 478, island.size());
@@ -523,7 +513,7 @@ public class PixelIslandTest {
 		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		Collections.sort(islands.getList(), new PixelIslandComparator(
-				PixelIslandComparator.ComparatorType.SIZE));
+				PixelComparator.ComparatorType.SIZE));
 		Assert.assertTrue(islands.size() > 1000);
 		Assert.assertEquals(1950, islands.size());
 		SVGSVG.wrapAndWriteAsSVG(islands.getOrCreateSVGG(), new File(phyloDir, "largePhyloBoxes.svg"));
@@ -723,8 +713,8 @@ public class PixelIslandTest {
 				.createCharactersByHeight();
 		PixelIslandList chars = new PixelIslandList(charactersByHeight.get(10));
 		Collections.sort(chars.getList(), new PixelIslandComparator(
-				PixelIslandComparator.ComparatorType.TOP,
-				PixelIslandComparator.ComparatorType.LEFT));
+				PixelComparator.ComparatorType.TOP,
+				PixelComparator.ComparatorType.LEFT));
 		PixelIslandList islandsA = new PixelIslandList();
 		File clipDir = new File("target/clip/");
 		clipDir.mkdirs();
@@ -1009,8 +999,8 @@ public class PixelIslandTest {
 				.createCharactersByHeight();
 		PixelIslandList chars = new PixelIslandList(charactersByHeight.get(10));
 		Collections.sort(chars.getList(), new PixelIslandComparator(
-				PixelIslandComparator.ComparatorType.TOP,
-				PixelIslandComparator.ComparatorType.LEFT));
+				PixelComparator.ComparatorType.TOP,
+				PixelComparator.ComparatorType.LEFT));
 		PixelIslandList islandsA = new PixelIslandList();
 		for (int charA : charsA) {
 			PixelIsland island = chars.get(charA);

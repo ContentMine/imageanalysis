@@ -1,19 +1,10 @@
 package org.xmlcml.image.pixel;
 
 import java.util.Comparator;
-
 import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 public class PixelIslandComparator implements Comparator<PixelIsland>{
-
-	public enum ComparatorType {
-		BOTTOM,
-		LEFT,
-		RIGHT,
-		SIZE,
-		TOP,
-//		TOP_TEXT, // take maximum Y of box, and 
-	}
 
 	private ComparatorType major;
 	private ComparatorType minor;

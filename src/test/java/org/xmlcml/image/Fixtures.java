@@ -49,6 +49,9 @@ public class Fixtures {
 	public static final File TERMINAL_PNG = new File(PROCESSING_DIR, "terminalnode.png");
 	public static final File TERMINALS_PNG = new File(PROCESSING_DIR, "terminalnodes.png");
 	public static final File ZIGZAG_PNG = new File(PROCESSING_DIR, "zigzag.png");
+	
+	public final static File PIXEL_DIR = new File(TEST_IMAGE_DIR, "pixel");
+	public static final File PHYLO_14811_2_PNG = new File(PIXEL_DIR, "ijs.0.014811-0-002.pbm.png");
 
 
 	public final static File TEXT_DIR = new File(TEST_IMAGE_DIR, "text");

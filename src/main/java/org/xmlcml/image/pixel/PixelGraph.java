@@ -1,10 +1,6 @@
 package org.xmlcml.image.pixel;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -16,7 +12,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.ImageParameters;
-import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 
 /**
@@ -41,7 +37,7 @@ public class PixelGraph {
 	private PixelNodeList nodeList; 
 	private PixelList pixelList;
 	private PixelIsland island;
-	private PixelSet twoConnectedSet;
+//	private PixelSet twoConnectedSet;
 	private ImageParameters parameters;
 	private Stack<PixelNode> nodeStack;
 	
@@ -122,45 +118,18 @@ public class PixelGraph {
 //		}
 //	}
 
-	private void createConnectedPixelSets() {
-//		createMultiConnectedDiagonalPixelSet();
-//		zeroConnectedSet = createConnectedDiagonalPixelSet(0);
-//		oneConnectedSet = createConnectedDiagonalPixelSet(1);
-		twoConnectedSet = createConnectedDiagonalPixelSet(2);
-//		threeConnectedSet = createConnectedDiagonalPixelSet(3);
-//		LOG.trace("connected "+zeroConnectedSet.size());
-//		LOG.trace("1connected "+oneConnectedSet.size());
-//		LOG.trace("2connected "+twoConnectedSet.size());
-//		LOG.trace("3connected "+threeConnectedSet.size());
-//		LOG.trace("Multiconnected "+multiConnectedSet.size());
-	}
-
-	private PixelSet createConnectedDiagonalPixelSet(int neighbours) {
-		island.setDiagonal(true);
-		PixelSet connectedSet = new PixelSet();
-		for (Pixel pixel : pixelList) {
-			pixel.clearNeighbours();
-			if (pixel.isConnectedAny(island, neighbours)) {
-				connectedSet.add(pixel);
-			}
-		}
-		return connectedSet;
-	}
-	
-//	@Deprecated
-//	private PixelSet createMultiConnectedDiagonalPixelSet() {
+//	private PixelSet createConnectedDiagonalPixelSet(int neighbours) {
 //		island.setDiagonal(true);
-//		multiConnectedSet = new PixelSet();
+//		PixelSet connectedSet = new PixelSet();
 //		for (Pixel pixel : pixelList) {
 //			pixel.clearNeighbours();
-//			for (int conn = 4; conn <= 8; conn++) {
-//				if (pixel.isConnectedAny(island, conn)) {
-//					multiConnectedSet.add(pixel);
-//				}
+//			if (pixel.isConnectedAny(island, neighbours)) {
+//				connectedSet.add(pixel);
 //			}
 //		}
-//		return multiConnectedSet;
+//		return connectedSet;
 //	}
+	
 	
 	/**
 	 * gets next pixel in chain.
@@ -483,9 +452,6 @@ public class PixelGraph {
 		Collections.sort(rootNodes.getList());
 		if (rootNodes.size() > 0) {
 			rootNode = rootNodes.get(0);
-	//			if (debug) {
-	//				LOG.trace("found root: " + rootNode);
-	//			}
 		} else {
 			try {
 				rootNode = getRootNodeFromExtremeEdge(rootPosition);
@@ -568,35 +534,6 @@ public class PixelGraph {
 		return edge;
 	}
 
-//	public PixelEdgeList createEdgeListOld() {
-//		PixelEdgeList pixelEdgeList = new PixelEdgeList();
-//		boolean moreToDo = true;
-//		while (moreToDo) {
-//			moreToDo = false;
-//			for (PixelNode node : nodeList) {
-//				if (node == null) {
-//					throw new RuntimeException("Null NODE");
-//				}
-//				if (node.getUnusedNeighbours().size() > 0) {
-//					LOG.debug("node with unused neighbours: "+node);
-//					PixelEdge edge = createEdge(node);
-//					pixelEdgeList.add(edge);
-//					LOG.trace("============== "+edge);
-//					moreToDo = true;
-//					break;
-//				}
-//			}
-//		}
-//		return pixelEdgeList;
-//	}
-	
-//	// FIXME
-//	public PixelEdgeList createEdgeListFromNodeList() {
-//		return getNucleusFactory().createPixelEdgeList();
-//		return pixelEdgeList;
-//
-//	}
-
 	private Stack<PixelNode> createNodeStack() {
 		createNodeList();
 		nodeStack = new Stack<PixelNode>();
@@ -617,20 +554,5 @@ public class PixelGraph {
 		return getNucleusFactory().getOrCreateNucleusList();
 	}
 
-//	/** get pixelNodes.
-//	 * 
-//	 * At present this is all except those with 2 connections
-//	 * 
-//	 * @return
-//	 */
-//	public PixelNodeList createNodeList() {
-//		PixelList pixels = getNodePixelList();
-//		pixelNodeList = new PixelNodeList();
-//		for (Pixel pixel : pixels) {
-//			PixelNode node = new PixelNode(pixel, this);
-//			pixelNodeList.add(node);
-//		}
-//		return pixelNodeList;
-//	}
 
 }

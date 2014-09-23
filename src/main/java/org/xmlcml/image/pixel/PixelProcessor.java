@@ -114,7 +114,7 @@ public class PixelProcessor {
 			FloodFill floodFill = new FloodFill(this.image);
 			floodFill.setDiagonal(true);
 			floodFill.fill();
-			pixelIslandList = floodFill.getPixelIslandList();
+			pixelIslandList = floodFill.getIslandList();
 //			SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/rawPixelIsland.svg"));
 			LOG.trace("after floodfill islands: "+pixelIslandList.size());
 			if (superThinning) {

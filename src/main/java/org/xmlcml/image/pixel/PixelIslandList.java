@@ -17,12 +17,10 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.Transform2;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.image.ImageParameters;
-import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.pixel.PixelIslandComparator.ComparatorType;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 

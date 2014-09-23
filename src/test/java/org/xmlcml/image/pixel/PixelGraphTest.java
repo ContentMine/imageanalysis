@@ -31,7 +31,7 @@ public class PixelGraphTest {
 	public void test2Nodes() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_LINE_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 2, "[(0,4)(2,0)]"); 
+		PixelTestUtils.assertNodeList(nodeList, 2, "[<(2,0)><(0,4)>]"); 
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public class PixelGraphTest {
 	public void test3Terminals() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_Y_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 4, "[(0,3)(0,0)(3,-3)(-3,-3)]"); 
+		PixelTestUtils.assertNodeList(nodeList, 4, "[<(0,3)><(-3,-3)><(3,-3)><(0,0)>]"); 
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class PixelGraphTest {
 	public void testDoubleYGraph() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_DOUBLE_Y_ISLAND());
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 6, "[(0,2)(-3,-5)(3,5)(0,-2)(3,-5)(-3,5)]"); 
+		PixelTestUtils.assertNodeList(nodeList, 6, "[<(3,5)><(-3,5)><(3,-5)><(-3,-5)><(0,2)><(0,-2)>]"); 
 //		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals("edges", 5, edgeList.size()); 
 //		Assert.assertEquals("{(-3,-5)(-2,-4)(-1,-3)(0,-2)}/[(-3,-5), (0,-2)]", edgeList.get(0).toString());
@@ -116,14 +116,14 @@ public class PixelGraphTest {
 		PixelIsland island = Fixtures.CREATE_RHOMBUS_ISLAND();
 		try {
 			PixelGraph graph = PixelGraph.createGraph(island);
-//			Assert.fail("should throw exception");
+			Assert.fail("should throw exception");
 			// error is now logged, not thrown
 		} catch (RuntimeException e) {
-			throw e;
+			Assert.assertEquals("threw exception", "Unknown nucleus: {(3,2)(2,1)(1,1)(2,2)}", e.getMessage());
 		}
 	}
 
-	@Test
+		@Test
 	@Ignore // recent edge algorithms broke this
 
 	public void testWCorner() {

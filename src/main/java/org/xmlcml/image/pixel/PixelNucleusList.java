@@ -1,14 +1,18 @@
 package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 public class PixelNucleusList implements Iterable<PixelNucleus> {
 
+	private static final String END_STRING= "]";
+	private static final String START_STRING = "[";
 	private final static Logger LOG = Logger.getLogger(PixelNucleusList.class);
 	private List<PixelNucleus> list;
 
@@ -47,11 +51,11 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("{");
+		sb.append(START_STRING);
 		for (PixelNucleus nucleus : this) {
 			sb.append(nucleus.toString());
 		}
-		sb.append("}");
+		sb.append(END_STRING);
 		return sb.toString();
 	}
 
@@ -92,6 +96,17 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * sorts Y first, then X.
+	 * 
+	 * @param tolerance
+	 *            error allowed (especially in Y)
+	 */
+	public void sortYX(double tolerance) {
+		Collections.sort(list, new PixelNucleusComparator(ComparatorType.TOP,
+				ComparatorType.LEFT, tolerance));
 	}
 
 

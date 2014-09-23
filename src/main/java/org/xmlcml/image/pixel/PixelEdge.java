@@ -20,9 +20,10 @@ public class PixelEdge {
 	private PixelNodeList nodes;
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
-	private PixelSegmentList pixelSegmentList;
+	private PixelSegmentList segmentList;
 	private String id;
 	private PixelGraph pixelGraph;
+	private SVGG svgg;
 
 	public PixelEdge(PixelIsland island) {
 		this.island = island;
@@ -134,13 +135,13 @@ public class PixelEdge {
 	}
 
 	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
-		if (pixelSegmentList == null) {
+		if (segmentList == null) {
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array points = pixelList.getReal2Array();
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
-			pixelSegmentList = new PixelSegmentList(pointArray);
+			segmentList = new PixelSegmentList(pointArray);
 		}
-		return pixelSegmentList;
+		return segmentList;
 	}
 
 	public PixelNode getOtherNode(PixelNode pixelNode) {
@@ -157,17 +158,14 @@ public class PixelEdge {
 
 	public Pixel getNearestPixelToMidPoint(Real2 midPoint) {
 		Pixel midPixel = null;
-		Real2 midPixelXY = null;
 		double distMin = Double.MAX_VALUE;
 		for (Pixel pixel :pixelList) {
 			if (midPixel == null) {
 				midPixel = pixel;
-				midPixelXY = new Real2(midPixel.getInt2());
 			} else {
 				Real2 xy = new Real2(pixel.getInt2());
 				double dist = midPoint.getDistance(xy);
 				if (dist < distMin) {
-					midPixelXY = xy;
 					distMin = dist;
 					midPixel = pixel;
 				}
@@ -265,5 +263,13 @@ public class PixelEdge {
 			}
 		}
 		return edge;
+	}
+
+	public SVGG getOrCreateSVG() {
+		if (svgg == null) {
+			svgg = new SVGG();
+			svgg.appendChild(pixelList.plotPixels("blue"));
+		}
+		return svgg;
 	}
 }

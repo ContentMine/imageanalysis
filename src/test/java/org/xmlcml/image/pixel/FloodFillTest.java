@@ -26,8 +26,8 @@ public class FloodFillTest {
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
-		Assert.assertEquals("pixelIslands", 5, floodFill.getPixelIslandList().size());
-		for (PixelIsland pixelIsland : floodFill.getPixelIslandList()) {
+		Assert.assertEquals("pixelIslands", 5, floodFill.getIslandList().size());
+		for (PixelIsland pixelIsland : floodFill.getIslandList()) {
 			LOG.trace(pixelIsland.size());
 		}
 	}
@@ -41,7 +41,7 @@ public class FloodFillTest {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.fill();
-		Assert.assertEquals("pixelIslands", 5, floodFill.getPixelIslandList().size());
+		Assert.assertEquals("pixelIslands", 5, floodFill.getIslandList().size());
 	}
 	
 	
@@ -54,7 +54,7 @@ public class FloodFillTest {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
 		FloodFill floodFill = new FloodFill(image);
 		floodFill.fill();
-		Assert.assertEquals("pixelIslands", 202, floodFill.getPixelIslandList().size());
+		Assert.assertEquals("pixelIslands", 202, floodFill.getIslandList().size());
 	}
 	
 	
