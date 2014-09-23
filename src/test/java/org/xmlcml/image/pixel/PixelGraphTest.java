@@ -116,10 +116,10 @@ public class PixelGraphTest {
 		PixelIsland island = Fixtures.CREATE_RHOMBUS_ISLAND();
 		try {
 			PixelGraph graph = PixelGraph.createGraph(island);
-			Assert.fail("should throw exception");
+			Assert.assertTrue("should not throw exception", true);
 			// error is now logged, not thrown
 		} catch (RuntimeException e) {
-			Assert.assertEquals("threw exception", "Unknown nucleus: {(3,2)(2,1)(1,1)(2,2)}", e.getMessage());
+			Assert.fail("should not throw exception");
 		}
 	}
 

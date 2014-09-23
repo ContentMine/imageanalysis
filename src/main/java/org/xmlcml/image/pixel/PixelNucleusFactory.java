@@ -107,6 +107,27 @@ public class PixelNucleusFactory {
 		return yJunctionList;
 	}
 	
+	public PixelNucleusList getOrCreateFivePixelJunctionList() {
+		if (fivePixelJunctionList == null) {
+			fivePixelJunctionList = new PixelNucleusList();
+		}
+		return fivePixelJunctionList;
+	}
+	
+	public PixelNucleusList getOrCreateSevenPixelJunctionList() {
+		if (sevenPixelJunctionList == null) {
+			sevenPixelJunctionList = new PixelNucleusList();
+		}
+		return sevenPixelJunctionList;
+	}
+	
+	public PixelNucleusList getOrCreateEightOrMorePixelJunctionList() {
+		if (eightOrMorePixelJunctionList == null) {
+			eightOrMorePixelJunctionList = new PixelNucleusList();
+		}
+		return eightOrMorePixelJunctionList;
+	}
+	
 	private void indexJunctions() {
 		ensureNucleusByPixelMap();
 		getOrCreateNucleusList();
@@ -154,7 +175,7 @@ public class PixelNucleusFactory {
 			eightOrMorePixelJunctionList.add(nucleus);
 			// others (probably thinning errors)
 		} else {
-			throw new RuntimeException("Unknown nucleus: "+nucleus);
+			LOG.error("Unknown nucleus: "+nucleus);
 		}
 	}
 
@@ -162,7 +183,10 @@ public class PixelNucleusFactory {
 		crossJunctionList = new PixelNucleusList();
 		dotJunctionList = new PixelNucleusList();
 		doubleYJunctionList = new PixelNucleusList();
+		fivePixelJunctionList = new PixelNucleusList();
 		sixPixelJunctionList = new PixelNucleusList();
+		sevenPixelJunctionList = new PixelNucleusList();
+		eightOrMorePixelJunctionList = new PixelNucleusList();
 		tJunctionList = new PixelNucleusList();
 		terminalJunctionList = new PixelNucleusList();
 		yJunctionList = new PixelNucleusList();
