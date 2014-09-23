@@ -36,12 +36,16 @@ public class PixelNucleusFactory {
 	private final static Logger LOG = Logger.getLogger(PixelNucleusFactory.class);
 
 	private PixelNucleusList crossJunctionList;
+	private PixelNucleusList fivePixelJunctionList;
 	private PixelNucleusList sixPixelJunctionList;
+	private PixelNucleusList sevenPixelJunctionList;
+	private PixelNucleusList eightOrMorePixelJunctionList;
 	private PixelNucleusList dotJunctionList;
 	private PixelNucleusList doubleYJunctionList;
 	private PixelNucleusList terminalJunctionList;
 	private PixelNucleusList tJunctionList;
 	private PixelNucleusList yJunctionList;
+	
 	private PixelNucleusList allNucleusList;
 	private PixelIsland island;
 	private PixelEdgeList edgeList;
@@ -118,20 +122,37 @@ public class PixelNucleusFactory {
 	}
 
 	private void indexNucleusTypeAndAddToLists(PixelNucleus nucleus) {
-		if (nucleus.isCrossJunction()) {
-			crossJunctionList.add(nucleus);
-		} else if (nucleus.isDotJunction()) {
+		// in order of size 
+		// zero
+		if (nucleus.isDotJunction()) {
 			dotJunctionList.add(nucleus);
-		} else if (nucleus.isDoubleYJunction()) {
-			doubleYJunctionList.add(nucleus);
-		} else if (nucleus.isTJunction()) {
-			tJunctionList.add(nucleus);
+			// one
 		} else if (nucleus.isTerminalJunction()) {
 			terminalJunctionList.add(nucleus);
+			// threeway
 		} else if (nucleus.isYJunction()) {
 			yJunctionList.add(nucleus);
+		} else if (nucleus.isTJunction()) {
+			tJunctionList.add(nucleus);
+			// cross (fourway)
+		} else if (nucleus.isCrossJunction()) {
+			crossJunctionList.add(nucleus);
+			// probably 3-way
+		} else if (nucleus.isFivePixelJunction()) {
+			fivePixelJunctionList.add(nucleus);
+
+			// fourway
+		} else if (nucleus.isDoubleYJunction()) {
+			doubleYJunctionList.add(nucleus);
+			// three
 		} else if (nucleus.isSixPixelJunction()) {
 			sixPixelJunctionList.add(nucleus);
+		} else if (nucleus.isSevenPixelJunction()) {
+			sevenPixelJunctionList.add(nucleus);
+			// others
+		} else if (nucleus.isEightOrMorePixelJunction()) {
+			eightOrMorePixelJunctionList.add(nucleus);
+			// others (probably thinning errors)
 		} else {
 			throw new RuntimeException("Unknown nucleus: "+nucleus);
 		}

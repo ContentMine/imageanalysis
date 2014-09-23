@@ -29,7 +29,10 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		DOUBLEY,
 		FILLEDT,
 		NICKEDT,
+		FIVEPIXEL,
 		SIXPIXEL,
+		SEVENPIXEL,
+		EIGHTORMOREPIXEL,
 		TERMINAL,
 		Y,
 	}
@@ -314,7 +317,29 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		}
 		return PixelJunctionType.Y.equals(getJunctionType());
 	}
-	
+
+	/** not expected.
+	 * 
+	 * Found one of form:
+	 * 
+	 *  + +
+	 * +++
+	 * 
+	 * don't understand it
+	 * 
+	 * @return
+	 */
+	public boolean isFivePixelJunction() {
+		if (getJunctionType() == null) {
+			if (pixelList.size() == 5) {
+				centrePixel = pixelList.getCentralPixel();
+				setJunctionType(PixelJunctionType.FIVEPIXEL);
+			}
+		}
+		return PixelJunctionType.FIVEPIXEL.equals(getJunctionType());
+	}
+
+
 	/** two rightangle triangles joined by tips.
 	 * 
 	 * The centre pixels will have 3 neighbours *in the nucleus*
@@ -341,7 +366,9 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 	 *   
 	 *   centre pixel will be randomly one of the two central pixels
 	 *   
-	 *   maybe all 6-connected should be this
+	 *   maybe all 6-connected should be this.
+	 *   
+	 *   They all seem fourway crossings
 	 *   
 	 * @return
 	 */
@@ -354,6 +381,44 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		}
 		return PixelJunctionType.SIXPIXEL.equals(getJunctionType());
 	}
+
+	/** hopefully rare
+	 * 
+	 * Found one of form:
+	 * 
+	 *    +
+	 *    ++
+	 * +++
+	 *  +
+	 * 
+	 * this is a T joined to a triangle. It looks like a fourway
+	 * 
+	 * @return
+	 */
+	public boolean isSevenPixelJunction() {
+		if (getJunctionType() == null) {
+			if (pixelList.size() == 7) {
+				centrePixel = pixelList.getCentralPixel();
+				setJunctionType(PixelJunctionType.SEVENPIXEL);
+			}
+		}
+		return PixelJunctionType.SEVENPIXEL.equals(getJunctionType());
+	}
+
+	/** not found yet
+	 * 
+	 * @return
+	 */
+	public boolean isEightOrMorePixelJunction() {
+		if (getJunctionType() == null) {
+			if (pixelList.size() >= 7) {
+				centrePixel = pixelList.getCentralPixel();
+				setJunctionType(PixelJunctionType.EIGHTORMOREPIXEL);
+			}
+		}
+		return PixelJunctionType.EIGHTORMOREPIXEL.equals(getJunctionType());
+	}
+
 
 	/** two diagonal Y's joined by stems.
 	 * 
