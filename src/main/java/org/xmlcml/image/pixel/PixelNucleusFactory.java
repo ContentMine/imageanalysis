@@ -14,6 +14,7 @@ import org.xmlcml.image.pixel.nucleus.FourPixelNucleus;
 import org.xmlcml.image.pixel.nucleus.SixSevenPixelNucleus;
 import org.xmlcml.image.pixel.nucleus.TerminalNucleus;
 import org.xmlcml.image.pixel.nucleus.ThreeWayNucleus;
+import org.xmlcml.image.pixel.nucleus.TwoWayNucleus;
 
 /** an intermediate object which identifies and manages PixelNucleus's and PixelNodes.
  * 
@@ -263,7 +264,9 @@ public class PixelNucleusFactory {
 		LOG.trace("making nucleus "+nucleusPixelList);
 		PixelNucleus nucleus = createSubtypedNucleus(nucleusPixelList);
 		if (nucleus == null) {
-			throw new RuntimeException("NULL NUCLEUS: "+seed+"; "+nucleusPixelList);
+			LOG.debug("island "+island);
+			throw new RuntimeException("NULL NUCLEUS: "+seed+"; "+nucleusPixelList+"; shell :"+
+		    ((nucleusPixelList == null) ? "" : nucleusPixelList.getOrCreateNeighbours().toString())+":");
 		}
 		nucleus.addAll(usedSet);
 		return nucleus;
@@ -565,6 +568,9 @@ public class PixelNucleusFactory {
 		if (pixelList.size() == 1) {
 			newNucleus = process1PixelNuclei(pixelList);
 
+		} else if (pixelList.size() == 2) {
+			newNucleus = process2PixelNuclei(pixelList);
+			
 		} else if (pixelList.size() == 3) {
 			newNucleus = process3PixelNuclei(pixelList);
 			
@@ -601,7 +607,7 @@ public class PixelNucleusFactory {
 		if (isFilledT(centrePixel, pixelList, island)) {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 		} else {
-			LOG.error("UNKNOWN 4 PIXEL NUCLEUS");
+			LOG.error("UNKNOWN 4 PIXEL NUCLEUS in "+island.size()+"; "+island.getIntBoundingBox()+"; "+centrePixel+"; "+pixelList+"; neigh "+pixelList.getOrCreateNeighbours());
 			newNucleus = new FourPixelNucleus(centrePixel, pixelList, island);
 		}
 		return newNucleus;
@@ -609,13 +615,14 @@ public class PixelNucleusFactory {
 
 	private PixelNucleus process3PixelNuclei(PixelList pixelList) {
 		PixelNucleus newNucleus = null;
-		Pixel centrePixel;
+		Pixel centrePixel = null;
 		int corner = getRightAngleCorner(pixelList);
 		if (corner != -1) {
 			centrePixel = pixelList.get(corner);
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 		} else {
-			LOG.error("UNKNOWN 3 PIXEL NUCLEUS");
+			LOG.error("UNKNOWN 3 PIXEL NUCLEUS in "+island.size()+"; "+island.getIntBoundingBox()+"; "+pixelList+"; shell "+pixelList.getOrCreateNeighbours());
+			newNucleus = new TwoWayNucleus(centrePixel, pixelList, island);
 		}
 		return newNucleus;
 	}
@@ -638,8 +645,32 @@ public class PixelNucleusFactory {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 			LOG.trace("made NICKED_T");
 			
+		} else if (centrePixel.getDiagonalNeighbours(island).size() == 3) {
+			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
+			LOG.trace("made TILTED T");
+			
 		} else {
 			LOG.error("UNKNOWN SINGLE PIXEL NUCLEUS: "+pixelList+"; "+pixelList.get(0).getOrCreateNeighbours(island));
+		}
+		return newNucleus;
+	}
+
+
+	private PixelNucleus process2PixelNuclei(PixelList pixelList) {
+		PixelNucleus newNucleus = null;
+		Pixel centrePixel;
+		centrePixel = pixelList.get(0);
+		if (centrePixel.getOrthogonalNeighbours(island).size() 
+				+ centrePixel.getDiagonalNeighbours(island).size() == 0) {
+			LOG.debug("2 pixel zero neighbour");
+			
+		} else if (centrePixel.getOrthogonalNeighbours(island).size() 
+					+ centrePixel.getDiagonalNeighbours(island).size() == 1) {
+				LOG.debug("2 pixel single neighbour");
+				
+		} else {
+			newNucleus = new TwoWayNucleus(centrePixel, pixelList, island);
+			LOG.error("UNKNOWN TWO PIXEL NUCLEUS in "+island.size()+"; "+island.getIntBoundingBox()+"; "+pixelList+"; "+pixelList.get(0).getOrCreateNeighbours(island));
 		}
 		return newNucleus;
 	}
@@ -675,8 +706,10 @@ public class PixelNucleusFactory {
 
 	private boolean isFilledT(Pixel centrePixel, PixelList pixelList, PixelIsland pixelIsland) {
 		for (Pixel pixel : pixelList) {
+			// find pixel with 3 orthogonal neighbours (assume only one?)
 			if (pixel.getOrthogonalNeighbours(island).size() == 3) {
 				if (centrePixel != null) {
+					// there are 2 or more, error
 					throw new RuntimeException("Not a filled TJunction "+this);
 				}
 				centrePixel = pixel;

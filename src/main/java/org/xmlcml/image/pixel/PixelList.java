@@ -30,8 +30,8 @@ public class PixelList implements Iterable<Pixel> {
 
 
 	// these may not be needed
-	private static final String START_STRING = "";
-	private static final String END_STRING = "";
+	private static final String START_STRING = ":";
+	private static final String END_STRING = ":";
 
 	public final static Pattern COORD_PATTERN = Pattern.compile("\\((\\d+),(\\d+)\\)");
 
@@ -185,11 +185,11 @@ public class PixelList implements Iterable<Pixel> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(START_STRING);
+		if (list.size() == 0) sb.append(START_STRING);
 		for (Pixel pixel : this) {
 			sb.append(pixel.toString());
 		}
-		sb.append(END_STRING);
+		if (list.size() == 0) sb.append(END_STRING);
 		return sb.toString();
 	}
 
@@ -414,6 +414,24 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public void sortYX() {
 		Collections.sort(list, new PixelComparator(ComparatorType.TOP, ComparatorType.LEFT));
+	}
+
+	/** find all neighbours not in current set.
+	 * 
+	 * Effectively the next outwards and inwards shell. Most commonly applied
+	 * to Nuclei when there is no inside.
+	 * 
+	 * uses PixelShell.
+	 * 
+	 * @return
+	 */
+	public PixelList getOrCreateNeighbours() {
+		PixelShell pixelShell = new PixelShell(this);
+		return new PixelList(pixelShell.getExpandedSetWithoutSeed());
+	}
+
+	public PixelIsland getIsland() {
+		return island;
 	}
 
 }

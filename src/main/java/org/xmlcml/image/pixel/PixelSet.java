@@ -20,7 +20,20 @@ public class PixelSet implements Set<Pixel> {
 	public PixelSet(PixelSet set) {
 		this.pixelSet = new HashSet<Pixel>(set.pixelSet);
 	}
+	
+	/** create set with single pixel.
+	 * 
+	 * @param pixel
+	 */
+	public PixelSet(Pixel pixel) {
+		this.pixelSet = new HashSet<Pixel>();
+		pixelSet.add(pixel);
+	}
 
+	/** create set with list of pixels (not necessarily unique).
+	 * 
+	 * @param pixelList
+	 */
 	public PixelSet(PixelList pixelList) {
 		this.pixelSet = new HashSet<Pixel>();
 		for (Pixel pixel : pixelList) {
