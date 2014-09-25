@@ -103,7 +103,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	@Test
 	public void testSpikesDot() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_DOT_ISLAND());
-		Assert.assertEquals("dot", "", nucleusFactory.createYXSortedSpikePixelList().toString());
+		Assert.assertEquals("dot", "::", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	@Test
 	public void testSpikesCycle() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_CYCLE_ISLAND());
-		Assert.assertEquals("cycle", "", nucleusFactory.createYXSortedSpikePixelList().toString());
+		Assert.assertEquals("cycle", "::", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
