@@ -132,20 +132,20 @@ public class NodesAndEdgesTest {
 		PixelTestUtils.assertNeighbourCounts(pixelIslandList,
 				new IntArray[] {
 				new IntArray(new int[]{1442, 0,0,1442,0,0,0,0,0,0}), // box // 0
-				new IntArray(new int[]{70, 0,2,66,2,0,0,0,0,0}), // A // 
+				new IntArray(new int[]{70, 0,2,64,4,0,0,0,0,0}), // A // 
 				new IntArray(new int[]{103, 0,0,98,4,1,0,0,0,0}), // B
 				new IntArray(new int[]{68, 0,2,66,0,0,0,0,0,0}), // C
 				new IntArray(new int[]{88, 0,0,88,0,0,0,0,0,0}), // D
 				new IntArray(new int[]{85, 0,3,78,3,1,0,0,0,0}), // E  // 5
 				new IntArray(new int[]{64, 0,3,57,3,1,0,0,0,0}), // F
-				new IntArray(new int[]{90, 0,3,86,1,0,0,0,0,0}), // G ??
+				new IntArray(new int[]{90, 0,3,84,3,0,0,0,0,0}), // G ??
 				new IntArray(new int[]{78, 0,4,66,6,2,0,0,0,0}), // H
 				new IntArray(new int[]{28, 0,2,26,0,0,0,0,0,0}), // I // no serif
 				new IntArray(new int[]{45, 0,2,43,0,0,0,0,0,0}), // J // 10
-				new IntArray(new int[]{71, 0,4,65,2,0,0,0,0,0}), // K 2 Y-junctions
+				new IntArray(new int[]{71, 0,4,61,6,0,0,0,0,0}), // K 2 Y-junctions
 				new IntArray(new int[]{45, 0,2,43,0,0,0,0,0,0}), // L
 				new IntArray(new int[]{108, 0,2,106,0,0,0,0,0,0}), // M
-				new IntArray(new int[]{81, 0,3,77,1,0,0,0,0,0}), // N
+				new IntArray(new int[]{81, 0,3,75,3,0,0,0,0,0}), // N
 				new IntArray(new int[]{6, 0,2,4,0,0,0,0,0,0}), // accent // 15 grave
 				new IntArray(new int[]{86, 0,0,86,0,0,0,0,0,0}), // O
 				new IntArray(new int[]{76, 0,1,71,3,1,0,0,0,0}), // P
@@ -159,33 +159,33 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{60, 0,4,50,6,0,0,0,0,0}), // X // 1 Y-junction // 25
 				new IntArray(new int[]{49, 0,3,42,3,1,0,0,0,0}), // Y
 				new IntArray(new int[]{66, 0,2,64,0,0,0,0,0,0}), // Z
-				new IntArray(new int[]{70, 0,2,66,2,0,0,0,0,0}), // A accented
+				new IntArray(new int[]{70, 0,2,64,4,0,0,0,0,0}), // A accented
 				
 				new IntArray(new int[]{19, 0,0,19,0,0,0,0,0,0}), // accent ring // 29
 				new IntArray(new int[]{5, 0,2,3,0,0,0,0,0,0}), // accent acute // 30
 				new IntArray(new int[]{8, 0,2,6,0,0,0,0,0,0}), // accent hat // 31
 				new IntArray(new int[]{15, 0,2,13,0,0,0,0,0,0}), // accent tilde // 32
-				new IntArray(new int[]{72, 0,2,68,2,0,0,0,0,0}), // accented A // 33
+				new IntArray(new int[]{72, 0,2,66,4,0,0,0,0,0}), // accented A // 33
 				new IntArray(new int[]{86, 0,3,79,3,1,0,0,0,0,0}), // accented E // 34
 				new IntArray(new int[]{28, 0,2,26,0,0,0,0,0,0}), // accented I // 35
 				new IntArray(new int[]{86, 0,0,86,0,0,0,0,0,0}), // accented O // 36
 				// these are sorted by the TOP of the box
-				new IntArray(new int[]{69, 0,1,67,1,0,0,0,0,0}), // b // 37 
+				new IntArray(new int[]{69, 0,1,65,3,0,0,0,0,0}), // b // 37 
 				new IntArray(new int[]{71, 0,1,66,3,1,0,0,0,0}), // d // 38
 				new IntArray(new int[]{38, 0,4,29,0,5,0,0,0,0}), // f // 39
-				new IntArray(new int[]{61, 0,3,57,1,0,0,0,0,0}), // h // 40
+				new IntArray(new int[]{61, 0,3,55,3,0,0,0,0,0}), // h // 40
 				new IntArray(new int[]{1,  1,0,0,0,0,0,0,0,0}), // dot // 41
 				new IntArray(new int[]{1,  1,0,0,0,0,0,0,0,0}), // dot // 42
-				new IntArray(new int[]{60, 0,4,51,4,1,0,0,0,0}), // k // 43 
+				new IntArray(new int[]{60, 0,4,49,6,1,0,0,0,0}), // k // 43 
 				new IntArray(new int[]{29, 0,2,27,0,0,0,0,0,0}), // l // 44 
-				new IntArray(new int[]{71, 0,2,64,4,1,0,0,0,0}), // a // 45
+				new IntArray(new int[]{71, 0,2,62,6,1,0,0,0,0}), // a // 45
 				new IntArray(new int[]{47, 0,2,45,0,0,0,0,0,0}), // c // 46
-				new IntArray(new int[]{72, 0,2,65,4,1,0,0,0,0}), // e // 47 // 1 Y junct
+				new IntArray(new int[]{72, 0,2,63,6,1,0,0,0,0}), // e // 47 // 1 Y junct
 				new IntArray(new int[]{85, 0,1,80,3,1,0,0,0,0}), // g  //48
 				new IntArray(new int[]{20, 0,2,18,0,0,0,0,0,0}), // i // 49
 				new IntArray(new int[]{32, 0,2,30,0,0,0,0,0,0}), // j // 50
-				new IntArray(new int[]{83, 0,4,77,2,0,0,0,0,0}), // m // 51 // 2 Yjunct
-				new IntArray(new int[]{52, 0,3,48,1,0,0,0,0,0}), // n // 52 // Y junct
+				new IntArray(new int[]{83, 0,4,73,6,0,0,0,0,0}), // m // 51 // 2 Yjunct
+				new IntArray(new int[]{52, 0,3,46,3,0,0,0,0,0}), // n // 52 // Y junct
 				
 				new IntArray(new int[]{6,  0,2,4,0,0,0,0,0,0}), // grave // 53
 				new IntArray(new int[]{18, 0,0,18,0,0,0,0,0,0}), // ring // 54
@@ -193,7 +193,7 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{36, 0,4,27,0,5,0,0,0,0}), // t // 56 // one cross => 5 4-ccords
 				new IntArray(new int[]{11, 0,2,9,0,0,0,0,0,0}), // hat // 57
 				new IntArray(new int[]{12, 0,2,10,0,0,0,0,0,0}), // tilde // 58
-				new IntArray(new int[]{87, 0,2,81,4,0,0,0,0,0}), // ampersand // 59
+				new IntArray(new int[]{87, 0,2,75,10,0,0,0,0,0}), // ampersand // 59
 				new IntArray(new int[]{58, 0,0,58,0,0,0,0,0,0}), // o // 60
 				new IntArray(new int[]{73, 0,2,66,4,1,0,0,0,0}), // p // 61
 				new IntArray(new int[]{73, 0,2,63,6,2,0,0,0,0}), // q // 62
@@ -201,29 +201,29 @@ public class NodesAndEdgesTest {
 				new IntArray(new int[]{55, 0,2,53,0,0,0,0,0,0}), // s // 64
 				new IntArray(new int[]{52, 0,3,48,1,0,0,0,0,0}), // u // 65
 				new IntArray(new int[]{40, 0,2,38,0,0,0,0,0,0}), // v // 66
-				new IntArray(new int[]{73, 0,3,69,1,0,0,0,0,0}), // w // 67
+				new IntArray(new int[]{73, 0,3,67,3,0,0,0,0,0}), // w // 67
 				new IntArray(new int[]{47, 0,4,38,4,1,0,0,0,0}), // x // 68
 				new IntArray(new int[]{54, 0,3,47,3,1,0,0,0,0}), // y // 69
 				new IntArray(new int[]{46, 0,2,44,0,0,0,0,0,0}), // z // 70
-				new IntArray(new int[]{71, 0,2,64,4,1,0,0,0,0}), // a no accent // 71
-				new IntArray(new int[]{70, 0,2,63,4,1,0,0,0,0}), // a no accent // 72
-				new IntArray(new int[]{72, 0,2,65,4,1,0,0,0,0}), // e no accent // 73
+				new IntArray(new int[]{71, 0,2,62,6,1,0,0,0,0}), // a no accent // 71
+				new IntArray(new int[]{70, 0,2,61,6,1,0,0,0,0}), // a no accent // 72
+				new IntArray(new int[]{72, 0,2,63,6,1,0,0,0,0}), // e no accent // 73
 				new IntArray(new int[]{20, 0,2,18,0,0,0,0,0,0}), // i no accent // 74
 				new IntArray(new int[]{58, 0,0,58,0,0,0,0,0,0}), // o no accent // 75
 				
 				new IntArray(new int[]{36, 0,3,29,3,1,0,0,0,0}), // 1 // 76
 				new IntArray(new int[]{63, 0,2,61,0,0,0,0,0,0}), // 2 // 77
-				new IntArray(new int[]{67, 0,3,63,1,0,0,0,0,0}), // 3 // 78
+				new IntArray(new int[]{67, 0,3,61,3,0,0,0,0,0}), // 3 // 78
 				new IntArray(new int[]{64, 0,3,52,3,6,0,0,0,0}), // 4 // 79
 				new IntArray(new int[]{67, 0,2,65,0,0,0,0,0,0}), // 5 // 80
-				new IntArray(new int[]{78, 0,1,76,1,0,0,0,0,0}), // 6 // 81
+				new IntArray(new int[]{78, 0,1,74,3,0,0,0,0,0}), // 6 // 81
 				new IntArray(new int[]{45, 0,2,43,0,0,0,0,0,0}), // 7 // 82
-				new IntArray(new int[]{85, 0,0,80,4,1,0,0,0,0}), // 8 // 83
+				new IntArray(new int[]{85, 0,0,78,6,1,0,0,0,0}), // 8 // 83
 				new IntArray(new int[]{79, 0,1,74,3,1,0,0,0,0}), // 9 // 84 // mess, correct it
 				new IntArray(new int[]{72, 0,0,72,0,0,0,0,0,0}), // 0 // 85
 				new IntArray(new int[]{41, 0,2,39,0,0,0,0,0,0}), // ( // 86
 				new IntArray(new int[]{106,0,4,86,6,10,0,0,0,0}), // $ // 87
-				new IntArray(new int[]{69, 0,4,60,4,1,0,0,0,0}), // pound // 88
+				new IntArray(new int[]{69, 0,4,58,6,1,0,0,0,0}), // pound // 88
 				new IntArray(new int[]{21, 0,2,19,0,0,0,0,0,0}), // shriek // 89
 				new IntArray(new int[]{36, 0,2,34,0,0,0,0,0,0}), // query // 90
 				new IntArray(new int[]{40, 0,2,38,0,0,0,0,0,0}), // ) // 91

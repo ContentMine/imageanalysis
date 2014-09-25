@@ -119,7 +119,8 @@ public class PixelGraphTest {
 			Assert.assertTrue("should not throw exception", true);
 			// error is now logged, not thrown
 		} catch (RuntimeException e) {
-			Assert.fail("should not throw exception");
+			e.printStackTrace();
+			throw e;
 		}
 	}
 

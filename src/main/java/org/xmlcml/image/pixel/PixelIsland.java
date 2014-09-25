@@ -671,7 +671,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	public PixelGraph getOrCreateGraph() {
 		PixelGraph graph = new PixelGraph(this);
 		graph.setParameters(this.parameters);
-		graph.createNodesAndEdges();
+//		graph.createNodesAndEdges();
 		return graph;
 	}
 
@@ -857,7 +857,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * @return the removed pixels
 	 */
 	public PixelNucleusList doTJunctionThinning() {
-		ensureNucleusFactory();
+		getOrCreateNucleusFactory();
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateNucleusList();
 		nucleusList.doTJunctionThinning(this);
 		return nucleusList;
@@ -876,36 +876,34 @@ public class PixelIsland implements Iterable<Pixel> {
 		return orthogonalStubList;
 	}
 
-	public PixelNucleusFactory getPixelNucleusCollection() {
-		ensureNucleusFactory();
-		return nucleusFactory;
-	}
-
-	private void ensureNucleusFactory() {
+	public PixelNucleusFactory getOrCreateNucleusFactory() {
 		if (nucleusFactory == null) {
 			nucleusFactory = new PixelNucleusFactory(this);
 			nucleusFactory.setIsland(this);
 		}
+		
+		return nucleusFactory;
 	}
 
+
 	public PixelNodeList createNodeList() {
-		return getPixelNucleusCollection().getOrCreateNodeListFromNuclei();
+		return getOrCreateNucleusFactory().getOrCreateNodeListFromNuclei();
 	}
 
 	public PixelEdgeList createEdgeList() {
-		return getPixelNucleusCollection().createPixelEdgeListFromNodeList();
+		return getOrCreateNucleusFactory().createPixelEdgeListFromNodeList();
 	}
 
-	public void rearrangeYJunctions() {
-		ensureNucleusFactory();
-		PixelNucleusList yJunctionList = nucleusFactory.getOrCreateYJunctionList();
-		for (PixelNucleus yJunction : yJunctionList) {
-			LOG.trace("rearrange Y "+yJunction);
-			if (yJunction.rearrangeYJunction(this)) {
-				LOG.trace("rearranged Y junction: "+yJunction);
-			}
-		}
-	}
+//	public void rearrangeYJunctions() {
+//		getOrCreateNucleusFactory();
+//		PixelNucleusList yJunctionList = nucleusFactory.getOrCreateYJunctionList();
+//		for (PixelNucleus yJunction : yJunctionList) {
+//			LOG.trace("rearrange Y "+yJunction);
+//			if (yJunction.rearrangeYJunction(this)) {
+//				LOG.trace("rearranged Y junction: "+yJunction);
+//			}
+//		}
+//	}
 
 	private boolean isOrthogonalStub(Pixel pixel) {
 		PixelList neighbours = pixel.getOrCreateNeighbours(this);

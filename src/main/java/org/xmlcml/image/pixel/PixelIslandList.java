@@ -49,6 +49,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private PixelProcessor pixelProcessor;
 	private ImageParameters parameters;
 	private boolean diagonal;
+	private List<PixelGraph> pixelGraphList;
 
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -161,16 +162,16 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			islandList.trimOrthogonalStubs();
 			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
 					"target/nodesEdges/afterTrimStubs.svg"));
-			if (control.contains("T")) {
-				islandList.doTJunctionThinning();
-				SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
-					"target/nodesEdges/afterTJunctThin.svg"));
-			}
-			if (control.contains("Y")) {
-				islandList.rearrangeYJunctions();
-				SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(),
-						new File("target/nodesEdges/afterYJunction.svg"));
-			}
+//			if (control.contains("T")) {
+//				islandList.doTJunctionThinning();
+//				SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
+//					"target/nodesEdges/afterTJunctThin.svg"));
+//			}
+//			if (control.contains("Y")) {
+//				islandList.rearrangeYJunctions();
+//				SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(),
+//						new File("target/nodesEdges/afterYJunction.svg"));
+//			}
 		}
 		return islandList;
 	}
@@ -207,11 +208,11 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return null;
 	}
 
-	private void rearrangeYJunctions() {
-		for (PixelIsland island : this) {
-			island.rearrangeYJunctions();
-		}
-	}
+//	private void rearrangeYJunctions() {
+//		for (PixelIsland island : this) {
+//			island.rearrangeYJunctions();
+//		}
+//	}
 
 	private void setDiagonal(boolean b) {
 		this.diagonal = b;
@@ -550,21 +551,22 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 //		return pixelGraphList;
 //	}
 
-	public List<PixelGraph> createGraphList() {
-		List<PixelGraph> pixelGraphList = new ArrayList<PixelGraph>();
-		thinThickStepsOld();
-		// main tree
-		for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
-			PixelIsland island = get(i);
-			PixelGraph graph = island.getOrCreateGraph();
-			graph.setParameters(parameters);
-			pixelGraphList.add(graph);
-		}
-		LOG.debug("created graphs: "+pixelGraphList.size()+pixelGraphList);
-		for (PixelGraph pixelGraph : pixelGraphList) {
-//			LOG.debug("graph "+pixelGraph.getEdgeList().size()+"; " +pixelGraph.getNodeList().size() /*+": "+pixelGraph.getEdges()+"; "*/);
-			for (PixelNode pixelNode : pixelGraph.getNodeList()) {
-				LOG.debug("Node "+pixelNode);
+	public List<PixelGraph> getOrCreateGraphList() {
+		if (pixelGraphList == null) {
+			pixelGraphList = new ArrayList<PixelGraph>();
+			thinThickStepsOld();
+			// main tree
+			for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
+				PixelIsland island = get(i);
+				PixelGraph graph = island.getOrCreateGraph();
+				graph.setParameters(parameters);
+				pixelGraphList.add(graph);
+			}
+			LOG.trace("created graphs: "+pixelGraphList.size()+pixelGraphList);
+			for (PixelGraph pixelGraph : pixelGraphList) {
+				for (PixelNode pixelNode : pixelGraph.getNodeList()) {
+					LOG.trace("Node "+pixelNode);
+				}
 			}
 		}
 		return pixelGraphList;

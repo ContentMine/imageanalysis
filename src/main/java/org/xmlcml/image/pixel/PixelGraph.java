@@ -82,6 +82,7 @@ public class PixelGraph {
 
 	void createNodesAndEdges() {
 		if (edgeList == null) {
+			LOG.trace("CREATING NODES AND EDGES "+this.hashCode()+"; p:"+this.getPixelList().size());
 			edgeList = getNucleusFactory().createPixelEdgeListFromNodeList();
 			nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
 		}
@@ -197,7 +198,7 @@ public class PixelGraph {
 		if (extremeEdge == null) {
 			throw new RuntimeException("Cannot find extreme edge for "+comparatorType);
 		}
-		LOG.debug("extreme "+extremeEdge+"; nodes "+extremeEdge.getNodes().size());
+		LOG.trace("extreme "+extremeEdge+"; nodes "+extremeEdge.getNodes().size());
 		
 		Pixel midPixel = extremeEdge.getNearestPixelToMidPoint();
 		PixelNode rootNode = new PixelNode(midPixel, this);
@@ -545,9 +546,9 @@ public class PixelGraph {
 
 	private PixelNucleusFactory getNucleusFactory() {
 		if (island == null) {
-			throw new RuntimeException("Island much not be null");
+			throw new RuntimeException("Island must not be null");
 		}
-		return island.getPixelNucleusCollection();
+		return island.getOrCreateNucleusFactory();
 	}
 
 	public PixelNucleusList getPixelNucleusList() {

@@ -36,10 +36,10 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		TERMINAL,
 		Y,
 	}
-	private PixelIsland island;
+	protected PixelIsland island;
 	private Real2 centre;
-	private Pixel centrePixel;
-	private PixelList pixelList;
+	protected Pixel centrePixel;
+	protected PixelList pixelList;
 	private int rightAngleCorner;
 	private PixelJunctionType junctionType;
 	private PixelNode pixelNode;  // the node that coresponds to centrePixel
@@ -50,6 +50,18 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 	public PixelNucleus(PixelIsland island) {
 		this.island = island;
 		setDefaults();
+	}
+
+	/** for making subclassed Nucleus
+	 * 
+	 * @param centrePixel
+	 * @param pixelList
+	 * @param island
+	 */
+	protected PixelNucleus(Pixel centrePixel, PixelList pixelList, PixelIsland island) {
+		this(island);
+		this.centrePixel = centrePixel;
+		this.pixelList = pixelList;
 	}
 
 	private void setDefaults() {
@@ -180,290 +192,278 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		return removableList;
 	}
 
+	@Deprecated
 	void doTJunctionThinning(PixelIsland island) {
 		PixelList removables = getSuperthinRemovablePixelList();
 		island.removePixels(removables);
 	}
 
-	public boolean isDotJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 1) {
-				centrePixel = pixelList.get(0);
-				if (centrePixel.getOrthogonalNeighbours(island).size() 
-						+ centrePixel.getDiagonalNeighbours(island).size() == 0) {
-					setJunctionType(PixelJunctionType.DOT);
-				}
-			}
-		}
-		return PixelJunctionType.DOT.equals(getJunctionType());
-	}
+//	public boolean isDotJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 1) {
+//				centrePixel = pixelList.get(0);
+//				if (centrePixel.getOrthogonalNeighbours(island).size() 
+//						+ centrePixel.getDiagonalNeighbours(island).size() == 0) {
+//					setJunctionType(PixelJunctionType.DOT);
+//				}
+//			}
+//		}
+//		return PixelJunctionType.DOT.equals(getJunctionType());
+//	}
+//
+//	public boolean isTerminalJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 1) {
+//				centrePixel = pixelList.get(0);
+//				if (centrePixel.getOrthogonalNeighbours(island).size() 
+//						+ centrePixel.getDiagonalNeighbours(island).size() == 1) {
+//					setJunctionType(PixelJunctionType.TERMINAL);
+//					LOG.trace("Terminal centre: "+centrePixel+" ; "+centrePixel.getOrCreateNeighbours(island));
+//				}
+//			}
+//		}
+//		return PixelJunctionType.TERMINAL.equals(getJunctionType());
+//	}
+//
+//	public boolean isCrossJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 5) {
+//				int corner = getCrossCentre();
+//				if (corner != -1) {
+//					setJunctionType(PixelJunctionType.CROSS);
+//				}
+//			}
+//		}
+//		return PixelJunctionType.CROSS.equals(getJunctionType());
+//	}
+//
+//	private int getCrossCentre() {
+//		centrePixel = null;
+//		int pixelNumber = -1;
+//		for (int i = 0; i < 5; i++) {
+//			Pixel pixel = pixelList.get(i);
+//			if (pixel.getOrthogonalNeighbours(island).size() == 4) {
+//				if (centrePixel != null) {
+//					throw new RuntimeException("Bad cross: " + this);
+//				}
+//				centrePixel = pixel;
+//				pixelNumber = i;
+//			}
+//		}
+//		return pixelNumber;
+//	}
+//
+//	public boolean isTJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 1) {
+//				if(isNickedT()) {
+//					setJunctionType(PixelJunctionType.NICKEDT); 
+//				}
+//			} else if (pixelList.size() == 4) {
+//				if (isFilledT()) {
+//					setJunctionType(PixelJunctionType.FILLEDT); 
+//				}
+//			}
+//		}
+//		return PixelJunctionType.NICKEDT.equals(getJunctionType()) ||
+//				PixelJunctionType.FILLEDT.equals(getJunctionType());
+//	}
+//
+//	/** symmetric about vertical stem.
+//	 * 
+//	 * @return
+//	 */
+//	private boolean isNickedT() {
+//		boolean isT = false;
+//		if (centrePixel == null) {
+//			if (pixelList.size() == 1) {
+//				centrePixel = pixelList.get(0);
+//				LOG.trace("nicked T "+centrePixel);
+//			}
+//		}
+//		if (centrePixel != null) {
+//			PixelList diagonalNeighbours = centrePixel.getDiagonalNeighbours(island);
+//			PixelList orthogonalNeighbours = centrePixel.getOrthogonalNeighbours(island);
+//			if (diagonalNeighbours.size() == 2 && orthogonalNeighbours.size() == 1) {
+//				isT = true;
+//			}
+//		}
+//		return isT;
+//	}
+//
+//	private boolean isFilledT() {
+//		boolean isT = false;
+//		centrePixel = null;
+//		for (Pixel pixel : pixelList) {
+//			if (pixel.getOrthogonalNeighbours(island).size() == 3) {
+//				if (centrePixel != null) {
+//					throw new RuntimeException("Not a filled TJunction "+this);
+//				}
+//				centrePixel = pixel;
+//			}
+//		}
+//		if (centrePixel != null) {
+//			isT = true;
+//			LOG.debug("Filled T: "+centrePixel);
+//		}
+//		return isT;
+//	}
+//
+//	/** 3 connected pixels in rightangle.
+//	 * 
+//	 * The first cross is the corner returned by getRightAngleCorner();
+//	 * 
+//	 * + +
+//	 * +
+//	 * 
+//	 * @return
+//	 */
+//	public boolean isYJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 3) {
+//				int corner = getRightAngleCorner();
+//				if (corner != -1) {
+//					centrePixel = pixelList.get(corner);
+//					setJunctionType(PixelJunctionType.Y);
+//				}
+//			}
+//		}
+//		return PixelJunctionType.Y.equals(getJunctionType());
+//	}
+//
+//	/** not expected.
+//	 * 
+//	 * Found one of form:
+//	 * 
+//	 *  + +
+//	 * +++
+//	 * 
+//	 * don't understand it
+//	 * 
+//	 * @return
+//	 */
+//	public boolean isFivePixelJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 5) {
+//				centrePixel = pixelList.getCentralPixel();
+//				setJunctionType(PixelJunctionType.FIVEPIXEL);
+//			}
+//		}
+//		return PixelJunctionType.FIVEPIXEL.equals(getJunctionType());
+//	}
+//
+//
+//	/** two rightangle triangles joined by tips.
+//	 * 
+//	 * The centre pixels will have 3 neighbours *in the nucleus*
+//	 * The others will have only two *in the nucleus*
+//	 * 
+//	 * +
+//	 * ++
+//	 *   ++
+//	 *    +
+//	 * or
+//	 * +
+//	 * ++
+//	 *   +
+//	 *   ++
+//	 * or
+//	 * +
+//	 * ++++
+//	 *    +
+//	 * or
+//	 * +  +
+//	 * ++++
+//	 *    
+//	 * or maybe others
+//	 *   
+//	 *   centre pixel will be randomly one of the two central pixels
+//	 *   
+//	 *   maybe all 6-connected should be this.
+//	 *   
+//	 *   They all seem fourway crossings
+//	 *   
+//	 * @return
+//	 */
+//	public boolean isSixPixelJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 6) {
+//				centrePixel = pixelList.getCentralPixel();
+//				setJunctionType(PixelJunctionType.SIXPIXEL);
+//			}
+//		}
+//		return PixelJunctionType.SIXPIXEL.equals(getJunctionType());
+//	}
+//
+//	/** hopefully rare
+//	 * 
+//	 * Found one of form:
+//	 * 
+//	 *    +
+//	 *    ++
+//	 * +++
+//	 *  +
+//	 * 
+//	 * this is a T joined to a triangle. It looks like a fourway
+//	 * 
+//	 * @return
+//	 */
+//	public boolean isSevenPixelJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 7) {
+//				centrePixel = pixelList.getCentralPixel();
+//				setJunctionType(PixelJunctionType.SEVENPIXEL);
+//			}
+//		}
+//		return PixelJunctionType.SEVENPIXEL.equals(getJunctionType());
+//	}
+//
+//	/** not found yet
+//	 * 
+//	 * @return
+//	 */
+//	public boolean isEightOrMorePixelJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() >= 7) {
+//				centrePixel = pixelList.getCentralPixel();
+//				setJunctionType(PixelJunctionType.EIGHTORMOREPIXEL);
+//			}
+//		}
+//		return PixelJunctionType.EIGHTORMOREPIXEL.equals(getJunctionType());
+//	}
+//
+//
+//	/** two diagonal Y's joined by stems.
+//	 * 
+//	 *  +
+//	 * ++
+//	 *   ++
+//	 *   +
+//	 *   
+//	 *   centre pixel will be randomly one of the two central pixels
+//	 * @return
+//	 */
+//	public boolean isDoubleYJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 6) {
+//				PixelList centres = new PixelList();
+//				for (Pixel pixel : pixelList) {
+//					PixelList orthNeighbours = pixel.getOrthogonalNeighbours(island);
+//					if (orthNeighbours.size() == 2 && 
+//							orthNeighbours.get(0).isDiagonalNeighbour(orthNeighbours.get(1)))  {
+//						centres.add(pixel);
+//					}
+//				}
+//				if (centres.size() == 2 && centres.get(0).isDiagonalNeighbour(centres.get(1))) {
+//					centrePixel = centres.get(0); // arbitrary but?
+//					setJunctionType(PixelJunctionType.DOUBLEY);
+//				}
+//			}
+//		}
+//		return PixelJunctionType.DOUBLEY.equals(getJunctionType());
+//	}
 
-	public boolean isTerminalJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 1) {
-				centrePixel = pixelList.get(0);
-				if (centrePixel.getOrthogonalNeighbours(island).size() 
-						+ centrePixel.getDiagonalNeighbours(island).size() == 1) {
-					setJunctionType(PixelJunctionType.TERMINAL);
-					LOG.trace("Terminal centre: "+centrePixel+" ; "+centrePixel.getOrCreateNeighbours(island));
-				}
-			}
-		}
-		return PixelJunctionType.TERMINAL.equals(getJunctionType());
-	}
-
-	public boolean isCrossJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 5) {
-				int corner = getCrossCentre();
-				if (corner != -1) {
-					setJunctionType(PixelJunctionType.CROSS);
-				}
-			}
-		}
-		return PixelJunctionType.CROSS.equals(getJunctionType());
-	}
-
-	private int getCrossCentre() {
-		centrePixel = null;
-		int pixelNumber = -1;
-		for (int i = 0; i < 5; i++) {
-			Pixel pixel = pixelList.get(i);
-			if (pixel.getOrthogonalNeighbours(island).size() == 4) {
-				if (centrePixel != null) {
-					throw new RuntimeException("Bad cross: " + this);
-				}
-				centrePixel = pixel;
-				pixelNumber = i;
-			}
-		}
-		return pixelNumber;
-	}
-
-	public boolean isTJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 1) {
-				if(isNickedT()) {
-					setJunctionType(PixelJunctionType.NICKEDT); 
-				}
-			} else if (pixelList.size() == 4) {
-				if (isFilledT()) {
-					setJunctionType(PixelJunctionType.FILLEDT); 
-				}
-			}
-		}
-		return PixelJunctionType.NICKEDT.equals(getJunctionType()) ||
-				PixelJunctionType.FILLEDT.equals(getJunctionType());
-	}
-
-	/** symmetric about vertical stem.
-	 * 
-	 * @return
-	 */
-	private boolean isNickedT() {
-		boolean isT = false;
-		if (centrePixel == null) {
-			if (pixelList.size() == 1) {
-				centrePixel = pixelList.get(0);
-				LOG.trace("nicked T "+centrePixel);
-			}
-		}
-		if (centrePixel != null) {
-			PixelList diagonalNeighbours = centrePixel.getDiagonalNeighbours(island);
-			PixelList orthogonalNeighbours = centrePixel.getOrthogonalNeighbours(island);
-			if (diagonalNeighbours.size() == 2 && orthogonalNeighbours.size() == 1) {
-				isT = true;
-			}
-		}
-		return isT;
-	}
-
-	private boolean isFilledT() {
-		boolean isT = false;
-		centrePixel = null;
-		for (Pixel pixel : pixelList) {
-			if (pixel.getOrthogonalNeighbours(island).size() == 3) {
-				if (centrePixel != null) {
-					throw new RuntimeException("Not a filled TJunction "+this);
-				}
-				centrePixel = pixel;
-			}
-		}
-		if (centrePixel != null) {
-			isT = true;
-			LOG.trace("Filled T: "+centrePixel);
-		}
-		return isT;
-	}
-
-	/** 3 connected pixels in rightangle.
-	 * 
-	 * The first cross is the corner returned by getRightAngleCorner();
-	 * 
-	 * + +
-	 * +
-	 * 
-	 * @return
-	 */
-	public boolean isYJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 3) {
-				int corner = getRightAngleCorner();
-				if (corner != -1) {
-					centrePixel = pixelList.get(corner);
-					setJunctionType(PixelJunctionType.Y);
-				}
-			}
-		}
-		return PixelJunctionType.Y.equals(getJunctionType());
-	}
-
-	/** not expected.
-	 * 
-	 * Found one of form:
-	 * 
-	 *  + +
-	 * +++
-	 * 
-	 * don't understand it
-	 * 
-	 * @return
-	 */
-	public boolean isFivePixelJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 5) {
-				centrePixel = pixelList.getCentralPixel();
-				setJunctionType(PixelJunctionType.FIVEPIXEL);
-			}
-		}
-		return PixelJunctionType.FIVEPIXEL.equals(getJunctionType());
-	}
-
-
-	/** two rightangle triangles joined by tips.
-	 * 
-	 * The centre pixels will have 3 neighbours *in the nucleus*
-	 * The others will have only two *in the nucleus*
-	 * 
-	 * +
-	 * ++
-	 *   ++
-	 *    +
-	 * or
-	 * +
-	 * ++
-	 *   +
-	 *   ++
-	 * or
-	 * +
-	 * ++++
-	 *    +
-	 * or
-	 * +  +
-	 * ++++
-	 *    
-	 * or maybe others
-	 *   
-	 *   centre pixel will be randomly one of the two central pixels
-	 *   
-	 *   maybe all 6-connected should be this.
-	 *   
-	 *   They all seem fourway crossings
-	 *   
-	 * @return
-	 */
-	public boolean isSixPixelJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 6) {
-				centrePixel = pixelList.getCentralPixel();
-				setJunctionType(PixelJunctionType.SIXPIXEL);
-			}
-		}
-		return PixelJunctionType.SIXPIXEL.equals(getJunctionType());
-	}
-
-	/** hopefully rare
-	 * 
-	 * Found one of form:
-	 * 
-	 *    +
-	 *    ++
-	 * +++
-	 *  +
-	 * 
-	 * this is a T joined to a triangle. It looks like a fourway
-	 * 
-	 * @return
-	 */
-	public boolean isSevenPixelJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 7) {
-				centrePixel = pixelList.getCentralPixel();
-				setJunctionType(PixelJunctionType.SEVENPIXEL);
-			}
-		}
-		return PixelJunctionType.SEVENPIXEL.equals(getJunctionType());
-	}
-
-	/** not found yet
-	 * 
-	 * @return
-	 */
-	public boolean isEightOrMorePixelJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() >= 7) {
-				centrePixel = pixelList.getCentralPixel();
-				setJunctionType(PixelJunctionType.EIGHTORMOREPIXEL);
-			}
-		}
-		return PixelJunctionType.EIGHTORMOREPIXEL.equals(getJunctionType());
-	}
-
-
-	/** two diagonal Y's joined by stems.
-	 * 
-	 *  +
-	 * ++
-	 *   ++
-	 *   +
-	 *   
-	 *   centre pixel will be randomly one of the two central pixels
-	 * @return
-	 */
-	public boolean isDoubleYJunction() {
-		if (getJunctionType() == null) {
-			if (pixelList.size() == 6) {
-				PixelList centres = new PixelList();
-				for (Pixel pixel : pixelList) {
-					PixelList orthNeighbours = pixel.getOrthogonalNeighbours(island);
-					if (orthNeighbours.size() == 2 && 
-							orthNeighbours.get(0).isDiagonalNeighbour(orthNeighbours.get(1)))  {
-						centres.add(pixel);
-					}
-				}
-				if (centres.size() == 2 && centres.get(0).isDiagonalNeighbour(centres.get(1))) {
-					centrePixel = centres.get(0); // arbitrary but?
-					setJunctionType(PixelJunctionType.DOUBLEY);
-				}
-			}
-		}
-		return PixelJunctionType.DOUBLEY.equals(getJunctionType());
-	}
-
-	private int getRightAngleCorner() {
-		rightAngleCorner = -1;
-		for (int i = 0; i < 3; i++) {
-			int j = (i + 1) % 3;
-			int k = (j + 1) % 3;
-			if (Pixel.isRightAngle(pixelList.get(i), pixelList.get(j),
-					pixelList.get(k))) {
-				rightAngleCorner = i;
-				break;
-			}
-		}
-		return rightAngleCorner;
-	}
-
+	@Deprecated
 	public boolean rearrangeYJunction(PixelIsland island) {
 		Pixel rightAnglePixel = pixelList.get(rightAngleCorner);
 		int p0 = (rightAngleCorner + 1) % 3;

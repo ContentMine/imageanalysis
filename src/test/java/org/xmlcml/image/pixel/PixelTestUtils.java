@@ -72,17 +72,18 @@ public class PixelTestUtils {
 
 	 * @param msg
 	 * @param island
-	 * @param nodeCounts 0th eelement is 0-brnach node count, 1st element is 1-branch ...
+	 * @param nodeCounts 0th element is 0-brnach node count, 1st element is 1-branch ...
 	 */
 	public static void assertNodeCounts(String msg, PixelIsland island, IntArray nodeCounts) {
 		// compare pixel counts
 		IntArray nodeCountArray = new IntArray();
-		PixelNucleusFactory nucleusCollection = island.getPixelNucleusCollection();
+		PixelNucleusFactory factory = island.getOrCreateNucleusFactory();
 		for (int i = 1; i < nodeCounts.size(); i++) {
-			nodeCountArray.addElement(nucleusCollection.getOrCreateTerminalJunctionList().size());
-			nodeCountArray.addElement(nucleusCollection.getThreewayJunctionList().size());
-			nodeCountArray.addElement(nucleusCollection.getOrCreateDoubleYJunctionList().size());
-			nodeCountArray.addElement(nucleusCollection.getOrCreateCrossJunctionList().size());
+			nodeCountArray.addElement(factory.getOrCreateDotJunctionList().size());
+			nodeCountArray.addElement(factory.getOrCreateTerminalJunctionList().size());
+			nodeCountArray.addElement(factory.getOrCreateThreeWayJunctionList().size());
+			nodeCountArray.addElement(factory.getOrCreateFourWayJunctionList().size());
+			nodeCountArray.addElement(factory.getOrCreateEightPlusPixelJunctionList().size());
 		}
 		
 	}

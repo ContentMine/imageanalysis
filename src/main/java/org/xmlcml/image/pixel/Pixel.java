@@ -242,7 +242,7 @@ public class Pixel {
 		return pixelList;
 	}
 
-	PixelList getOrthogonalNeighbours(PixelIsland island) {
+	public PixelList getOrthogonalNeighbours(PixelIsland island) {
 		PixelList neighbours = getOrCreateNeighbours(island);
 		PixelList pixelList = new PixelList();
 		for (Pixel neighbour : neighbours) {

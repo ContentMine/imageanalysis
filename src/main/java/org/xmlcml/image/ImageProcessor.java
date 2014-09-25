@@ -12,13 +12,15 @@ import org.xmlcml.image.pixel.PixelProcessor;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
-/** transforms an image independently of future use.
+/**
+ * transforms an image independently of future use.
  * 
  * may use a variety of ImageUtil routines
  * 
- *  * NOTE: setters return ImageProcessor so they can be chained, e.g.
- *     ImageProcessor processor = new ImageProcessor().setThreshold(190).setThinning(null);
-
+ * * NOTE: setters return ImageProcessor so they can be chained, e.g.
+ * ImageProcessor processor = new
+ * ImageProcessor().setThreshold(190).setThinning(null);
+ * 
  * 
  * @author pm286
  *
@@ -41,7 +43,7 @@ public class ImageProcessor {
 	public static final String THRESH1 = "--threshold";
 	public static final String THINNING = "-v";
 	public static final String THINNING1 = "--thinning";
-	
+
 	private static final String BINARIZED_PNG = "binarized.png";
 	private static final String RAW_IMAGE_PNG = "rawImage.png";
 	private static final String TARGET = "target";
@@ -57,12 +59,13 @@ public class ImageProcessor {
 	private File outputDir;
 	private PixelProcessor pixelProcessor;
 	private ImageParameters parameters;
+	private PixelIslandList pixelIslandList = null;
 
 	public ImageProcessor() {
 		setDefaults();
 		clearVariables();
 	}
-	
+
 	public ImageProcessor(BufferedImage image) {
 		this();
 		this.image = image;
@@ -70,7 +73,7 @@ public class ImageProcessor {
 
 	public void setDefaults() {
 		ensurePixelProcessor();
-		
+
 		pixelProcessor.setDefaults();
 		this.setThreshold(getDefaultThreshold());
 		this.setThinning(new ZhangSuenThinning());
@@ -81,10 +84,10 @@ public class ImageProcessor {
 
 	public void clearVariables() {
 		pixelProcessor.clearVariables();
-		
+
 		image = null;
 		inputFile = null;
-//		outputDir = null;
+		// outputDir = null;
 	}
 
 	public void setBase(String base) {
@@ -94,7 +97,7 @@ public class ImageProcessor {
 	public void setBinarize(boolean binarize) {
 		this.binarize = binarize;
 	}
-	
+
 	public boolean getBinarize() {
 		return binarize;
 	}
@@ -102,7 +105,7 @@ public class ImageProcessor {
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}
-	
+
 	public boolean getDebug() {
 		return debug;
 	}
@@ -110,7 +113,7 @@ public class ImageProcessor {
 	public void setImage(BufferedImage img) {
 		this.image = img;
 	}
-	
+
 	public BufferedImage getImage() {
 		return this.image;
 	}
@@ -119,12 +122,15 @@ public class ImageProcessor {
 		this.thinning = thinning;
 	}
 
-	/** sets threshold.
+	/**
+	 * sets threshold.
 	 * 
-	 * this assumes an image with white background and black lines and characters.
+	 * this assumes an image with white background and black lines and
+	 * characters.
 	 * 
 	 * if the antialising bleeds between characters, set the threshold low. Thus
-	 * in 
+	 * in
+	 * 
 	 * @param threshold
 	 */
 	public void setThreshold(int threshold) {
@@ -132,10 +138,10 @@ public class ImageProcessor {
 		this.binarize = true;
 	}
 
-	
 	public BufferedImage processImageFile(File file) {
 		if (file == null || !file.exists() || file.isDirectory()) {
-			throw new RuntimeException("Image file is null/missing/directory: "+file);
+			throw new RuntimeException("Image file is null/missing/directory: "
+					+ file);
 		}
 		try {
 			this.inputFile = file;
@@ -143,10 +149,10 @@ public class ImageProcessor {
 			processImage(image);
 			return image;
 		} catch (Exception e) {
-			throw new RuntimeException("bad image: "+file, e);
+			throw new RuntimeException("bad image: " + file, e);
 		}
 	}
-	
+
 	public File getInputFile() {
 		return inputFile;
 	}
@@ -154,24 +160,24 @@ public class ImageProcessor {
 	public BufferedImage processImage(BufferedImage img) {
 		this.setImage(img);
 		if (debug) {
-			String filename =  TARGET+"/"+base+"/"+RAW_IMAGE_PNG;
+			String filename = TARGET + "/" + base + "/" + RAW_IMAGE_PNG;
 			ImageUtil.writeImageQuietly(this.image, filename);
-			System.err.println("wrote raw image file: "+filename);
+			System.err.println("wrote raw image file: " + filename);
 		}
 		if (this.binarize) {
 			this.image = ImageUtil.boofCVBinarization(this.image, threshold);
 			if (debug) {
-				String filename =  TARGET+"/"+base+"/"+BINARIZED_PNG;
+				String filename = TARGET + "/" + base + "/" + BINARIZED_PNG;
 				ImageUtil.writeImageQuietly(this.image, filename);
-				System.err.println("wrote binarized file: "+filename);
+				System.err.println("wrote binarized file: " + filename);
 			}
 		}
 		if (thinning != null) {
 			image = ImageUtil.thin(this.image, thinning);
 			if (debug) {
-				String filename =  TARGET+"/"+base+"/"+THINNED_PNG;
+				String filename = TARGET + "/" + base + "/" + THINNED_PNG;
 				ImageUtil.writeImageQuietly(this.image, filename);
-				System.err.println("wrote thinned file: "+filename);
+				System.err.println("wrote thinned file: " + filename);
 			}
 		}
 		return this.image;
@@ -185,7 +191,8 @@ public class ImageProcessor {
 		return threshold;
 	}
 
-	/** creates default processor.
+	/**
+	 * creates default processor.
 	 * 
 	 * currently sets binarize=true, thinning=ZhangSuenThinning(), threshold=128
 	 * But use getters to query actual values
@@ -198,20 +205,23 @@ public class ImageProcessor {
 		return imageProcessor;
 	}
 
-	/** creates default processor and processes image.
+	/**
+	 * creates default processor and processes image.
 	 * 
 	 * currently sets binarize=true, thinning=ZhangSuenThinning(), threshold=128
 	 * But use getters to query actual values
 	 * 
 	 * @return
 	 */
-	public static ImageProcessor createDefaultProcessorAndProcess(BufferedImage image) {
+	public static ImageProcessor createDefaultProcessorAndProcess(
+			BufferedImage image) {
 		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessor();
 		imageProcessor.processImage(image);
 		return imageProcessor;
 	}
 
-	/** creates default processor and processes image.
+	/**
+	 * creates default processor and processes image.
 	 * 
 	 * uses createDefaultProcessorAndProcess(BufferedImage image)
 	 * 
@@ -219,14 +229,16 @@ public class ImageProcessor {
 	 */
 	public static ImageProcessor createDefaultProcessorAndProcess(File imageFile) {
 		if (imageFile == null || !imageFile.exists() || imageFile.isDirectory()) {
-			throw new RuntimeException("Cannot find/open file "+imageFile);
+			throw new RuntimeException("Cannot find/open file " + imageFile);
 		} else {
 			try {
-				return ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(imageFile));
+				return ImageProcessor.createDefaultProcessorAndProcess(ImageIO
+						.read(imageFile));
 			} catch (Exception e) {
-				throw new RuntimeException("Cannot read image file: "+imageFile, e);
+				throw new RuntimeException("Cannot read image file: "
+						+ imageFile, e);
 			}
-		} 
+		}
 	}
 
 	public String getBase() {
@@ -243,41 +255,43 @@ public class ImageProcessor {
 	public void readAndProcessFile(File file) {
 		this.setInputFile(file);
 		processImageFile(file);
-		
+
 	}
 
 	public void setInputFile(File file) {
 		this.inputFile = file;
 	}
-	
+
 	public BufferedImage processImageFile() {
 		if (image == null) {
 			if (inputFile == null || !inputFile.exists()) {
-				throw new RuntimeException("File does not exist: "+inputFile);
-			} 
+				throw new RuntimeException("File does not exist: " + inputFile);
+			}
 			if (getBase() == null) {
 				setBase(FilenameUtils.getBaseName(inputFile.toString()));
 			}
 			try {
 				image = ImageIO.read(inputFile);
-				LOG.trace("read image "+image);
+				LOG.trace("read image " + image);
 			} catch (Exception e) {
-				throw new RuntimeException("Cannot find/read imagefile: "+inputFile, e);
+				throw new RuntimeException("Cannot find/read imagefile: "
+						+ inputFile, e);
 			}
 		}
 		if (image != null) {
 			image = processImage(image);
 		}
-		LOG.trace("image "+image);
+		LOG.trace("image " + image);
 		return image;
 	}
 
-
 	public void debug() {
-		System.err.println("input:     "+((inputFile == null) ? "null" : inputFile.getAbsolutePath()));
-		System.err.println("output:    "+((outputDir == null) ? "null" : outputDir.getAbsolutePath()));
-		System.err.println("threshold: "+threshold);
-		System.err.println("thinning:  "+thinning);
+		System.err.println("input:     "
+				+ ((inputFile == null) ? "null" : inputFile.getAbsolutePath()));
+		System.err.println("output:    "
+				+ ((outputDir == null) ? "null" : outputDir.getAbsolutePath()));
+		System.err.println("threshold: " + threshold);
+		System.err.println("thinning:  " + thinning);
 		pixelProcessor.debug();
 	}
 
@@ -285,8 +299,9 @@ public class ImageProcessor {
 		return this.pixelProcessor;
 	}
 
-	/** creates a default ImageProcessor and immediately processes Image.
-	 *  
+	/**
+	 * creates a default ImageProcessor and immediately processes Image.
+	 * 
 	 * @param image
 	 * @return
 	 */
@@ -297,14 +312,17 @@ public class ImageProcessor {
 	}
 
 	public PixelIslandList getOrCreatePixelIslandList() {
-		ensurePixelProcessor();
-		// this is messy - the super thinning should have been done earlier
-		PixelIslandList pixelIslandList = pixelProcessor.getOrCreatePixelIslandList(thinning != null);
 		if (pixelIslandList == null) {
-			throw new RuntimeException("Could not create pixelIslandList");
+			ensurePixelProcessor();
+			// this is messy - the super thinning should have been done earlier
+			pixelIslandList = pixelProcessor
+					.getOrCreatePixelIslandList(thinning != null);
+			if (pixelIslandList == null) {
+				throw new RuntimeException("Could not create pixelIslandList");
+			}
+			pixelIslandList.setParameters(this.parameters);
+			LOG.trace("pil " + pixelIslandList);
 		}
-		pixelIslandList.setParameters(this.parameters);
-		LOG.trace("pil "+pixelIslandList);
 		return pixelIslandList;
 	}
 
@@ -312,12 +330,12 @@ public class ImageProcessor {
 		ensureParameterObject();
 		if (pixelProcessor == null) {
 			pixelProcessor = new PixelProcessor(this);
-//			new Exception("ppex ").printStackTrace();
+			// new Exception("ppex ").printStackTrace();
 			pixelProcessor.setParameters(this.parameters);
 		}
 		return pixelProcessor;
 	}
-	
+
 	private void ensureParameterObject() {
 		if (this.parameters == null) {
 			parameters = new ImageParameters();
@@ -340,15 +358,21 @@ public class ImageProcessor {
 		return outputDir;
 	}
 
-	
 	public void usage() {
 		System.err.println("  imageanalysis options:");
-		System.err.println("       "+INPUT+" "+INPUT1+"        input file (directory not yet supported)");
-		System.err.println("       "+OUTPUT+" "+OUTPUT1+"        output directory; def="+getDefaultOutputDirectory());
-		System.err.println("       "+BINARIZE+" "+BINARIZE1+"        set binarize on");
-		System.err.println("       "+DEBUG+" "+DEBUG1+"        set debug on");
-		System.err.println("       "+THRESH+" "+THRESH1+"    threshold (default: "+getDefaultThreshold()+")");
-		System.err.println("       "+THINNING+" "+THINNING1+"    thinning ('none', 'z' (ZhangSuen))");
+		System.err.println("       " + INPUT + " " + INPUT1
+				+ "        input file (directory not yet supported)");
+		System.err.println("       " + OUTPUT + " " + OUTPUT1
+				+ "        output directory; def="
+				+ getDefaultOutputDirectory());
+		System.err.println("       " + BINARIZE + " " + BINARIZE1
+				+ "        set binarize on");
+		System.err.println("       " + DEBUG + " " + DEBUG1
+				+ "        set debug on");
+		System.err.println("       " + THRESH + " " + THRESH1
+				+ "    threshold (default: " + getDefaultThreshold() + ")");
+		System.err.println("       " + THINNING + " " + THINNING1
+				+ "    thinning ('none', 'z' (ZhangSuen))");
 	}
 
 	protected void parseArgs(ArgIterator argIterator) {
@@ -375,12 +399,13 @@ public class ImageProcessor {
 			LOG.debug(arg);
 		}
 		if (false) {
-			
-		} else if (arg.equals(ImageProcessor.DEBUG) || arg.equals(ImageProcessor.DEBUG1)) {
+
+		} else if (arg.equals(ImageProcessor.DEBUG)
+				|| arg.equals(ImageProcessor.DEBUG1)) {
 			debug = true;
 			argIterator.setDebug(true);
 			argIterator.next();
-			
+
 		} else if (arg.equals(BINARIZE) || arg.equals(BINARIZE1)) {
 			this.setBinarize(true);
 			argIterator.next();
@@ -407,30 +432,30 @@ public class ImageProcessor {
 		} else {
 			found = pixelProcessor.processArg(argIterator);
 			if (!found) {
-				LOG.debug("skipped unknown token: "+argIterator.getLast());
+				LOG.debug("skipped unknown token: " + argIterator.getLast());
 				argIterator.next();
 			}
 		}
 		return found;
 	}
 
-
 	private void setThin(String thinningS) {
 		if (thinningS == null) {
-			throw new RuntimeException("no thinning argument [for none use 'none']");
+			throw new RuntimeException(
+					"no thinning argument [for none use 'none']");
 		} else if (thinningS.equalsIgnoreCase("none")) {
 			setThinning(null);
 		} else if (thinningS.equalsIgnoreCase("z")) {
-			setThinning(new ZhangSuenThinning()); 
+			setThinning(new ZhangSuenThinning());
 		} else {
-			LOG.error("unknown thinning argument: "+thinningS);
+			LOG.error("unknown thinning argument: " + thinningS);
 		}
 	}
 
 	public static void main(String[] args) throws Exception {
 		ImageProcessor imageProcessor = new ImageProcessor();
 		ArgIterator argIterator = new ArgIterator(args);
-		imageProcessor.processArgsAndRun(argIterator);		
+		imageProcessor.processArgsAndRun(argIterator);
 	}
 
 	private void processArgsAndRun(ArgIterator argIterator) {
@@ -453,8 +478,9 @@ public class ImageProcessor {
 		} else {
 			processImage(image);
 		}
-		PixelIslandList islandList = pixelProcessor.getOrCreatePixelIslandList();
-		LOG.debug("islandList "+islandList.size());
+		PixelIslandList islandList = pixelProcessor
+				.getOrCreatePixelIslandList();
+		LOG.trace("islandList " + islandList.size());
 	}
 
 	public void parseArgs(String[] args) {

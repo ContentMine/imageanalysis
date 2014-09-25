@@ -256,10 +256,10 @@ public class PixelEdge {
 				edge = new PixelEdge(island);
 				String pixelListS = matcher.group(1);
 				edge.pixelList = PixelList.createPixelList(pixelListS, island);
-				LOG.debug("pixelList "+edge.pixelList);
+				LOG.trace("pixelList "+edge.pixelList);
 				String nodeListS = matcher.group(2);
 				edge.nodes = PixelNodeList.createNodeList(nodeListS, island);
-				LOG.debug("nodeList "+edge.nodes);
+				LOG.trace("nodeList "+edge.nodes);
 			}
 		}
 		return edge;

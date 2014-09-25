@@ -1,13 +1,19 @@
 package org.xmlcml.image.pixel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.image.pixel.PixelNucleus.PixelJunctionType;
+import org.xmlcml.image.pixel.nucleus.CrossNucleus;
+import org.xmlcml.image.pixel.nucleus.DotNucleus;
+import org.xmlcml.image.pixel.nucleus.EightPlusPixelNucleus;
+import org.xmlcml.image.pixel.nucleus.FivePixelNucleus;
+import org.xmlcml.image.pixel.nucleus.FourPixelNucleus;
+import org.xmlcml.image.pixel.nucleus.SixSevenPixelNucleus;
+import org.xmlcml.image.pixel.nucleus.TerminalNucleus;
+import org.xmlcml.image.pixel.nucleus.ThreeWayNucleus;
 
 /** an intermediate object which identifies and manages PixelNucleus's and PixelNodes.
  * 
@@ -35,16 +41,16 @@ public class PixelNucleusFactory {
 	
 	private final static Logger LOG = Logger.getLogger(PixelNucleusFactory.class);
 
-	private PixelNucleusList crossJunctionList;
-	private PixelNucleusList fivePixelJunctionList;
-	private PixelNucleusList sixPixelJunctionList;
-	private PixelNucleusList sevenPixelJunctionList;
-	private PixelNucleusList eightOrMorePixelJunctionList;
+	private PixelNucleusList fourWayJunctionList;
+//	private PixelNucleusList fivePixelJunctionList;
+//	private PixelNucleusList sixSevenPixelJunctionList;
+	private PixelNucleusList eightPlusPixelJunctionList;
 	private PixelNucleusList dotJunctionList;
-	private PixelNucleusList doubleYJunctionList;
+//	private PixelNucleusList doubleYJunctionList;
 	private PixelNucleusList terminalJunctionList;
-	private PixelNucleusList tJunctionList;
-	private PixelNucleusList yJunctionList;
+	private PixelNucleusList threeWayJunctionList;
+//	private PixelNucleusList tJunctionList;
+//	private PixelNucleusList yJunctionList;
 	
 	private PixelNucleusList allNucleusList;
 	private PixelIsland island;
@@ -56,10 +62,10 @@ public class PixelNucleusFactory {
 	private Map<Pixel, PixelNode> nodeByPixelMap;
 	private PixelList spikePixelList;
 	private Map<Pixel, PixelNucleus> nucleusBySpikePixelMap;
-//	private Set<Pixel> terminalPixels;
 	private PixelSet unusedPixelSet;
 	
 	public PixelNucleusFactory(PixelIsland island) {
+		LOG.trace("MAKING FACTORY from "+island.hashCode()+"; "+island.pixelList.size());
 		this.island = island;
 		island.setNucleusFactory(this);
 		indexJunctions();
@@ -69,141 +75,78 @@ public class PixelNucleusFactory {
 		return island;
 	}
 	
-	public PixelNucleusList getOrCreateCrossJunctionList() {
-		if (crossJunctionList == null) {
-			crossJunctionList = new PixelNucleusList();
+	public PixelNucleusList getOrCreateDotJunctionList() {
+		if (dotJunctionList == null) {
+			dotJunctionList = new PixelNucleusList();
+			addPixelNuclei(DotNucleus.class, dotJunctionList);
 		}
-		return crossJunctionList;
+		return dotJunctionList;
 	}
-	public PixelNucleusList getOrCreateDoubleLJunctionList() {
-		if (sixPixelJunctionList == null) {
-			sixPixelJunctionList = new PixelNucleusList();
-		}
-		return sixPixelJunctionList;
-	}
-	public PixelNucleusList getOrCreateDoubleYJunctionList() {
-		if (doubleYJunctionList == null) {
-			doubleYJunctionList = new PixelNucleusList();
-		}
-		return doubleYJunctionList;
-	}
+
 	public PixelNucleusList getOrCreateTerminalJunctionList() {
 		if (terminalJunctionList == null) {
 			terminalJunctionList = new PixelNucleusList();
+			addPixelNuclei(TerminalNucleus.class, terminalJunctionList);
 		}
 		return terminalJunctionList;
 	}
-	public PixelNucleusList getOrCreateTJunctionList() {
-		if (tJunctionList == null) {
-			tJunctionList = new PixelNucleusList();
+
+	public PixelNucleusList getOrCreateThreeWayJunctionList() {
+		if (threeWayJunctionList == null) {
+			threeWayJunctionList = new PixelNucleusList();
+			addPixelNuclei(ThreeWayNucleus.class, threeWayJunctionList);
 		}
-		return tJunctionList;
+		return threeWayJunctionList;
+	}
+
+	public PixelNucleusList getOrCreateFourWayJunctionList() {
+		if (fourWayJunctionList == null) {
+			fourWayJunctionList = new PixelNucleusList();
+		}
+		return fourWayJunctionList;
 	}
 	
-	public PixelNucleusList getOrCreateYJunctionList() {
-		if (yJunctionList == null) {
-			yJunctionList = new PixelNucleusList();
+	public PixelNucleusList getOrCreateEightPlusPixelJunctionList() {
+		if (eightPlusPixelJunctionList == null) {
+			eightPlusPixelJunctionList = new PixelNucleusList();
 		}
-		return yJunctionList;
+		return eightPlusPixelJunctionList;
 	}
 	
-	public PixelNucleusList getOrCreateFivePixelJunctionList() {
-		if (fivePixelJunctionList == null) {
-			fivePixelJunctionList = new PixelNucleusList();
+	private void addPixelNuclei(Class<? extends PixelNucleus> nucleusClass, PixelNucleusList junctionList) {
+		for (PixelNucleus nucleus : allNucleusList) {
+			if (nucleus.getClass().equals(nucleusClass)) {
+				junctionList.add(nucleus);
+			}
 		}
-		return fivePixelJunctionList;
 	}
-	
-	public PixelNucleusList getOrCreateSevenPixelJunctionList() {
-		if (sevenPixelJunctionList == null) {
-			sevenPixelJunctionList = new PixelNucleusList();
-		}
-		return sevenPixelJunctionList;
-	}
-	
-	public PixelNucleusList getOrCreateEightOrMorePixelJunctionList() {
-		if (eightOrMorePixelJunctionList == null) {
-			eightOrMorePixelJunctionList = new PixelNucleusList();
-		}
-		return eightOrMorePixelJunctionList;
-	}
-	
+
 	private void indexJunctions() {
 		ensureNucleusByPixelMap();
 		getOrCreateNucleusList();
 		ensureJunctionLists();
 		for (PixelNucleus nucleus : allNucleusList) {
-			indexNucleusTypeAndAddToLists(nucleus);
+//			indexNucleusTypeAndAddToLists(nucleus);
 			for (Pixel pixel : nucleus.getPixelList()) {
 				nucleusByPixelMap.put(pixel, nucleus);
 			}
 		}
-
-
-	}
-
-	private void indexNucleusTypeAndAddToLists(PixelNucleus nucleus) {
-		// in order of size 
-		// zero
-		if (nucleus.isDotJunction()) {
-			dotJunctionList.add(nucleus);
-			// one
-		} else if (nucleus.isTerminalJunction()) {
-			terminalJunctionList.add(nucleus);
-			// threeway
-		} else if (nucleus.isYJunction()) {
-			yJunctionList.add(nucleus);
-		} else if (nucleus.isTJunction()) {
-			tJunctionList.add(nucleus);
-			// cross (fourway)
-		} else if (nucleus.isCrossJunction()) {
-			crossJunctionList.add(nucleus);
-			// probably 3-way
-		} else if (nucleus.isFivePixelJunction()) {
-			fivePixelJunctionList.add(nucleus);
-
-			// fourway
-		} else if (nucleus.isDoubleYJunction()) {
-			doubleYJunctionList.add(nucleus);
-			// three
-		} else if (nucleus.isSixPixelJunction()) {
-			sixPixelJunctionList.add(nucleus);
-		} else if (nucleus.isSevenPixelJunction()) {
-			sevenPixelJunctionList.add(nucleus);
-			// others
-		} else if (nucleus.isEightOrMorePixelJunction()) {
-			eightOrMorePixelJunctionList.add(nucleus);
-			// others (probably thinning errors)
-		} else {
-			LOG.error("Unknown nucleus: "+nucleus);
-		}
+		return;
 	}
 
 	private void ensureJunctionLists() {
-		crossJunctionList = new PixelNucleusList();
 		dotJunctionList = new PixelNucleusList();
-		doubleYJunctionList = new PixelNucleusList();
-		fivePixelJunctionList = new PixelNucleusList();
-		sixPixelJunctionList = new PixelNucleusList();
-		sevenPixelJunctionList = new PixelNucleusList();
-		eightOrMorePixelJunctionList = new PixelNucleusList();
-		tJunctionList = new PixelNucleusList();
 		terminalJunctionList = new PixelNucleusList();
-		yJunctionList = new PixelNucleusList();
-	}
-		
-	public PixelNucleusList getThreewayJunctionList() {
-		PixelNucleusList threewayList = new PixelNucleusList();
-		threewayList.addAll(getOrCreateTJunctionList());
-		threewayList.addAll(getOrCreateYJunctionList());
-		return threewayList;
+		threeWayJunctionList = new PixelNucleusList();
+		fourWayJunctionList = new PixelNucleusList();
+		eightPlusPixelJunctionList = new PixelNucleusList();
 	}
 	
 	@Deprecated
 	public PixelNucleusList getOrCreateNucleusListOld() {
 		if (allNucleusList == null) {
 			allNucleusList = new PixelNucleusList();
-			LOG.debug(this.hashCode()+"; NucleusList pixelList:"+island.pixelList.size());
+			LOG.trace(this.hashCode()+"; NucleusList pixelList:"+island.pixelList.size());
 			for (Pixel pixel : island.pixelList) {
 				boolean added = false;
 				if (pixel.getOrCreateNeighbours(island).size() != 2) {
@@ -217,13 +160,13 @@ public class PixelNucleusFactory {
 					if (!added) {
 						PixelNucleus nucleus = new PixelNucleus(island);
 						nucleus.add(pixel);
-						LOG.debug("created nucleus: "+pixel+"; "+nucleus+"; "+nucleus.hashCode());
+						LOG.trace("created nucleus: "+pixel+"; "+nucleus+"; "+nucleus.hashCode());
 						allNucleusList.add(nucleus);
 					}
 				}
-				allNucleusList.mergeTouchingNuclei();
+//				allNucleusList.mergeTouchingNuclei();
 			}
-			LOG.debug("Created nucleusList: "+allNucleusList.toString());
+			LOG.trace("Created nucleusList: "+allNucleusList.toString());
 		}
 		return allNucleusList;
 	}
@@ -234,7 +177,7 @@ public class PixelNucleusFactory {
 			unusedPixelSet = new PixelSet(island.pixelList);
 			makeDotAndTerminalNuclei();
 			makeNonTerminalNuclei();
-			LOG.trace("Created nucleusList: "+allNucleusList.toString());
+			LOG.trace("Created nucleusList: "+allNucleusList.size());
 		}
 		return allNucleusList;
 	}
@@ -248,7 +191,7 @@ public class PixelNucleusFactory {
 				PixelNucleus nucleus = makeNucleusFromSeed(pixel, island);
 				allNucleusList.add(nucleus);
 				unusedPixelSet.removeAll(nucleus.getPixelList().getList());
-				LOG.trace("created nucleus: "+pixel+"; "+nucleus+"; "+nucleus.hashCode());
+				LOG.trace("created non-terminal nucleus: px: "+pixel+"; n: "+nucleus.hashCode()+"; "+nucleus.getJunctionType()+"; "+nucleus.getPixelList());
 			} else if (neighbours.size() == 2 || neighbours.size() == 0) {
 				// skip these
 			} else {
@@ -305,29 +248,39 @@ public class PixelNucleusFactory {
 	}
 
 	private PixelNucleus makeNucleusFromSeed(Pixel seed, PixelIsland island) {
-		PixelNucleus nucleus = new PixelNucleus(island);
 		PixelSet seedSet = new PixelSet();
 		seedSet.add(seed);
 		PixelSet usedSet = new PixelSet();
 		while (!seedSet.isEmpty()) {
 			Pixel pixel = seedSet.next();
 			seedSet.remove(pixel);
-			usedSet.add(pixel);
 			PixelList neighbours = pixel.getOrCreateNeighbours(island);
+			LOG.trace("next pixel: "+pixel+"; "+neighbours);
 			addNeighboursWith3orMoreNeighbours(island, seedSet, usedSet, neighbours);
+			usedSet.add(pixel);
+		}
+		PixelList nucleusPixelList = new PixelList(new ArrayList<Pixel>(usedSet));
+		LOG.trace("making nucleus "+nucleusPixelList);
+		PixelNucleus nucleus = createSubtypedNucleus(nucleusPixelList);
+		if (nucleus == null) {
+			throw new RuntimeException("NULL NUCLEUS: "+seed+"; "+nucleusPixelList);
 		}
 		nucleus.addAll(usedSet);
 		return nucleus;
 	}
 
-	private void addNeighboursWith3orMoreNeighbours(PixelIsland island, PixelSet set, PixelSet used, PixelList neighbours) {
+	private void addNeighboursWith3orMoreNeighbours(PixelIsland island, PixelSet seedSet, PixelSet used, PixelList neighbours) {
 		for (Pixel neighbour : neighbours) {
 			if (neighbour.getOrCreateNeighbours(island).size() > 2) {
 				if (!used.contains(neighbour)) {
-					set.add(neighbour);
+					seedSet.add(neighbour);
+					LOG.trace("added "+neighbour+" to "+seedSet);
 				}
+				used.add(neighbour);
+				LOG.trace("used "+used);
 			}
 		}
+		LOG.trace("======added neighbours: "+used);
 	}
 
 	private void ensureNucleusByPixelMap() {
@@ -602,5 +555,164 @@ public class PixelNucleusFactory {
 		spikePixelList.sortYX();
 		return spikePixelList;
 	}
+
+	//====================subtyped Nuclei==========
+	
+	PixelNucleus createSubtypedNucleus(PixelList pixelList) {
+		PixelNucleus newNucleus = null;
+		Pixel centrePixel = null;
+		// DOT
+		if (pixelList.size() == 1) {
+			newNucleus = process1PixelNuclei(pixelList);
+
+		} else if (pixelList.size() == 3) {
+			newNucleus = process3PixelNuclei(pixelList);
+			
+		} else if (pixelList.size() == 4) {
+			newNucleus = process4PixelNuclei(pixelList, centrePixel);
+			
+		} else if (pixelList.size() == 5) {
+			newNucleus = process5PixelNuclei(pixelList, centrePixel);
+			
+		} else if (pixelList.size() == 6 || pixelList.size() == 7) {
+			newNucleus = new SixSevenPixelNucleus(centrePixel, pixelList, island);
+			
+		} else if (pixelList.size() >= 8) {
+			newNucleus = new EightPlusPixelNucleus(centrePixel, pixelList, island);
+			
+		}
+		
+		return newNucleus;
+	}
+
+	private PixelNucleus process5PixelNuclei(PixelList pixelList, Pixel centrePixel) {
+		PixelNucleus newNucleus = null;
+		int corner = CrossNucleus.getCrossCentre(centrePixel, pixelList, island);
+		if (corner != -1) {
+			newNucleus = new CrossNucleus(centrePixel, pixelList, island);
+		} else {
+			newNucleus = new FivePixelNucleus(centrePixel, pixelList, island);
+		}
+		return newNucleus;
+	}
+
+	private PixelNucleus process4PixelNuclei(PixelList pixelList, Pixel centrePixel) {
+		PixelNucleus newNucleus = null;
+		if (isFilledT(centrePixel, pixelList, island)) {
+			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
+		} else {
+			LOG.error("UNKNOWN 4 PIXEL NUCLEUS");
+			newNucleus = new FourPixelNucleus(centrePixel, pixelList, island);
+		}
+		return newNucleus;
+	}
+
+	private PixelNucleus process3PixelNuclei(PixelList pixelList) {
+		PixelNucleus newNucleus = null;
+		Pixel centrePixel;
+		int corner = getRightAngleCorner(pixelList);
+		if (corner != -1) {
+			centrePixel = pixelList.get(corner);
+			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
+		} else {
+			LOG.error("UNKNOWN 3 PIXEL NUCLEUS");
+		}
+		return newNucleus;
+	}
+
+	private PixelNucleus process1PixelNuclei(PixelList pixelList) {
+		PixelNucleus newNucleus = null;
+		Pixel centrePixel;
+		centrePixel = pixelList.get(0);
+		if (centrePixel.getOrthogonalNeighbours(island).size() 
+				+ centrePixel.getDiagonalNeighbours(island).size() == 0) {
+			newNucleus = new DotNucleus(centrePixel, pixelList, island);
+			LOG.trace("made DOT");
+			
+		} else if (centrePixel.getOrthogonalNeighbours(island).size() 
+				+ centrePixel.getDiagonalNeighbours(island).size() == 1) {
+			newNucleus = new TerminalNucleus(centrePixel, pixelList, island);
+			LOG.debug("made TERMINAL");
+			
+		} else if (isNickedT(centrePixel, island)) {
+			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
+			LOG.trace("made NICKED_T");
+			
+		} else {
+			LOG.error("UNKNOWN SINGLE PIXEL NUCLEUS: "+pixelList+"; "+pixelList.get(0).getOrCreateNeighbours(island));
+		}
+		return newNucleus;
+	}
+
+	private int getRightAngleCorner(PixelList pixelList) {
+		int rightAngleCorner = -1;
+		for (int i = 0; i < 3; i++) {
+			int j = (i + 1) % 3;
+			int k = (j + 1) % 3;
+			if (Pixel.isRightAngle(pixelList.get(i), pixelList.get(j),
+					pixelList.get(k))) {
+				rightAngleCorner = i;
+				break;
+			}
+		}
+		return rightAngleCorner;
+	}
+
+	/** symmetric about vertical stem.
+	 * 
+	 * @return
+	 */
+	private boolean isNickedT(Pixel centrePixel, PixelIsland island) {
+		if (centrePixel != null) {
+			PixelList diagonalNeighbours = centrePixel.getDiagonalNeighbours(island);
+			PixelList orthogonalNeighbours = centrePixel.getOrthogonalNeighbours(island);
+			if (diagonalNeighbours.size() == 2 && orthogonalNeighbours.size() == 1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isFilledT(Pixel centrePixel, PixelList pixelList, PixelIsland pixelIsland) {
+		for (Pixel pixel : pixelList) {
+			if (pixel.getOrthogonalNeighbours(island).size() == 3) {
+				if (centrePixel != null) {
+					throw new RuntimeException("Not a filled TJunction "+this);
+				}
+				centrePixel = pixel;
+			}
+		}
+		return (centrePixel != null);
+	}
+
+	/** two diagonal Y's joined by stems.
+	 * 
+	 *  +
+	 * ++
+	 *   ++
+	 *   +
+	 *   
+	 *   centre pixel will be randomly one of the two central pixels
+	 * @return
+	 */
+//	public boolean isDoubleYJunction() {
+//		if (getJunctionType() == null) {
+//			if (pixelList.size() == 6) {
+//				PixelList centres = new PixelList();
+//				for (Pixel pixel : pixelList) {
+//					PixelList orthNeighbours = pixel.getOrthogonalNeighbours(island);
+//					if (orthNeighbours.size() == 2 && 
+//							orthNeighbours.get(0).isDiagonalNeighbour(orthNeighbours.get(1)))  {
+//						centres.add(pixel);
+//					}
+//				}
+//				if (centres.size() == 2 && centres.get(0).isDiagonalNeighbour(centres.get(1))) {
+//					centrePixel = centres.get(0); // arbitrary but?
+//					setJunctionType(PixelJunctionType.DOUBLEY);
+//				}
+//			}
+//		}
+//		return PixelJunctionType.DOUBLEY.equals(getJunctionType());
+//	}
 
 }
