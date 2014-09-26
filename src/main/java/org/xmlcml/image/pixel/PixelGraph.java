@@ -172,7 +172,7 @@ public class PixelGraph {
 	}
 
 	public PixelNodeList getPossibleRootNodes1() {
-		PixelNodeList nodeList = new PixelNodeList();
+		PixelNodeList rootNodeList = new PixelNodeList();
 		for (PixelNode node : nodeList) {
 			PixelEdgeList edgeList = node.getEdges();
 			if (edgeList.size() == 1) {
@@ -180,11 +180,11 @@ public class PixelGraph {
 				PixelSegmentList segmentList = (edge == null) ? new PixelSegmentList() :
 				    edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
 				if (segmentList.size() == 1) {
-					nodeList.add(node);
+					rootNodeList.add(node);
 				}
 			}
 		}
-		return nodeList;
+		return rootNodeList;
 	}
 
 	/** get root pixel as middle of leftmost internode edge.
@@ -553,6 +553,15 @@ public class PixelGraph {
 
 	public PixelNucleusList getPixelNucleusList() {
 		return getNucleusFactory().getOrCreateNucleusList();
+	}
+
+	public PixelEdgeList getEdgeList() {
+		if (island != null) {
+			edgeList = getNucleusFactory().getEdgeList();
+		} else {
+			ensureEdges();
+		}
+		return edgeList;
 	}
 
 
