@@ -5,6 +5,9 @@ import java.util.Comparator;
 public class PixelComparator extends AbstractCoordinateComparator implements Comparator<Pixel>{
 
 	public enum ComparatorType {
+		ANY,      // undefined
+		HORIZONTAL,
+		VERTICAL,
 		BOTTOM,
 		LEFT,
 		RIGHT,
