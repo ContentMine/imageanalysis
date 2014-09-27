@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.xmlcml.image.pixel.PixelIslandList;
-import org.xmlcml.image.pixel.PixelProcessor;
+import org.xmlcml.image.pixel.MainPixelProcessor;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
@@ -57,9 +57,9 @@ public class ImageProcessor {
 	private int threshold;
 	private File inputFile;
 	private File outputDir;
-	private PixelProcessor pixelProcessor;
+	private MainPixelProcessor mainProcessor;
 	private ImageParameters parameters;
-	private PixelIslandList pixelIslandList = null;
+	private PixelIslandList islandList = null;
 
 	public ImageProcessor() {
 		setDefaults();
@@ -73,8 +73,9 @@ public class ImageProcessor {
 
 	public void setDefaults() {
 		ensurePixelProcessor();
+		ensureParameterObject();
 
-		pixelProcessor.setDefaults();
+		mainProcessor.setDefaults();
 		this.setThreshold(getDefaultThreshold());
 		this.setThinning(new ZhangSuenThinning());
 		this.setOutputDir(getDefaultOutputDirectory());
@@ -83,7 +84,7 @@ public class ImageProcessor {
 	}
 
 	public void clearVariables() {
-		pixelProcessor.clearVariables();
+		mainProcessor.clearVariables();
 
 		image = null;
 		inputFile = null;
@@ -292,11 +293,11 @@ public class ImageProcessor {
 				+ ((outputDir == null) ? "null" : outputDir.getAbsolutePath()));
 		System.err.println("threshold: " + threshold);
 		System.err.println("thinning:  " + thinning);
-		pixelProcessor.debug();
+		mainProcessor.debug();
 	}
 
-	public PixelProcessor getPixelProcessor() {
-		return this.pixelProcessor;
+	public MainPixelProcessor getPixelProcessor() {
+		return this.mainProcessor;
 	}
 
 	/**
@@ -312,28 +313,27 @@ public class ImageProcessor {
 	}
 
 	public PixelIslandList getOrCreatePixelIslandList() {
-		if (pixelIslandList == null) {
+		if (islandList == null) {
 			ensurePixelProcessor();
 			// this is messy - the super thinning should have been done earlier
-			pixelIslandList = pixelProcessor
-					.getOrCreatePixelIslandList(thinning != null);
-			if (pixelIslandList == null) {
-				throw new RuntimeException("Could not create pixelIslandList");
+			islandList = mainProcessor.getOrCreatePixelIslandList(thinning != null);
+			if (islandList == null) {
+				throw new RuntimeException("Could not create islandList");
 			}
-			pixelIslandList.setParameters(this.parameters);
-			LOG.trace("pil " + pixelIslandList);
+			islandList.setMainProcessor(mainProcessor);
+			LOG.trace("pil " + islandList);
 		}
-		return pixelIslandList;
+		return islandList;
 	}
 
-	public PixelProcessor ensurePixelProcessor() {
+	public MainPixelProcessor ensurePixelProcessor() {
 		ensureParameterObject();
-		if (pixelProcessor == null) {
-			pixelProcessor = new PixelProcessor(this);
+		if (mainProcessor == null) {
+			mainProcessor = new MainPixelProcessor(this);
 			// new Exception("ppex ").printStackTrace();
-			pixelProcessor.setParameters(this.parameters);
+			mainProcessor.setParameters(this.parameters);
 		}
-		return pixelProcessor;
+		return mainProcessor;
 	}
 
 	private void ensureParameterObject() {
@@ -430,7 +430,7 @@ public class ImageProcessor {
 				setThreshold(value);
 			}
 		} else {
-			found = pixelProcessor.processArg(argIterator);
+			found = mainProcessor.processArg(argIterator);
 			if (!found) {
 				LOG.debug("skipped unknown token: " + argIterator.getLast());
 				argIterator.next();
@@ -478,7 +478,7 @@ public class ImageProcessor {
 		} else {
 			processImage(image);
 		}
-		PixelIslandList islandList = pixelProcessor
+		PixelIslandList islandList = mainProcessor
 				.getOrCreatePixelIslandList();
 		LOG.trace("islandList " + islandList.size());
 	}

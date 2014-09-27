@@ -24,6 +24,8 @@ import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
+import boofcv.alg.feature.associate.EnsureUniqueAssociation;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -46,8 +48,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private String pixelColor;
 	private SVGG svgg;
 	private boolean debug = false;
-	private PixelProcessor pixelProcessor;
-	private ImageParameters parameters;
+	private MainPixelProcessor mainProcessor;
+//	private ImageParameters parameters;
 	private boolean diagonal;
 	private List<PixelGraph> pixelGraphList;
 
@@ -69,8 +71,8 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		this(new ArrayList<PixelIsland>(collection));
 	}
 
-	public void setPixelProcessor(PixelProcessor pixelProcessor) {
-		this.pixelProcessor = pixelProcessor;
+	public void setMainProcessor(MainPixelProcessor processor) {
+		this.mainProcessor = processor;
 	}
 
 	public int size() {
@@ -105,7 +107,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	 */
 	public static PixelIslandList createSuperThinnedPixelIslandListNew(
 			BufferedImage image) {
-		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(image);
 		PixelIslandList islandList = pixelProcessor
 				.getOrCreatePixelIslandList();
 		islandList.doSuperThinning();
@@ -145,7 +147,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 		PixelIslandList islandList = null;
 		if (image != null) {
-			PixelProcessor pixelProcessor = new PixelProcessor(image);
+			MainPixelProcessor pixelProcessor = new MainPixelProcessor(image);
 			islandList = pixelProcessor.getOrCreatePixelIslandList();
 			islandList.setDiagonal(true);
 			SVGSVG.wrapAndWriteAsSVG(islandList.createSVGG(), new File(
@@ -556,10 +558,10 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			pixelGraphList = new ArrayList<PixelGraph>();
 			thinThickStepsOld();
 			// main tree
-			for (int i = 0; i < Math.min(size(), pixelProcessor.getMaxIsland()); i++) {
+			for (int i = 0; i < Math.min(size(), mainProcessor.getMaxIsland()); i++) {
 				PixelIsland island = get(i);
 				PixelGraph graph = island.getOrCreateGraph();
-				graph.setParameters(parameters);
+//				graph.setParameters(parameters);
 				pixelGraphList.add(graph);
 			}
 			LOG.trace("created graphs: "+pixelGraphList.size()+pixelGraphList);
@@ -607,11 +609,15 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	}
 
 	public ImageParameters getParameters() {
-		return parameters;
+		getMainProcessor();
+		return mainProcessor.getParameters();
 	}
 
-	public void setParameters(ImageParameters parameters) {
-		this.parameters = parameters;
+	private MainPixelProcessor getMainProcessor() {
+		if (mainProcessor == null) {
+			throw new RuntimeException("Must have Main Processor");
+		}
+		return mainProcessor;
 	}
 
 	/**
@@ -672,6 +678,12 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public List<PixelGraph> analyzeEdgesAndPlot() {
 		LOG.error("NYI");
 		return new ArrayList<PixelGraph>();
+	}
+
+	public void setParentIslandList(MainPixelProcessor mainPixelProcessor) {
+		for (PixelIsland island : this) {
+			island.setIslandList(this);
+		}
 	}
 
 }

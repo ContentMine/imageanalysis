@@ -37,8 +37,6 @@ public class PixelGraph {
 	private PixelNodeList nodeList; 
 	private PixelList pixelList;
 	private PixelIsland island;
-//	private PixelSet twoConnectedSet;
-	private ImageParameters parameters;
 	private Stack<PixelNode> nodeStack;
 	
 	private PixelGraph() {
@@ -172,13 +170,16 @@ public class PixelGraph {
 	}
 
 	public PixelNodeList getPossibleRootNodes1() {
+		getEdgeList();
 		PixelNodeList rootNodeList = new PixelNodeList();
+		LOG.debug(">root>"+nodeList.toString());
 		for (PixelNode node : nodeList) {
 			PixelEdgeList edgeList = node.getEdges();
+			LOG.debug(">n>"+node+">e>"+edgeList);
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
 				PixelSegmentList segmentList = (edge == null) ? new PixelSegmentList() :
-				    edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
+				    edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
 				if (segmentList.size() == 1) {
 					rootNodeList.add(node);
 				}
@@ -265,7 +266,7 @@ public class PixelGraph {
 		double extreme = Double.MAX_VALUE;
 		for (PixelEdge edge : edgeList) {
 			LOG.trace(edge);
-			PixelSegmentList segmentList = edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
+			PixelSegmentList segmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
 			LOG.trace("PL "+segmentList.size()+"  /  "+segmentList.getReal2Array());
 			// look for goal post edge
 			if (segmentList.size() != 3) {
@@ -313,7 +314,7 @@ public class PixelGraph {
 		PixelNode midNode = null;
 		for (PixelEdge edge : edgeList) {
 			LOG.trace(edge.getNodes());
-			PixelSegmentList segmentList = edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
+			PixelSegmentList segmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
 			Angle deviation = segmentList.getSignedAngleOfDeviation();
 			if (Math.abs(deviation.getRadian()) < 2.0) continue;
 			LOG.trace("POLY "+segmentList.get(0)+"/"+segmentList.getLast()+"/"+deviation);
@@ -443,10 +444,6 @@ public class PixelGraph {
 		}
 	}
 
-	public void setParameters(ImageParameters parameters) {
-		this.parameters = parameters;
-	}
-
 	public PixelNode createRootNodeEmpirically(ComparatorType rootPosition) {
 		PixelNode rootNode = null;
 		PixelNodeList rootNodes = getPossibleRootNodes1();
@@ -464,7 +461,14 @@ public class PixelGraph {
 	}
 
 	public ImageParameters getParameters() {
-		return parameters;
+		return getIsland().getParameters();
+	}
+
+	private PixelIsland getIsland() {
+		if (island == null) {
+			throw new RuntimeException("Island is required");
+		}
+		return island;
 	}
 
 	/** creates segmented lines from pixels adds them to edges and draws them.
@@ -475,10 +479,10 @@ public class PixelGraph {
 	public SVGG createSegmentedEdges() {
 		SVGG g = new SVGG();
 		for (PixelEdge edge: edgeList) {
-			PixelSegmentList pixelSegmentList = edge.getOrCreateSegmentList(parameters.getSegmentTolerance());
-			pixelSegmentList.setStroke(parameters.getStroke());
-			pixelSegmentList.setWidth(parameters.getLineWidth());
-			pixelSegmentList.setFill(parameters.getFill());
+			PixelSegmentList pixelSegmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
+			pixelSegmentList.setStroke(getParameters().getStroke());
+			pixelSegmentList.setWidth(getParameters().getLineWidth());
+			pixelSegmentList.setFill(getParameters().getFill());
 			g.appendChild(pixelSegmentList.getOrCreateSVG());
 		}
 		return g;
@@ -563,6 +567,14 @@ public class PixelGraph {
 		}
 		return edgeList;
 	}
+
+	public void numberAllNodes() {
+		int i = 0;
+		for (PixelNode node : nodeList) {
+			node.setLabel("n"+(i++));
+		}
+	}
+
 
 
 }

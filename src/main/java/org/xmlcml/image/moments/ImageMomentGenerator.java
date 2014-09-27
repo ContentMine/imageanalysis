@@ -8,7 +8,7 @@ import org.xmlcml.euclid.RealArray;
 import org.xmlcml.image.pixel.Pixel;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.PixelList;
-import org.xmlcml.image.pixel.PixelProcessor;
+import org.xmlcml.image.pixel.MainPixelProcessor;
 
 /**
  * see http://en.wikipedia.org/wiki/Image_moment
@@ -71,7 +71,7 @@ public class ImageMomentGenerator {
 			throw new RuntimeException("null image");
 		}
 		this.image = image;
-		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(image);
 		islandList = pixelProcessor.getOrCreatePixelIslandList();
 		readPixelList(islandList);
 	}

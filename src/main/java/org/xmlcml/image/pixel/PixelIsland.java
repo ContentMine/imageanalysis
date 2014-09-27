@@ -50,6 +50,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private static final int NEIGHBOUR8 = -1;
 
+	private PixelIslandList islandList;
 	PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 //	boolean allowDiagonal = true;
@@ -58,10 +59,9 @@ public class PixelIsland implements Iterable<Pixel> {
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private PixelList terminalPixels;
 
-//	private List<Real2Array> segmentArrayList;
 	private String pixelColor = "red";
 	private PixelSet cornerSet;
-	private ImageParameters parameters;
+//	private ImageParameters parameters;
 	private PixelList emptyPixelList;
 	private PixelList singleHoleList;
 	private PixelNucleusFactory nucleusFactory;
@@ -69,7 +69,6 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelGraph pixelGraph;
 
 	private SVGG svgg;
-
 	private String id;
 	
 	public PixelIsland() {
@@ -670,8 +669,6 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	public PixelGraph getOrCreateGraph() {
 		PixelGraph graph = new PixelGraph(this);
-		graph.setParameters(this.parameters);
-//		graph.createNodesAndEdges();
 		return graph;
 	}
 
@@ -938,6 +935,22 @@ public class PixelIsland implements Iterable<Pixel> {
 	
 	public String getId() {
 		return id;
+	}
+
+	public void setIslandList(PixelIslandList islandList) {
+		this.islandList = islandList;
+	}
+
+	public ImageParameters getParameters() {
+		getIslandList();
+		return islandList.getParameters();
+	}
+
+	private PixelIslandList getIslandList() {
+		if (islandList == null) {
+			throw new RuntimeException("Island must have IslandList");
+		}
+		return islandList;
 	}
 
 

@@ -38,6 +38,11 @@ public class PixelEdgeList implements Iterable<PixelEdge> {
 		return list.size();
 	}
 
+	public List<PixelEdge> getList() {
+		ensureList();
+		return list;
+	}
+
 	/** gets edges regardless of node order.
 	 * 
 	 * @param pixel0

@@ -15,7 +15,7 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.image.pixel.Pixel;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.PixelList;
-import org.xmlcml.image.pixel.PixelProcessor;
+import org.xmlcml.image.pixel.MainPixelProcessor;
 
 /**
  * This class provides a set of methods for computing Zernike moments.
@@ -61,7 +61,7 @@ public class ZernikeMoments {
 		this.image = image;
 		width = image.getWidth();
 		height = image.getHeight();
-		PixelProcessor pixelProcessor = new PixelProcessor(image);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(image);
 		pixelIslandList = pixelProcessor.getOrCreatePixelIslandList();
 		PixelList pixels = pixelIslandList.getPixelList();
 		npixels = pixels.size();

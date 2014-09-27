@@ -179,4 +179,9 @@ public class PixelNode implements Comparable<PixelNode> {
 		this.island = island;
 		
 	}
+
+	public Real2 getReal2() {
+		return (centrePixel == null) ? null : 
+			(centrePixel.getInt2() == null ? null : new Real2(centrePixel.getInt2()));
+	}
 }

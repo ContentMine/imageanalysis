@@ -17,19 +17,9 @@ public class FloodFill {
 	private boolean[][] painted;
 	private boolean diagonal = false;
 	private PixelIslandList islandList;
-//	private Integer width;
-//	private Integer height;
 
 	public FloodFill(BufferedImage image) {
 		this.image = image;
-//		this.width = image.getWidth();
-//		this.height = image.getHeight();
-	}
-
-	// NOT YET WRITTEN
-	// FIXME
-	public FloodFill(PixelIslandList islandList) {
-		throw new RuntimeException("NYI");
 	}
 
 	private boolean isBlack(int posX, int posY) {

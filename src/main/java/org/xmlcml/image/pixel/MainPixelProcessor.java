@@ -24,9 +24,9 @@ import org.xmlcml.image.processing.Thinning;
  * @author pm286
  *
  */
-public class PixelProcessor {
+public class MainPixelProcessor {
 
-	private final static Logger LOG = Logger.getLogger(PixelProcessor.class);
+	private final static Logger LOG = Logger.getLogger(MainPixelProcessor.class);
 
 	public static final String ISLAND = "-y";
 	public static final String ISLAND1 = "--island";
@@ -34,7 +34,6 @@ public class PixelProcessor {
 
 	private PixelIslandList pixelIslandList;
 	private int maxIsland;
-	private List<PixelGraph> pixelGraphList;
 	private boolean debug;
 	private ImageProcessor imageProcessor;
 	private BufferedImage image;
@@ -43,25 +42,24 @@ public class PixelProcessor {
 	private ImageParameters parameters;
 
 	
-	public PixelProcessor(ImageProcessor imageProcessor) {
+	public MainPixelProcessor(ImageProcessor imageProcessor) {
 		this.imageProcessor = imageProcessor;
 		this.parameters = imageProcessor.getParameters();
 		setDefaults();
 	}
 	
-	public PixelProcessor(BufferedImage image) {
+	public MainPixelProcessor(BufferedImage image) {
 		this.image = image;
 	}
 
 	public void setDefaults() {
 		this.setMaxIsland(getDefaultMaxIsland());
 		this.setIsland(-1); // because 0 is a valid island
-		
+		this.parameters = new ImageParameters();
 	}
 	
 	public void clearVariables() {
 		pixelIslandList = null;
-		pixelGraphList = null;
 		image = null;
 	}
 
@@ -115,17 +113,17 @@ public class PixelProcessor {
 			floodFill.setDiagonal(true);
 			floodFill.fill();
 			pixelIslandList = floodFill.getIslandList();
-//			SVGSVG.wrapAndWriteAsSVG(pixelIslandList.getOrCreateSVGG(), new File("target/rawPixelIsland.svg"));
 			LOG.trace("after floodfill islands: "+pixelIslandList.size());
 			if (superThinning) {
 				pixelIslandList.thinThickStepsOld();
 			}
-			pixelIslandList.setPixelProcessor(this);
+			pixelIslandList.setMainProcessor(this);
+			pixelIslandList.setParentIslandList(this);
 		}
 		return pixelIslandList;
 	}
 
-	public PixelProcessor setMaxIsland(int maxIsland) {
+	public MainPixelProcessor setMaxIsland(int maxIsland) {
 		this.maxIsland = maxIsland;
 		return this;
 	}
@@ -134,7 +132,7 @@ public class PixelProcessor {
 		return maxIsland;
 	}
 
-	public PixelProcessor setOutputDir(File outputDir) {
+	public MainPixelProcessor setOutputDir(File outputDir) {
 		this.outputDir = outputDir;
 		return this;
 	}
@@ -159,7 +157,7 @@ public class PixelProcessor {
 			if (value != null) {
 				this.parameters.setSegmentTolerance(value);
 			}
-		} else if (arg.equals(PixelProcessor.ISLAND) || arg.equals(PixelProcessor.ISLAND1)) {
+		} else if (arg.equals(MainPixelProcessor.ISLAND) || arg.equals(MainPixelProcessor.ISLAND1)) {
 			Integer value = argIterator.getSingleIntegerValue();
 			if (value != null) {
 				setIsland(value);
@@ -183,11 +181,15 @@ public class PixelProcessor {
 	public void debug() {
 		System.err.println("pixelIslandList   "+pixelIslandList);
 		System.err.println("maxIsland         "+maxIsland);
-		System.err.println("pixelGraphList    "+pixelGraphList);
+//		System.err.println("pixelGraphList    "+pixelGraphList);
 	}
 
 	public void setParameters(ImageParameters parameters) {
 		this.parameters = parameters;
+	}
+
+	public ImageParameters getParameters() {
+		return parameters;
 	}
 
 }

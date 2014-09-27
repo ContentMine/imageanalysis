@@ -490,7 +490,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testBoundingBoxes() throws IOException {
-		PixelProcessor pixelProcessor = new PixelProcessor(ImageIO.read(Fixtures.MALTORYZINE_PNG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.MALTORYZINE_PNG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		Assert.assertEquals("islands", 5, islands.size());
 		for (PixelIsland island : islands) {
@@ -591,7 +591,7 @@ public class PixelIslandTest {
 	 * @throws IOException
 	 */
 	public void testInterboxCorrelations() throws IOException {
-		PixelProcessor pixelProcessor = new PixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				5.), new RealRange(20., 25.));
@@ -705,7 +705,7 @@ public class PixelIslandTest {
 		int[] charsA = { 90, 274, 97, 98, 133, 202, 283, 136, 143, 1, 2 // dummies
 		};
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		PixelProcessor pixelProcessor = new PixelProcessor(rawImage);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(rawImage);
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				15.), new RealRange(0., 12.));
@@ -798,7 +798,7 @@ public class PixelIslandTest {
 	 */
 	public void testFindCharsA() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		PixelProcessor pixelProcessor = new PixelProcessor(rawImage);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(rawImage);
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		extractCharactersAndCorrelate(rawImage, islands, "65", 0.27);
 	}
@@ -809,7 +809,7 @@ public class PixelIslandTest {
 	 */
 	public void testFindCharsAny() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		PixelProcessor pixelProcessor = new PixelProcessor(rawImage);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(rawImage);
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		extractCharactersAndCorrelate(rawImage, islands, "65", 0.30);
 		extractCharactersAndCorrelate(rawImage, islands, "A10b", 0.27);
@@ -842,7 +842,7 @@ public class PixelIslandTest {
 	@Ignore // this takes a long time
 	public void extractCharsToImages() throws IOException {
 		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		PixelProcessor pixelProcessor = new PixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		for (int h = 5; h < 10; h++) {
 			PixelIslandList characters = islands.isContainedIn(new RealRange(
@@ -991,7 +991,7 @@ public class PixelIslandTest {
 	}
 
 	private PixelIslandList createAs(int[] charsA) throws IOException {
-		PixelProcessor pixelProcessor = new PixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				15.), new RealRange(0., 12.));
@@ -1036,7 +1036,7 @@ public class PixelIslandTest {
 	}
 
 	private PixelIsland createFirstPixelIsland(File file) throws IOException {
-		PixelProcessor pixelProcessor = new PixelProcessor(ImageIO.read(file));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(file));
 		return pixelProcessor.getOrCreatePixelIslandList().get(0);
 	}
 
