@@ -140,9 +140,17 @@ public class ImageProcessor {
 	}
 
 	public BufferedImage processImageFile(File file) {
-		if (file == null || !file.exists() || file.isDirectory()) {
-			throw new RuntimeException("Image file is null/missing/directory: "
+		
+		if (file == null) {
+			throw new RuntimeException("Image file is null: "
 					+ file);
+		} else if (!file.exists()) {
+			LOG.debug(file.getAbsolutePath().toString());
+			throw new RuntimeException("Image file is missing: "
+					+ file);
+		} else if (file.isDirectory()) {
+				throw new RuntimeException("Image file is directory: "
+						+ file);
 		}
 		try {
 			this.inputFile = file;

@@ -50,7 +50,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private static final int NEIGHBOUR8 = -1;
 
-	private PixelIslandList islandList;
+	PixelIslandList islandList;
 	PixelList pixelList; // these may have original coordinates
 	boolean allowDiagonal = false;
 //	boolean allowDiagonal = true;
@@ -100,6 +100,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	public PixelIsland(PixelIsland island) {
 		this(island.getPixelList());
 		this.allowDiagonal = island.allowDiagonal;
+		this.islandList = island.islandList;
 	}
 
 //	private void ensurePixelGraph() {
@@ -946,7 +947,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		return islandList.getParameters();
 	}
 
-	private PixelIslandList getIslandList() {
+	PixelIslandList getIslandList() {
 		if (islandList == null) {
 			throw new RuntimeException("Island must have IslandList");
 		}

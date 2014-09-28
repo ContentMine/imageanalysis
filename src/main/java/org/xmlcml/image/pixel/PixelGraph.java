@@ -172,10 +172,10 @@ public class PixelGraph {
 	public PixelNodeList getPossibleRootNodes1() {
 		getEdgeList();
 		PixelNodeList rootNodeList = new PixelNodeList();
-		LOG.debug(">root>"+nodeList.toString());
+		LOG.trace(">root>"+nodeList.toString());
 		for (PixelNode node : nodeList) {
 			PixelEdgeList edgeList = node.getEdges();
-			LOG.debug(">n>"+node+">e>"+edgeList);
+			LOG.trace(">n>"+node+">e>"+edgeList);
 			if (edgeList.size() == 1) {
 				PixelEdge edge = edgeList.get(0);
 				PixelSegmentList segmentList = (edge == null) ? new PixelSegmentList() :

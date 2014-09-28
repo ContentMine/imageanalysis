@@ -88,7 +88,14 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list.get(i);
 	}
 
+	/** add and make sure pixelIsland has a pixelIslandList for communications.
+	 * 
+	 * @param pixelIsland
+	 */
 	public void add(PixelIsland pixelIsland) {
+		if(pixelIsland.islandList == null) {
+			pixelIsland.setIslandList(this);
+		}
 		list.add(pixelIsland);
 	}
 
@@ -516,6 +523,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		List<PixelIsland> newIslandList = new ArrayList<PixelIsland>();
 		for (PixelIsland island : this) {
 			PixelIsland newIsland = new PixelIsland(island.getPixelList());
+			newIsland.islandList = this;
 			newIsland.setDiagonal(diagonal);
 			newIslandList.add(newIsland);
 			this.list = newIslandList;
@@ -554,6 +562,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 //	}
 
 	public List<PixelGraph> getOrCreateGraphList() {
+		this.debugIslands();
 		if (pixelGraphList == null) {
 			pixelGraphList = new ArrayList<PixelGraph>();
 			thinThickStepsOld();
@@ -684,6 +693,13 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		for (PixelIsland island : this) {
 			island.setIslandList(this);
 		}
+	}
+
+	public void debugIslands() {
+		for (PixelIsland island : this) {
+			if (island.islandList == null) LOG.error("******NULL ISLAND LIST");
+		}
+		LOG.trace("DEBUG ISLAND LIST");
 	}
 
 }

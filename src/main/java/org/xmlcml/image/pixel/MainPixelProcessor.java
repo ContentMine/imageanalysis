@@ -38,7 +38,7 @@ public class MainPixelProcessor {
 	private ImageProcessor imageProcessor;
 	private BufferedImage image;
 	private File outputDir;
-	private int selectedIsland;
+	private int selectedIslandIndex;
 	private ImageParameters parameters;
 
 	
@@ -170,12 +170,12 @@ public class MainPixelProcessor {
 	}
 
 	private void setIsland(int island) {
-		this.selectedIsland = island;
+		this.selectedIslandIndex = island;
 		LOG.trace("PPxx "+this.hashCode()+" "+island);
 	}
 
-	public int getSelectedIsland() {
-		return selectedIsland;
+	public int getSelectedIslandIndex() {
+		return selectedIslandIndex;
 	}
 
 	public void debug() {

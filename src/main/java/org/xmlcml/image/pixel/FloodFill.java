@@ -93,6 +93,7 @@ public class FloodFill {
 		ensureIslandList();
 		for (PixelIsland island : islandList) {
 			island.setDiagonal(diagonal);
+			island.setIslandList(islandList); // each island knows who made it
 		}
 		return islandList;
 	}
