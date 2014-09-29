@@ -2,11 +2,13 @@ package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 public class PixelNodeList implements Iterable<PixelNode> {
 
@@ -125,5 +127,32 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		return nodeList;
 	}
 
+	/**
+	 * sorts by comparator.
+	 * 
+	 * only one direction
+	 * 
+	 */
+	public void sort(ComparatorType comparatorType) {
+		Collections.sort(nodeList, new PixelNodeComparator(comparatorType));
+	}
+
+	/**
+	 * sorts X first, then Y.
+	 * 
+	 */
+	public void sortXY() {
+		Collections.sort(nodeList, new PixelNodeComparator(ComparatorType.LEFT,
+				ComparatorType.TOP));
+	}
+
+	/**
+	 * sorts Y first, then X.
+	 * 
+	 */
+	public void sortYX() {
+		Collections.sort(nodeList, new PixelNodeComparator(ComparatorType.TOP,
+				ComparatorType.LEFT));
+	}
 
 }

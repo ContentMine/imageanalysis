@@ -387,17 +387,38 @@ public class PixelList implements Iterable<Pixel> {
 		return pixelList;
 	}
 
+	/** gets pixel closest to centroid.
+	 * 
+	 * for wiggly line might not be the halfway point
+	 * 
+	 * @return
+	 */
 	public Pixel getCentralPixel() {
 		Pixel centrePixel = null;
-		Double distance = null;
 		Real2 centre = getCentreCoordinate();
 		if (centre != null) {
-			for (Pixel pixel : this) {
-				double d = centre.getDistance(new Real2(pixel.getInt2()));
-				if (distance == null || distance > d) {
-					distance = d;
-					centrePixel = pixel;
-				}
+			centrePixel = getClosestPixel(centre);
+		}
+		return centrePixel;
+	}
+
+	/** get pixel closest to point.
+	 * 
+	 * uses real Euclidean distance
+	 * 
+	 * if two pixels have same distance , returns the first in the list
+	 * 
+	 * @param point
+	 * @return closest pixel or null
+	 */
+	public Pixel getClosestPixel(Real2 point) {
+		Pixel centrePixel = null;
+		Double distance = null;
+		for (Pixel pixel : this) {
+			double d = point.getDistance(new Real2(pixel.getInt2()));
+			if (distance == null || distance > d) {
+				distance = d;
+				centrePixel = pixel;
 			}
 		}
 		return centrePixel;

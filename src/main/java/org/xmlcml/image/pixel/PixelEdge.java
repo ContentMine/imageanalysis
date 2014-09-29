@@ -4,6 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
@@ -24,6 +26,8 @@ public class PixelEdge {
 	private String id;
 	private PixelGraph pixelGraph;
 	private SVGG svgg;
+
+	private Int2Range boundingBox;
 
 	public PixelEdge(PixelIsland island) {
 		this.island = island;
@@ -272,4 +276,16 @@ public class PixelEdge {
 		}
 		return svgg;
 	}
+	
+	public Int2Range getInt2BoundingBox() {
+		if (boundingBox == null) {
+			boundingBox = pixelList == null ? null : pixelList.getIntBoundingBox();
+		}
+		return boundingBox;
+	}
+
+	public Pixel getClosestPixel(Real2 point) {
+		return (pixelList == null || pixelList.size() == 0) ? null : pixelList.getClosestPixel(point);
+	}
+
 }

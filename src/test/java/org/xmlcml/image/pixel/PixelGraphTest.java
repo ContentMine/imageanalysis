@@ -10,8 +10,12 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntRange;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class PixelGraphTest {
@@ -198,8 +202,6 @@ public class PixelGraphTest {
 			Assert.fail("failed "+e);
 			e.printStackTrace();
 		}
-//		LOG.debug("edges "+graph.getPixelEdgeList().size());
 	}
 	
-
 }

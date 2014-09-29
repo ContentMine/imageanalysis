@@ -1,11 +1,13 @@
 package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 public class PixelEdgeList implements Iterable<PixelEdge> {
 
@@ -97,4 +99,15 @@ public class PixelEdgeList implements Iterable<PixelEdge> {
 		return svgg;
 	}
 	
+	/**
+	 * sorts by comparator.
+	 * 
+	 * only one direction
+	 * 
+	 */
+	public void sort(ComparatorType comparatorType) {
+		Collections.sort(list, new PixelEdgeComparator(comparatorType));
+	}
+
+
 }

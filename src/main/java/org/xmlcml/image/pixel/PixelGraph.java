@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
@@ -25,6 +27,7 @@ import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
  * 
  */
 public class PixelGraph {
+
 
 	private static final String NODE_PREFIX = "zn";
 
@@ -169,25 +172,6 @@ public class PixelGraph {
 		return s;
 	}
 
-	public PixelNodeList getPossibleRootNodes1() {
-		getEdgeList();
-		PixelNodeList rootNodeList = new PixelNodeList();
-		LOG.trace(">root>"+nodeList.toString());
-		for (PixelNode node : nodeList) {
-			PixelEdgeList edgeList = node.getEdges();
-			LOG.trace(">n>"+node+">e>"+edgeList);
-			if (edgeList.size() == 1) {
-				PixelEdge edge = edgeList.get(0);
-				PixelSegmentList segmentList = (edge == null) ? new PixelSegmentList() :
-				    edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
-				if (segmentList.size() == 1) {
-					rootNodeList.add(node);
-				}
-			}
-		}
-		return rootNodeList;
-	}
-
 	/** get root pixel as middle of leftmost internode edge.
 	 * 
 	 *  where mid edge is vertical.
@@ -202,24 +186,32 @@ public class PixelGraph {
 		LOG.trace("extreme "+extremeEdge+"; nodes "+extremeEdge.getNodes().size());
 		
 		Pixel midPixel = extremeEdge.getNearestPixelToMidPoint();
+		PixelNode rootNode = splitEdgeAndInsertNewNode(extremeEdge, midPixel);
+				
+		return rootNode;
+	}
+
+	public PixelNode splitEdgeAndInsertNewNode(PixelEdge oldEdge, Pixel midPixel) {
 		PixelNode rootNode = new PixelNode(midPixel, this);
 		PixelList neighbours = midPixel.getOrCreateNeighbours(island);
 		if (neighbours.size() != 2) {
 			throw new RuntimeException("Should have exactly 2 neighbours "+neighbours.size());
 		}
 
-		PixelEdgeList edgeList = splitEdge(extremeEdge, midPixel, rootNode);
+		PixelEdgeList edgeList = splitEdge(oldEdge, midPixel, rootNode);
 		this.addEdge(edgeList.get(0));
 		this.addEdge(edgeList.get(1));
 		this.addNode(rootNode);
-		this.removeEdge(extremeEdge);
-				
+		this.removeEdge(oldEdge);
 		return rootNode;
 	}
 
 	private void removeEdge(PixelEdge edge) {
 		edgeList.remove(edge);
-		
+		PixelNodeList nodeList = edge.getNodes();
+		for (PixelNode node : nodeList) {
+			node.removeEdge(edge);
+		}
 	}
 
 	private PixelEdgeList splitEdge(PixelEdge edge, Pixel midPixel,
@@ -261,6 +253,7 @@ public class PixelGraph {
 		return edge;
 	}
 
+	@Deprecated
 	private PixelEdge getExtremeEdge(ComparatorType comparatorType) {
 		PixelEdge extremeEdge = null;
 		double extreme = Double.MAX_VALUE;
@@ -444,20 +437,22 @@ public class PixelGraph {
 		}
 	}
 
+	@Deprecated
 	public PixelNode createRootNodeEmpirically(ComparatorType rootPosition) {
-		PixelNode rootNode = null;
-		PixelNodeList rootNodes = getPossibleRootNodes1();
-		Collections.sort(rootNodes.getList());
-		if (rootNodes.size() > 0) {
-			rootNode = rootNodes.get(0);
-		} else {
-			try {
-				rootNode = getRootNodeFromExtremeEdge(rootPosition);
-			} catch (RuntimeException e) {
-					throw(e);
-			}
-		}
-		return rootNode;
+		throw new RuntimeException("MEND or KILL");
+//		PixelNode rootNode = null;
+//		PixelNodeList rootNodes = getPossibleRootNodes(null);
+//		Collections.sort(rootNodes.getList());
+//		if (rootNodes.size() > 0) {
+//			rootNode = rootNodes.get(0);
+//		} else {
+//			try {
+//				rootNode = getRootNodeFromExtremeEdge(rootPosition);
+//			} catch (RuntimeException e) {
+//					throw(e);
+//			}
+//		}
+//		return rootNode;
 	}
 
 	public ImageParameters getParameters() {
@@ -572,6 +567,26 @@ public class PixelGraph {
 		int i = 0;
 		for (PixelNode node : nodeList) {
 			node.setLabel("n"+(i++));
+		}
+	}
+
+	public void addCoordsToNodes() {
+		for (PixelNode node : nodeList) {
+			Int2 coord = node.getInt2();
+			if (coord != null) {
+				String label = String.valueOf(coord).replaceAll("[\\(\\)]", "").replaceAll(",","_");
+				node.setLabel(label);
+			}
+		}
+	}
+
+	public void debug() {
+		LOG.debug("graph...");
+		for (PixelNode node : this.getNodeList()) {
+			LOG.debug("n> "+ node.toString());
+			for (PixelEdge edge : node.getEdges()) {
+				LOG.debug("  e: "+edge.getNodes());
+			}
 		}
 	}
 

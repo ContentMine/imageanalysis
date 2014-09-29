@@ -2,10 +2,8 @@ package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ArgIterator;
 import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.ImageProcessor;

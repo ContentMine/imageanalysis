@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
@@ -181,7 +182,11 @@ public class PixelNode implements Comparable<PixelNode> {
 	}
 
 	public Real2 getReal2() {
-		return (centrePixel == null) ? null : 
-			(centrePixel.getInt2() == null ? null : new Real2(centrePixel.getInt2()));
+		return (getInt2() == null) ? null : new Real2(getInt2());
+	}
+
+	public Int2 getInt2() {
+		Pixel pixel = getCentrePixel();
+		return pixel == null ? null : pixel.getInt2();
 	}
 }
