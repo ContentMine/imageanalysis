@@ -290,7 +290,7 @@ public class ImageProcessor {
 		if (image != null) {
 			image = processImage(image);
 		}
-		LOG.trace("image " + image);
+		LOG.debug("image " + image);
 		return image;
 	}
 

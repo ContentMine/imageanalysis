@@ -51,7 +51,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private MainPixelProcessor mainProcessor;
 //	private ImageParameters parameters;
 	private boolean diagonal;
-	private List<PixelGraph> pixelGraphList;
+	private List<PixelGraph> graphList;
 
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -563,24 +563,23 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public List<PixelGraph> getOrCreateGraphList() {
 		this.debugIslands();
-		if (pixelGraphList == null) {
-			pixelGraphList = new ArrayList<PixelGraph>();
+		if (graphList == null) {
+			graphList = new ArrayList<PixelGraph>();
 			thinThickStepsOld();
 			// main tree
 			for (int i = 0; i < Math.min(size(), mainProcessor.getMaxIsland()); i++) {
 				PixelIsland island = get(i);
 				PixelGraph graph = island.getOrCreateGraph();
 //				graph.setParameters(parameters);
-				pixelGraphList.add(graph);
+				graphList.add(graph);
 			}
-			LOG.trace("created graphs: "+pixelGraphList.size()+pixelGraphList);
-			for (PixelGraph pixelGraph : pixelGraphList) {
-				for (PixelNode pixelNode : pixelGraph.getNodeList()) {
-					LOG.trace("Node "+pixelNode);
-				}
+			LOG.debug("created graphs: "+graphList.size()+graphList);
+			for (PixelGraph graph : graphList) {
+				//graph.debug();
 			}
 		}
-		return pixelGraphList;
+		LOG.debug("pixelGraphList: "+graphList.size());
+		return graphList;
 	}
 
 	public void debug() {
