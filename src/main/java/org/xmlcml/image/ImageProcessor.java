@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.MainPixelProcessor;
 import org.xmlcml.image.processing.Thinning;
@@ -174,6 +175,7 @@ public class ImageProcessor {
 			System.err.println("wrote raw image file: " + filename);
 		}
 		if (this.binarize) {
+			ColorUtilities.convertTransparentToWhite(image);
 			this.image = ImageUtil.boofCVBinarization(this.image, threshold);
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + BINARIZED_PNG;
