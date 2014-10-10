@@ -87,6 +87,22 @@ public class ColorUtilities {
 		sum /= pix.length;
 		return sum;
 	}
+	
+	//TODO this and the method below need checking regarding raster types
+	public static void convertTransparentToWhite(BufferedImage image) {
+		if (image != null) {
+			for (int i = 0; i < image.getWidth(); i++) {
+				for (int j = 0; j < image.getHeight(); j++) {
+					int rgb = image.getRGB(i, j);
+					int trans = rgb & 0xff000000;
+					if (trans == 0) {
+						rgb = 0xffffffff;
+					}
+					image.setRGB(i, j, rgb);
+				}
+			}
+		}
+	}
 
 	/** flips black pixels to white and vice versa.
 	 * 
