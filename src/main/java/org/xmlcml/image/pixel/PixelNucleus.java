@@ -34,7 +34,7 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		SEVENPIXEL,
 		EIGHTORMOREPIXEL,
 		TERMINAL,
-		Y,
+		Y, CYCLIC,
 	}
 	protected PixelIsland island;
 	private Real2 centre;

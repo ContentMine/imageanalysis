@@ -223,7 +223,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 //		}
 //	}
 
-	private void setDiagonal(boolean b) {
+	public void setDiagonal(boolean b) {
 		this.diagonal = b;
 		for (PixelIsland island : this) {
 			island.setDiagonal(b);
@@ -575,7 +575,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			}
 			LOG.debug("created graphs: "+graphList.size()+graphList);
 			for (PixelGraph graph : graphList) {
-				//graph.debug();
+				graph.debug();
 			}
 		}
 		LOG.debug("pixelGraphList: "+graphList.size());
@@ -699,6 +699,16 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			if (island.islandList == null) LOG.error("******NULL ISLAND LIST");
 		}
 		LOG.trace("DEBUG ISLAND LIST");
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("islands: "+this.size());
+		for (PixelIsland island : this) {
+			sb.append("["+island.size()+"; "+island.getIntBoundingBox()+"]");
+		}
+		return sb.toString();
 	}
 
 }

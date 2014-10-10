@@ -66,7 +66,7 @@ public class PixelNucleusFactory {
 	private PixelSet unusedPixelSet;
 	
 	public PixelNucleusFactory(PixelIsland island) {
-		LOG.trace("MAKING FACTORY from "+island.hashCode()+"; "+island.pixelList.size());
+		LOG.debug("MAKING FACTORY from "+island.hashCode()+"; "+island.pixelList.size());
 		this.island = island;
 		island.setNucleusFactory(this);
 		indexJunctions();
@@ -178,7 +178,8 @@ public class PixelNucleusFactory {
 			unusedPixelSet = new PixelSet(island.pixelList);
 			makeDotAndTerminalNuclei();
 			makeNonTerminalNuclei();
-			LOG.trace("Created nucleusList: "+allNucleusList.size());
+			makeCyclicNuclei();
+			LOG.debug("Created nucleusList: "+allNucleusList.size());
 		}
 		return allNucleusList;
 	}
@@ -192,7 +193,7 @@ public class PixelNucleusFactory {
 				PixelNucleus nucleus = makeNucleusFromSeed(pixel, island);
 				allNucleusList.add(nucleus);
 				unusedPixelSet.removeAll(nucleus.getPixelList().getList());
-				LOG.trace("created non-terminal nucleus: px: "+pixel+"; n: "+nucleus.hashCode()+"; "+nucleus.getJunctionType()+"; "+nucleus.getPixelList());
+				LOG.debug("created non-terminal nucleus: px: "+pixel+"; n: "+nucleus.hashCode()+"; type: "+nucleus.getJunctionType()+"; "+nucleus.getPixelList());
 			} else if (neighbours.size() == 2 || neighbours.size() == 0) {
 				// skip these
 			} else {
@@ -208,6 +209,7 @@ public class PixelNucleusFactory {
 			PixelNucleus nucleus = new PixelNucleus(island);
 			nucleus.setJunctionType(PixelJunctionType.DOT);
 			nucleus.add(pixel);
+			LOG.debug("made dot: "+nucleus);
 			allNucleusList.add(nucleus);
 		}
 		PixelList terminalPixelList = get1ConnectedPixelList();
@@ -216,6 +218,22 @@ public class PixelNucleusFactory {
 			PixelNucleus nucleus = new PixelNucleus(island);
 			nucleus.setJunctionType(PixelJunctionType.TERMINAL);
 			nucleus.add(pixel);
+			LOG.debug("made terminal: "+nucleus);
+			allNucleusList.add(nucleus);
+		}
+	}
+	
+	/** nuclei representing circles.
+	 * 
+	 */
+	private void makeCyclicNuclei() {
+		if (island.size() > 3 && allNucleusList.size() == 0) {
+			Pixel pixel = island.getPixelList().get(0);
+			unusedPixelSet.removeAll(island.getPixelList().getList());
+			PixelNucleus nucleus = new PixelNucleus(island);
+			nucleus.setJunctionType(PixelJunctionType.CYCLIC);
+			nucleus.add(pixel);
+			LOG.debug("made cycle: "+nucleus);
 			allNucleusList.add(nucleus);
 		}
 	}
@@ -375,6 +393,7 @@ public class PixelNucleusFactory {
 		if (spikePixelList == null) {
 			getOrCreateNucleusList();
 			spikePixelList = createSpikePixelList();
+			LOG.debug("spikePixelList "+spikePixelList);
 		}
 		return spikePixelList;
 	}
@@ -410,7 +429,7 @@ public class PixelNucleusFactory {
 
 	public PixelEdgeList createPixelEdgeListFromNodeList() {
 		getOrCreateNodeListFromNuclei();
-		PixelEdgeList edgeList = new PixelEdgeList();
+		edgeList = new PixelEdgeList();
 		getOrCreateSpikePixelList();
 		return edgeList;
 	}

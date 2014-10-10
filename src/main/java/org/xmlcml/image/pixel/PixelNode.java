@@ -1,12 +1,10 @@
 package org.xmlcml.image.pixel;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 
 public class PixelNode implements Comparable<PixelNode> {
@@ -15,6 +13,16 @@ public class PixelNode implements Comparable<PixelNode> {
 
 	private static final String START_STRING = "<";
 	private static final String END_STRING = ">";
+
+	private static final double RADIUS = 3.;
+	private static final String STROKE = "blue";
+	private static final double STROKE_WIDTH = 1.0;
+	private static final double OPACITY = 0.4;
+	
+	private double radius = RADIUS;
+	private String stroke = STROKE;
+	private double strokeWidth = STROKE_WIDTH;
+	private double opacity = OPACITY;
 	
 	Pixel centrePixel; // pixel 1
 	private PixelEdgeList edgeList;
@@ -24,6 +32,8 @@ public class PixelNode implements Comparable<PixelNode> {
 	private PixelIsland island;
 	private PixelNucleus pixelNucleus;
 	private PixelGraph pixelGraph; // is this used?
+
+	private SVGG svgg;
 
 	protected PixelNode() {
 	}
@@ -188,5 +198,17 @@ public class PixelNode implements Comparable<PixelNode> {
 	public Int2 getInt2() {
 		Pixel pixel = getCentrePixel();
 		return pixel == null ? null : pixel.getInt2();
+	}
+
+	public SVGG getOrCreateSVG() {
+		if (svgg == null) {
+			svgg = new SVGG();
+			SVGCircle svgCircle = new SVGCircle(new Real2(centrePixel.getInt2()), radius);
+			svgCircle.setStroke(stroke);
+			svgCircle.setStrokeWidth(strokeWidth);
+			svgCircle.setOpacity(opacity);
+			svgg.appendChild(svgCircle);
+		}
+		return svgg;
 	}
 }

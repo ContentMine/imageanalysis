@@ -8,12 +8,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 public class PixelNodeList implements Iterable<PixelNode> {
 
 	private final static Logger LOG = Logger.getLogger(PixelNodeList.class);
 	private List<PixelNode> nodeList;
+	private SVGG svgg;
 	
 	public PixelNodeList() {
 		ensureList();
@@ -153,6 +155,16 @@ public class PixelNodeList implements Iterable<PixelNode> {
 	public void sortYX() {
 		Collections.sort(nodeList, new PixelNodeComparator(ComparatorType.TOP,
 				ComparatorType.LEFT));
+	}
+
+	public SVGG getOrCreateSVG() {
+		if (svgg == null) {
+			svgg = new SVGG();
+			for (PixelNode node : this) {
+				svgg.appendChild(node.getOrCreateSVG());
+			}
+		}
+		return svgg;
 	}
 
 }

@@ -83,9 +83,11 @@ public class PixelGraph {
 
 	void createNodesAndEdges() {
 		if (edgeList == null) {
-			LOG.trace("CREATING NODES AND EDGES "+this.hashCode()+"; p:"+this.getPixelList().size());
+			LOG.debug("CREATING NODES AND EDGES "+this.hashCode()+"; p:"+this.getPixelList().size());
 			edgeList = getNucleusFactory().createPixelEdgeListFromNodeList();
-			nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
+			for (PixelEdge edge : edgeList) {
+				LOG.debug("edge "+edge);
+			}
 		}
 	}
 
@@ -166,10 +168,12 @@ public class PixelGraph {
 	}
 
 	public String toString() {
-		String s = "";
-		s += "; edges: " + (edgeList == null ? "none" : edgeList.toString());
-		s += "; nodes: " + (nodeList == null ? "none" : nodeList.toString());
-		return s;
+		getEdgeList();
+		StringBuilder sb = new StringBuilder();
+		sb.append("; edges: " + (edgeList == null ? "none" : edgeList.size()+"; "+edgeList.toString()));
+		sb.append("\n     ");
+		sb.append("nodes: " + (nodeList == null ? "none" : nodeList.size()+"; "+nodeList.toString()));
+		return sb.toString();
 	}
 
 	/** get root pixel as middle of leftmost internode edge.
@@ -571,12 +575,19 @@ public class PixelGraph {
 	}
 
 	public void addCoordsToNodes() {
+		ensureNodeList();
 		for (PixelNode node : nodeList) {
 			Int2 coord = node.getInt2();
 			if (coord != null) {
 				String label = String.valueOf(coord).replaceAll("[\\(\\)]", "").replaceAll(",","_");
 				node.setLabel(label);
 			}
+		}
+	}
+
+	private void ensureNodeList() {
+		if (nodeList == null) {
+			nodeList = new PixelNodeList();
 		}
 	}
 

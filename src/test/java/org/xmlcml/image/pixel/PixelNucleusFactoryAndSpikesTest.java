@@ -39,8 +39,8 @@ public class PixelNucleusFactoryAndSpikesTest {
 		Assert.assertEquals("island", "(1,0)(0,1)(-1,0)(0,-1)",
 				Fixtures.CREATE_CYCLE_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
-		Assert.assertEquals("nucleusList", 0, nucleusList.size());
-		Assert.assertEquals("nucleusList: ", "[]", 
+		Assert.assertEquals("nucleusList", 1, nucleusList.size());
+		Assert.assertEquals("nucleusList: ", "[{(1,0)}]", 
 				nucleusList.toString());
 	}
 
@@ -115,7 +115,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	@Test
 	public void testSpikesCycle() {
 		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_CYCLE_ISLAND());
-		Assert.assertEquals("cycle", "::", nucleusFactory.createYXSortedSpikePixelList().toString());
+		Assert.assertEquals("cycle", "(0,-1)(0,1)", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	public void testJoinSpikesCycle() {
 		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_CYCLE_ISLAND());
 	    factory.createNodesAndEdges();
-		Assert.assertEquals("edges", "", 
+		Assert.assertEquals("edges", "(1,0)(0,-1)(-1,0)(0,1)(1,0)/[<(1,0)><(1,0)>]", 
 				factory.getEdgeList().toString());
 	}
 
