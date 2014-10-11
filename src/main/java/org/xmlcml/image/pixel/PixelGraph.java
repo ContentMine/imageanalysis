@@ -568,6 +568,7 @@ public class PixelGraph {
 	}
 
 	public void numberAllNodes() {
+		ensureNodeList();
 		int i = 0;
 		for (PixelNode node : nodeList) {
 			node.setLabel("n"+(i++));
