@@ -71,338 +71,338 @@ public class NeighbourPixelTest {
 
 	private static void makeDOT1() {
 		DOT1 = new PixelIsland();
-		DOT1.addPixel(new Pixel(0, 0));
+		DOT1.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0));
 	}
 
 	private static void makeLINE2() {
 		LINE2 = new PixelIsland();
-		LINE2.addPixel(new Pixel(0, 0));
-		LINE2.addPixel(new Pixel(0, 1));
+		LINE2.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0));
+		LINE2.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1));
 	}
 
 	private static void makeLINE4() {
 		LINE4 = new PixelIsland();
 		LINE4.setDiagonal(true);
-		LINE4.addPixel(new Pixel(0, 0));
-		LINE4.addPixel(new Pixel(0, 1));
-		LINE4.addPixel(new Pixel(1, 2));
-		LINE4.addPixel(new Pixel(2, 2));
+		LINE4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0));
+		LINE4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1));
+		LINE4.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 2));
+		LINE4.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 2));
 	}
 
 	private static void makeYORTH4() {
 		YORTH4 = new PixelIsland();
 		YORTH4.setDiagonal(true);
-		YORTH4.addPixel(new Pixel(0, -1)); // stem
-		YORTH4.addPixel(new Pixel(0, 0)); // centre of Y
-		YORTH4.addPixel(new Pixel(-1, 1));
-		YORTH4.addPixel(new Pixel(1, 1));
+		YORTH4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // stem
+		YORTH4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of Y
+		YORTH4.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 1));
+		YORTH4.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1));
 	}
 
 	private static void makeYORTH7() {
 		YORTH7 = new PixelIsland();
 		YORTH7.setDiagonal(true);
-		YORTH7.addPixel(new Pixel(0, -1)); // stem
-		YORTH7.addPixel(new Pixel(0, -2)); // stem
-		YORTH7.addPixel(new Pixel(0, 0)); // centre of Y
-		YORTH7.addPixel(new Pixel(-1, 1));
-		YORTH7.addPixel(new Pixel(-2, 2));
-		YORTH7.addPixel(new Pixel(1, 1));
-		YORTH7.addPixel(new Pixel(1, 2));
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // stem
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2)); // stem
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of Y
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 1));
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 2));
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1));
+		YORTH7.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 2));
 	}
 
 	private static void makeYDIAG4() {
 		YDIAG4 = new PixelIsland();
 		YDIAG4.setDiagonal(true);
-		YDIAG4.addPixel(new Pixel(1, 1)); // stem
-		YDIAG4.addPixel(new Pixel(0, 0)); // centre of Y
-		YDIAG4.addPixel(new Pixel(0, -1));
-		YDIAG4.addPixel(new Pixel(-1, 0));
+		YDIAG4.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1)); // stem
+		YDIAG4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of Y
+		YDIAG4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		YDIAG4.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
 	}
 
 	private static void makeYDIAG7() {
 		YDIAG7 = new PixelIsland();
 		YDIAG7.setDiagonal(true);
-		YDIAG7.addPixel(new Pixel(1, 1)); // stem
-		YDIAG7.addPixel(new Pixel(2, 2)); // stem
-		YDIAG7.addPixel(new Pixel(0, 0)); // centre of Y
-		YDIAG7.addPixel(new Pixel(0, -1));
-		YDIAG7.addPixel(new Pixel(0, -2));
-		YDIAG7.addPixel(new Pixel(-1, 0));
-		YDIAG7.addPixel(new Pixel(-2, 0));
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1)); // stem
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 2)); // stem
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of Y
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2));
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
+		YDIAG7.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 0));
 	}
 
 	private static void makeT4() {
 		T4 = new PixelIsland();       // simplest T
 		T4.setDiagonal(true);
-		T4.addPixel(new Pixel(1, 0)); // stem
-		T4.addPixel(new Pixel(0, 0)); // centre of T
-		T4.addPixel(new Pixel(0, -1));
-		T4.addPixel(new Pixel(-1, 0));
+		T4.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // stem
+		T4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of T
+		T4.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		T4.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
 	}
 
 	private static void makeT7() {
 		T7 = new PixelIsland();      // T extended by 1
 		T7.setDiagonal(true);
-		T7.addPixel(new Pixel(1, 0)); // stem
-		T7.addPixel(new Pixel(2, 0)); // stem
-		T7.addPixel(new Pixel(0, 0)); // centre of T
-		T7.addPixel(new Pixel(0, -1));
-		T7.addPixel(new Pixel(0, -2));
-		T7.addPixel(new Pixel(-1, 0));
-		T7.addPixel(new Pixel(-2, 0));
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // stem
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // stem
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of T
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2));
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
+		T7.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 0));
 	}
 
 	private static void makeT10() {
 		T10 = new PixelIsland();      // T extended by 2
 		T10.setDiagonal(true);
-		T10.addPixel(new Pixel(1, 0)); // stem
-		T10.addPixel(new Pixel(2, 0)); // stem
-		T10.addPixel(new Pixel(3, 0)); // stem
-		T10.addPixel(new Pixel(0, 0)); // centre of T
-		T10.addPixel(new Pixel(0, -1));
-		T10.addPixel(new Pixel(0, -2));
-		T10.addPixel(new Pixel(0, -3));
-		T10.addPixel(new Pixel(-1, 0));
-		T10.addPixel(new Pixel(-2, 0));
-		T10.addPixel(new Pixel(-3, 0));
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // stem
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // stem
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0)); // stem
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of T
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2));
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -3));
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 0));
+		T10.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, 0));
 	}
 
 	private static void makeXORTH5() {
 		XORTH5 = new PixelIsland();      // Orthogonal cross
 		XORTH5.setDiagonal(true);
-		XORTH5.addPixel(new Pixel(0, 0)); // centre of X
-		XORTH5.addPixel(new Pixel(0, 1));
-		XORTH5.addPixel(new Pixel(0, -1));
-		XORTH5.addPixel(new Pixel(1, 0));
-		XORTH5.addPixel(new Pixel(-1, 0));
+		XORTH5.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of X
+		XORTH5.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1));
+		XORTH5.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		XORTH5.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0));
+		XORTH5.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
 	}
 
 	private static void makeXORTH9() {
 		XORTH9 = new PixelIsland();      // Orthogonal cross extended 1
 		XORTH9.setDiagonal(true);
-		XORTH9.addPixel(new Pixel(0, 0)); // centre of X
-		XORTH9.addPixel(new Pixel(0, 1));
-		XORTH9.addPixel(new Pixel(0, 2));
-		XORTH9.addPixel(new Pixel(0, -1));
-		XORTH9.addPixel(new Pixel(0, -2));
-		XORTH9.addPixel(new Pixel(1, 0));
-		XORTH9.addPixel(new Pixel(2, 0));
-		XORTH9.addPixel(new Pixel(-1, 0));
-		XORTH9.addPixel(new Pixel(-2, 0));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of X
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0));
+		XORTH9.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 0));
 	}
 
 	private static void makeXDIAG5() {
 		XDIAG5 = new PixelIsland();      // Diagonal cross
 		XDIAG5.setDiagonal(true);
-		XDIAG5.addPixel(new Pixel(0, 0)); // centre of X
-		XDIAG5.addPixel(new Pixel(1, 1));
-		XDIAG5.addPixel(new Pixel(-1, -1));
-		XDIAG5.addPixel(new Pixel(1, -1));
-		XDIAG5.addPixel(new Pixel(-1, 1));
+		XDIAG5.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre of X
+		XDIAG5.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1));
+		XDIAG5.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, -1));
+		XDIAG5.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -1));
+		XDIAG5.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 1));
 	}
 
 	private static void makeTT6() {
 		TT6 = new PixelIsland();      // 2 T-junctions joined by arms
 		TT6.setDiagonal(true);
-		TT6.addPixel(new Pixel(0, 0)); 
-		TT6.addPixel(new Pixel(1, 0)); // first centre
-		TT6.addPixel(new Pixel(1, 1)); // first stem
-		TT6.addPixel(new Pixel(2, 0)); // second centre
-		TT6.addPixel(new Pixel(2, -1));// second stem
-		TT6.addPixel(new Pixel(3, 0));
+		TT6.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); 
+		TT6.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // first centre
+		TT6.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1)); // first stem
+		TT6.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // second centre
+		TT6.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -1));// second stem
+		TT6.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0));
 	}
 
 	private static void makeTT10() {
 		TT10 = new PixelIsland();      // 2 T-junctions joined by arms
 		TT10.setDiagonal(true);
-		TT10.addPixel(new Pixel(-1, 0)); 
-		TT10.addPixel(new Pixel(0, 0)); 
-		TT10.addPixel(new Pixel(1, 0)); // first centre
-		TT10.addPixel(new Pixel(1, 1)); // first stem
-		TT10.addPixel(new Pixel(1, 2)); // first stem
-		TT10.addPixel(new Pixel(2, 0)); // second centre
-		TT10.addPixel(new Pixel(2, -1));// second stem
-		TT10.addPixel(new Pixel(2, -2));// second stem
-		TT10.addPixel(new Pixel(3, 0));
-		TT10.addPixel(new Pixel(4, 0));
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 0)); 
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); 
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // first centre
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 1)); // first stem
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 2)); // first stem
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // second centre
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -1));// second stem
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -2));// second stem
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0));
+		TT10.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 0));
 	}
 
 	private static void makeA12() {
 		A12 = new PixelIsland(); // capital A with Y-junctions
 		A12.setDiagonal(true);
-		A12.addPixel(new Pixel(0, 0)); // left leg
-		A12.addPixel(new Pixel(0, 1)); // left leg
-		A12.addPixel(new Pixel(1, 2)); // left node
-		A12.addPixel(new Pixel(2, 2)); // bar
-		A12.addPixel(new Pixel(3, 2)); // right node
-		A12.addPixel(new Pixel(4, 1)); // right leg
-		A12.addPixel(new Pixel(4, 0)); // right leg
-		A12.addPixel(new Pixel(0, 3)); // arch
-		A12.addPixel(new Pixel(1, 4)); // arch
-		A12.addPixel(new Pixel(2, 4)); // arch
-		A12.addPixel(new Pixel(3, 4)); // arch
-		A12.addPixel(new Pixel(4, 3)); // arch
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // left leg
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // left leg
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 2)); // left node
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 2)); // bar
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 2)); // right node
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 1)); // right leg
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 0)); // right leg
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 3)); // arch
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 4)); // arch
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 4)); // arch
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 4)); // arch
+		A12.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 3)); // arch
 	}
 
 	private static void makeA14() {
 		A14 = new PixelIsland(); // capital A with Y-junctions
 		A14.setDiagonal(true);
-		A14.addPixel(new Pixel(0, 0)); // left leg
-		A14.addPixel(new Pixel(0, 1)); // left leg
-		A14.addPixel(new Pixel(0, 2)); // left T centre
-		A14.addPixel(new Pixel(1, 2)); // left node
-		A14.addPixel(new Pixel(2, 2)); // bar
-		A14.addPixel(new Pixel(3, 2)); // right node
-		A14.addPixel(new Pixel(4, 2)); // right T centre
-		A14.addPixel(new Pixel(4, 1)); // right leg
-		A14.addPixel(new Pixel(4, 0)); // right leg
-		A14.addPixel(new Pixel(0, 3)); // arch
-		A14.addPixel(new Pixel(1, 4)); // arch
-		A14.addPixel(new Pixel(2, 4)); // arch
-		A14.addPixel(new Pixel(3, 4)); // arch
-		A14.addPixel(new Pixel(4, 3)); // arch
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // left leg
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // left leg
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2)); // left T centre
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 2)); // left node
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 2)); // bar
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 2)); // right node
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 2)); // right T centre
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 1)); // right leg
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 0)); // right leg
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 3)); // arch
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 4)); // arch
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 4)); // arch
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 4)); // arch
+		A14.addPixelAndComputeNeighbourNeighbours(new Pixel(4, 3)); // arch
 	}
 
 	private static void makeE14() {
 		E14 = new PixelIsland(); // capital E
 		E14.setDiagonal(true);
-		E14.addPixel(new Pixel(0, 0)); // centre
-		E14.addPixel(new Pixel(0, 1)); // vert
-		E14.addPixel(new Pixel(0, 2)); // vert
-		E14.addPixel(new Pixel(1, 3)); // corner
-		E14.addPixel(new Pixel(2, 3)); // level
-		E14.addPixel(new Pixel(3, 3)); // level
-		E14.addPixel(new Pixel(1, 0)); // middle
-		E14.addPixel(new Pixel(2, 0)); // middle
-		E14.addPixel(new Pixel(3, 0)); // middle
-		E14.addPixel(new Pixel(0, -1)); // vert
-		E14.addPixel(new Pixel(0, -2)); // vert
-		E14.addPixel(new Pixel(1, -3)); // corner
-		E14.addPixel(new Pixel(2, -3)); // level
-		E14.addPixel(new Pixel(3, -3)); // level
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // vert
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2)); // vert
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 3)); // corner
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 3)); // level
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 3)); // level
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // middle
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // middle
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0)); // middle
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // vert
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2)); // vert
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -3)); // corner
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -3)); // level
+		E14.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -3)); // level
 	}
 
 	private static void makeH16() {
 		H16 = new PixelIsland(); // capital H
 		H16.setDiagonal(true);
-		H16.addPixel(new Pixel(0, 0)); // centre
-		H16.addPixel(new Pixel(0, 1)); // vert
-		H16.addPixel(new Pixel(0, 2)); // vert
-		H16.addPixel(new Pixel(0, 3)); // end
-		H16.addPixel(new Pixel(0, -1)); // vert
-		H16.addPixel(new Pixel(0, -2)); // vert
-		H16.addPixel(new Pixel(0, -3)); // end
-		H16.addPixel(new Pixel(1, 0)); // level
-		H16.addPixel(new Pixel(2, 0)); // level
-		H16.addPixel(new Pixel(3, 0)); // level
-		H16.addPixel(new Pixel(3, 1)); // vert
-		H16.addPixel(new Pixel(3, 2)); // vert
-		H16.addPixel(new Pixel(3, 3)); // end
-		H16.addPixel(new Pixel(3, -1)); // vert
-		H16.addPixel(new Pixel(3, -2)); // vert
-		H16.addPixel(new Pixel(3, -3)); // end
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 3)); // end
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -3)); // end
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // level
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // level
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0)); // level
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 1)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 2)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 3)); // end
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -1)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -2)); // vert
+		H16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -3)); // end
 	}
 
 	private static void makeO16() {
 		O16 = new PixelIsland(); // capital O
 		O16.setDiagonal(true);
-		O16.addPixel(new Pixel(-3, 0)); 
-		O16.addPixel(new Pixel(-3, 1)); 
-		O16.addPixel(new Pixel(-2, 2)); 
-		O16.addPixel(new Pixel(-1, 3)); 
-		O16.addPixel(new Pixel(0, 3)); 
-		O16.addPixel(new Pixel(1, 3)); 
-		O16.addPixel(new Pixel(2, 2)); 
-		O16.addPixel(new Pixel(3, 1)); 
-		O16.addPixel(new Pixel(3, 0)); 
-		O16.addPixel(new Pixel(3, -1)); 
-		O16.addPixel(new Pixel(2, -2)); 
-		O16.addPixel(new Pixel(1, -3)); 
-		O16.addPixel(new Pixel(0, -3)); 
-		O16.addPixel(new Pixel(-1, -3)); 
-		O16.addPixel(new Pixel(-2, -2)); 
-		O16.addPixel(new Pixel(-3, -1));
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, 0)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, 1)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 2)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 3)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 3)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 3)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 2)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 1)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -1)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -2)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -3)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -3)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, -3)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, -2)); 
+		O16.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, -1));
 	}
 
 	private static void makeP12() {
 		P12 = new PixelIsland(); // capital P
 		P12.setDiagonal(true);
-		P12.addPixel(new Pixel(0, 0)); // centre
-		P12.addPixel(new Pixel(0, 1)); // vert
-		P12.addPixel(new Pixel(0, 2)); // vert
-		P12.addPixel(new Pixel(1, 3)); // corner
-		P12.addPixel(new Pixel(2, 3)); // level
-		P12.addPixel(new Pixel(3, 2)); // corner
-		P12.addPixel(new Pixel(3, 1)); // vert
-		P12.addPixel(new Pixel(2, 0)); // corner
-		P12.addPixel(new Pixel(1, 0)); // bridge
-		P12.addPixel(new Pixel(0, -1)); // vert
-		P12.addPixel(new Pixel(0, -2)); // vert
-		P12.addPixel(new Pixel(0, -3)); // corner
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // vert
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2)); // vert
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 3)); // corner
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 3)); // level
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 2)); // corner
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 1)); // vert
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // corner
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // bridge
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // vert
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2)); // vert
+		P12.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -3)); // corner
 	}
 
 	private static void makeQ19() {
 		Q19 = new PixelIsland(); // capital Q
 		Q19.setDiagonal(true);
-		Q19.addPixel(new Pixel(-3, 0)); 
-		Q19.addPixel(new Pixel(-3, 1)); 
-		Q19.addPixel(new Pixel(-2, 2)); 
-		Q19.addPixel(new Pixel(-1, 3)); 
-		Q19.addPixel(new Pixel(0, 3)); 
-		Q19.addPixel(new Pixel(1, 3)); 
-		Q19.addPixel(new Pixel(2, 2)); 
-		Q19.addPixel(new Pixel(3, 1)); 
-		Q19.addPixel(new Pixel(3, 0)); 
-		Q19.addPixel(new Pixel(3, -1)); 
-		Q19.addPixel(new Pixel(2, -2)); 
-		Q19.addPixel(new Pixel(1, -3)); 
-		Q19.addPixel(new Pixel(0, -3)); 
-		Q19.addPixel(new Pixel(-1, -3)); 
-		Q19.addPixel(new Pixel(-2, -2)); 
-		Q19.addPixel(new Pixel(-3, -1)); 
-		Q19.addPixel(new Pixel(-1, -1)); // tail
-		Q19.addPixel(new Pixel(-3, -3)); // tail
-		Q19.addPixel(new Pixel(-4, -4)); // tail
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, 0)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, 1)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, 2)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, 3)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 3)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 3)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 2)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 1)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 0)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -1)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -2)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -3)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -3)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, -3)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, -2)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, -1)); 
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, -1)); // tail
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, -3)); // tail
+		Q19.addPixelAndComputeNeighbourNeighbours(new Pixel(-4, -4)); // tail
 	}
 
 	private static void makeR15() {
 		R15 = new PixelIsland(); // capital R
 		R15.setDiagonal(true);
-		R15.addPixel(new Pixel(0, 0)); // centre
-		R15.addPixel(new Pixel(0, 1)); // vert
-		R15.addPixel(new Pixel(0, 2)); // vert
-		R15.addPixel(new Pixel(1, 3)); // corner
-		R15.addPixel(new Pixel(2, 3)); // level
-		R15.addPixel(new Pixel(3, 2)); // corner
-		R15.addPixel(new Pixel(3, 1)); // vert
-		R15.addPixel(new Pixel(2, 0)); // corner
-		R15.addPixel(new Pixel(1, 0)); // bridge
-		R15.addPixel(new Pixel(0, -1)); // vert
-		R15.addPixel(new Pixel(0, -2)); // vert
-		R15.addPixel(new Pixel(1, -3)); // corner
-		R15.addPixel(new Pixel(2, -3)); // level
-		R15.addPixel(new Pixel(3, -3)); // corner
-		R15.addPixel(new Pixel(4, -3)); // vert
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // vert
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2)); // vert
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 3)); // corner
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 3)); // level
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 2)); // corner
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 1)); // vert
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // corner
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // bridge
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // vert
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2)); // vert
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -3)); // corner
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -3)); // level
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -3)); // corner
+		R15.addPixelAndComputeNeighbourNeighbours(new Pixel(4, -3)); // vert
 	}
 
 	private static void makeB15() {
 		B15 = new PixelIsland(); // capital B
 		B15.setDiagonal(true);
-		B15.addPixel(new Pixel(0, 0)); // centre
-		B15.addPixel(new Pixel(0, 1)); // vert
-		B15.addPixel(new Pixel(0, 2)); // vert
-		B15.addPixel(new Pixel(1, 3)); // corner
-		B15.addPixel(new Pixel(2, 3)); // level
-		B15.addPixel(new Pixel(3, 2)); // corner
-		B15.addPixel(new Pixel(3, 1)); // vert
-		B15.addPixel(new Pixel(2, 0)); // corner
-		B15.addPixel(new Pixel(1, 0)); // bridge
-		B15.addPixel(new Pixel(0, -1)); // vert
-		B15.addPixel(new Pixel(0, -2)); // vert
-		B15.addPixel(new Pixel(1, -3)); // corner
-		B15.addPixel(new Pixel(2, -3)); // level
-		B15.addPixel(new Pixel(3, -2)); // corner
-		B15.addPixel(new Pixel(3, -1)); // vert
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 0)); // centre
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 1)); // vert
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 2)); // vert
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 3)); // corner
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 3)); // level
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 2)); // corner
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, 1)); // vert
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(2, 0)); // corner
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(1, 0)); // bridge
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1)); // vert
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -2)); // vert
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -3)); // corner
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -3)); // level
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -2)); // corner
+		B15.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -1)); // vert
 	}
 
 	@Test

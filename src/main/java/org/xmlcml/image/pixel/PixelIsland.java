@@ -78,6 +78,17 @@ public class PixelIsland implements Iterable<Pixel> {
 	public PixelIsland(PixelList pixelList) {
 		this(pixelList, false);
 	}
+	
+	public static PixelIsland createSeparateIslandWithClonedPixels(PixelList pixelList, boolean diagonal) {
+		PixelIsland cloneIsland = new PixelIsland();
+		for (Pixel pixel : pixelList) {
+			Pixel clonePixel = new Pixel(pixel);
+			clonePixel.setIsland(cloneIsland);
+			cloneIsland.addPixelWithoutComputingNeighbours(clonePixel);
+		}
+		cloneIsland.setDiagonal(diagonal);
+		return cloneIsland;
+	}
 
 	private void ensurePixelList() {
 		if (pixelList == null) {
@@ -134,10 +145,26 @@ public class PixelIsland implements Iterable<Pixel> {
 		return i2r;
 	}
 
-	public void addPixel(Pixel pixel) {
+	public void addPixelAndComputeNeighbourNeighbours(Pixel pixel) {
 		ensurePixelList();
 		this.pixelList.add(pixel);
 		createMapAndRanges(pixel);
+		// FIXME - why???
+		pixel.createNeighbourNeighbourList(this);
+	}
+
+	public void addPixelWithoutComputingNeighbours(Pixel pixel) {
+		ensurePixelList();
+		this.pixelList.add(pixel);
+	}
+
+	@Deprecated // does not control neighbour list
+	public void addPixel(Pixel pixel) {
+		
+		ensurePixelList();
+		this.pixelList.add(pixel);
+		createMapAndRanges(pixel);
+		// FIXME - why???
 		pixel.createNeighbourNeighbourList(this);
 	}
 
@@ -147,7 +174,19 @@ public class PixelIsland implements Iterable<Pixel> {
 			createMapAndRanges(pixel);
 		}
 	}
+	
+	void ensurePopulatedMapAndRanges() {
+		ensurePixelByCoordMap();
+		if (pixelByCoordMap.size() == 0) {
+			createMapAndRanges(pixelList);
+		}
+	}
 
+	private void createMapAndRanges(PixelList pixelList) {
+		for (Pixel pixel : pixelList) {
+			createMapAndRanges(pixel);
+		}
+	}
 	private void createMapAndRanges(Pixel pixel) {
 		ensureInt2Range();
 		ensurePixelByCoordMap();
@@ -172,6 +211,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public Pixel getPixelByCoord(Int2 coord) {
+		ensurePopulatedMapAndRanges();
 		Pixel pixel = getPixelByCoordMap().get(coord);
 		return pixel;
 	}
@@ -265,7 +305,7 @@ public class PixelIsland implements Iterable<Pixel> {
 						Pixel pk = pixelNeighbours.get(k);
 						if (pj.isKnightsMove(pk, pi)) {
 							removed.add(pixel);
-							LOG.trace("removed: " + pixel);
+							LOG.debug("removed: " + pixel);
 							// this.remove(pixel);
 						}
 					}
@@ -731,7 +771,7 @@ public class PixelIsland implements Iterable<Pixel> {
 				if (neighbours.size() == 4) {
 					Pixel newPixel = new Pixel(pixel.getInt2().getX(), pixel.getInt2().getY());
 					singleHoleList.add(newPixel);
-					this.addPixel(newPixel);
+					this.addPixelAndComputeNeighbourNeighbours(newPixel);
 				}
 			}
 		}

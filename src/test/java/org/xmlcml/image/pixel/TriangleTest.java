@@ -29,9 +29,9 @@ public class TriangleTest {
 		pixel[0] = new Pixel(new Point(0,0));
 		pixel[1] = new Pixel(new Point(0,1));
 		pixel[2] = new Pixel(new Point(1,0));
-		island.addPixel(pixel[0]);
-		island.addPixel(pixel[1]);
-		island.addPixel(pixel[2]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[0]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[1]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[2]);
 		
 	}
 	

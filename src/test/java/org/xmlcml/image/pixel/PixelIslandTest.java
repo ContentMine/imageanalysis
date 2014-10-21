@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2Array;
@@ -878,10 +879,10 @@ public class PixelIslandTest {
 	@Test
 	public void testFillSingleHoles() {
 		PixelIsland island = new PixelIsland();
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,-1));
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(-1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,0));
 		Pixel centre = new Pixel(0,0);
 		PixelList filled = island.fillSingleHoles();
 		Assert.assertEquals("filled", 1, filled.size());
@@ -890,10 +891,10 @@ public class PixelIslandTest {
 	@Test
 	public void testFindEmptyPixels() {
 		PixelIsland island = new PixelIsland();
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,-1));
-		island.addPixel(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
 		PixelList empty = island.getEmptyPixels();
 		Assert.assertEquals("empty", 2, empty.size());
 	}
@@ -902,10 +903,10 @@ public class PixelIslandTest {
 	public void testFindStubPixels() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,-1));
-		island.addPixel(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
 		PixelList stubs = island.getOrCreateOrthogonalStubList();
 		Assert.assertEquals("empty", 1, stubs.size());
 	}
@@ -914,13 +915,51 @@ public class PixelIslandTest {
 	public void testTrimStubs() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,-1));
-		island.addPixel(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
 		PixelList stubs = island.trimOrthogonalStubs();
 		Assert.assertEquals("stubs ", 1, stubs.size());
 		Assert.assertEquals("after trimming ", 3, island.size());
+	}
+
+	@Test
+	public void testCreateSeparateIslandWithClonedPixels() {
+		PixelIsland originalIsland = new PixelIsland();
+		originalIsland.setDiagonal(true);
+		Pixel[][] pixels = new Pixel[5][];
+		for (int i = 0; i < 5; i++) {
+			pixels[i] = new Pixel[5];
+			for (int j = 0; j < 5; j++) {
+				pixels[i][j] = new Pixel(i, j);
+				originalIsland.addPixelWithoutComputingNeighbours(pixels[i][j]);
+			}
+		}
+		PixelList originalList = originalIsland.getPixelList();
+		Assert.assertEquals("original", 25, originalList.size());
+		Assert.assertEquals("originalNeighbours00", 3, pixels[0][0].getOrCreateNeighbours(originalIsland).size());
+		Assert.assertEquals("originalNeighbours02", 5, pixels[0][2].getOrCreateNeighbours(originalIsland).size());
+		Assert.assertEquals("originalNeighbours33", 8, pixels[3][3].getOrCreateNeighbours(originalIsland).size());
+		
+		PixelIsland cloneIsland = PixelIsland.createSeparateIslandWithClonedPixels(originalList, true);
+		PixelList cloneList = cloneIsland.getPixelList();
+		Assert.assertEquals("clone", 25, cloneList.size());
+		Assert.assertEquals("cloneNeighbours00", 3, cloneIsland.getPixelByCoord(new Int2(0, 0)).getOrCreateNeighbours(cloneIsland).size());
+		Assert.assertEquals("cloneNeighbours02", 5, cloneIsland.getPixelByCoord(new Int2(0, 2)).getOrCreateNeighbours(cloneIsland).size());
+		Assert.assertEquals("cloneNeighbours33", 8, cloneIsland.getPixelByCoord(new Int2(3, 3)).getOrCreateNeighbours(cloneIsland).size());
+		
+		originalIsland.remove(pixels[0][1]);
+		Assert.assertEquals("original", 24, originalList.size());
+		Assert.assertEquals("originalNeighbours00", 2, pixels[0][0].getOrCreateNeighbours(originalIsland).size());
+		Assert.assertEquals("originalNeighbours02", 4, pixels[0][2].getOrCreateNeighbours(originalIsland).size());
+		Assert.assertEquals("originalNeighbours33", 8, pixels[3][3].getOrCreateNeighbours(originalIsland).size());
+		
+		Assert.assertEquals("clone", 25, cloneList.size());
+		Assert.assertEquals("cloneNeighbours00", 3, cloneIsland.getPixelByCoord(new Int2(0, 0)).getOrCreateNeighbours(cloneIsland).size());
+		Assert.assertEquals("cloneNeighbours02", 5, cloneIsland.getPixelByCoord(new Int2(0, 2)).getOrCreateNeighbours(cloneIsland).size());
+		Assert.assertEquals("cloneNeighbours33", 8, cloneIsland.getPixelByCoord(new Int2(3, 3)).getOrCreateNeighbours(cloneIsland).size());
+		
 	}
 
 	// FIXME
@@ -944,12 +983,12 @@ public class PixelIslandTest {
 	private PixelIsland createLargeY() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(-1,-1));
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(2,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,0));
 		return island;
 	}
 	

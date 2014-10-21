@@ -26,10 +26,10 @@ public class JunctionTest {
 		p1_10 = new Pixel(1,0);
 		p1_20 = new Pixel(2,0);
 		p1_11 = new Pixel(1,1);
-		island1.addPixel(p1_00);
-		island1.addPixel(p1_10);
-		island1.addPixel(p1_20);
-		island1.addPixel(p1_11);
+		island1.addPixelAndComputeNeighbourNeighbours(p1_00);
+		island1.addPixelAndComputeNeighbourNeighbours(p1_10);
+		island1.addPixelAndComputeNeighbourNeighbours(p1_20);
+		island1.addPixelAndComputeNeighbourNeighbours(p1_11);
 		island1.setDiagonal(true);
 		return island1;
 	}

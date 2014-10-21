@@ -38,6 +38,16 @@ public class Pixel {
 		this(new Point(x, y));
 	}
 
+	/** creates deep copy of Pixel without island.
+	 * 
+	 * neighbourList is null;
+	 * 
+	 * @param pixel
+	 */
+	public Pixel(Pixel pixel) {
+		this(new Point(pixel.point));
+	}
+
 	public Int2 getInt2() {
 		return point == null ? null : new Int2(point.x, point.y);
 	}
@@ -47,6 +57,7 @@ public class Pixel {
 	}
 
 	public PixelList getOrCreateNeighbours(PixelIsland island) {
+		island.ensurePopulatedMapAndRanges();
 		this.island = island;
 		getOrCreateNeighbourList(island);
 		return neighbourList;
@@ -70,11 +81,25 @@ public class Pixel {
 		return neighbourList;
 	}
 	
-	public void createNeighbourNeighbourList(PixelIsland island) {
+	/** creates neighbourList for neighbours of neighbours.
+	 * 
+	 * @param island
+	 */
+	public PixelList createNeighbourNeighbourList(PixelIsland island) {
+		PixelList neighbourNeighbourList = new PixelList();
 		PixelList neighbourList = createNeighbourList(island);
 		for (Pixel neighbour : neighbourList) {
-			neighbour.createNeighbourList(island);
+			PixelList neighbourList1 = neighbour.createNeighbourList(island);
+			LOG.debug("neighbours1 "+neighbourList1);
+			for (Pixel nl1 : neighbourList1) {
+				LOG.debug("   nl1 "+nl1);
+				if (!neighbourNeighbourList.contains(nl1)) {
+					neighbourNeighbourList.add(nl1);
+				}
+				LOG.debug("neighboursNeighbours "+neighbourNeighbourList);
+			}
 		}
+		return neighbourNeighbourList;
 	}
 
 	private List<Int2> calculateNeighbourCoordList(PixelIsland island) {

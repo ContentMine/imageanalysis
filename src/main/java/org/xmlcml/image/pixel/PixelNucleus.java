@@ -502,7 +502,7 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 																		// removal
 		island.remove(pixel1);
 		newPixel.clearNeighbours();
-		island.addPixel(newPixel);
+		island.addPixelAndComputeNeighbourNeighbours(newPixel);
 		PixelList newPixelNeighbours = newPixel.getOrCreateNeighbours(island);
 		LOG.trace("new " + newPixel + "neighbours: " + newPixelNeighbours);
 		for (Pixel oldNeighbour : oldNeighbours) {

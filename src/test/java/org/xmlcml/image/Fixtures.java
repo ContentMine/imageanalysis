@@ -144,85 +144,85 @@ public class Fixtures {
 	public static PixelIsland CREATE_DOUBLE_Y_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(1,3));
-		island.addPixel(new Pixel(-1,3));
-		island.addPixel(new Pixel(2,4));
-		island.addPixel(new Pixel(-2,4));
-		island.addPixel(new Pixel(3,5));
-		island.addPixel(new Pixel(-3,5));
-		island.addPixel(new Pixel(0,-1));
-		island.addPixel(new Pixel(0,-2));
-		island.addPixel(new Pixel(1,-3));
-		island.addPixel(new Pixel(-1,-3));
-		island.addPixel(new Pixel(2,-4));
-		island.addPixel(new Pixel(-2,-4));
-		island.addPixel(new Pixel(3,-5));
-		island.addPixel(new Pixel(-3,-5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,-3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,-3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,-4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,-4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,-5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3,-5));
 		return island;
 	}
 
 	public static PixelIsland CREATE_TRISPIKED_HEXAGON_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(1,3));
-		island.addPixel(new Pixel(-1,3));
-		island.addPixel(new Pixel(1,4));
-		island.addPixel(new Pixel(-1,4));
-		island.addPixel(new Pixel(-2,5));
-		island.addPixel(new Pixel(0,5));
-		island.addPixel(new Pixel(2,5));
-		island.addPixel(new Pixel(-3,6));
-		island.addPixel(new Pixel(3,6));
-		island.addPixel(new Pixel(-4,7));
-		island.addPixel(new Pixel(4,7));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3,6));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,6));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-4,7));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,7));
 		return island;
 	}
 
 	public static PixelIsland CREATE_Y_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(0,2));
-		island.addPixel(new Pixel(0,3));
-		island.addPixel(new Pixel(-1, -1));
-		island.addPixel(new Pixel(-2, -2));
-		island.addPixel(new Pixel(-3, -3));
-		island.addPixel(new Pixel(1, -1));
-		island.addPixel(new Pixel(2, -2));
-		island.addPixel(new Pixel(3, -3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1, -1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2, -2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3, -3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1, -1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2, -2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3, -3));
 		return island;
 	}
 
 	public static PixelIsland CREATE_T_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(-1,-1));
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(2,1));
-		island.addPixel(new Pixel(3,1));
-		island.addPixel(new Pixel(4,1));
-		island.addPixel(new Pixel(5,1));
-		island.addPixel(new Pixel(6,0));
-		island.addPixel(new Pixel(7,0));
-		island.addPixel(new Pixel(3,2));
-		island.addPixel(new Pixel(3,3));
-		island.addPixel(new Pixel(3,4));
-		island.addPixel(new Pixel(3,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(5,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(6,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(7,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,5));
 		return island;
 	}
 
 	public static PixelIsland CREATE_DOT_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
 		return island;
 	}
 
@@ -230,12 +230,12 @@ public class Fixtures {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
 		// simple wiggly line
-		island.addPixel(new Pixel(2,0));
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(-1,2));
-		island.addPixel(new Pixel(0, 3));
-		island.addPixel(new Pixel(0, 4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0, 4));
 		return island;
 	}
 
@@ -243,54 +243,54 @@ public class Fixtures {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
 		// simple diamond cycle
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(0,1));
-		island.addPixel(new Pixel(-1,0));
-		island.addPixel(new Pixel(0, -1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0, -1));
 		return island;
 	}
 
 	public static PixelIsland CREATE_RHOMBUS_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(1,1));
-		island.addPixel(new Pixel(2,1));
-		island.addPixel(new Pixel(2,2));
-		island.addPixel(new Pixel(3,2));
-		island.addPixel(new Pixel(4,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,3));
 		return island;
 	}
 
 	public static PixelIsland CREATE_ZIGZAG_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(1,1));
-		island.addPixel(new Pixel(2,2));
-		island.addPixel(new Pixel(3,3));
-		island.addPixel(new Pixel(4,4));
-		island.addPixel(new Pixel(5,5));
-		island.addPixel(new Pixel(6,4));
-		island.addPixel(new Pixel(7,3));
-		island.addPixel(new Pixel(8,2));
-		island.addPixel(new Pixel(9,1));
-		island.addPixel(new Pixel(10,0));
-		island.addPixel(new Pixel(11,1));
-		island.addPixel(new Pixel(12,2));
-		island.addPixel(new Pixel(13,3));
-		island.addPixel(new Pixel(14,4));
-		island.addPixel(new Pixel(15,5));
-		island.addPixel(new Pixel(16,4));
-		island.addPixel(new Pixel(17,3));
-		island.addPixel(new Pixel(18,2));
-		island.addPixel(new Pixel(19,1));
-		island.addPixel(new Pixel(20,0));
-		island.addPixel(new Pixel(20,1));
-		island.addPixel(new Pixel(20,2));
-		island.addPixel(new Pixel(20,3));
-		island.addPixel(new Pixel(20,4));
-		island.addPixel(new Pixel(20,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(5,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(6,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(7,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(8,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(9,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(10,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(11,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(12,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(13,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(14,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(15,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(16,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(17,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(18,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(19,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,5));
 		return island;
 	}
 

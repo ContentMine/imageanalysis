@@ -6,8 +6,7 @@ import java.awt.image.BufferedImage;
 public abstract class Thinning {
 
 	protected BufferedImage image;
-	protected int[][] binaryImage;
-	protected boolean hasChange;
+	protected int[][] binary;
 	
 	public Thinning(BufferedImage image) {
     	createBinary(image);
@@ -19,13 +18,13 @@ public abstract class Thinning {
 
 	public void createBinary(BufferedImage image) {
 		this.image = image;
-	    binaryImage = copyImageToBinary(image);
+	    binary = copyImageToBinary(image);
 	}
 	public int[][] getBinaryImage() {
-		return binaryImage;
+		return binary;
 	}
 	public BufferedImage getThinnedImage() {
-	    copyBinaryToImage(image, binaryImage);
+	    copyBinaryToImage(image, binary);
 		return image;
 	}
 	
@@ -62,6 +61,66 @@ public abstract class Thinning {
 	       }
 	}
 
-	public abstract int[][] doThinning();
+	/** creates a thinned array 
+	 * 
+	 */
+	public abstract void doThinning();
+
+	protected int getNeighbourSum(int y, int x) {
+	
+	    return binary[y - 1][x] + binary[y - 1][x + 1] + binary[y][x + 1]
+	            + binary[y + 1][x + 1] + binary[y + 1][x] + binary[y + 1][x - 1]
+	            + binary[y][x - 1] + binary[y - 1][x - 1];
+	}
+
+	/**
+	 * traverses neighbours in a cycle. Adds 1 for any 0 pixel whose next neighbour is 1.
+	 * minimum sum is 0 (00000000 or 11111111), maximum is 4 (01010101) 
+	 * otherwise 1,2,3 also possible
+	 * 
+	 * 
+	 * @param y
+	 * @param x
+	 * @return
+	 */
+	protected int getSumCyclicChanges(int y, int x) {
+	
+	    int count = 0;
+	    //p2 p3
+	    if (binary[y - 1][x] == 0 && binary[y - 1][x + 1] == 1) {
+	        count++;
+	    }
+	    //p3 p4
+	    if (binary[y - 1][x + 1] == 0 && binary[y][x + 1] == 1) {
+	        count++;
+	    }
+	    //p4 p5
+	    if (binary[y][x + 1] == 0 && binary[y + 1][x + 1] == 1) {
+	        count++;
+	    }
+	    //p5 p6
+	    if (binary[y + 1][x + 1] == 0 && binary[y + 1][x] == 1) {
+	        count++;
+	    }
+	    //p6 p7
+	    if (binary[y + 1][x] == 0 && binary[y + 1][x - 1] == 1) {
+	        count++;
+	    }
+	    //p7 p8
+	    if (binary[y + 1][x - 1] == 0 && binary[y][x - 1] == 1) {
+	        count++;
+	    }
+	    //p8 p9
+	    if (binary[y][x - 1] == 0 && binary[y - 1][x - 1] == 1) {
+	        count++;
+	    }
+	    //p9 p2
+	    if (binary[y - 1][x - 1] == 0 && binary[y - 1][x] == 1) {
+	        count++;
+	    }
+	
+	    return count;
+	}
+
 
 }

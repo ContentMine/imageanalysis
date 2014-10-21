@@ -24,12 +24,12 @@ public class PixelTest {
 		pixel[3] = new Pixel(new Point(1,1));
 		pixel[4] = new Pixel(new Point(2,0));
 		pixel[5] = new Pixel(new Point(2,1));
-		island.addPixel(pixel[0]);
-		island.addPixel(pixel[1]);
-		island.addPixel(pixel[2]);
-		island.addPixel(pixel[3]);
-		island.addPixel(pixel[4]);
-		island.addPixel(pixel[5]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[0]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[1]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[2]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[3]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[4]);
+		island.addPixelAndComputeNeighbourNeighbours(pixel[5]);
 	}
 
 	@Test

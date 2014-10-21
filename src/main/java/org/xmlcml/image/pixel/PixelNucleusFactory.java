@@ -438,9 +438,9 @@ public class PixelNucleusFactory {
 		PixelList neighbours = spike.getOrCreateNeighbours(island);
 		PixelList line = null;
 		if (neighbours.size() > 2) {
-			LOG.debug("spike too many neighbours: "+spike+";"+spike.getOrCreateNeighbours(island)+"; "+nucleus);
+			LOG.trace("spike too many neighbours: "+spike+";"+spike.getOrCreateNeighbours(island)+"; "+nucleus);
 		} else if (neighbours.size() != 2) {
-			LOG.debug("spike too few neighbours:"+spike+";"+spike.getOrCreateNeighbours(island)+"; "+nucleus);
+			LOG.trace("spike too few neighbours:"+spike+";"+spike.getOrCreateNeighbours(island)+"; "+nucleus);
 		} else {
 			int nucleusNeighbourIndex = -1;
 			if (getNucleusByPixel(neighbours.get(0)) != null) {
@@ -650,13 +650,13 @@ public class PixelNucleusFactory {
 		PixelNucleus newNucleus = null;
 		Pixel centrePixel;
 		centrePixel = pixelList.get(0);
-		if (centrePixel.getOrthogonalNeighbours(island).size() 
-				+ centrePixel.getDiagonalNeighbours(island).size() == 0) {
+		PixelList orthNeighbours = centrePixel.getOrthogonalNeighbours(island);
+		PixelList diagNeighbours = centrePixel.getDiagonalNeighbours(island);
+		if (orthNeighbours.size() + diagNeighbours.size() == 0) {
 			newNucleus = new DotNucleus(centrePixel, pixelList, island);
 			LOG.trace("made DOT");
 			
-		} else if (centrePixel.getOrthogonalNeighbours(island).size() 
-				+ centrePixel.getDiagonalNeighbours(island).size() == 1) {
+		} else if (orthNeighbours.size() + diagNeighbours.size() == 1) {
 			newNucleus = new TerminalNucleus(centrePixel, pixelList, island);
 			LOG.debug("made TERMINAL");
 			
@@ -664,9 +664,16 @@ public class PixelNucleusFactory {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 			LOG.trace("made NICKED_T");
 			
-		} else if (centrePixel.getDiagonalNeighbours(island).size() == 3) {
+		} else if (diagNeighbours.size() == 3) {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 			LOG.trace("made TILTED T");
+			
+		} else if ((diagNeighbours.size() == 1 && orthNeighbours.size() == 2) ||
+				(diagNeighbours.size() == 2 && orthNeighbours.size() == 1) &&
+				centrePixel.createNeighbourNeighbourList(island).size() == 4) {
+		// this is probably a terminal node with two single pixel stubs (due to bad thinning)
+			newNucleus = new TerminalNucleus(centrePixel, pixelList, island);
+			LOG.debug("Caution: made PSEUDO_TERMINAL");
 			
 		} else {
 			LOG.error("UNKNOWN SINGLE PIXEL NUCLEUS: "+pixelList+"; "+pixelList.get(0).getOrCreateNeighbours(island));

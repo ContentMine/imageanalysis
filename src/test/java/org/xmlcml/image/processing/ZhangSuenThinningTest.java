@@ -17,7 +17,7 @@ public class ZhangSuenThinningTest {
 	@Test
 	public void testMolecule() throws IOException {
 	       BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
-	       ZhangSuenThinning thinningService = new ZhangSuenThinning(image);
+	       Thinning thinningService = new ZhangSuenThinning(image);
 	       thinningService.doThinning();
 	       image = thinningService.getThinnedImage();
 	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thinning/zhangSuenMaltoryzine.png");

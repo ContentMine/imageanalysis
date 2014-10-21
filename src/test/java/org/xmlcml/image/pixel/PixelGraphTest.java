@@ -134,13 +134,13 @@ public class PixelGraphTest {
 	public void testWCorner() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(2,0));
-		island.addPixel(new Pixel(2,1));
-		island.addPixel(new Pixel(3,1));
-		island.addPixel(new Pixel(3,2));
-		island.addPixel(new Pixel(3,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,3));
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(7, graph.getPixelList().size());
 		Assert.assertEquals(5, graph.getNodeList().size());
@@ -170,18 +170,18 @@ public class PixelGraphTest {
 	public static PixelIsland CREATE_TWO_NUCLEUS_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
-		island.addPixel(new Pixel(0,0));
-		island.addPixel(new Pixel(1,0));
-		island.addPixel(new Pixel(2,0));
-		island.addPixel(new Pixel(2,1));
-		island.addPixel(new Pixel(3,1));
-		island.addPixel(new Pixel(3,2));
-		island.addPixel(new Pixel(3,3));
-		island.addPixel(new Pixel(4,4));
-		island.addPixel(new Pixel(5,4));
-		island.addPixel(new Pixel(5,5));
-		island.addPixel(new Pixel(6,5));
-		island.addPixel(new Pixel(7,6));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(5,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(5,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(6,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(7,6));
 		return island;
 	}
 	

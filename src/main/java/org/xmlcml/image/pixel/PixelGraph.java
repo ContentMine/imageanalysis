@@ -1,14 +1,11 @@
 package org.xmlcml.image.pixel;
 
-import java.util.Collections;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Int2;
-import org.xmlcml.euclid.Int2Range;
-import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
@@ -50,12 +47,26 @@ public class PixelGraph {
 		this(island.getPixelList(), island);
 	}
 	
-	private PixelGraph(PixelList pixelList, PixelIsland island) {
+	public PixelGraph(PixelList list) {
+		this.island = list.getIsland();
+		createGraph(pixelList);
+	}
+	
+	/** all pixels have to belong to island
+	 * 
+	 * @param pixelList
+	 * @param island
+	 */
+	public PixelGraph(PixelList pixelList, PixelIsland island) {
+		this.island = island;
+		createGraph(pixelList);
+	}
+
+	private void createGraph(PixelList pixelList) {
 		if (pixelList == null) {
 			throw new RuntimeException("null pixelList");
 		}
 		this.pixelList = pixelList;
-		this.island = island;
 		this.createNodesAndEdges();
 	}
 
@@ -84,7 +95,8 @@ public class PixelGraph {
 	void createNodesAndEdges() {
 		if (edgeList == null) {
 			LOG.debug("CREATING NODES AND EDGES "+this.hashCode()+"; p:"+this.getPixelList().size());
-			edgeList = getNucleusFactory().createPixelEdgeListFromNodeList();
+			PixelNucleusFactory nucleusFactory = getNucleusFactory();
+			edgeList = nucleusFactory.createPixelEdgeListFromNodeList();
 			for (PixelEdge edge : edgeList) {
 				LOG.debug("edge "+edge);
 			}
