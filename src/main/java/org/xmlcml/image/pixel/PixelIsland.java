@@ -898,7 +898,6 @@ public class PixelIsland implements Iterable<Pixel> {
 			for (Pixel pixel : this) {
 				if (isOrthogonalStub(pixel)) {
 					orthogonalStubList.add(pixel);
-					LOG.debug("orthogonal "+pixel);
 				}
 			}
 		}

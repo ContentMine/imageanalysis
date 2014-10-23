@@ -128,7 +128,24 @@ public class PixelGraphTest {
 		}
 	}
 
-		@Test
+	@Test
+	/** rhombus with side shoots.
+	 * 
+	 * 
+	 */
+	public void testZNucleus() {
+		PixelIsland island = Fixtures.CREATE_ZNUCLEUS_ISLAND();
+		try {
+			PixelGraph graph = PixelGraph.createGraph(island);
+			Assert.assertTrue("should not throw exception", true);
+			// error is now logged, not thrown
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	@Test
 	@Ignore // recent edge algorithms broke this
 
 	public void testWCorner() {

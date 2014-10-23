@@ -250,6 +250,14 @@ public class Fixtures {
 		return island;
 	}
 
+	/**
+	 * +
+	 *  $$
+	 *   $$
+	 *     +
+	 *     
+	 * @return
+	 */
 	public static PixelIsland CREATE_RHOMBUS_ISLAND() {
 		PixelIsland island = new PixelIsland();
 		island.setDiagonal(true);
@@ -258,6 +266,27 @@ public class Fixtures {
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,2));
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,3));
+		return island;
+	}
+
+	/**
+	 * +  +
+	 *  $$
+	 *   $$
+	 *  +  +
+	 * @return
+	 */
+	public static PixelIsland CREATE_ZNUCLEUS_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,3));
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(4,3));
 		return island;
 	}

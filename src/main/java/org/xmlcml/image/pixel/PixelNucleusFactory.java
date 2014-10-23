@@ -701,14 +701,16 @@ public class PixelNucleusFactory {
 		return newNucleus;
 	}
 
-	private PixelNucleus process4PixelNuclei(PixelList pixelList,
-			Pixel centrePixel) {
+	private PixelNucleus process4PixelNuclei(PixelList pixelList, Pixel centrePixel) {
 		PixelNucleus newNucleus = null;
 		if (isFilledT(centrePixel, pixelList, island)) {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 		} else if (isZ(centrePixel, pixelList, island)) {
 			LOG.debug("Z-NUCLEUS");
-//			newNucleus = new FourWayNucleus(centrePixel, pixelList, island);
+			newNucleus = new FourPixelNucleus(centrePixel, pixelList, island);
+		} else if (isRhombus(centrePixel, pixelList, island)) {
+			LOG.debug("RHOMBUS");
+			newNucleus = new TwoWayNucleus(centrePixel, pixelList, island);
 		} else {
 			LOG.error("UNKNOWN 4 PIXEL NUCLEUS in " + island.size() + "; "
 					+ island.getIntBoundingBox() + "; " + centrePixel + "; "
@@ -868,6 +870,28 @@ public class PixelNucleusFactory {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 *    
+	 * +$$
+	 *   $$+
+	 *  
+	 *   
+	 * @param centrePixel
+	 * @param pixelList
+	 * @param pixelIsland
+	 * @return
+	 */
+	private boolean isRhombus(Pixel centrePixel, PixelList pixelList, PixelIsland island) {
+		PixelList connect3List = new PixelList();
+		for (Pixel pixel : pixelList) {
+			PixelList neighbours = pixel.getOrCreateNeighbours(island);
+			if (neighbours.size() == 3) {
+				connect3List.add(pixel);
+			}
+		}
+		return (connect3List.size() == 4) ;
 	}
 
 	/**

@@ -50,7 +50,6 @@ public class PixelNucleusFactoryAndSpikesTest {
 		Assert.assertEquals("island", "(0,0)(0,1)(0,2)(0,3)(-1,-1)(-2,-2)(-3,-3)(1,-1)(2,-2)(3,-3)",
 				Fixtures.CREATE_Y_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
-		LOG.debug("nuclei "+nucleusList);
 		nucleusList.sortYX(3);
 		Assert.assertEquals("nucleusList", 4, nucleusList.size());
 		Assert.assertEquals("nucleusList: ", "[{(-3,-3)}{(3,-3)}{(0,0)}{(0,3)}]", 
