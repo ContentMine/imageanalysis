@@ -291,8 +291,6 @@ public class ImageProcessor {
 		if (image != null) {
 			image = processImage(image);
 		}
-		LOG.debug("image " + image);
-//		ImageUtil.writeImageQuietly(image, new File("target/junk.png"));
 		return image;
 	}
 
@@ -331,7 +329,6 @@ public class ImageProcessor {
 				LOG.error("Could not create islandList");
 			} else {
 				islandList.setMainProcessor(mainProcessor);
-				LOG.debug("pil " + islandList);
 			}
 		}
 		return islandList;
@@ -341,7 +338,6 @@ public class ImageProcessor {
 		ensureParameterObject();
 		if (mainProcessor == null) {
 			mainProcessor = new MainPixelProcessor(this);
-			// new Exception("ppex ").printStackTrace();
 			mainProcessor.setParameters(this.parameters);
 		}
 		return mainProcessor;

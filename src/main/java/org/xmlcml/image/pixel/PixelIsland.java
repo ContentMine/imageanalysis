@@ -75,6 +75,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		ensurePixelList();
 	}
 
+	@Deprecated // shallow copy
 	public PixelIsland(PixelList pixelList) {
 		this(pixelList, false);
 	}
@@ -102,9 +103,11 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * @param diagonal
 	 *            were diagonal neighbours allowed in creating the pixelList?
 	 */
+	@Deprecated //(shallow copy, not always what was wanted)
 	public PixelIsland(PixelList pixelList, boolean diagonal) {
 		this.pixelList = pixelList;
 		this.allowDiagonal = diagonal;
+		pixelList.setIsland(this);
 		createMapAndRanges();
 	}
 
@@ -114,19 +117,6 @@ public class PixelIsland implements Iterable<Pixel> {
 		this.islandList = island.islandList;
 	}
 
-//	private void ensurePixelGraph() {
-//		if (pixelGraph == null) {
-//			pixelGraph = new PixelGraph(this);
-//		}
-//	}
-//	
-//	private void getOrCreatePixelGraph() {
-//		ensureNucleusFactory();
-//		if (pixelGraph == null) {
-//			pixelGraph = new PixelGraph(this);
-//		}
-//	}
-	
 	public Real2Range getBoundingBox() {
 		ensurePixelList();
 		Real2Range r2r = new Real2Range();
@@ -577,6 +567,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	 */
 	public PixelRingList createOnionRings() {
 		PixelRingList onionRings = new PixelRingList();
+		onionRings.setIsland(this);
 		setDiagonal(true);
 		findRidge();
 		PixelList list = getPixelsWithValue(1);
@@ -992,6 +983,16 @@ public class PixelIsland implements Iterable<Pixel> {
 			throw new RuntimeException("Island must have IslandList");
 		}
 		return islandList;
+	}
+
+	/** removes minorIslands 
+	 * does not reset maps yet...
+	 * 
+	 * @param size
+	 */
+	public void removeMinorIslands(int size) {
+		pixelList.setIsland(this);
+		pixelList.removeMinorIslands(size);
 	}
 
 

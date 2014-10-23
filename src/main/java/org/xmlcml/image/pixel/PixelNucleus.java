@@ -612,5 +612,9 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		return 0;
 	}
 
+	public void setPixelList(PixelList pixelList) {
+		this.pixelList = pixelList;
+	}
+
 
 }

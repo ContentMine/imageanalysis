@@ -141,6 +141,11 @@ public class PixelSegment {
 		return line;
 	}
 
+	public SVGLine getSVGLine(String color) {
+		line.setStroke(color);
+		return line;
+	}
+		
 	public void setLine(SVGLine line) {
 		this.line = line;
 	}

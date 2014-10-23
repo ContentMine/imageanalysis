@@ -5,12 +5,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
 
 public class PixelRingList implements Iterable<PixelList> {
 
+	private final Logger LOG = Logger.getLogger(PixelRingList.class);
+	
 	public static final String[] DEFAULT_COLOURS = {"red", "cyan", "orange", "green", "magenta", "blue"};
 	private List<PixelList> ringList;
+	private PixelIsland island;
 	
 	public PixelRingList() {
 		init();
@@ -95,30 +99,29 @@ public class PixelRingList implements Iterable<PixelList> {
 		return plotPixels(null, null);
 	}
 
-//	/**
-//	 * creates a list of onion rings.
-//	 * 
-//	 * the pixels are organized as 1-pixel-thick rings from the outside
-//	 * 
-//	 * @param gg
-//	 *            if not null plots the rings within gg
-//	 * @param colours
-//	 * @return
-//	 */
-//	@Deprecated
-//	public void createRingsAndPlot(SVGG gg, String[] colours) {
-//		SVGG g = new SVGG();
-//		if (gg != null) {
-//			int i = 0;
-//			for (PixelList ring : this) {
-//				ring.plotPixels(g, colours[i]);
-//				if (g.getParent() != null) {
-//					g.detach();
-//				}
-//				gg.appendChild(g);
-//				i = (i + 1) % colours.length;
-//			}
-//		}
-//	}
+	/** remove islands with only a few pixels (likely to be artefacts)
+	 * 
+	 * @param size max size of islands to remove
+	 * 
+	 */
+	public void removeMinorIslands(int size) {
+		for (int ring = 0; ring < ringList.size(); ring++) {
+			PixelList ringPixels = ringList.get(ring);
+			// make copy of ring as island to isolate the ring
+			PixelIsland newIsland = PixelIsland.createSeparateIslandWithClonedPixels(ringPixels, true);
+			int oldSize = newIsland.size();
+			newIsland.removeMinorIslands(size);
+			int newSize = newIsland.size();
+			// if it's changed swap the old pixels for the new
+			if (newSize != oldSize) {
+				ringList.set(ring, newIsland.getPixelList());
+				LOG.debug("island size after "+newIsland.size());
+			}
+		}
+	}
+
+	public void setIsland(PixelIsland pixelIsland) {
+		this.island = pixelIsland;
+	}
 
 }

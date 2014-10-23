@@ -43,15 +43,14 @@ public class ZhangSuenThinning extends Thinning {
 		    for (int x = 1; x + 1 < binary[y].length; x++) {
 		        int sumCyclicChanges = getSumCyclicChanges(y, x);
 		        int neighbourSum = getNeighbourSum(y, x);
-				boolean neighbourFunction = extracted(y, x, sumCyclicChanges,
-						neighbourSum);
+				boolean neighbourContrast = getNeighbourContrast(y, x, sumCyclicChanges, neighbourSum);
 		        boolean triangles = false;
 		        if (LEFT_TOP.equals(trbl)) {
 		        	triangles = leftTopTriangles(y, x);
 		        } else if (RIGHT_BOTTOM.equals(trbl)) {
 		        	triangles = rightBottomTriangles(y, x);
 		        }
-				if ( neighbourFunction && triangles) {
+				if ( neighbourContrast && triangles) {
 		            pointsToChange.add(new Int2(x, y));
 		            hasChange = true;
 		        }
@@ -62,7 +61,7 @@ public class ZhangSuenThinning extends Thinning {
 	}
 
 
-	private boolean extracted(int y, int x, int sumCyclicChanges,
+	private boolean getNeighbourContrast(int y, int x, int sumCyclicChanges,
 			int neighbourSum) {
 		boolean neighbourFunction = binary[y][x]==1 && 2 <= neighbourSum && neighbourSum <= 6 && sumCyclicChanges == 1;
 		return neighbourFunction;

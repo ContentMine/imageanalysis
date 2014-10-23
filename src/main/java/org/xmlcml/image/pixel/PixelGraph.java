@@ -94,12 +94,8 @@ public class PixelGraph {
 
 	void createNodesAndEdges() {
 		if (edgeList == null) {
-			LOG.debug("CREATING NODES AND EDGES "+this.hashCode()+"; p:"+this.getPixelList().size());
 			PixelNucleusFactory nucleusFactory = getNucleusFactory();
 			edgeList = nucleusFactory.createPixelEdgeListFromNodeList();
-			for (PixelEdge edge : edgeList) {
-				LOG.debug("edge "+edge);
-			}
 		}
 	}
 
@@ -107,45 +103,6 @@ public class PixelGraph {
 		nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
 	}
 
-//	private void createNodeListFromEdgesOld() {
-//		Set<PixelNode> nodeSet = new HashSet<PixelNode>();
-//		nodeByNucleusMap = new HashMap<PixelNucleus, PixelNode>();
-//		for (PixelEdge edge : pixelEdgeList) {
-//			Pixel pixel0 = edge.getPixelList().get(0);
-//			createAndAddNode(nodeSet, edge, pixel0, 0);
-//			Pixel pixelLast = edge.getPixelList().last();
-//			createAndAddNode(nodeSet, edge, pixelLast, 1);
-//		}
-//		pixelNodeList.addAll(nodeSet);
-//	}
-
-//	private void createAndAddNode(Set<PixelNode> nodeSet, PixelEdge edge,
-//			Pixel pixel, int end) {
-//		PixelNode node = createNode(pixel);
-//		if (node == null) {
-//			LOG.trace("null node");
-//		} else {
-//			// add serial
-////			node.setId("nn"+pixel+nodeSet.size());
-//			node.setId("nn"+pixel);
-//			edge.addNode(node, end);
-//			nodeSet.add(node);
-////			usedNonNodePixelSet.add(node.getCentrePixel());
-//		}
-//	}
-
-//	private PixelSet createConnectedDiagonalPixelSet(int neighbours) {
-//		island.setDiagonal(true);
-//		PixelSet connectedSet = new PixelSet();
-//		for (Pixel pixel : pixelList) {
-//			pixel.clearNeighbours();
-//			if (pixel.isConnectedAny(island, neighbours)) {
-//				connectedSet.add(pixel);
-//			}
-//		}
-//		return connectedSet;
-//	}
-	
 	
 	/**
 	 * gets next pixel in chain.
@@ -164,7 +121,6 @@ public class PixelGraph {
 		Long time3 = System.currentTimeMillis();
 		return next;
 	}
-
 
 	public PixelNodeList getNodeList() {
 		if (island != null) {

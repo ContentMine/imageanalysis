@@ -142,7 +142,20 @@ public class PixelEdge {
 		if (segmentList == null) {
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array points = pixelList.getReal2Array();
+			if (nodes == null || nodes.size() != 2) {
+				throw new RuntimeException("segmentation requires 2 nodes");
+			}
+			boolean isCyclic = nodes.get(0).getInt2().equals(nodes.get(1).getInt2());
+			if (isCyclic) {
+				// rmove a point
+				points.deleteElement(points.size()-1);
+;			}
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
+			if (isCyclic) {
+				Real2 point0 = pointArray.get(0);
+				pointArray.setElement(pointArray.size() - 1, new Real2(point0));
+			}
+			LOG.debug(pointArray);
 			segmentList = new PixelSegmentList(pointArray);
 		}
 		return segmentList;

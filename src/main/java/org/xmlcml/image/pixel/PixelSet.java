@@ -149,4 +149,10 @@ public class PixelSet implements Set<Pixel> {
 	public String toString() {
 		return pixelSet.toString();
 	}
+
+	public void removeAll(PixelList pixelList) {
+		for (Pixel pixel : pixelList) {
+			this.remove(pixel);
+		}
+	}
 }

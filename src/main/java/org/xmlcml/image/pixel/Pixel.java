@@ -90,13 +90,13 @@ public class Pixel {
 		PixelList neighbourList = createNeighbourList(island);
 		for (Pixel neighbour : neighbourList) {
 			PixelList neighbourList1 = neighbour.createNeighbourList(island);
-			LOG.debug("neighbours1 "+neighbourList1);
+			LOG.trace("neighbours1 "+neighbourList1);
 			for (Pixel nl1 : neighbourList1) {
-				LOG.debug("   nl1 "+nl1);
+				LOG.trace("   nl1 "+nl1);
 				if (!neighbourNeighbourList.contains(nl1)) {
 					neighbourNeighbourList.add(nl1);
 				}
-				LOG.debug("neighboursNeighbours "+neighbourNeighbourList);
+				LOG.trace("neighboursNeighbours "+neighbourNeighbourList);
 			}
 		}
 		return neighbourNeighbourList;

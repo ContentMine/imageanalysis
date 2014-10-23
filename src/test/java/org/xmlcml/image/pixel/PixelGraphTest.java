@@ -27,7 +27,7 @@ public class PixelGraphTest {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_CYCLE_ISLAND());
 		Assert.assertNotNull(graph);
 		PixelNodeList nodeList = graph.getNodeList();
-		PixelTestUtils.assertNodeList(nodeList, 1, "[<(1,0)>]"); 
+		PixelTestUtils.assertNodeList(nodeList, 1, "[<(0,-1)>]"); 
 	}
 
 	@Test

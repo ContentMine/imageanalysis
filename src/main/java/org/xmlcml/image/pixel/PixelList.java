@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
@@ -28,6 +29,7 @@ import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
  */
 public class PixelList implements Iterable<Pixel> {
 
+	private final static Logger LOG = Logger.getLogger(PixelList.class);
 
 	// these may not be needed
 	private static final String START_STRING = ":";
@@ -453,6 +455,100 @@ public class PixelList implements Iterable<Pixel> {
 
 	public PixelIsland getIsland() {
 		return island;
+	}
+	
+	/** Finds pixels with orthogonal contacts to another PixelList
+	 * 
+	 * Typical usage is pixels in a PixelRing touching an inner or outer
+	 * Hopefully the orthogonal nature creates a thinned result.
+	 * 
+	 * @param firstRingPixels
+	 * @param island
+	 * @return
+	 */
+
+	public PixelList getPixelsWithOrthogonalContactsTo(PixelList firstRingPixels, PixelIsland island) {
+		PixelSet firstRingSet = new PixelSet(firstRingPixels);
+		PixelList touchingPixelList = new PixelList();
+		for (Pixel pixel : this) {
+			PixelList orthogonalNeighbours = pixel.getOrthogonalNeighbours(island);
+			for (Pixel neighbour : orthogonalNeighbours) {
+				if (firstRingSet.contains(neighbour)) {
+					touchingPixelList.add(pixel);
+					break;
+				}
+			}
+		}
+		return touchingPixelList;
+	}
+
+	/** removes islands in list as small or smaller than limit
+	 * only renoves from PixelList (does not delete the actual Pixel
+	 * 
+	 * @param size maximum size of islands to removeß
+	 */
+	public void removeMinorIslands(int size) {
+		if (island == null) {
+			throw new RuntimeException("PixelList island must be non-null");
+		}
+		if (size > 3) {
+			throw new RuntimeException("Cannot treat islands > 3 pixels at present");
+		}
+		PixelList deleteList = new PixelList();
+		if (size >= 1) {
+			addAllSinglePixelsToDeleteList(deleteList);
+		}
+		PixelList terminalList = island.getPixelsWithNeighbourCount(1);
+		
+		if (size >= 2) {
+			addAllDominoesToDeleteList(terminalList, deleteList);
+		}
+		if (size >= 3) {
+			addAllTriominoesToDeleteList(terminalList, deleteList);
+		}
+		if (deleteList.size() > 0) {
+			LOG.trace("deleted "+deleteList.size());
+		}
+		list.removeAll(deleteList.getList());
+	}
+
+	private void addAllSinglePixelsToDeleteList(PixelList deleteList) {
+		PixelList list = island.getPixelsWithNeighbourCount(0);
+		deleteList.addAll(list);
+	}
+
+	private void addAllDominoesToDeleteList(PixelList terminalList, PixelList deleteList) {
+		for (Pixel pixel : terminalList) {
+			Pixel neighbour = pixel.getOrCreateNeighbours(island).get(0);
+			if (terminalList.contains(neighbour) && terminalList.contains(pixel)) {
+				if (!deleteList.contains(pixel) && !deleteList.contains(neighbour)) {
+					deleteList.add(pixel);
+					deleteList.add(neighbour);
+				}
+			}
+		}
+	}
+
+	private void addAllTriominoesToDeleteList(PixelList terminalList, PixelList deleteList) {
+		// linear
+		PixelList twoConnectedList = island.getPixelsWithNeighbourCount(2);
+		for (Pixel pixel : twoConnectedList) {
+			PixelList neighbours = pixel.getOrCreateNeighbours(island);
+			Pixel neighbour0 = neighbours.get(0);
+			Pixel neighbour1 = neighbours.get(1);
+			if (terminalList.contains(neighbour0) && terminalList.contains(neighbour1)) {
+				if (!deleteList.contains(pixel)) {
+					deleteList.add(pixel);
+					deleteList.add(neighbour0);
+					deleteList.add(neighbour1);
+				}
+			}
+		}
+		// triangle NYI
+	}
+
+	public void setIsland(PixelIsland island) {
+		this.island = island;
 	}
 
 }
