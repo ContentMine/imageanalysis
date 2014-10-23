@@ -706,10 +706,10 @@ public class PixelNucleusFactory {
 		if (isFilledT(centrePixel, pixelList, island)) {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 		} else if (isZ(centrePixel, pixelList, island)) {
-			LOG.debug("Z-NUCLEUS");
+			LOG.trace("Z-NUCLEUS");
 			newNucleus = new FourPixelNucleus(centrePixel, pixelList, island);
 		} else if (isRhombus(centrePixel, pixelList, island)) {
-			LOG.debug("RHOMBUS");
+			LOG.trace("RHOMBUS");
 			newNucleus = new TwoWayNucleus(centrePixel, pixelList, island);
 		} else {
 			LOG.error("UNKNOWN 4 PIXEL NUCLEUS in " + island.size() + "; "
