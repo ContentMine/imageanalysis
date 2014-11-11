@@ -149,6 +149,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	@Deprecated // does not control neighbour list
+	// use addPixelWithoutComputingNeighbours or addPixelAndComputeNeighbourNeighbours
 	public void addPixel(Pixel pixel) {
 		
 		ensurePixelList();
@@ -504,6 +505,47 @@ public class PixelIsland implements Iterable<Pixel> {
 		throw new RuntimeException("NYI");
 	}
 	
+	/** finds all pixels exposed to whitespace.
+	 * 
+	 * defined as a pixel with < 8 neighbours.
+	 * 
+	 * includes external and internal space.
+	 * 
+	 * @return
+	 */
+	public PixelList createExposedPixelList() {
+		PixelList exposedList = new PixelList();
+		for (Pixel pixel : pixelList) {
+			PixelList neighbours = pixel.getOrCreateNeighbours(this);
+			if (neighbours.size() < 8) {
+				exposedList.add(pixel);
+			}
+		}
+		return exposedList;
+	}
+
+	/** repeatedly gets shells of pixels neighbouring the island.
+	 * 
+	 * @param thickness number of shells to grow.
+	 * 
+	 * @return all pixels 
+	 */
+	public PixelList getNeighbouringShells(int thickness) {
+		PixelList exposedList = this.createExposedPixelList();
+		for (int i = 0; i < thickness; i++) {
+			PixelList neighbours = exposedList.getOrCreateNeighbours();
+			for (Pixel neighbour : neighbours) {
+				if (!this.contains(neighbour)) {
+					this.addPixelWithoutComputingNeighbours(neighbour);
+				}
+			}
+		}
+		throw new RuntimeException("NYI");
+
+//		return exposedList;
+	}
+			
+
 	public void findRidge() {
 		markEdges();
 	}
@@ -513,14 +555,18 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * set value to ffffff (white) by default and 1 if < 8 neighbours
 	 * 
 	 */
-	public void markEdges() {
+	private void markEdges() {
+		PixelList exposedList = new PixelList();
 		for (Pixel pixel : pixelList) {
 			pixel.setValue(NEIGHBOUR8);
 			PixelList neighbours = pixel.getOrCreateNeighbours(this);
 			int size = neighbours.size();
 			if (size < 8) {
-				pixel.setValue(1);
+				exposedList.add(pixel);
 			}
+		}
+		for (Pixel pixel : exposedList) {
+			pixel.setValue(1);
 		}
 	}
 
@@ -561,11 +607,12 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 		return growList;
 	}
-	/** find rings round rideg.
+	
+	/** find rings round ridge.
 	 * 
 	 * @return
 	 */
-	public PixelRingList createOnionRings() {
+	public PixelRingList createInternalOnionRings() {
 		PixelRingList onionRings = new PixelRingList();
 		onionRings.setIsland(this);
 		setDiagonal(true);

@@ -49,7 +49,6 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private SVGG svgg;
 	private boolean debug = false;
 	private MainPixelProcessor mainProcessor;
-//	private ImageParameters parameters;
 	private boolean diagonal;
 	private List<PixelGraph> graphList;
 
@@ -327,7 +326,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public List<PixelRingList> createRingListList() {
 		List<PixelRingList> ringListList = new ArrayList<PixelRingList>();
 		for (PixelIsland island : this) {
-			PixelRingList ringList = island.createOnionRings();
+			PixelRingList ringList = island.createInternalOnionRings();
 			ringListList.add(ringList);
 		}
 		return ringListList;
@@ -570,15 +569,10 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			for (int i = 0; i < Math.min(size(), mainProcessor.getMaxIsland()); i++) {
 				PixelIsland island = get(i);
 				PixelGraph graph = island.getOrCreateGraph();
-//				graph.setParameters(parameters);
 				graphList.add(graph);
 			}
-			LOG.debug("created graphs: "+graphList.size()+graphList);
-			for (PixelGraph graph : graphList) {
-				graph.debug();
-			}
 		}
-		LOG.debug("pixelGraphList: "+graphList.size());
+		LOG.trace("pixelGraphList: "+graphList.size());
 		return graphList;
 	}
 
