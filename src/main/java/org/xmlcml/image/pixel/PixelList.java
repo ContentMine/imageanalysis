@@ -136,17 +136,19 @@ public class PixelList implements Iterable<Pixel> {
 		return false;
 	}
 
-	public PixelList getPixelsTouching(PixelList list1, PixelIsland island) {
+	public PixelList getPixelsTouching(PixelList list1) {
 		PixelSet used = new PixelSet();
 		PixelList touchingList = new PixelList();
-		if (list1 != null && list1.size() > 0) {
-			int value = list1.get(0).getValue();
-			for (Pixel pixel : list) {
-				PixelList neighbours = pixel.getOrCreateNeighbours(island);
-				for (Pixel neighbour : neighbours) {
-					if (neighbour.getValue() == value && !used.contains(neighbour)) {
-						used.add(neighbour);
-						touchingList.add(neighbour);
+		if (this.island != null && list1 != null && this.island.equals(list1.getIsland())) {
+			if (list1.size() > 0) {
+				int value = list1.get(0).getValue();
+				for (Pixel pixel : list) {
+					PixelList neighbours = pixel.getOrCreateNeighbours(island);
+					for (Pixel neighbour : neighbours) {
+						if (neighbour.getValue() == value && !used.contains(neighbour)) {
+							used.add(neighbour);
+							touchingList.add(neighbour);
+						}
 					}
 				}
 			}

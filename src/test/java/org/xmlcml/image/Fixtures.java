@@ -75,6 +75,17 @@ public class Fixtures {
 	public static final File HELVETICA_MAIN_DIR = new File(FONTS_MAIN_DIR, "helvetica");
 
 	public static final File TEST_HELVETICA = new File(Fixtures.TEST_IMAGE_DIR, "text/fonts/helvetica");
+	public static final String[] FILL = {
+		"red",
+		"green",
+		"blue",
+		"yellow",
+		"magenta",
+		"cyan",
+		"orange",
+		"purple",
+		
+	};
 	
 	public static PixelList LINE_LIST = new PixelList(Arrays.asList(new Pixel[] {
 			new Pixel(new Point(1, 1)), 

@@ -1,5 +1,6 @@
 package org.xmlcml.image.pixel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -7,6 +8,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGSVG;
 
 public class PixelRingList implements Iterable<PixelList> {
 
@@ -15,6 +17,8 @@ public class PixelRingList implements Iterable<PixelList> {
 	public static final String[] DEFAULT_COLOURS = {"red", "cyan", "orange", "green", "magenta", "blue"};
 	private List<PixelList> ringList;
 	private PixelIsland island;
+
+	private PixelList outline;
 	
 	public PixelRingList() {
 		init();
@@ -122,6 +126,46 @@ public class PixelRingList implements Iterable<PixelList> {
 
 	public void setIsland(PixelIsland pixelIsland) {
 		this.island = pixelIsland;
+	}
+
+	public void plotRings(SVGG g, String[] colours) {
+		for (int i = 0; i < size(); i++) {
+			get(i).plotPixels(g, colours[i % colours.length]);
+		}
+	}
+
+	public SVGG getGraphEdges(PixelIsland island, String[] fill) {
+		SVGG g = new SVGG();
+		PixelList outline;
+		if (size() > 1) {
+			outline = get(0).getPixelsWithOrthogonalContactsTo(get(1), island);
+			outline.plotPixels(g, fill[0]);
+			PixelIsland outlineIsland = PixelIsland.createSeparateIslandWithClonedPixels(outline, true);
+			PixelGraph graph = PixelGraph.createGraph(outlineIsland);
+//			PixelNodeList nodeList = graph.getNodeList();
+			PixelEdgeList edgeList = graph.getEdgeList();
+			for (PixelEdge edge : edgeList) {
+				PixelSegmentList segmentList = edge.getOrCreateSegmentList(2);
+				g.appendChild(segmentList.getOrCreateSVG());
+			}
+		}
+		return g;
+	}
+
+	public PixelList getOrCreateOutline() {
+		if (outline == null) {
+			if (size() > 1) {
+				outline = get(1).getPixelsTouching(get(0));
+			}
+		}
+		return outline;
+	}
+	
+	public SVGG plotOutline(String colour) {
+		SVGG g = null;
+		outline = getOrCreateOutline();
+		outline.plotPixels(g, colour);
+		return g;
 	}
 
 }

@@ -289,8 +289,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			String saveColor = island.getPixelColor();
 			island.setPixelColor(this.pixelColor);
 			SVGG gg = island.plotPixels();
-			if (t2 != null)
+			if (t2 != null) {
 				gg.setTransform(t2);
+			}	
 			island.setPixelColor(saveColor);
 			g.appendChild(gg);
 		}
@@ -326,7 +327,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public List<PixelRingList> createRingListList() {
 		List<PixelRingList> ringListList = new ArrayList<PixelRingList>();
 		for (PixelIsland island : this) {
-			PixelRingList ringList = island.createInternalOnionRings();
+			PixelRingList ringList = island.getOrCreateInternalPixelRings();
 			ringListList.add(ringList);
 		}
 		return ringListList;
@@ -426,7 +427,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private SVGG createSVGG() {
 		this.svgg = new SVGG();
 		for (PixelIsland pixelIsland : list) {
-			svgg.appendChild(pixelIsland.getSVGG());
+			svgg.appendChild(pixelIsland.getSVGG().copy());
 		}
 		return svgg;
 	}

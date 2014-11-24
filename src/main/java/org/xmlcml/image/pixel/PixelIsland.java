@@ -13,7 +13,6 @@ import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.graphics.svg.SVGG;
@@ -48,7 +47,23 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private final static Logger LOG = Logger.getLogger(PixelIsland.class);
 
+	public enum PlotType {
+		INTERNAL_RINGS,
+		ISLAND,
+		OUTLINE,
+		RIDGE,
+		THINNED,
+	}
 	private static final int NEIGHBOUR8 = -1;
+	
+	private static final String DEFAULT_OUTPUT_DIRECTORY_FILENAME = "target/island/";
+	private static final String DEFAULT_INTERNAL_RING_NAME = "internalRings";
+	private static final String DEFAULT_ISLAND_NAME = "island";
+	private static final String DEFAULT_OUTLINE_NAME = "outline";
+	private static final String DEFAULT_RIDGE_NAME = "ridge";
+	private static final String DEFAULT_THINNED_NAME = "thinned";
+	
+	
 
 	PixelIslandList islandList;
 	PixelList pixelList; // these may have original coordinates
@@ -61,7 +76,6 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private String pixelColor = "red";
 	private PixelSet cornerSet;
-//	private ImageParameters parameters;
 	private PixelList emptyPixelList;
 	private PixelList singleHoleList;
 	private PixelNucleusFactory nucleusFactory;
@@ -70,9 +84,39 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	private SVGG svgg;
 	private String id;
+
+	private PixelRingList internalPixelRings;
+
+	// plotting stuff
+	private PixelPlotter pixelPlotter;
+	private String internalRingName;
+	private boolean plotInternalRings;
+	private String islandName;
+	private boolean plotIsland;
+	private String outlineName;
+	private boolean plotOutline;
+	private String ridgeName;
+	private boolean plotRidge;
+	private String thinnedName;
+	private boolean plotThinned;
+	
 	
 	public PixelIsland() {
 		ensurePixelList();
+		setDefaults();
+	}
+
+	private void setDefaults() {
+		pixelPlotter = new PixelPlotter();
+		plotInternalRings = true;
+		setIslandName(DEFAULT_ISLAND_NAME);
+		plotIsland = true;
+		setOutlineName(DEFAULT_OUTLINE_NAME);
+		plotOutline = true;
+		setRidgeName(DEFAULT_RIDGE_NAME);
+		plotRidge = true;
+		setThinnedName(DEFAULT_THINNED_NAME);
+		plotThinned = true;
 	}
 
 	@Deprecated // shallow copy
@@ -327,20 +371,21 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * @return
 	 */
 	public SVGG plotPixels() {
-		return PixelIsland.plotPixels(this.getPixelList(), this.pixelColor);
-	}
-
-	public static SVGG plotPixels(PixelList pixelList, String pixelColor) {
-		SVGG g = new SVGG();
-		LOG.trace("pixelList " + pixelList.size());
-		for (Pixel pixel : pixelList) {
-			SVGRect rect = pixel.getSVGRect();
-			rect.setFill(pixelColor);
-			LOG.trace(rect.getBoundingBox());
-			g.appendChild(rect);
-		}
+		SVGG g = pixelPlotter.plotPixels(this.getPixelList(), this.pixelColor);
 		return g;
 	}
+
+//	public static SVGG plotPixels(PixelList pixelList, String pixelColor) {
+//		SVGG g = new SVGG();
+//		LOG.trace("pixelList " + pixelList.size());
+//		for (Pixel pixel : pixelList) {
+//			SVGRect rect = pixel.getSVGRect();
+//			rect.setFill(pixelColor);
+//			LOG.trace(rect.getBoundingBox());
+//			g.appendChild(rect);
+//		}
+//		return g;
+//	}
 
 	public boolean fitsWithin(RealRange xSizeRange, RealRange ySizeRange) {
 		double wmax = xSizeRange.getMax();
@@ -612,18 +657,20 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * 
 	 * @return
 	 */
-	public PixelRingList createInternalOnionRings() {
-		PixelRingList onionRings = new PixelRingList();
-		onionRings.setIsland(this);
-		setDiagonal(true);
-		findRidge();
-		PixelList list = getPixelsWithValue(1);
-		int ring = 1;
-		while (list.size() > 0) {
-			onionRings.add(list);
-			list = growFrom(list, ring++);
+	public PixelRingList getOrCreateInternalPixelRings() {
+		if (internalPixelRings == null) {
+			internalPixelRings = new PixelRingList();
+			internalPixelRings.setIsland(this);
+			setDiagonal(true);
+			findRidge();
+			PixelList list = getPixelsWithValue(1);
+			int ring = 1;
+			while (list.size() > 0) {
+				internalPixelRings.add(list);
+				list = growFrom(list, ring++);
+			}
 		}
-		return onionRings;
+		return internalPixelRings;
 	}
 
 	public Pixel get(int i) {
@@ -654,7 +701,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	 */
 	@Deprecated
 	public SVGG getSVGG() {
-		return plotPixels(pixelList, pixelColor);
+		return getOrCreateSVGG();
 	}
 
 	/**
@@ -663,10 +710,17 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * @return
 	 */
 	public SVGG getOrCreateSVGG() {
+		ensurePixelPlotter();
 		if (svgg == null) {
-			svgg = plotPixels(pixelList, pixelColor);
+			svgg = pixelPlotter.plotPixels(pixelList, pixelColor);
 		}
 		return svgg;
+	}
+
+	private void ensurePixelPlotter() {
+		if (pixelPlotter == null) {
+			pixelPlotter = new PixelPlotter();
+		}
 	}
 
 	public void removeCorners() {
@@ -1041,6 +1095,193 @@ public class PixelIsland implements Iterable<Pixel> {
 		pixelList.removeMinorIslands(size);
 	}
 
+	// ============= PLOTTING =========
+	
+	/** plots island with options set in PixelPlotter.
+	 * 
+	 * @return
+	 */
+	public SVGG plotIsland() {
+		SVGG g = new SVGG();
+		getOrCreateInternalPixelRings();
+		plot(g, plotInternalRings, getInternalRingName(), internalPixelRings);
+		plot(g, plotOutline, getOutlineName(), internalPixelRings.getOrCreateOutline());
+//		plot(g, plotFirstOutline, getFirstOutlineName(), internalPixelRings.getOrCreateFirstOutline());
+		return g;
+	}
+
+	private void plot(SVGG g, boolean plotMe, String name, PixelRingList pixelRingList) {
+		g = ensureSVGG(g);
+		if (plotMe && name != null && pixelRingList != null) {
+			pixelPlotter.plot(g, pixelRingList);
+		}
+	}
+
+	private void plot(SVGG g, boolean plotMe, String name, PixelList pixelList) {
+		g = ensureSVGG(g);
+		if (plotMe && name != null && pixelList != null) {
+			pixelPlotter.plot(g, pixelList);
+		}
+	}
+
+	private SVGG createAndPlotInternalPixelRings(SVGG g) {
+		g = ensureSVGG(g);
+		PixelRingList pixelRingList = getOrCreateInternalPixelRings();
+		pixelPlotter.plot(g, pixelRingList);
+		return g;
+	}
+
+	private SVGG ensureSVGG(SVGG g) {
+		return g == null ? new SVGG() : g;
+	}
+
+	public void setPixelPlotter(PixelPlotter pixelPlotter) {
+		this.pixelPlotter = pixelPlotter;
+	}
+	
+	/**
+	 * @return the plotInternalRings
+	 */
+	public boolean isPlotInternalRings() {
+		return plotInternalRings;
+	}
+
+	/**
+	 * @param plotInternalRings the plotInternalRings to set
+	 */
+	public void setPlotInternalRings(boolean plotInternalRings) {
+		this.plotInternalRings = plotInternalRings;
+	}
+
+	/** get root name for internal rings.
+	 * 
+	 * @return name
+	 */
+	public String getInternalRingName() {
+		return internalRingName;
+	}
+
+	/** root of filenames with internalRings.
+	 * 
+	 * @param name if not null draws rings and outputs file with that name
+	 */
+	public void setInternalRingName(String name) {
+		this.internalRingName = name;
+	}
+
+	/**
+	 * @return the islandName
+	 */
+	public String getIslandName() {
+		return islandName;
+	}
+
+	/**
+	 * @param islandName the islandName to set
+	 */
+	public void setIslandName(String islandName) {
+		this.islandName = islandName;
+	}
+
+	/**
+	 * @return the plotIsland
+	 */
+	public boolean isPlotIsland() {
+		return plotIsland;
+	}
+
+	/**
+	 * @param plotIsland the plotIsland to set
+	 */
+	public void setPlotIsland(boolean plotIsland) {
+		this.plotIsland = plotIsland;
+	}
+
+	/**
+	 * @return the outlineName
+	 */
+	public String getOutlineName() {
+		return outlineName;
+	}
+
+	/**
+	 * @param outlineName the outlineName to set
+	 */
+	public void setOutlineName(String outlineName) {
+		this.outlineName = outlineName;
+	}
+
+	/**
+	 * @return the plotOutline
+	 */
+	public boolean isPlotOutline() {
+		return plotOutline;
+	}
+
+	/**
+	 * @param plotOutline the plotOutline to set
+	 */
+	public void setPlotOutline(boolean plotOutline) {
+		this.plotOutline = plotOutline;
+	}
+
+	/**
+	 * @return the ridgeName
+	 */
+	public String getRidgeName() {
+		return ridgeName;
+	}
+
+	/**
+	 * @param ridgeName the ridgeName to set
+	 */
+	public void setRidgeName(String ridgeName) {
+		this.ridgeName = ridgeName;
+	}
+
+	/**
+	 * @return the plotRidge
+	 */
+	public boolean isPlotRidge() {
+		return plotRidge;
+	}
+
+	/**
+	 * @param plotRidge the plotRidge to set
+	 */
+	public void setPlotRidge(boolean plotRidge) {
+		this.plotRidge = plotRidge;
+	}
+
+	/**
+	 * @return the thinnedName
+	 */
+	public String getThinnedName() {
+		return thinnedName;
+	}
+
+	/**
+	 * @param thinnedName the thinnedName to set
+	 */
+	public void setThinnedName(String thinnedName) {
+		this.thinnedName = thinnedName;
+	}
+
+	/**
+	 * @return the plotThinned
+	 */
+	public boolean isPlotThinned() {
+		return plotThinned;
+	}
+
+	/**
+	 * @param plotThinned the plotThinned to set
+	 */
+	public void setPlotThinned(boolean plotThinned) {
+		this.plotThinned = plotThinned;
+	}
+
+	
 
 //	/** create rings of pixels starting at the outside.
 //	 * 

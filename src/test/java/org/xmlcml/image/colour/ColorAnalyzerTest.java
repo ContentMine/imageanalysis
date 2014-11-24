@@ -87,6 +87,11 @@ public class ColorAnalyzerTest {
 		}
 
 	@Test
+	public void testPosterizePhylo() throws IOException {
+		testPosterize0("phylo");
+	}
+
+	@Test
 	public void testPosterize22249() throws IOException {
 		testPosterize0("22249");
 	}
