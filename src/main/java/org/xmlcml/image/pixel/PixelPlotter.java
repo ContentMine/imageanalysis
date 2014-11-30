@@ -1,10 +1,12 @@
 package org.xmlcml.image.pixel;
 
 import java.io.File;
+import java.io.ObjectInputStream.GetField;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
+import org.xmlcml.graphics.svg.SVGSVG;
 
 /** plots Pixel objects such as PixelList, PixelIsland, PixelGraph.
  * 
@@ -17,6 +19,7 @@ public class PixelPlotter {
 
 	private final static Logger LOG = Logger.getLogger(PixelPlotter.class);
 	
+	public static final String DEFAULT_OUTPUT_DIRECTORY = "target/pixels/";
 	public static final String DEFAULT_COLOUR = "red";
 		
 	public static final String[] DEFAULT_COLOURS = {
@@ -46,10 +49,11 @@ public class PixelPlotter {
 	private void setDefaults() {
 		setCurrentColour(DEFAULT_COLOUR);
 		setCurrentColourArray(DEFAULT_COLOURS);
+		directoryFilename = DEFAULT_OUTPUT_DIRECTORY;
 		setSerial("");
-		setOpacity((Double)null);
-		setStroke((String)null);
-		setStrokeWidth((Double)null);
+		setOpacity((Double)1.0);
+		setStroke((String)"none");
+		setStrokeWidth((Double)0.0);
 	}
 
 
@@ -211,6 +215,13 @@ public class PixelPlotter {
 		return g;
 	}
 
+	public void plotPixelsToFile(PixelList pixelList) {
+		SVGG g = plotPixels(pixelList);
+		File file = getOutputFile("svg");
+		LOG.debug("output "+file.getAbsolutePath());
+		SVGSVG.wrapAndWriteAsSVG(g, file);
+	}
+
 	public SVGG plotPixels(PixelList pixelList) {
 		return plotPixels(pixelList, currentColour);
 	}
@@ -246,5 +257,11 @@ public class PixelPlotter {
 
 	private SVGG ensureSVGG(SVGG g) {
 		return (g == null) ? new SVGG() : g;
+	}
+
+	public void plotPixelsToFile(PixelRingList pixelRingList) {
+		SVGG g = new SVGG();
+		plot(g, pixelRingList);
+		SVGSVG.wrapAndWriteAsSVG(g, getOutputFile("svg"));
 	}
 }
