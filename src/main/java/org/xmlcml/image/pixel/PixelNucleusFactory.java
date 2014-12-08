@@ -198,9 +198,11 @@ public class PixelNucleusFactory {
 			if (neighbours.size() > 2) {
 				unusedPixelSet.remove(pixel);
 				PixelNucleus nucleus = makeNucleusFromSeed(pixel, island);
-				allNucleusList.add(nucleus);
-				PixelList nucleusPixelList = nucleus.getPixelList();
-				unusedPixelSet.removeAll(nucleusPixelList);
+				if (nucleus != null) {
+					allNucleusList.add(nucleus);
+					PixelList nucleusPixelList = nucleus.getPixelList();
+					unusedPixelSet.removeAll(nucleusPixelList);
+				}
 			} else if (neighbours.size() == 2 || neighbours.size() == 0) {
 				// skip these
 			} else {
@@ -345,13 +347,21 @@ public class PixelNucleusFactory {
 		PixelNucleus nucleus = createSubtypedNucleus(nucleusPixelList);
 		if (nucleus == null) {
 			LOG.trace("island " + island);
-			throw new RuntimeException("NULL NUCLEUS: "
+			LOG.debug("NULL NUCLEUS: "
 					+ seed
 					+ "; "
 					+ nucleusPixelList
 					+ "; shell :"
 					+ ((nucleusPixelList == null) ? "" : nucleusPixelList
 							.getOrCreateNeighbours().toString()) + ":");
+//			throw new RuntimeException("NULL NUCLEUS: "
+//			+ seed
+//			+ "; "
+//			+ nucleusPixelList
+//			+ "; shell :"
+//			+ ((nucleusPixelList == null) ? "" : nucleusPixelList
+//					.getOrCreateNeighbours().toString()) + ":");
+			return null;
 		}
 		nucleus.addAll(usedSet);
 		return nucleus;

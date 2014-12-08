@@ -49,7 +49,7 @@ public class PixelGraph {
 	
 	public PixelGraph(PixelList list) {
 		this.island = list.getIsland();
-		createGraph(pixelList);
+		createGraph(list);
 	}
 	
 	/** all pixels have to belong to island

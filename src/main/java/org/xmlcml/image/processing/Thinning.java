@@ -13,14 +13,27 @@ public abstract class Thinning {
 	}
 	
 	public Thinning() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public void createBinary(BufferedImage image) {
 		this.image = image;
 	    binary = copyImageToBinary(image);
 	}
-	public int[][] getBinaryImage() {
+	
+	public void setBinary(int[][] b) {
+		if (b != null && b[0] != null) {
+			int ly = b.length;
+			int lx = b[0].length;
+			this.binary = new int[ly][lx];
+			for (int y = 0; y < ly; y++) {
+		       for (int x = 0; x < lx; x++) {
+		    	   binary[y][x] = b[y][x];
+		       }
+			}
+		}
+	}
+	
+	public int[][] getBinary() {
 		return binary;
 	}
 	public BufferedImage getThinnedImage() {

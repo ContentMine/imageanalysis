@@ -5,8 +5,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,17 +31,20 @@ import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
  */
 public class PixelList implements Iterable<Pixel> {
 
-	private final static Logger LOG = Logger.getLogger(PixelList.class);
+	final static Logger LOG = Logger.getLogger(PixelList.class);
 
 	// these may not be needed
 	private static final String START_STRING = ":";
 	private static final String END_STRING = ":";
-
 	public final static Pattern COORD_PATTERN = Pattern.compile("\\((\\d+),(\\d+)\\)");
+	private static final String DEFAULT_FILL = "red";
 
 	private List<Pixel> list;
 	private Real2Array points;
 	private PixelIsland island;
+	private Map<Int2, Pixel> pixelByCoordinateMap;
+
+	Int2Range bbox;
 	
 	public PixelList() {
 		ensureList();
@@ -63,6 +68,50 @@ public class PixelList implements Iterable<Pixel> {
 		this(list.getList());
 	}
 
+	public Pixel getPixelByCoordinate(Int2 coord) {
+		ensurePixelByCoordinateMap();
+		return pixelByCoordinateMap.get(coord);
+	}
+
+	private void ensurePixelByCoordinateMap() {
+		if (pixelByCoordinateMap == null) {
+			pixelByCoordinateMap = new HashMap<Int2, Pixel>();
+			for (Pixel pixel : this) {
+				if (pixel == null) {
+					throw new RuntimeException("null pixel");
+				}
+				pixelByCoordinateMap.put(pixel.getInt2(), pixel);
+			}
+		}
+	}
+
+	public int[][] createBinary() {
+		int[][] binary = null;
+		Int2Range bbox = this.getIntBoundingBox();
+		int xmin = bbox.getXRange().getMin();
+		int ymin = bbox.getYRange().getMin();
+		int w = bbox.getXRange().getRange() + 1; // this was a bug
+		int h = bbox.getYRange().getRange() + 1; // and this
+		
+		binary = new int[w][h];
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				binary[i][j] = 0;
+			}
+		}
+		for (Pixel pixel : this) {
+			Int2 xy = pixel.getInt2();
+			int x = xy.getX() - xmin;
+			int y = xy.getY() - ymin;
+			if (x < w && y < h) {
+				binary[x][y] = 1;
+			} else {
+				LOG.error("Tried to write pixel outside image area "+xy);
+			}
+		}
+		return binary;
+	}
+	
 	@Override
 	public Iterator<Pixel> iterator() {
 		return list.iterator();
@@ -90,16 +139,20 @@ public class PixelList implements Iterable<Pixel> {
 			checkFromSameIsland(pixel);
 		}
 		list.add(pixel);
+		addToMap(pixel);
+	}
+
+	private void addToMap(Pixel pixel) {
+		ensurePixelByCoordinateMap();
+		this.pixelByCoordinateMap.put(pixel.getInt2(), pixel);
 	}
 
 	private void checkFromSameIsland(Pixel pixel) {
 		PixelIsland island = pixel.getIsland();
-		{
 		if (this.island == null) {
 			this.island = island;
 		} else if (island == null || !this.island.equals(island)) {
 			throw new RuntimeException("change of island not allowed: "+this.island+"=>"+island);
-		}
 		}
 	}
 	
@@ -131,6 +184,8 @@ public class PixelList implements Iterable<Pixel> {
 
 	public boolean remove(Pixel pixel) {
 		if (list != null) {
+			ensurePixelByCoordinateMap();
+			pixelByCoordinateMap.remove(pixel.getInt2());
 			return list.remove(pixel);
 		}
 		return false;
@@ -155,8 +210,6 @@ public class PixelList implements Iterable<Pixel> {
 		}
 		return touchingList;
 	}
-
-	
 	
 	/** plots pixels as squares
 	 * 
@@ -171,6 +224,22 @@ public class PixelList implements Iterable<Pixel> {
 		for (Pixel pixel : this) {
 			SVGRect rect = pixel.getSVGRect();
 			rect.setFill(fill);
+			g.appendChild(rect);
+		}
+		return g;
+	}
+
+	/** plots pixels as squares
+	 * 
+	 * @param g if null creates one
+	 * @param fill colour
+	 * @return
+	 */
+	public SVGG getOrCreateSVG() {
+		SVGG g = new SVGG();
+		for (Pixel pixel : this) {
+			SVGRect rect = pixel.getSVGRect();
+			rect.setFill(DEFAULT_FILL);
 			g.appendChild(rect);
 		}
 		return g;
@@ -456,6 +525,7 @@ public class PixelList implements Iterable<Pixel> {
 	}
 
 	public PixelIsland getIsland() {
+		this.checkFromSameIsland(this.get(0));
 		return island;
 	}
 	
@@ -552,5 +622,40 @@ public class PixelList implements Iterable<Pixel> {
 	public void setIsland(PixelIsland island) {
 		this.island = island;
 	}
+
+	public PixelList findExtremePixels() {
+		PixelList extremeList = new PixelList();
+
+		Pixel eastPixel = null;
+		Pixel westPixel = null;
+		this.sortYX();
+		int xmin = Integer.MAX_VALUE;
+		int xmax = Integer.MIN_VALUE;
+		for (Pixel pixel : list) {
+			int x = pixel.getInt2().getX();
+			// Eastern
+			if (x > xmax) {
+				eastPixel = pixel;
+				xmax = x;
+			}
+			// Western
+			if (x < xmin) {
+				westPixel = pixel;
+				xmin = x;
+			}
+		}
+		extremeList.add(list.get(0));
+		extremeList.add(eastPixel);
+		extremeList.add(list.get(list.size() - 1)); // last
+		extremeList.add(westPixel);
+		return extremeList;
+	}
+
+//	public void removeAll(PixelList pixelList) {
+//		if (pixelList != null) {
+//			list.removeAll(pixelList.getList());
+//		}
+//	}
+
 
 }

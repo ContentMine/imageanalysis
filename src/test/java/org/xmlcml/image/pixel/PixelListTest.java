@@ -1,9 +1,80 @@
 package org.xmlcml.image.pixel;
 
+import java.io.File;
+
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlcml.euclid.Int2;
+import org.xmlcml.euclid.IntMatrix;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGSVG;
 
 public class PixelListTest {
+
+	private final static Logger LOG = Logger.getLogger(PixelListTest.class);
+	
+	private static PixelList CREATE_TEST_ISLAND() {
+		PixelList pixelList = new PixelList();
+		pixelList.add(new Pixel(1, 11));
+		pixelList.add(new Pixel(2, 11));
+		pixelList.add(new Pixel(4, 11));
+		pixelList.add(new Pixel(5, 11));
+		pixelList.add(new Pixel(1, 12));
+		pixelList.add(new Pixel(2, 12));
+		pixelList.add(new Pixel(4, 12));
+		pixelList.add(new Pixel(1, 13));
+		pixelList.add(new Pixel(3, 13));
+		pixelList.add(new Pixel(5, 13));
+		pixelList.add(new Pixel(1, 14));
+		pixelList.add(new Pixel(5, 14));
+		pixelList.add(new Pixel(2, 15));
+		pixelList.add(new Pixel(3, 15));
+		pixelList.add(new Pixel(4, 15));
+		pixelList.add(new Pixel(5, 16));
+		return pixelList;
+	}
+
+	static PixelList CREATE_DIAMOND() {
+		PixelList pixelList = new PixelList();
+		pixelList.add(new Pixel(2, 12));
+		pixelList.add(new Pixel(1, 13));
+		pixelList.add(new Pixel(2, 14));
+		pixelList.add(new Pixel(3, 15));
+		pixelList.add(new Pixel(4, 16));
+		pixelList.add(new Pixel(5, 15));
+		pixelList.add(new Pixel(5, 14));
+		pixelList.add(new Pixel(6, 13));
+		pixelList.add(new Pixel(5, 12));
+		pixelList.add(new Pixel(4, 11));
+		pixelList.add(new Pixel(3, 11));
+		return pixelList;
+	}
+
+	static PixelList CREATE_TWO_ISLANDS() {
+		PixelList pixelList = CREATE_DIAMOND();
+		pixelList.add(new Pixel(12, 2));
+		pixelList.add(new Pixel(11, 3));
+		pixelList.add(new Pixel(12, 4));
+		pixelList.add(new Pixel(13, 5));
+		pixelList.add(new Pixel(14, 4));
+		pixelList.add(new Pixel(15, 5));
+		pixelList.add(new Pixel(15, 4));
+		pixelList.add(new Pixel(16, 3));
+		pixelList.add(new Pixel(15, 2));
+		pixelList.add(new Pixel(14, 1));
+		pixelList.add(new Pixel(13, 1));
+		return pixelList;
+	}
+
+	static PixelList CREATE_DIAMOND_SPIRO() {
+		PixelList spiro = CREATE_DIAMOND();
+		spiro.add(new Pixel(1,16));
+		spiro.add(new Pixel(2,16));
+		return spiro;
+	}
+
 
 	@Test
 	public void testRemoveMinorIslands() {
@@ -32,6 +103,54 @@ public class PixelListTest {
 		pixelList.removeMinorIslands(3);
 		Assert.assertEquals("pixels", 16, pixelList.size());
 		
+	}
+	
+	@Test
+	public void testCreateBinary() {
+		PixelList list = new PixelList();
+		list.add(new Pixel(1, 10));
+		list.add(new Pixel(2, 10));
+		list.add(new Pixel(3, 10));
+		list.add(new Pixel(1, 11));
+		list.add(new Pixel(1, 12));
+		list.add(new Pixel(2, 12));
+		list.add(new Pixel(2, 13));
+		int[][] binary = list.createBinary();
+		IntMatrix matrix = new IntMatrix(binary);
+		Assert.assertEquals("{3,4}\n(1,1,1,0)\n(1,0,1,1)\n(1,0,0,0)", matrix.toString());
+		PixelList list1 = new PixelList();
+	}
+	
+	@Test
+	public void testCreateInterior() {
+		PixelList pixelList = CREATE_TEST_ISLAND();
+		
+		int[][] binary = pixelList.createBinary();
+		IntMatrix matrix = new IntMatrix(binary);
+		Assert.assertEquals("{5,6}\n(1,1,1,1,0,0)\n(1,1,0,0,1,0)\n(0,0,1,0,1,0)\n(1,1,0,0,1,0)\n(1,0,1,1,0,1)", matrix.toString());
+		
+		PixelListFloodFill pixelListFloodFill = new PixelListFloodFill(pixelList);
+		pixelListFloodFill.fillExteriorOfGrid();
+		PixelList interiorPixelList = pixelListFloodFill.createInteriorPixelList();
+		Assert.assertEquals("interior", 5, interiorPixelList.size());
+		SVGSVG.wrapAndWriteAsSVG(interiorPixelList.getOrCreateSVG(), new File("target/pixels/interiorTest.svg"));
+		
+	}
+
+	@Test
+	public void testCreateOutline() {
+		PixelList diamond = CREATE_DIAMOND();
+		SVGSVG.wrapAndWriteAsSVG(diamond.getOrCreateSVG(), new File("target/pixels/diamondTest.svg"));
+		PixelList extremes = diamond.findExtremePixels();
+		Assert.assertEquals("extremes", "(3,11)(6,13)(4,16)(1,13)", extremes.toString());
+		
+	}
+
+	@Test
+	public void testAnalyzeOutline() {
+		PixelList diamond = CREATE_DIAMOND();
+		PixelOutliner outliner = new PixelOutliner(diamond);
+		outliner.createOutline();
 	}
 
 

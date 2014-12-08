@@ -38,6 +38,10 @@ public class Pixel {
 		this(new Point(x, y));
 	}
 
+	public Pixel(Int2 xy) {
+		this(new Point(xy.getX(), xy.getY()));
+	}
+
 	/** creates deep copy of Pixel without island.
 	 * 
 	 * neighbourList is null;

@@ -495,6 +495,8 @@ public class PixelIsland implements Iterable<Pixel> {
 		return createImage(BufferedImage.TYPE_INT_RGB);
 	}
 
+
+
 	public BufferedImage createImage(int imageType) {
 		Int2Range bbox = this.getIntBoundingBox();
 		int xmin = bbox.getXRange().getMin();
@@ -517,7 +519,6 @@ public class PixelIsland implements Iterable<Pixel> {
 			Int2 xy = pixel.getInt2();
 			int x = xy.getX() - xmin;
 			int y = xy.getY() - ymin;
-			// System.out.println(xy+" "+bbox+" "+w+" "+h+" "+x+" "+y);
 			if (x < w && y < h) {
 				image.setRGB(x, y, 0);
 				wrote++;

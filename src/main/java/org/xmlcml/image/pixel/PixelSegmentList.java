@@ -28,6 +28,7 @@ public class PixelSegmentList implements List<PixelSegment> {
 	private List<PixelSegment> segmentList;
 	private Real2Array real2Array;
 	private List<SVGLine> svgLineList;
+	private SVGG g;
 	
 	public PixelSegmentList() {
 		super();
@@ -367,9 +368,16 @@ public class PixelSegmentList implements List<PixelSegment> {
 		}
 	}
 
-	public String getOrCreateSVG() {
-		// TODO Auto-generated method stub
-		return null;
+	public SVGG getOrCreateSVG() {
+		getSVGLineList();
+		if (g == null) {
+			g = new SVGG();
+			g.setStrokeWidth(1.0); // alter later
+			for (SVGLine line : svgLineList) {
+				g.appendChild(line.copy());
+			}
+		}
+		return g;
 	}
 
 	public static PixelSegmentList createSegmentList(PixelList pixelList, double tolerance) {

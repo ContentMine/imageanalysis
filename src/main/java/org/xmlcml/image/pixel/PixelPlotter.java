@@ -264,4 +264,11 @@ public class PixelPlotter {
 		plot(g, pixelRingList);
 		SVGSVG.wrapAndWriteAsSVG(g, getOutputFile("svg"));
 	}
+
+	public void plotIsland(PixelIsland island, String serial) {
+		island.setPixelPlotter(this);
+		setSerial(serial);
+		PixelRingList ringList = island.getOrCreateInternalPixelRings();
+		plotPixelsToFile(ringList);
+	}
 }
