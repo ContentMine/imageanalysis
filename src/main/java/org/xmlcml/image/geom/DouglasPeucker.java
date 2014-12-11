@@ -19,6 +19,8 @@ import org.xmlcml.euclid.Real2Array;
 public class DouglasPeucker {
 
 	private double tolerance;
+	int cornerFindingWindow;
+	double relativeCornernessThresholdForCornerAggregation;
 	private boolean[] marked;
 	private List<Real2> shape;
 	private List<Real2> newShape;
@@ -28,6 +30,13 @@ public class DouglasPeucker {
 	public DouglasPeucker(double tolerance) {
 		this.tolerance = tolerance;
 	}
+	
+	public DouglasPeucker(double tolerance, int cornerFindingWindow, double relativeCornernessThresholdForCornerAggregation) {
+		this.tolerance = tolerance;
+		this.cornerFindingWindow = cornerFindingWindow;
+		this.relativeCornernessThresholdForCornerAggregation = relativeCornernessThresholdForCornerAggregation;
+	}
+	
 	/**
 	 * Reduce the number of points in a shape using the Douglas-Peucker
 	 * algorithm
@@ -118,8 +127,6 @@ public class DouglasPeucker {
 		indexOfMaxDeviation = 0;
 		int indexOfMaxCornerness = 0;
 		double maxCornerness = 0.0;
-		int cornerFindingWindow = 5;
-		double relativeCornernessThresholdForCornerAggregation = 0.7;
 		double[] cornernesses = new double[shape.size()];
 
 		Real2 firstPoint = shape.get(firstIdx);
