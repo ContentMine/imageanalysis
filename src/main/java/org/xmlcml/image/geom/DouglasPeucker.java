@@ -26,6 +26,8 @@ public class DouglasPeucker {
 	private List<Real2> newShape;
 	private double maxDeviation;
 	private int indexOfMaxDeviation;
+	double[] cornernesses;
+	int[] cornerPositions;
 
 	public DouglasPeucker(double tolerance) {
 		this.tolerance = tolerance;
@@ -61,10 +63,72 @@ public class DouglasPeucker {
 		marked[0] = true;
 		marked[n - 1] = true;
 
+		calculateCornernesses(shape, n);
 		douglasPeuckerReduction(0, n - 1);
 
 		newShape = createNewShapeFromMarked();
 		return newShape;
+	}
+
+	private void calculateCornernesses(List<Real2> shape, int n) {
+		cornernesses = new double[shape.size()];
+		cornerPositions = new int[shape.size()];
+		for (int idx = 1; idx < n - 1; idx++) {
+			Real2 point = shape.get(idx);
+			List<Real2> localPoints = new ArrayList<Real2>();
+			try {
+				for (int idx2 = idx - cornerFindingWindow; idx2 <= idx + cornerFindingWindow; idx2++) {
+					localPoints.add(shape.get(idx2));
+				}
+				cornernesses[idx] = Real2.getCentroid(localPoints).getDistance(point);
+			} catch (IndexOutOfBoundsException e) {
+				
+			}
+			if (idx > cornerFindingWindow * 2) {
+				List<Real2> corners = new ArrayList<Real2>();
+				try {
+					if (cornernesses[idx - cornerFindingWindow * 2] >= cornernesses[idx - cornerFindingWindow * 2 + 1]) {
+						corners.add(new Real2(idx - cornerFindingWindow * 2, cornernesses[idx - cornerFindingWindow * 2]));
+					}
+				} catch (IndexOutOfBoundsException e) {
+					
+				}
+				try {
+					if (cornernesses[idx] >= cornernesses[idx - 1]) {
+						corners.add(new Real2(idx, cornernesses[idx]));
+					}
+				} catch (IndexOutOfBoundsException e) {
+					
+				}
+				for (int idx2 = idx - cornerFindingWindow * 2 + 1; idx2 < idx; idx2++) {
+					double thisCornerness = 0;
+					double leftCornerness = -1;
+					double rightCornerness = -1;
+					try {
+						thisCornerness = cornernesses[idx2];
+					} catch (IndexOutOfBoundsException e) {
+						continue;
+					}
+					try {
+						leftCornerness = cornernesses[idx2 - 1];
+					} catch (IndexOutOfBoundsException e) {
+						
+					}
+					rightCornerness = cornernesses[idx2 + 1];
+					if (thisCornerness >= leftCornerness && thisCornerness >= rightCornerness) {
+						corners.add(new Real2(idx2, thisCornerness));
+					}
+				}
+				
+				Collections.sort(corners, new Comparator<Real2>(){
+					@Override
+					public int compare(Real2 o1, Real2 o2) {
+						return Double.compare(o2.getY(), o1.getY());
+					}
+				});
+				cornerPositions[idx - cornerFindingWindow] = (int) ((corners.size() == 1 || corners.get(1).getY() < relativeCornernessThresholdForCornerAggregation * corners.get(0).getY()) ? corners.get(0).getX() : corners.get(0).getMidPoint(corners.get(1)).getX());
+			}
+		}
 	}
 	
 	private List<Real2> createNewShapeFromMarked() {
@@ -127,23 +191,12 @@ public class DouglasPeucker {
 		indexOfMaxDeviation = 0;
 		int indexOfMaxCornerness = 0;
 		double maxCornerness = 0.0;
-		double[] cornernesses = new double[shape.size()];
 
 		Real2 firstPoint = shape.get(firstIdx);
 		Real2 lastPoint = shape.get(lastIdx);
 
 		for (int idx = firstIdx + 1; idx < lastIdx; idx++) {
 			Real2 point = shape.get(idx);
-			
-			List<Real2> localPoints = new ArrayList<Real2>();
-			try {
-				for (int idx2 = idx - cornerFindingWindow; idx2 <= idx + cornerFindingWindow; idx2++) {
-					localPoints.add(shape.get(idx2));
-				}
-				cornernesses[idx] = Real2.getCentroid(localPoints).getDistance(point);
-			} catch (IndexOutOfBoundsException e) {
-				
-			}
 			
 			double distance = orthogonalDistance(point, firstPoint, lastPoint);
 			// the point with the greatest distance
@@ -152,52 +205,9 @@ public class DouglasPeucker {
 				indexOfMaxDeviation = idx;
 			}
 			
-			if (idx > cornerFindingWindow * 2 + firstIdx + 1) {
-				List<Real2> corners = new ArrayList<Real2>();
-				try {
-					if (cornernesses[idx - cornerFindingWindow * 2] >= cornernesses[idx - cornerFindingWindow * 2 + 1] && idx - cornerFindingWindow * 2 > firstIdx) {
-						corners.add(new Real2(idx - cornerFindingWindow * 2, cornernesses[idx - cornerFindingWindow * 2]));
-					}
-				} catch (IndexOutOfBoundsException e) {
-					
-				}
-				try {
-					if (cornernesses[idx] >= cornernesses[idx - 1]) {
-						corners.add(new Real2(idx, cornernesses[idx]));
-					}
-				} catch (IndexOutOfBoundsException e) {
-					
-				}
-				for (int idx2 = idx - cornerFindingWindow * 2 + 1; idx2 < idx; idx2++) {
-					double thisCornerness = 0;
-					double leftCornerness = -1;
-					double rightCornerness = -1;
-					try {
-						thisCornerness = cornernesses[idx2];
-					} catch (IndexOutOfBoundsException e) {
-						continue;
-					}
-					try {
-						leftCornerness = cornernesses[idx2 - 1];
-					} catch (IndexOutOfBoundsException e) {
-						
-					}
-					rightCornerness = cornernesses[idx2 + 1];
-					if (((thisCornerness >= leftCornerness && idx2 > firstIdx + 1) || (idx2 == firstIdx + 1)) && thisCornerness >= rightCornerness) {
-						corners.add(new Real2(idx2, thisCornerness));
-					}
-				}
-				
-				Collections.sort(corners, new Comparator<Real2>(){
-					@Override
-					public int compare(Real2 o1, Real2 o2) {
-						return Double.compare(o2.getY(), o1.getY());
-					}
-				});
-				if (cornernesses[idx - cornerFindingWindow] > maxCornerness) {
-					maxCornerness = cornernesses[idx - cornerFindingWindow];
-					indexOfMaxCornerness = (int) ((corners.size() == 1 || corners.get(1).getY() < relativeCornernessThresholdForCornerAggregation * corners.get(0).getY()) ? corners.get(0).getX() : corners.get(0).getMidPoint(corners.get(1)).getX());
-				}
+			if (cornernesses[idx] > maxCornerness && idx > firstIdx + cornerFindingWindow && idx < lastIdx - cornerFindingWindow) {
+				maxCornerness = cornernesses[idx];
+				indexOfMaxCornerness = cornerPositions[idx];
 			}
 		}
 		
