@@ -1,6 +1,7 @@
 package org.xmlcml.image.geom;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -28,6 +29,10 @@ public class DouglasPeucker {
 	private int indexOfMaxDeviation;
 	double[] cornernesses;
 	int[] cornerPositions;
+	private double secondGreatestCornerness;
+	private int secondGreatestCornernessPosition;
+	private double greatestCornerness;
+	private int greatestCornernessPosition;
 
 	public DouglasPeucker(double tolerance) {
 		this.tolerance = tolerance;
@@ -59,13 +64,28 @@ public class DouglasPeucker {
 		for (int i = 1; i < n - 1; i++) {
 			marked[i] = false;
 		}
-		// first and last points
-		marked[0] = true;
-		marked[n - 1] = true;
-
+		
 		calculateCornernesses(shape, n);
-		douglasPeuckerReduction(0, n - 1);
+		
+		if (shape.get(0).isEqualTo(shape.get(shape.size() - 1), 1.5)) {
+			Collections.rotate(shape, -greatestCornernessPosition);
+			calculateCornernesses(shape, n);
+			// first and last points
+			marked[0] = true;
+			marked[n - 1] = true;
+			int split = (secondGreatestCornernessPosition - greatestCornernessPosition >= 0 ? secondGreatestCornernessPosition - greatestCornernessPosition : secondGreatestCornernessPosition - greatestCornernessPosition + shape.size());
+			marked[split] = true;
 
+			douglasPeuckerReduction(0, split);
+			douglasPeuckerReduction(split, n - 1);
+		} else {
+			// first and last points
+			marked[0] = true;
+			marked[n - 1] = true;
+	
+			douglasPeuckerReduction(0, n - 1);
+		}
+		
 		newShape = createNewShapeFromMarked();
 		return newShape;
 	}
@@ -127,6 +147,15 @@ public class DouglasPeucker {
 					}
 				});
 				cornerPositions[idx - cornerFindingWindow] = (int) ((corners.size() == 1 || corners.get(1).getY() < relativeCornernessThresholdForCornerAggregation * corners.get(0).getY()) ? corners.get(0).getX() : corners.get(0).getMidPoint(corners.get(1)).getX());
+				if (cornernesses[idx - cornerFindingWindow] > greatestCornerness) {
+					secondGreatestCornerness = greatestCornerness;
+					secondGreatestCornernessPosition = greatestCornernessPosition;
+					greatestCornerness = cornernesses[idx - cornerFindingWindow];
+					greatestCornernessPosition = cornerPositions[idx - cornerFindingWindow];
+				} else if (cornernesses[idx - cornerFindingWindow] > secondGreatestCornerness) {
+					secondGreatestCornerness = cornernesses[idx - cornerFindingWindow];
+					secondGreatestCornernessPosition = cornerPositions[idx - cornerFindingWindow];
+				}
 			}
 		}
 	}

@@ -139,17 +139,18 @@ public class PixelEdge {
 	}
 
 	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
+		return getOrCreateSegmentList(tolerance, null, null);
+	}
+	
+	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation) {
 		if (segmentList == null) {
-			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
+			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null;
+			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation) : new DouglasPeucker(tolerance));
 			Real2Array points = pixelList.getReal2Array();
 			if (nodes == null || nodes.size() != 2) {
 				throw new RuntimeException("segmentation requires 2 nodes");
 			}
 			boolean isCyclic = nodes.get(0).getInt2().equals(nodes.get(1).getInt2());
-			if (isCyclic) {
-				// rmove a point
-				points.deleteElement(points.size()-1);
-;			}
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
 			if (isCyclic) {
 				Real2 point0 = pointArray.get(0);
