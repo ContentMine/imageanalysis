@@ -13,6 +13,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGText;
 import org.xmlcml.html.HtmlElement;
+import org.xmlcml.html.HtmlFactory;
 import org.xmlcml.html.HtmlSpan;
 import org.xmlcml.html.util.HtmlUtil;
 
@@ -35,7 +36,8 @@ public class SVGGenerator {
 	public void readHtml(File htmlFile) {
 		HtmlElement element = null;
 		try {
-			element = HtmlUtil.readAndCreateElement(htmlFile);
+			HtmlFactory htmlFactory = new HtmlFactory();
+			element = htmlFactory.parse(htmlFile);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
