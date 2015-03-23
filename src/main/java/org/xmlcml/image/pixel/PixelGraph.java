@@ -1,5 +1,10 @@
 package org.xmlcml.image.pixel;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -8,10 +13,12 @@ import org.xmlcml.euclid.Angle.Units;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.Vector2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.ImageParameters;
 import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
+import org.xmlcml.image.pixel.nucleus.DotNucleus;
 
 
 /**
@@ -569,7 +576,85 @@ public class PixelGraph {
 			}
 		}
 	}
+	
+	public <T> PixelTree<T> getPixelTree() {
+		return getFirstTree(new ArrayList<PixelNode>());
+	}
 
+	public <T> List<PixelTree<T>> getPixelTrees() {
+		List<PixelNode> nodes = new ArrayList<PixelNode>();
+		PixelTree<T> tree1 = getFirstTree(nodes);
+		PixelTree<T> tree2 = new PixelTree<T>();
+		for (int i = nodes.size() - 1; i >= 0; i--) {
+			PixelNode node = nodes.get(i);
+			for (PixelEdge e : node.getEdges()) {
+				addLineToTree(tree2, e, node);
+			}
+		}
+		/*PixelNode firstNode;
+		try {
+			firstNode = getNucleusFactory().getOrCreateTerminalJunctionList().get(0).getNode();//getNodeList().get(0);
+		} catch (IndexOutOfBoundsException e) {
+			firstNode = getNucleusFactory().getOrCreateNucleusList().get(0).getNode();
+		}
+		PixelEdgeList edges = getEdgeList();
+		Set<PixelEdge> setOfEdges = new HashSet<PixelEdge>(edges.getList());
+		//Pixel firstSpike = getNucleusFactory().getOrCreateSpikePixelList().get(0);
+		PixelTree<T> tree = new PixelTree<T>();
+		addLineToTree(tree, setOfEdges.iterator().next(), firstNode, );
+		while (setOfEdges.size() > 0) {
+			addLineToTree(tree, setOfEdges.iterator().next(), firstNode, );
+		}*/
+		List<PixelTree<T>> trees = new ArrayList<PixelTree<T>>();
+		trees.add(tree1);
+		trees.add(tree2);
+		return trees;
+	}
 
+	private <T> PixelTree<T> getFirstTree(List<PixelNode> nodes) {
+		getEdgeList();
+		PixelTree<T> tree = new PixelTree<T>();
+		for (PixelNucleus terminal : getNucleusFactory().getOrCreateTerminalJunctionList()) {
+			if (terminal.getNode().getEdges().size() == 1) {
+				addLineToTree(tree, terminal.getNode().getEdges().get(0), terminal.getNode());
+				nodes.add(terminal.getNode());
+			} else {
+				System.out.println("Error: tricky nucleus");
+			}
+		}
+		for (PixelNucleus other : getNucleusFactory().getOrCreateNucleusList()) {
+			if (other instanceof DotNucleus) {
+				tree.addEdgelessNode(other.getNode());
+				nodes.add(other.getNode());
+			} else if (other.getNode().getEdges().size() > 0) {
+				nodes.add(other.getNode());
+				for (PixelEdge e : other.getNode().getEdges()) {
+					addLineToTree(tree, e, other.getNode());
+				}
+			} else {
+				System.out.println("Error: tricky nucleus");
+			}
+		}
+		return tree;
+	}
+
+	private <T> void addLineToTree(PixelTree<T> tree, PixelEdge edge, PixelNode startNode) {
+		if (tree.edgeEncountered(edge)) {
+			return;
+		}
+		/*PixelNucleusFactory nucleusFactory = getNucleusFactory();
+		PixelList line = nucleusFactory.findLine(nucleusFactory.getNucleusBySpikePixel(firstSpike), firstSpike);*/
+		tree.addPixelsFromEdge(startNode, edge);
+		PixelNode endNode = edge.getOtherNode(startNode);
+		if (!tree.nodeEncountered(endNode)) {
+			Set<PixelEdge> edges = new LinkedHashSet<PixelEdge>(endNode.getEdges().getList());
+			for (PixelEdge e : edges) {
+				if (!tree.edgeEncountered(e)) {
+					addLineToTree(tree, e, endNode);
+				}
+			}
+		}
+		//nucleusFactory.getNucleusByPixel(line.get(line.size())).createSpikePixelList()
+	}
 
 }
