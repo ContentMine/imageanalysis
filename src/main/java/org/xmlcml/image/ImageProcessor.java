@@ -28,7 +28,7 @@ import org.xmlcml.image.processing.ZhangSuenThinning;
  */
 public class ImageProcessor {
 
-	private static final int DEFAULT_THRESHOLD = 128;
+	private static final int DEFAULT_THRESHOLD = 129;
 
 	private static final Logger LOG = Logger.getLogger(ImageProcessor.class);
 
