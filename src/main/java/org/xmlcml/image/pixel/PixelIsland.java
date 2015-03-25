@@ -417,6 +417,10 @@ public class PixelIsland implements Iterable<Pixel> {
 		return include;
 	}
 
+	public boolean fitsWithin(Real2Range range) {
+		return range.includes(getBoundingBox());
+	}
+
 	/**
 	 * computes correlations and outputs images.
 	 * 
