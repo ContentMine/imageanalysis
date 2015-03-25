@@ -48,6 +48,7 @@ public class PixelList implements Iterable<Pixel> {
 	
 	public PixelList() {
 		ensureList();
+		ensurePixelByCoordinateMap();
 	}
 
 	private void ensureList() {
@@ -179,7 +180,7 @@ public class PixelList implements Iterable<Pixel> {
 	}
 
 	public boolean contains(Pixel pixel) {
-		return list != null && list.contains(pixel);
+		return list != null && pixelByCoordinateMap.get(pixel.getInt2()) != null;
 	}
 
 	public boolean remove(Pixel pixel) {
@@ -581,7 +582,7 @@ public class PixelList implements Iterable<Pixel> {
 		if (deleteList.size() > 0) {
 			LOG.trace("deleted "+deleteList.size());
 		}
-		list.removeAll(deleteList.getList());
+		removeAll(deleteList.getList());
 	}
 
 	private void addAllSinglePixelsToDeleteList(PixelList deleteList) {
@@ -649,6 +650,14 @@ public class PixelList implements Iterable<Pixel> {
 		extremeList.add(list.get(list.size() - 1)); // last
 		extremeList.add(westPixel);
 		return extremeList;
+	}
+
+	private void removeAll(List<Pixel> smallList) {
+		ensurePixelByCoordinateMap();
+		list.removeAll(smallList);
+		for (Pixel pixel : smallList) {
+			pixelByCoordinateMap.remove(pixel.getInt2());
+		}
 	}
 
 //	public void removeAll(PixelList pixelList) {
