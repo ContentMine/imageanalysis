@@ -69,13 +69,13 @@ public class DouglasPeucker {
 		
 		if (shape.get(0).isEqualTo(shape.get(shape.size() - 1), 1.5)) {
 			Collections.rotate(shape, -greatestCornernessPosition);
-			calculateCornernesses(shape, n);
 			// first and last points
 			marked[0] = true;
 			marked[n - 1] = true;
 			int split = (secondGreatestCornernessPosition - greatestCornernessPosition >= 0 ? secondGreatestCornernessPosition - greatestCornernessPosition : secondGreatestCornernessPosition - greatestCornernessPosition + shape.size());
 			marked[split] = true;
 
+			calculateCornernesses(shape, n);
 			douglasPeuckerReduction(0, split);
 			douglasPeuckerReduction(split, n - 1);
 		} else {
@@ -93,6 +93,8 @@ public class DouglasPeucker {
 	private void calculateCornernesses(List<Real2> shape, int n) {
 		cornernesses = new double[shape.size()];
 		cornerPositions = new int[shape.size()];
+		greatestCornerness = 0;
+		secondGreatestCornerness = 0;
 		for (int idx = 1; idx < n - 1; idx++) {
 			Real2 point = shape.get(idx);
 			List<Real2> localPoints = new ArrayList<Real2>();
