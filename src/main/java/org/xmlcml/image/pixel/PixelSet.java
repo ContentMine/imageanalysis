@@ -1,8 +1,8 @@
 package org.xmlcml.image.pixel;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PixelSet implements Set<Pixel> {
@@ -18,7 +18,7 @@ public class PixelSet implements Set<Pixel> {
 	 * @param set
 	 */
 	public PixelSet(PixelSet set) {
-		this.pixelSet = new HashSet<Pixel>(set.pixelSet);
+		this.pixelSet = new LinkedHashSet<Pixel>(set.pixelSet);
 	}
 	
 	/** create set with single pixel.
@@ -26,7 +26,7 @@ public class PixelSet implements Set<Pixel> {
 	 * @param pixel
 	 */
 	public PixelSet(Pixel pixel) {
-		this.pixelSet = new HashSet<Pixel>();
+		this.pixelSet = new LinkedHashSet<Pixel>();
 		pixelSet.add(pixel);
 	}
 
@@ -35,7 +35,7 @@ public class PixelSet implements Set<Pixel> {
 	 * @param pixelList
 	 */
 	public PixelSet(PixelList pixelList) {
-		this.pixelSet = new HashSet<Pixel>();
+		this.pixelSet = new LinkedHashSet<Pixel>();
 		for (Pixel pixel : pixelList) {
 			add(pixel);
 		}
@@ -43,7 +43,7 @@ public class PixelSet implements Set<Pixel> {
 
 	private void ensurePixelSet() {
 		if (pixelSet == null) {
-			pixelSet = new HashSet<Pixel>(); 
+			pixelSet = new LinkedHashSet<Pixel>(); 
 		}
 	}
 
