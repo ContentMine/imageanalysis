@@ -168,6 +168,8 @@ public class ImageProcessor {
 	}
 
 	public BufferedImage processImage(BufferedImage img) {
+		islandList = null;
+		mainProcessor.clearVariables();
 		this.setImage(img);
 		if (debug) {
 			String filename = TARGET + "/" + base + "/" + RAW_IMAGE_PNG;
