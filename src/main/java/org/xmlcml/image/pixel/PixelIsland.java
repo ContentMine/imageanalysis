@@ -70,6 +70,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	boolean allowDiagonal = false;
 //	boolean allowDiagonal = true;
 	private Int2Range int2range;
+	private Real2Range real2range;
 	private Int2 leftmostCoord;
 	Map<Int2, Pixel> pixelByCoordMap; // find pixel or null
 	private PixelList terminalPixels;
@@ -162,20 +163,28 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 	public Real2Range getBoundingBox() {
+		if (real2range != null) {
+			return real2range;
+		}
 		ensurePixelList();
 		Real2Range r2r = new Real2Range();
 		for (Pixel pixel : pixelList) {
 			r2r.add(new Real2(pixel.getInt2()));
 		}
+		real2range = r2r;
 		return r2r;
 	}
 
 	public Int2Range getIntBoundingBox() {
+		if (int2range != null) {
+			return int2range;
+		}
 		ensurePixelList();
 		Int2Range i2r = new Int2Range();
 		for (Pixel pixel : pixelList) {
 			i2r.add(pixel.getInt2());
 		}
+		int2range = i2r;
 		return i2r;
 	}
 
@@ -224,10 +233,12 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 	private void createMapAndRanges(Pixel pixel) {
 		ensureInt2Range();
+		ensureReal2Range();
 		ensurePixelByCoordMap();
 		Int2 int2 = pixel.getInt2();
 		pixelByCoordMap.put(int2, pixel);
 		int2range.add(int2);
+		real2range.add(new Real2(int2));
 		if (leftmostCoord == null || leftmostCoord.getX() < int2.getX()) {
 			leftmostCoord = int2;
 		}
@@ -237,6 +248,12 @@ public class PixelIsland implements Iterable<Pixel> {
 	private void ensureInt2Range() {
 		if (this.int2range == null) {
 			int2range = new Int2Range();
+		}
+	}
+
+	private void ensureReal2Range() {
+		if (real2range == null) {
+			real2range = new Real2Range();
 		}
 	}
 
@@ -300,8 +317,9 @@ public class PixelIsland implements Iterable<Pixel> {
 	 */
 	public void remove(Pixel pixel) {
 		if (pixelList.remove(pixel)) {
-			// leaves int2range and laftmostCoord dirty
+			//Leaves int2range, real2range and leftmostCoord dirty
 			int2range = null;
+			real2range = null;
 			leftmostCoord = null;
 			Int2 coord = pixel.getInt2();
 			pixelByCoordMap.remove(coord);
