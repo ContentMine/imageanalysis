@@ -59,9 +59,8 @@ public class ImageUtil {
 	public static BufferedImage boofCVBinarization(BufferedImage image, int threshold) {
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
-		ThresholdImageOps.threshold(input, binary, threshold, true);
+		ThresholdImageOps.threshold(input, binary, threshold, false);
 		BufferedImage outputImage = VisualizeBinaryData.renderBinary(binary,null);
-		ColorUtilities.flipWhiteBlack(outputImage);
 		return outputImage;
 	}
 
@@ -71,7 +70,7 @@ public class ImageUtil {
 	 * clip to bounding box inclusive? or edge of image
 	 * 
 	 * @param image 
-	 * @return null if clip is ouside size of image
+	 * @return null if clip is outside size of image
 	 */
 	public static BufferedImage clipSubImage(BufferedImage image, Int2Range boundingBox) {
 		BufferedImage subImage = null;
