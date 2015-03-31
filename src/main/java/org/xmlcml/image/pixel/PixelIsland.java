@@ -67,7 +67,7 @@ public class PixelIsland implements Iterable<Pixel> {
 
 	PixelIslandList islandList;
 	PixelList pixelList; // these may have original coordinates
-	boolean allowDiagonal = false;
+	private boolean allowDiagonal = false;
 //	boolean allowDiagonal = true;
 	private Int2Range int2range;
 	private Real2Range real2range;

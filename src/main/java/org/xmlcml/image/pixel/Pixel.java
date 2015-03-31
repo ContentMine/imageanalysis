@@ -94,33 +94,43 @@ public class Pixel {
 		PixelList neighbourList = createNeighbourList(island);
 		for (Pixel neighbour : neighbourList) {
 			PixelList neighbourList1 = neighbour.createNeighbourList(island);
-			LOG.trace("neighbours1 "+neighbourList1);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("neighbours1 "+neighbourList1);
+			}
 			for (Pixel nl1 : neighbourList1) {
-				LOG.trace("   nl1 "+nl1);
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("   nl1 "+nl1);
+				}
 				if (!neighbourNeighbourList.contains(nl1)) {
 					neighbourNeighbourList.add(nl1);
 				}
-				LOG.trace("neighboursNeighbours "+neighbourNeighbourList);
+				if (LOG.isTraceEnabled()) {
+					LOG.trace("neighboursNeighbours "+neighbourNeighbourList);
+				}
 			}
 		}
 		return neighbourNeighbourList;
 	}
-
-	private List<Int2> calculateNeighbourCoordList(PixelIsland island) {
+	
+	public List<Int2> calculateNeighbourCoordList(boolean diagonal) {
 		List<Int2> coordList = new ArrayList<Int2>();
 		coordList.add(new Int2(point.x + 1, point.y));
 		coordList.add(new Int2(point.x - 1, point.y));
-		if (island.allowDiagonal) {
+		if (diagonal) {
 			coordList.add(new Int2(point.x + 1, point.y + 1));
 			coordList.add(new Int2(point.x - 1, point.y + 1));
 		}
 		coordList.add(new Int2(point.x, point.y + 1));
 		coordList.add(new Int2(point.x, point.y - 1));
-		if (island.allowDiagonal) {
+		if (diagonal) {
 			coordList.add(new Int2(point.x + 1, point.y - 1));
 			coordList.add(new Int2(point.x - 1, point.y - 1));
 		}
 		return coordList;
+	}
+
+	public List<Int2> calculateNeighbourCoordList(PixelIsland island) {
+		return calculateNeighbourCoordList(island.getDiagonal());
 	}
 
 	public void setIsland(PixelIsland island) {
