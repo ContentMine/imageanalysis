@@ -130,7 +130,6 @@ public class PixelListTest {
 		Assert.assertEquals("{5,6}\n(1,1,1,1,0,0)\n(1,1,0,0,1,0)\n(0,0,1,0,1,0)\n(1,1,0,0,1,0)\n(1,0,1,1,0,1)", matrix.toString());
 		
 		PixelListFloodFill pixelListFloodFill = new PixelListFloodFill(pixelList);
-		pixelListFloodFill.fillExteriorOfGrid();
 		PixelList interiorPixelList = pixelListFloodFill.createInteriorPixelList();
 		Assert.assertEquals("interior", 5, interiorPixelList.size());
 		SVGSVG.wrapAndWriteAsSVG(interiorPixelList.getOrCreateSVG(), new File("target/pixels/interiorTest.svg"));

@@ -23,9 +23,8 @@ public class FloodFillTest {
 	@Test
 	public void testThinnedMaltoryzineDiagonal() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
-		FloodFill floodFill = new FloodFill(image);
+		FloodFill floodFill = new ImageFloodFill(image);
 		floodFill.setDiagonal(true);
-		floodFill.fill();
 		Assert.assertEquals("pixelIslands", 5, floodFill.getIslandList().size());
 		for (PixelIsland pixelIsland : floodFill.getIslandList()) {
 			LOG.trace(pixelIsland.size());
@@ -39,8 +38,7 @@ public class FloodFillTest {
 	@Test
 	public void testBinaryMaltoryzine() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.fill();
+		FloodFill floodFill = new ImageFloodFill(image);
 		Assert.assertEquals("pixelIslands", 5, floodFill.getIslandList().size());
 	}
 	
@@ -52,8 +50,7 @@ public class FloodFillTest {
 	@Test
 	public void testThinnedMaltoryzineNoDiagnal() throws IOException {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.fill();
+		FloodFill floodFill = new ImageFloodFill(image);
 		Assert.assertEquals("pixelIslands", 202, floodFill.getIslandList().size());
 	}
 	

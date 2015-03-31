@@ -121,7 +121,7 @@ public class PixelIslandTest {
 	@Test
 	public void testgetTerminalMaltoryzine1() throws Exception {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
-		FloodFill floodFill = new FloodFill(image);
+		FloodFill floodFill = new ImageFloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
 		PixelIsland island = floodFill.getIslandList().get(1);
@@ -133,7 +133,7 @@ public class PixelIslandTest {
 	@Test
 	public void testgetTerminalMaltoryzine0() throws Exception {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
-		FloodFill floodFill = new FloodFill(image);
+		FloodFill floodFill = new ImageFloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
 		PixelIsland island = floodFill.getIslandList().get(0);
