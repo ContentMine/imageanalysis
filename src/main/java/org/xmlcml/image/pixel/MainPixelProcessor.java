@@ -62,7 +62,7 @@ public class MainPixelProcessor {
 	}
 
 	private int getDefaultMaxIsland() {
-		return 3;
+		return 30;
 	}
 
 	public BufferedImage getImage() {
@@ -113,6 +113,8 @@ public class MainPixelProcessor {
 			LOG.trace("after floodfill islands: "+pixelIslandList.size());
 			if (superThinning) {
 				pixelIslandList.thinThickStepsOld();
+				pixelIslandList.trimOrthogonalStubs();
+				pixelIslandList.doSuperThinning();
 			}
 			pixelIslandList.setMainProcessor(this);
 			pixelIslandList.setParentIslandList(this);
