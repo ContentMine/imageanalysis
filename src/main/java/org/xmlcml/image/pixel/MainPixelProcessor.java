@@ -107,9 +107,8 @@ public class MainPixelProcessor {
 	 */
 	public PixelIslandList getOrCreatePixelIslandList(boolean superThinning) {
 		if (pixelIslandList == null && getImage() != null) {
-			FloodFill floodFill = new FloodFill(this.image);
+			FloodFill floodFill = new ImageFloodFill(this.image);
 			floodFill.setDiagonal(true);
-			floodFill.fill();
 			pixelIslandList = floodFill.getIslandList();
 			LOG.trace("after floodfill islands: "+pixelIslandList.size());
 			if (superThinning) {

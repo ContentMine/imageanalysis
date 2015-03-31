@@ -1,62 +1,38 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import javax.imageio.ImageIO;
-
-public class FloodFill {
+public abstract class FloodFill {
 
 	// informed by
 	// http://stackoverflow.com/questions/2783204/flood-fill-using-a-stack
 
-	private BufferedImage image;
-	private boolean[][] painted;
-	private boolean diagonal = false;
-	private PixelIslandList islandList;
+	protected boolean[][] painted;
+	protected boolean diagonal = false;
+	protected PixelIslandList islandList;
+	protected int width;
+	protected int height;
 
-	public FloodFill(BufferedImage image) {
-		this.image = image;
+	protected FloodFill(int width, int height) {
+		this.width = width;
+		this.height = height;
 	}
+	
+	protected abstract boolean isBlack(int posX, int posY);
+	
+	protected void fill() {
+		painted = new boolean[height][width];
 
-	private boolean isBlack(int posX, int posY) {
-		if (image != null) {
-			int color = image.getRGB(posX, posY);
-			int brightness = (color & 0xFF) + ((color >> 2) & 0xFF)
-					+ ((color >> 4) & 0xFF);
-			brightness /= 3;
-			return brightness < 128;
-		} else {
-			return false;
-		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		if (args.length != 1) {
-			System.err.println("ERROR: Pass filename as argument.");
-			return;
-		}
-		String filename = args[0];
-		BufferedImage image = ImageIO.read(new File(filename));
-		FloodFill floodFill = new FloodFill(image);
-		floodFill.fill();
-	}
-
-	public void fill() {
-		painted = new boolean[image.getHeight()][image.getWidth()];
-
-		for (int i = 0; i < image.getHeight(); i++) {
-			for (int j = 0; j < image.getWidth(); j++) {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
 				addNextUnpaintedBlack(i, j);
 			}
 		}
-
 	}
-
-	private void addNextUnpaintedBlack(int i, int j) {
+	
+	protected void addNextUnpaintedBlack(int i, int j) {
 		if (isBlack(j, i) && !painted[i][j]) {
 
 			Queue<Point> queue = new LinkedList<Point>();
@@ -68,14 +44,17 @@ public class FloodFill {
 				if (isInsideImage(p)) {
 					if (!painted[p.y][p.x] && isBlack(p.x, p.y)) {
 						painted[p.y][p.x] = true;
-						Pixel pixel = new Pixel(p);
-						pixelList.add(pixel);
+						pixelList.add(getPixelFromPoint(p));
 						addNewPoints(queue, p);
 					}
 				}
 			}
-			add(new PixelIsland(pixelList));
+			add(PixelIsland.createSeparateIslandWithClonedPixels(pixelList, true));
 		}
+	}
+
+	protected Pixel getPixelFromPoint(Point p) {
+		return new Pixel(p);
 	}
 
 	private void add(PixelIsland island) {
@@ -91,16 +70,17 @@ public class FloodFill {
 	
 	public PixelIslandList getIslandList() {
 		ensureIslandList();
+		fill();
 		for (PixelIsland island : islandList) {
 			island.setDiagonal(diagonal);
 			island.setIslandList(islandList); // each island knows who made it
 		}
+		islandList.setDiagonal(diagonal);
 		return islandList;
 	}
 
 	private boolean isInsideImage(Point p) {
-		return (p.x >= 0) && (p.x < image.getWidth() &&
-				(p.y >= 0) && (p.y < image.getHeight()));
+		return (p.x >= 0) && (p.x < width && (p.y >= 0) && (p.y < height));
 	}
 
 	private void addNewPoints(Queue<Point> queue, Point p) {
