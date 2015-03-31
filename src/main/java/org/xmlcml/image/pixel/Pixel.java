@@ -437,4 +437,23 @@ public class Pixel {
 		
 	}
 
+	public PixelList createCompleteNeighbourNeighbourList(PixelIsland island) {
+		PixelList listOfNeighboursOfNeighbours = new PixelList();
+		List<Int2> neighbours = calculateNeighbourCoordList(island);
+		Set<Int2> neighboursOfNeighbours = new HashSet<Int2>();
+		for (Int2 neighbour : neighbours) {
+			neighboursOfNeighbours.addAll(new Pixel(neighbour).calculateNeighbourCoordList(island.getDiagonal()));
+		}
+		for (Int2 neighbour : neighbours) {
+			neighboursOfNeighbours.remove(neighbour);
+		}
+		for (Int2 coord : neighboursOfNeighbours) {
+			Pixel pixel = island.getPixelByCoordMap().get(coord);
+			if (pixel != null) {
+				listOfNeighboursOfNeighbours.add(pixel);
+			}
+		}
+		return listOfNeighboursOfNeighbours;
+	}
+
 }
