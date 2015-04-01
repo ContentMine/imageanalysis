@@ -45,7 +45,8 @@ public class PixelOutliner {
 		while (pixelList.size() > 0) {
 			PixelList extremes = pixelList.findExtremePixels();
 			Pixel startPixel = extremes.get(0);
-			SVGPolygon polygon = iterateClockwiseRoundPerimeter(startPixel);
+			iterateClockwiseRoundPerimeter(startPixel);
+			SVGPolygon polygon = getSVGPolygon();
 			if (polygon.size() > minPolySize) {
 				polygonList.add(polygon);
 				LOG.debug("poly size " + polygon.size() + " pixelList "
@@ -68,17 +69,22 @@ public class PixelOutliner {
 	public List<SVGPolygon> getPolygonList() {
 		return polygonList;
 	}
+	
+	public PixelList iterateClockwiseRoundPerimeter(Pixel startPixel) {
+		return iterateClockwiseRoundPerimeter(startPixel, new Int2(1, 0));
+	}
 
-	private SVGPolygon iterateClockwiseRoundPerimeter(Pixel startPixel) {
+	public PixelList iterateClockwiseRoundPerimeter(Pixel startPixel, Int2 initialDirection) {
 		failedConverge = false;
 		lineList = new ArrayList<IntLine>();
 		usedPixels = new PixelList();
-		Int2 current = startPixel.getInt2();
+		Int2 current = startPixel.getInt2().plus(new Int2((initialDirection.getY() > initialDirection.getX() ? 1 : 0), (initialDirection.getX() + initialDirection.getY() < 0 ? 1 : 0)));
 		Int2 next = new Int2(current);
-		next.incrementX();
+		next = next.plus(initialDirection);
 		IntLine line = new IntLine(current, next, startPixel.getInt2(),
 				startPixel);
 		int count = 0;
+		Pixel previousPixel = line.getCurrentPixel();
 		while (!next.equals(current)) {
 			lineList.add(line);
 			IntLine nextLine = createNextLine(line);
@@ -87,10 +93,32 @@ public class PixelOutliner {
 			}
 			Pixel currentPixel = nextLine.getCurrentPixel();
 			if (currentPixel != null) {
-				usedPixels.add(currentPixel);
+				if (currentPixel != previousPixel) {
+					if (previousPixel != null) {// && currentPixel.isDiagonalNeighbour(previousPixel)) {
+						Int2 difference = currentPixel.getInt2().subtract(previousPixel.getInt2());
+						Int2 toFindCornerPixel = null;
+						if (difference.isEqualTo(new Int2(1, 1))) {
+							toFindCornerPixel = new Int2(-1, 0);
+						} else if (difference.isEqualTo(new Int2(1, -1))) {
+							toFindCornerPixel = new Int2(0, 1);
+						} else if (difference.isEqualTo(new Int2(-1, 1))) {
+							toFindCornerPixel = new Int2(0, -1);
+						} else if (difference.isEqualTo(new Int2(-1, -1))) {
+							toFindCornerPixel = new Int2(1, 0);
+						}
+						if (toFindCornerPixel != null) {
+							Pixel possiblePixel = pixelList.getPixelByCoordinate(currentPixel.getInt2().plus(toFindCornerPixel));
+							if (possiblePixel != null) {
+								usedPixels.add(possiblePixel);
+							}
+						}
+					}
+					usedPixels.add(currentPixel);
+				}
 			} else {
 				LOG.error("null current pixel");
 			}
+			previousPixel = currentPixel;
 			line = nextLine;
 			if (nextLine.equals(lineList.get(0))) {
 				break;
@@ -101,7 +129,7 @@ public class PixelOutliner {
 				break;
 			}
 		}
-		return getSVGPolygon();
+		return usedPixels;
 	}
 
 	/**
