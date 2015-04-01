@@ -493,16 +493,13 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 				+ this.getPixelList().size());
 		removeStepsIteratively();
 		createCleanIslandList();
-		LOG.trace("sort and reverse");
-		sortSize();
-		reverse();
 		LOG.trace("finish");
 	}
 
 	/**
 	 * thin all "thick steps".
 	 * 
-	 * Zhang-Suen thinning sometimes leaves uneccesarily thick lines with
+	 * Zhang-Suen thinning sometimes leaves unnecessarily thick lines with
 	 * "steps".
 	 * 
 	 * remove all thick steps to preserve 2-connectivity (including diagonal)
@@ -513,6 +510,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		List<PixelIsland> newIslandList = new ArrayList<PixelIsland>();
 		for (PixelIsland island : this) {
 			PixelIsland newIsland = new PixelIsland(island.getPixelList());
+			newIsland.setDiagonal(island.getDiagonal());
 			newIsland.doSuperThinning();
 			newIslandList.add(newIsland);
 		}
@@ -565,7 +563,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		this.debugIslands();
 		if (graphList == null) {
 			graphList = new ArrayList<PixelGraph>();
-			thinThickStepsOld();
+			doSuperThinning();
 			// main tree
 			for (int i = 0; i < Math.min(size(), mainProcessor.getMaxIsland()); i++) {
 				PixelIsland island = get(i);
