@@ -225,12 +225,31 @@ public class PixelNucleusFactory {
 		}
 		PixelList terminalPixelList = get1ConnectedPixelList();
 		for (Pixel pixel : terminalPixelList) {
-			unusedPixelSet.remove(pixel);
-			PixelNucleus nucleus = new PixelNucleus(island);
-			nucleus.setJunctionType(PixelJunctionType.TERMINAL);
-			nucleus.add(pixel);
-			LOG.trace("made terminal: " + nucleus);
-			allNucleusList.add(nucleus);
+			if (unusedPixelSet.contains(pixel)) {
+				Pixel neighbour = pixel.getOrCreateNeighbours(getPixelIsland()).get(0);
+				if (terminalPixelList.contains(neighbour)) {
+					unusedPixelSet.remove(pixel);
+					unusedPixelSet.remove(neighbour);
+					PixelList list = new PixelList();
+					list.add(pixel);
+					list.add(neighbour);
+					PixelNucleus nucleus = new DotNucleus(pixel, list, island);
+					nucleus.setJunctionType(PixelJunctionType.DOT);
+					nucleus.add(pixel);
+					nucleus.add(neighbour);
+					LOG.trace("Made large dot: " + nucleus);
+					allNucleusList.add(nucleus);
+				} else {
+					unusedPixelSet.remove(pixel);
+					PixelList list = new PixelList();
+					list.add(pixel);
+					PixelNucleus nucleus = new TerminalNucleus(pixel, list, island);
+					nucleus.setJunctionType(PixelJunctionType.TERMINAL);
+					nucleus.add(pixel);
+					LOG.trace("made terminal: " + nucleus);
+					allNucleusList.add(nucleus);
+				}
+			}
 		}
 	}
 
