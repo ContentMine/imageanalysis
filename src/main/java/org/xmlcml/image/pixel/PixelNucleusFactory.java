@@ -576,11 +576,15 @@ public class PixelNucleusFactory {
 	}
 
 	public PixelEdge createEdgeFromLine(PixelList line) {
-		PixelEdge edge = new PixelEdge(island);
-		edge.addPixelList(line);
-		addNodeToEdge(line, edge, 0);
-		addNodeToEdge(line, edge, 1);
-		return edge;
+		if (line.size() > 4 || !line.get(0).isNeighbour(line.get(line.size() - 1))) {
+			PixelEdge edge = new PixelEdge(island);
+			edge.addPixelList(line);
+			addNodeToEdge(line, edge, 0);
+			addNodeToEdge(line, edge, 1);
+			return edge;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -665,9 +669,10 @@ public class PixelNucleusFactory {
 			spikeSet.remove(lastSpike);
 			PixelEdge edge = createEdgeFromLine(line);
 			if (edge == null) {
-				throw new RuntimeException("cannot create edge: null");
+				LOG.trace("Did not create edge (small cycle)");
+			} else {
+				addEdge(edge);
 			}
-			addEdge(edge);
 		}
 	}
 
