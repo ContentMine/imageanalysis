@@ -594,11 +594,14 @@ public class PixelGraph {
 		int i = 0;
 		for (PixelNode node : getNodeList()) {
 			PixelTree<T> tree = new PixelTree<T>();
-			trees.add(tree);
-			if (node.getEdges().size() == 0 && node.getNucleus().getJunctionType() == PixelJunctionType.DOT) {
-				tree.addEdgelessNode(node);
+			if (node.getEdges().size() == 0) {
+				if (node.getNucleus().getJunctionType() == PixelJunctionType.DOT) {
+					tree.addEdgelessNode(node);
+					trees.add(tree);
+				}
 				continue;
 			}
+			trees.add(tree);
 			for (PixelEdge e : node.getEdges()) {
 				addLineToTree(tree, e, node);
 			}
