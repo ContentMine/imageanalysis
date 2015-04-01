@@ -52,7 +52,9 @@ public class PixelOutliner {
 						+ pixelList.size());
 			}
 			for (Pixel pixel : usedPixels) {
-				pixelList.remove(pixel);
+				while (pixelList.remove(pixel)) {
+					
+				}
 			}
 			if (failedConverge) {
 				LOG.error("FAILED TO CONVERGE");
