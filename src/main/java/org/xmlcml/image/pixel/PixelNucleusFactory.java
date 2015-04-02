@@ -655,11 +655,13 @@ public class PixelNucleusFactory {
 	}
 
 	public void createNodesAndEdges() {
-		for (PixelNode node : nodeList) {
-			Iterator<PixelEdge> it = node.getEdges().iterator();
-			while (it.hasNext()) {
-				it.next();
-				it.remove();
+		if (nodeList != null) {
+			for (PixelNode node : nodeList) {
+				Iterator<PixelEdge> it = node.getEdges().iterator();
+				while (it.hasNext()) {
+					it.next();
+					it.remove();
+				}
 			}
 		}
 		PixelList spikeList = getOrCreateSpikePixelList();
