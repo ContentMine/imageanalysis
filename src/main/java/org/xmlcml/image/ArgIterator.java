@@ -84,7 +84,7 @@ public class ArgIterator {
 		String vv = getSingleValue();
 		if (vv != null) {
 			try {
-				value = new Double(vv);
+				value = Double.valueOf(vv);
 			} catch (Exception e) {
 				LOG.error("Bad double value: "+vv);
 			}
