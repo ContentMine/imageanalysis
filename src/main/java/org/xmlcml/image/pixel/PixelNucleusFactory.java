@@ -3,6 +3,7 @@ package org.xmlcml.image.pixel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -654,6 +655,13 @@ public class PixelNucleusFactory {
 	}
 
 	public void createNodesAndEdges() {
+		for (PixelNode node : nodeList) {
+			Iterator<PixelEdge> it = node.getEdges().iterator();
+			while (it.hasNext()) {
+				it.next();
+				it.remove();
+			}
+		}
 		PixelList spikeList = getOrCreateSpikePixelList();
 		PixelSet spikeSet = new PixelSet(spikeList);
 		LOG.trace("made spikeSet");
