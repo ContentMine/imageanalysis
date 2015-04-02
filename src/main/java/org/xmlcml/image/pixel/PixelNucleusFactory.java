@@ -263,7 +263,6 @@ public class PixelNucleusFactory {
 			PixelNucleus nucleus = getCyclicNucleus(pixel);
 			if (nucleus != null) {
 				unusedPixelSet.removeAll(island.getPixelList().getList());
-				nucleus.add(pixel);
 				allNucleusList.add(nucleus);
 			}
 		}
@@ -273,12 +272,20 @@ public class PixelNucleusFactory {
 		PixelNucleus nucleus = null;
 		Pixel lastPixel = null;
 		Pixel pixel0 = pixel;
-		PixelList pixelList = new PixelList();
+		Pixel topLeftPixel = pixel;
 		while (true) {
 			unusedPixelSet.remove(pixel);
-			;
+			int yForPixel = pixel.getInt2().getY();
+			int yForTopLeftPixel = topLeftPixel.getInt2().getY();
+			int sumForPixel = pixel.getInt2().getX() + yForPixel;
+			int sumForTopLeftPixel = topLeftPixel.getInt2().getX() + yForTopLeftPixel; 
+			if (sumForPixel < sumForTopLeftPixel || sumForPixel == sumForTopLeftPixel && yForPixel < yForTopLeftPixel) {
+				topLeftPixel = pixel;
+			}
 			Pixel nextPixel = getOtherNeighbour(pixel, lastPixel);
-			LOG.trace("next " + nextPixel);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("next " + nextPixel);
+			}
 			if (nextPixel == null) {
 				// not a 2-connected pixel
 				break;
@@ -286,7 +293,7 @@ public class PixelNucleusFactory {
 				// closed the cycle
 				nucleus = new PixelNucleus(island);
 				nucleus.setJunctionType(PixelJunctionType.CYCLIC);
-				nucleus.setPixelList(pixelList);
+				nucleus.add(topLeftPixel);
 				break;
 			} else {
 				lastPixel = pixel;
