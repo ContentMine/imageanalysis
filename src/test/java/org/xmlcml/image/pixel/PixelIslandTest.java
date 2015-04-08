@@ -516,7 +516,7 @@ public class PixelIslandTest {
 		Collections.sort(islands.getList(), new PixelIslandComparator(
 				PixelComparator.ComparatorType.SIZE));
 		Assert.assertTrue(islands.size() > 1000);
-		Assert.assertEquals(1950, islands.size());
+		Assert.assertEquals(2003, islands.size());
 		SVGSVG.wrapAndWriteAsSVG(islands.getOrCreateSVGG(), new File(phyloDir, "largePhyloBoxes.svg"));
 	}
 
@@ -564,7 +564,7 @@ public class PixelIslandTest {
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				20.), new RealRange(0., 1.));
-		Assert.assertEquals("all chars", 144, characters.size());
+		Assert.assertEquals("all chars", 196, characters.size());
 		plotBoxes(characters, new File(charDir, "chars0-1.svg"));
 	}
 
@@ -579,7 +579,7 @@ public class PixelIslandTest {
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				20.), new RealRange(12., 25.));
-		Assert.assertEquals("all chars", 56, characters.size());
+		Assert.assertEquals("all chars", 60, characters.size());
 		plotBoxes(characters, new File(charDir, "charsHeightLarge.svg"));
 	}
 

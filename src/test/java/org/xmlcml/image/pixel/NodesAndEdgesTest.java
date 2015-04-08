@@ -87,9 +87,9 @@ public class NodesAndEdgesTest {
 		PixelNucleusFactory factory = new PixelNucleusFactory(A12);
 		factory.createNodesAndEdges();
 		PixelNodeList nodeList = factory.getOrCreateNodeListFromNuclei();
-		Assert.assertEquals("nodes", "[<(0,0)><(4,0)><(3,2)><(1,2)>]", nodeList.toString());
+		Assert.assertEquals("nodes", "[<(0,0)><(4,0)><(1,2)><(3,2)>]", nodeList.toString());
 		PixelEdgeList edgeList = factory.getEdgeList();
-		Assert.assertEquals("edges", "(1,2)(0,1)(0,0)/[<(1,2)><(0,0)>](3,2)(4,3)(3,4)(2,4)(1,4)(0,3)(1,2)/[<(3,2)><(1,2)>](3,2)(2,2)(1,2)/[<(3,2)><(1,2)>](3,2)(4,1)(4,0)/[<(3,2)><(4,0)>]", edgeList.toString());
+		Assert.assertEquals("edges", "(1,2)(0,1)(0,0)/[<(1,2)><(0,0)>](3,2)(4,1)(4,0)/[<(3,2)><(4,0)>](3,2)(2,2)(1,2)/[<(3,2)><(1,2)>](1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2)/[<(1,2)><(3,2)>]", edgeList.toString());
 		Assert.assertEquals(4, edgeList.size());
 	}
 
@@ -132,14 +132,14 @@ public class NodesAndEdgesTest {
 		PixelTestUtils.assertNeighbourCounts(pixelIslandList,
 				new IntArray[] {
 				new IntArray(new int[]{1442, 0,0,1442,0,0,0,0,0,0}), // box // 0
-				new IntArray(new int[]{70, 0,2,64,4,0,0,0,0,0}), // A // 
+				new IntArray(new int[]{73, 0,2,67,4,0,0,0,0,0}), // A // 
 				new IntArray(new int[]{103, 0,0,98,4,1,0,0,0,0}), // B
-				new IntArray(new int[]{68, 0,2,66,0,0,0,0,0,0}), // C
+				new IntArray(new int[]{70, 0,2,68,0,0,0,0,0,0}), // C
 				new IntArray(new int[]{88, 0,0,88,0,0,0,0,0,0}), // D
-				new IntArray(new int[]{85, 0,3,78,3,1,0,0,0,0}), // E  // 5
-				new IntArray(new int[]{64, 0,3,57,3,1,0,0,0,0}), // F
-				new IntArray(new int[]{90, 0,3,84,3,0,0,0,0,0}), // G ??
-				new IntArray(new int[]{78, 0,4,66,6,2,0,0,0,0}), // H
+				new IntArray(new int[]{88, 0,3,81,3,1,0,0,0,0}), // E  // 5
+				new IntArray(new int[]{67, 0,3,60,3,1,0,0,0,0}), // F
+				new IntArray(new int[]{93, 0,3,87,3,0,0,0,0,0}), // G ??
+				new IntArray(new int[]{80, 0,4,68,6,2,0,0,0,0}), // H
 				new IntArray(new int[]{28, 0,2,26,0,0,0,0,0,0}), // I // no serif
 				new IntArray(new int[]{45, 0,2,43,0,0,0,0,0,0}), // J // 10
 				new IntArray(new int[]{71, 0,4,61,6,0,0,0,0,0}), // K 2 Y-junctions
