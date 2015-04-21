@@ -71,7 +71,7 @@ public class ImageProcessorTest {
 		Assert.assertEquals("inputFile", "sue", PROCESSOR.getOutputDir().toString());
 		Assert.assertTrue("binarization", PROCESSOR.getBinarize());
 		Assert.assertFalse("debug", PROCESSOR.getDebug());
-		Assert.assertEquals("threshold", 128, PROCESSOR.getThreshold());
+		Assert.assertEquals("threshold", 129, PROCESSOR.getThreshold());
 		Assert.assertEquals("thinning", ZhangSuenThinning.class, PROCESSOR.getThinning().getClass());
 	}
 	
