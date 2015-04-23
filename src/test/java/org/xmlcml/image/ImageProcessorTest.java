@@ -63,7 +63,7 @@ public class ImageProcessorTest {
 	 */
 	@Test
 	public void testCommandLineErrors() {
-		String[] args = {"-i", "-q", "-o", "sue", "-b", "dummy", "-t", "x160", "-v", "junk"};
+		String[] args = {"-i", "-q", "-o", "sue", "-b", "dummy", "-t", /*"x160" ,*/ "128", "-v", "junk"};
 		PROCESSOR.parseArgs(args);		
 		Assert.assertNull("base", PROCESSOR.getBase());
 		Assert.assertNull("inputFile", PROCESSOR.getInputFile());
