@@ -358,7 +358,7 @@ public class PixelIsland implements Iterable<Pixel> {
 						Pixel pk = pixelNeighbours.get(k);
 						if (pj.isKnightsMove(pk, pi)) {
 							removed.add(pixel);
-							LOG.debug("removed: " + pixel);
+							LOG.trace("removed: " + pixel);
 							// this.remove(pixel);
 						}
 					}

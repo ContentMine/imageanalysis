@@ -560,7 +560,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 //	}
 
 	public List<PixelGraph> getOrCreateGraphList() {
-		this.debugIslands();
+//		this.debugIslands();
 		if (graphList == null) {
 			graphList = new ArrayList<PixelGraph>();
 			doSuperThinning();
@@ -689,7 +689,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public void debugIslands() {
 		for (PixelIsland island : this) {
-			if (island.islandList == null) LOG.error("******NULL ISLAND LIST");
+			if (island.islandList == null) LOG.debug("******NULL ISLAND LIST");
 		}
 		LOG.trace("DEBUG ISLAND LIST");
 	}
