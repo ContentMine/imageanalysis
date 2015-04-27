@@ -604,7 +604,6 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 		this.junctionType = junctionType;
 	}
 
-	@Override
 	public int compareTo(PixelNucleus nucleus) {
 		if (centrePixel != null && nucleus.centrePixel != null) {
 			return centrePixel.compareTo(nucleus.centrePixel);

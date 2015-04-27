@@ -78,7 +78,6 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 		return list.size();
 	}
 
-	@Override
 	public Iterator<PixelIsland> iterator() {
 		return list.iterator();
 	}

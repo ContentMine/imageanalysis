@@ -18,7 +18,6 @@ public class PixelEdgeList implements Iterable<PixelEdge> {
 		ensureList();
 	}
 	
-	@Override
 	public Iterator<PixelEdge> iterator() {
 		ensureList();
 		return list.iterator();

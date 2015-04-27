@@ -143,7 +143,6 @@ public class DouglasPeucker {
 				}
 				
 				Collections.sort(corners, new Comparator<Real2>(){
-					@Override
 					public int compare(Real2 o1, Real2 o2) {
 						return Double.compare(o2.getY(), o1.getY());
 					}

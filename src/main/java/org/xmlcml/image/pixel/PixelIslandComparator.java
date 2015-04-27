@@ -41,7 +41,6 @@ public class PixelIslandComparator implements Comparator<PixelIsland>{
 		this.minor = minor;
 	}
 	
-	@Override
 	public int compare(PixelIsland island0, PixelIsland island1) {
 		this.island0 = island0;
 		this.island1 = island1;

@@ -20,7 +20,6 @@ public class PixelNucleusList implements Iterable<PixelNucleus> {
 		ensureList();
 	}
 	
-	@Override
 	public Iterator<PixelNucleus> iterator() {
 		ensureList();
 		return list.iterator();

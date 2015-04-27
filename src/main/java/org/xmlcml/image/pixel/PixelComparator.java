@@ -45,7 +45,6 @@ public class PixelComparator extends AbstractCoordinateComparator implements Com
 		this.minor = minor;
 	}
 	
-	@Override
 	public int compare(Pixel pixel0, Pixel pixel1) {
 		this.pixel0 = pixel0;
 		this.pixel1 = pixel1;

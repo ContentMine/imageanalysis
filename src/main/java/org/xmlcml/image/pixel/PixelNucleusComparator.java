@@ -35,7 +35,6 @@ public class PixelNucleusComparator extends AbstractCoordinateComparator impleme
 		this.minor = minor;
 	}
 	
-	@Override
 	public int compare(PixelNucleus nucleus0, PixelNucleus nucleus1) {
 		this.nucleus0 = nucleus0;
 		this.nucleus1 = nucleus1;

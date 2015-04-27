@@ -42,7 +42,6 @@ public class PixelEdgeComparator implements Comparator<PixelEdge>{
 		this.minor = minor;
 	}
 	
-	@Override
 	public int compare(PixelEdge edge0, PixelEdge edge1) {
 		this.edge0 = edge0;
 		this.edge1 = edge1;

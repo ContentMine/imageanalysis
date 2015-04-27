@@ -390,6 +390,7 @@ public class PixelGraph {
 	}
 
 	public void drawNodes(String[] colours, SVGG g) {
+		ensureNodeList();
 		for (int i = 0; i < nodeList.size(); i++) {
 			String col = colours[i % colours.length];
 			PixelNode node = nodeList.get(i);

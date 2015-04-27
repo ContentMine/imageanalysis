@@ -1,6 +1,7 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -113,7 +114,6 @@ public class PixelList implements Iterable<Pixel> {
 		return binary;
 	}
 	
-	@Override
 	public Iterator<Pixel> iterator() {
 		return list.iterator();
 	}
@@ -558,7 +558,7 @@ public class PixelList implements Iterable<Pixel> {
 	/** removes islands in list as small or smaller than limit
 	 * only renoves from PixelList (does not delete the actual Pixel
 	 * 
-	 * @param size maximum size of islands to removeß
+	 * @param size maximum size of islands to remove��
 	 */
 	public void removeMinorIslands(int size) {
 		if (island == null) {

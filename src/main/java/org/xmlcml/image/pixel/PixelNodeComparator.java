@@ -42,7 +42,6 @@ public class PixelNodeComparator implements Comparator<PixelNode>{
 		this.minor = minor;
 	}
 	
-	@Override
 	public int compare(PixelNode node0, PixelNode node1) {
 		this.node0 = node0;
 		this.node1 = node1;

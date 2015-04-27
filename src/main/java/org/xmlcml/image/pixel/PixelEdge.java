@@ -156,7 +156,7 @@ public class PixelEdge {
 				Real2 point0 = pointArray.get(0);
 				pointArray.setElement(pointArray.size() - 1, new Real2(point0));
 			}
-			LOG.debug(pointArray);
+			LOG.trace(pointArray);
 			segmentList = new PixelSegmentList(pointArray);
 		}
 		return segmentList;

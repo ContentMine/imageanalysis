@@ -819,7 +819,7 @@ public class PixelNucleusFactory {
 			LOG.trace("Caution: made PSEUDO_TERMINAL");
 
 		} else {
-			LOG.error("UNKNOWN SINGLE PIXEL NUCLEUS: " + pixelList + "; "
+			LOG.trace("UNKNOWN SINGLE PIXEL NUCLEUS: " + pixelList + "; "
 					+ pixelList.get(0).getOrCreateNeighbours(island));
 		}
 		return newNucleus;
@@ -839,7 +839,7 @@ public class PixelNucleusFactory {
 
 		} else {
 			newNucleus = new TwoWayNucleus(centrePixel, pixelList, island);
-			LOG.error("UNKNOWN TWO PIXEL NUCLEUS in " + island.size() + "; "
+			LOG.trace("UNKNOWN TWO PIXEL NUCLEUS in " + island.size() + "; "
 					+ island.getIntBoundingBox() + "; " + pixelList + "; "
 					+ pixelList.get(0).getOrCreateNeighbours(island));
 		}

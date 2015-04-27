@@ -48,7 +48,6 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		}
 	}
 
-	@Override
 	public Iterator<PixelNode> iterator() {
 		ensureList();
 		return nodeList.iterator();

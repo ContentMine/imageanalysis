@@ -33,7 +33,6 @@ public class PixelRingList implements Iterable<PixelList> {
 		ringList.addAll(pixelCollection);
 	}
 
-	@Override
 	public Iterator<PixelList> iterator() {
 		return ringList.iterator();
 	}
