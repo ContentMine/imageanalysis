@@ -135,10 +135,14 @@ public class PixelNode implements Comparable<PixelNode> {
 	}
 
 	public SVGG createSVG(double rad) {
+		return createSVG(rad, "none");
+	}
+
+	public SVGG createSVG(double rad, String color) {
 		SVGG g = new SVGG();
 		SVGCircle circle = new SVGCircle(new Real2(centrePixel.getInt2()).plus(new Real2(0.5, 0.5)), rad);
 		g.appendChild(circle);
-		circle.setFill("none");
+		circle.setFill(color);
 		return g;
 	}
 

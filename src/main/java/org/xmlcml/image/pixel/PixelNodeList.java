@@ -21,6 +21,10 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		ensureList();
 	}
 	
+	public PixelNodeList(PixelNodeList nodeList) {
+		this.nodeList = new ArrayList<PixelNode>(nodeList.nodeList);
+	}
+
 	/**
 	 * creates from output string, such as (11,22)(33,44)
 	 * 
@@ -164,6 +168,11 @@ public class PixelNodeList implements Iterable<PixelNode> {
 			}
 		}
 		return svgg;
+	}
+
+	public boolean remove(PixelNode node) {
+		ensureList();
+		return nodeList.remove(node);
 	}
 
 }

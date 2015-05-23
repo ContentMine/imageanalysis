@@ -67,6 +67,9 @@ public class PixelEdgeComparator implements Comparator<PixelEdge>{
 
 	private int boxCompare(ComparatorType type) {
 		if (type == null) return 0;
+		if (r2r0 == null ||r2r1 == null) {
+			return 0;
+		}
 		if (type.equals(ComparatorType.LEFT)) {
 			return compare(r2r0.getXRange().getMin(), r2r1.getXRange().getMin());
 		}

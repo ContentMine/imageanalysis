@@ -19,7 +19,7 @@ public class PixelEdge {
 	
 	private static Pattern EDGE_PATTERN = Pattern.compile("\\{([^\\}]*)\\}\\/\\[([^\\]]*)\\]");
 
-	private PixelNodeList nodes;
+	private PixelNodeList nodeList;
 	private PixelList pixelList; // pixels in order
 	private PixelIsland island;
 	private PixelSegmentList segmentList;
@@ -32,7 +32,7 @@ public class PixelEdge {
 	public PixelEdge(PixelIsland island) {
 		this.island = island;
 		this.pixelList = new PixelList();
-		this.nodes = new PixelNodeList();
+		this.nodeList = new PixelNodeList();
 	}
 
 	public PixelEdge(PixelGraph pixelGraph) {
@@ -46,20 +46,20 @@ public class PixelEdge {
 	 */
 	public void addNode(PixelNode node, int pos) {
 		ensureNodes();
-		if (this.nodes.size() != pos) {
+		if (this.nodeList.size() != pos) {
 			LOG.trace("Cannot add node");
 		} else if (node == null) {
 			LOG.trace("Cannot add null node");
 		} else {
-			nodes.add(node);
+			nodeList.add(node);
 			node.addEdge(this);
-			LOG.trace("size "+nodes.size());
+			LOG.trace("size "+nodeList.size());
 		}
 	}
 	
 	private void ensureNodes() {
-		if (nodes == null) {
-			nodes = new PixelNodeList();
+		if (nodeList == null) {
+			nodeList = new PixelNodeList();
 		}
 	}
 
@@ -89,7 +89,7 @@ public class PixelEdge {
 	 * @return
 	 */
 	public PixelNodeList getNodes() {
-		return nodes;
+		return nodeList;
 	}
 	
 	/** gets pixel from list.
@@ -114,17 +114,17 @@ public class PixelEdge {
 	}
 
 	public PixelNode getPixelNode(int i) {
-		return (nodes == null || i < 0 || i >= nodes.size()) ? null : nodes.get(i);
+		return (nodeList == null || i < 0 || i >= nodeList.size()) ? null : nodeList.get(i);
 	}
 	
 	public void removeNodes() {
-		while (nodes != null && nodes.size() > 0) {
-			nodes.remove(0);
+		while (nodeList != null && nodeList.size() > 0) {
+			nodeList.remove(0);
 		}
 	}
 	
 	public String toString() {
-		String s = ""+pixelList+"/"+nodes;
+		String s = ""+pixelList+"/"+nodeList;
 		return s;
 	}
 
@@ -147,10 +147,10 @@ public class PixelEdge {
 			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null;
 			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation) : new DouglasPeucker(tolerance));
 			Real2Array points = pixelList.getReal2Array();
-			if (nodes == null || nodes.size() != 2) {
+			if (nodeList == null || nodeList.size() != 2) {
 				throw new RuntimeException("segmentation requires 2 nodes");
 			}
-			boolean isCyclic = nodes.get(0).getInt2().equals(nodes.get(1).getInt2());
+			boolean isCyclic = nodeList.get(0).getInt2().equals(nodeList.get(1).getInt2());
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
 			if (isCyclic) {
 				Real2 point0 = pointArray.get(0);
@@ -163,12 +163,12 @@ public class PixelEdge {
 	}
 
 	public PixelNode getOtherNode(PixelNode pixelNode) {
-		if (nodes.size() != 2) {
+		if (nodeList.size() != 2) {
 			return null;
-		} else if (nodes.get(0).equals(pixelNode)) {
-			return nodes.get(1);
-		} else if (nodes.get(1).equals(pixelNode)) {
-			return nodes.get(0);
+		} else if (nodeList.get(0).equals(pixelNode)) {
+			return nodeList.get(1);
+		} else if (nodeList.get(1).equals(pixelNode)) {
+			return nodeList.get(0);
 		} else {
 			return null;
 		}
@@ -216,9 +216,9 @@ public class PixelEdge {
 	 */
 	public boolean isZeroCircular() {
 		boolean circular = false;
-		if (nodes.size() == 0) {
+		if (nodeList.size() == 0) {
 			circular = pixelList.size() <= 1;
-		} else if (nodes.size() == 2) {
+		} else if (nodeList.size() == 2) {
 			circular = pixelList.size() <= 1;
 		}
 		return circular;
@@ -276,8 +276,8 @@ public class PixelEdge {
 				edge.pixelList = PixelList.createPixelList(pixelListS, island);
 				LOG.trace("pixelList "+edge.pixelList);
 				String nodeListS = matcher.group(2);
-				edge.nodes = PixelNodeList.createNodeList(nodeListS, island);
-				LOG.trace("nodeList "+edge.nodes);
+				edge.nodeList = PixelNodeList.createNodeList(nodeListS, island);
+				LOG.trace("nodeList "+edge.nodeList);
 			}
 		}
 		return edge;
@@ -300,6 +300,10 @@ public class PixelEdge {
 
 	public Pixel getClosestPixel(Real2 point) {
 		return (pixelList == null || pixelList.size() == 0) ? null : pixelList.getClosestPixel(point);
+	}
+
+	public boolean removeNode(PixelNode node) {
+		return nodeList.remove(node);
 	}
 
 }
