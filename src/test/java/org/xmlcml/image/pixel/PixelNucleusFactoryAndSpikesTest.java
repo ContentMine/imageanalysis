@@ -95,7 +95,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 				Fixtures.CREATE_T_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		nucleusList.sortYX(3);
-		LOG.debug("nucleusList "+nucleusList.size()+"; "+nucleusList);
+		LOG.trace("nucleusList "+nucleusList.size()+"; "+nucleusList);
 		Assert.assertEquals("nucleusList", 4, nucleusList.size());
 		Assert.assertEquals("nucleusList: ", ""
 				+ "[{(-1,-1)}{(3,1)(3,2)(2,1)(4,1)}{(7,0)}{(3,5)}]", 

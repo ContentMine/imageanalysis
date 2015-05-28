@@ -723,18 +723,18 @@ public class PixelGraph {
 	private void tidyEdges() {
 		for (PixelEdge edge : edgeList) {
 			if (edge.getNodes().size() != 2) {
-				LOG.debug("edge with missing node/s "+edge.getNodes().size());
+				LOG.trace("edge with missing node/s "+edge.getNodes().size());
 			}
 		}
 	}
 
 	private void tidyNodes() {
-		LOG.debug("nodes: "+nodeList.size());
+		LOG.trace("nodes: "+nodeList.size());
 		PixelNodeList copyList = new PixelNodeList(nodeList);
 		for (PixelNode node : copyList) {
 			remove2ConnectedNode(node);
 		}
-		LOG.debug("nodes after: "+nodeList.size());
+		LOG.trace("nodes after: "+nodeList.size());
 	}
 
 	private void remove2ConnectedNode(PixelNode node) {

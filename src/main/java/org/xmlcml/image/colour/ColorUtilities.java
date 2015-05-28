@@ -63,10 +63,9 @@ public class ColorUtilities {
 			Raster raster = image.getRaster();
 			int numdata = raster.getNumDataElements();
 			int[] values = new int[numdata];
-	//		LOG.debug(width+" "+height+" "+values.length);
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
-					LOG.debug(i+" "+j);
+					LOG.trace(i+" "+j);
 					values = raster.getPixel(i, j, values);
 					int value = ColorUtilities.getValue(values);
 					if (value >= minBlack && value <= maxBlack) {

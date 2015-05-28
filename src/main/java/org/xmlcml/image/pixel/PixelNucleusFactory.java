@@ -374,7 +374,7 @@ public class PixelNucleusFactory {
 		PixelNucleus nucleus = createSubtypedNucleus(nucleusPixelList);
 		if (nucleus == null) {
 			LOG.trace("island " + island);
-			LOG.debug("NULL NUCLEUS: "
+			LOG.trace("NULL NUCLEUS: "
 					+ seed
 					+ "; "
 					+ nucleusPixelList
@@ -780,7 +780,7 @@ public class PixelNucleusFactory {
 			centrePixel = pixelList.get(corner);
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
 		} else {
-			LOG.error("UNKNOWN 3 PIXEL NUCLEUS in " + island.size() + "; "
+			LOG.trace("UNKNOWN 3 PIXEL NUCLEUS in " + island.size() + "; "
 					+ island.getIntBoundingBox() + "; " + pixelList
 					+ "; shell " + pixelList.getOrCreateNeighbours());
 			newNucleus = new TwoWayNucleus(centrePixel, pixelList, island);

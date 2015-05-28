@@ -210,7 +210,7 @@ public class PixelGraphTest {
 		image = ImageUtil.thin(image, new ZhangSuenThinning());
 		ImageUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
-		LOG.debug("islands: "+pixelIslandList.size());
+		LOG.trace("islands: "+pixelIslandList.size());
 		PixelIsland island = pixelIslandList.getLargestIsland();
 		PixelGraph graph = null;
 		try {

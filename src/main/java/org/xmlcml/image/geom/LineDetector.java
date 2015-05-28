@@ -53,7 +53,7 @@ public class LineDetector extends AbstractDetector {
 	
 	private void drawGrid(IntArray array, Direction dir) {
 		int rasterSize = dir.equals(Direction.HORIZ) ? raster.getWidth() : raster.getHeight();
-		LOG.debug(rasterSize+" "+array.size());
+		LOG.trace(rasterSize+" "+array.size());
 		int[] pix = new int[numData];
 		Real2 start = null;
 		Real2 end = null;
@@ -80,8 +80,6 @@ public class LineDetector extends AbstractDetector {
 						}
 					}
 				}
-//				LOG.debug(line.toXML());
-//				svg.appendChild(line);
 			}
 		}
 	}
@@ -100,8 +98,8 @@ public class LineDetector extends AbstractDetector {
 				}
 			}
 		}
-		LOG.debug(colArray);
-		LOG.debug(rowArray);
+		LOG.trace(colArray);
+		LOG.trace(rowArray);
 	}
 
 	private void getRasterParameters() {
@@ -109,6 +107,6 @@ public class LineDetector extends AbstractDetector {
 		cols = raster.getWidth();
 		rows = raster.getHeight();
 		numData = raster.getNumDataElements();
-		LOG.debug(" w "+ cols +" h "+ rows +" num " + numData);
+		LOG.trace(" w "+ cols +" h "+ rows +" num " + numData);
 	}
 }

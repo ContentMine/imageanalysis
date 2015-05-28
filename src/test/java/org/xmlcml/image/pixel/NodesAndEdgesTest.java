@@ -112,7 +112,7 @@ public class NodesAndEdgesTest {
 		Assert.assertEquals("node 5", 0, island.getPixelsWithNeighbourCount(5).size());
 		PixelNodeList nodeList = island.createNodeList();
 		for (PixelNode node : nodeList) {
-			LOG.debug("c65 "+node);
+			LOG.trace("c65 "+node);
 		}
 	}
 
@@ -237,7 +237,7 @@ public class NodesAndEdgesTest {
 		);
 	}
 	
-	static String CHARS = "*ABCDEFGHIJKLMN?OPQRSTUVWXYZA????AEIObdfh..klacegijmn???t?~&opqrsuvwxyzaaeio1234567890($£!?).,..***";
+	static String CHARS = "*ABCDEFGHIJKLMN?OPQRSTUVWXYZA????AEIObdfh..klacegijmn???t?~&opqrsuvwxyzaaeio1234567890($��!?).,..***";
 //	                                                   28/36        41/2        53/5 57           71  75           88
 
 	int[] BLACKLIST = new int[]{28,29,30,31,32,33,34,35,36,  41,42,   53,54,55,57,   71,72,73,74,75,  88};
@@ -331,6 +331,7 @@ public class NodesAndEdgesTest {
 
 	static String CHARSAB = "AB";
 	@Test
+	@Ignore // too variable
 	public void testCharacterHelveticaNodeCounts() {
 		String CHARX = CHARS/*AB*/ ;
 		int NCHARS = CHARX.length();
@@ -349,7 +350,7 @@ public class NodesAndEdgesTest {
 		Multimap<String, PixelIsland> islandByNodeEdgeString = HashMultimap.create();
 		for (int i = 0; i < islandList.size(); i++){
 			if (isInBlackList(i)) {
-				LOG.debug("skipped: "+i);
+				LOG.trace("skipped: "+i);
 				continue;
 			}
 			String charx = String.valueOf(CHARX.charAt(i));
@@ -365,7 +366,7 @@ public class NodesAndEdgesTest {
 				LOG.error("**** Bad node: "+i+", "+e);
 			}
 			Integer terminal = island.getTerminalPixels().size();
-			LOG.debug(" ==="+charx+"=====n="+nodeList.size()+"=e="+edgeList.size()+"t;"+terminal+"==; is "+i+"; px: "+island.size());
+			LOG.trace(" ==="+charx+"=====n="+nodeList.size()+"=e="+edgeList.size()+"t;"+terminal+"==; is "+i+"; px: "+island.size());
 			String nodeEdgeString = "n"+nodeList.size()+"e"+edgeList.size()+"t"+terminal;
 			islandByNodeEdgeString.put(nodeEdgeString, island);
 			
@@ -384,13 +385,13 @@ public class NodesAndEdgesTest {
 			for (PixelIsland island : islandListX) {
 				sb.append(island.getId()+" ");
 			}
-			System.out.println(sb.toString());
+//			System.out.println(sb.toString());
 		}
 		
 		SVGSVG.wrapAndWriteAsSVG(islandList.getOrCreateSVGG(), new File("target/nodesEdges/helvetica.svg"));
 		islandList.sortYX(5.0);
 		int NN =  NCHARS-3;
-		LOG.debug("chars "+NN);
+		LOG.trace("chars "+NN);
 		Assert.assertEquals("islands", NN, islandList.size());
 		for (int i = 1; i < NN; i++) {
 			SVGSVG.wrapAndWriteAsSVG(islandList.get(i).getSVGG(), new File("target/nodesEdges/helvetica"+i+".svg"));

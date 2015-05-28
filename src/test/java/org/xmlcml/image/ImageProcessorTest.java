@@ -2,6 +2,7 @@ package org.xmlcml.image;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
@@ -62,6 +63,7 @@ public class ImageProcessorTest {
 	 * 
 	 */
 	@Test
+	@Ignore // to avoid output
 	public void testCommandLineErrors() {
 		String[] args = {"-i", "-q", "-o", "sue", "-b", "dummy", "-t", /*"x160" ,*/ "128", "-v", "junk"};
 		PROCESSOR.parseArgs(args);		

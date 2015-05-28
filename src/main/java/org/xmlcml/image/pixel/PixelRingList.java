@@ -118,7 +118,7 @@ public class PixelRingList implements Iterable<PixelList> {
 			// if it's changed swap the old pixels for the new
 			if (newSize != oldSize) {
 				ringList.set(ring, newIsland.getPixelList());
-				LOG.debug("island size after "+newIsland.size());
+				LOG.trace("island size after "+newIsland.size());
 			}
 		}
 	}

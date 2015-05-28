@@ -218,7 +218,7 @@ public class PixelPlotter {
 	public void plotPixelsToFile(PixelList pixelList) {
 		SVGG g = plotPixels(pixelList);
 		File file = getOutputFile("svg");
-		LOG.debug("output "+file.getAbsolutePath());
+		LOG.trace("output "+file.getAbsolutePath());
 		SVGSVG.wrapAndWriteAsSVG(g, file);
 	}
 

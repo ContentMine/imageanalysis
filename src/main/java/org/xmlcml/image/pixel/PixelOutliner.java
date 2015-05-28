@@ -49,7 +49,7 @@ public class PixelOutliner {
 			SVGPolygon polygon = getSVGPolygon();
 			if (polygon.size() > minPolySize) {
 				polygonList.add(polygon);
-				LOG.debug("poly size " + polygon.size() + " pixelList "
+				LOG.trace("poly size " + polygon.size() + " pixelList "
 						+ pixelList.size());
 			}
 			for (Pixel pixel : usedPixels) {
@@ -62,7 +62,7 @@ public class PixelOutliner {
 				break;
 			}
 		}
-		LOG.debug("polygons " + polygonList.size());
+		LOG.trace("polygons " + polygonList.size());
 		return polygonList;
 	}
 
