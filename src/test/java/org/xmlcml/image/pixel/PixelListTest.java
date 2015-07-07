@@ -5,10 +5,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.IntMatrix;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
 
 public class PixelListTest {

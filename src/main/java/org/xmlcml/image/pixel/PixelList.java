@@ -1,7 +1,6 @@
 package org.xmlcml.image.pixel;
 
 import java.awt.image.BufferedImage;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;

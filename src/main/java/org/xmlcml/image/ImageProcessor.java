@@ -1,17 +1,24 @@
 package org.xmlcml.image;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.IntRange;
+import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.colour.ColorUtilities;
-import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.MainPixelProcessor;
+import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
+import org.xmlcml.image.slice.XSlice;
 
 /**
  * transforms an image independently of future use.
@@ -61,6 +68,7 @@ public class ImageProcessor {
 	private MainPixelProcessor mainProcessor;
 	private ImageParameters parameters;
 	private PixelIslandList islandList = null;
+	private XSliceList xSliceList;
 
 	public ImageProcessor() {
 		setDefaults();
@@ -510,6 +518,25 @@ public class ImageProcessor {
 
 	public void setParameters(ImageParameters parameters) {
 		this.parameters = parameters;
+	}
+
+	public XSliceList getOrCreateXSliceList() {
+		if (xSliceList == null) {
+			SVGG g = new SVGG();
+			xSliceList = new XSliceList();
+			int width = image.getWidth();
+			for (int x = 0; x < width; x++) {
+				XSlice xSlice = XSlice.getBinarySlice(image, x);
+				if (xSlice.size() > 0) {
+					LOG.debug(x+": "+xSlice);
+					xSliceList.add(xSlice);
+					SVGG gg = xSlice.getSVGG();
+					g.appendChild(gg);
+				}
+			}
+			SVGSVG.wrapAndWriteAsSVG(g, new File("target/neuro/text.svg"));
+		}
+		return xSliceList;
 	}
 
 }

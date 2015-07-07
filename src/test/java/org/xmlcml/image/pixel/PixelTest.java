@@ -5,8 +5,6 @@ import java.awt.Point;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelIsland;
 
 public class PixelTest {
 

@@ -1,6 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -8,7 +7,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGSVG;
 
 public class PixelRingList implements Iterable<PixelList> {
 

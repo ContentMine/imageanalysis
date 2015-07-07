@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.geom.AbstractDetector;
-import org.xmlcml.image.geom.LineDetector;
 
 public class LineDetectorTest {
 

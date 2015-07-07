@@ -3,24 +3,16 @@ package org.xmlcml.image.pixel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.xmlcml.euclid.Int2;
-import org.xmlcml.euclid.Real2;
-import org.xmlcml.euclid.Vector2;
-import org.xmlcml.graphics.svg.SVGG;
-import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.image.pixel.PixelNucleus.PixelJunctionType;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.sun.org.apache.regexp.internal.recompile;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class PixelTree<T> {
 

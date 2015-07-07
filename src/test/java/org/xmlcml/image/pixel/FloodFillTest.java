@@ -10,8 +10,6 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.pixel.FloodFill;
-import org.xmlcml.image.pixel.PixelIsland;
 
 public class FloodFillTest {
 	private static final Logger LOG = Logger.getLogger(FloodFillTest.class);

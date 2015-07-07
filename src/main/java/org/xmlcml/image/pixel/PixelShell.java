@@ -1,7 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 
 /** coordination shell radiating from pixel or pixelList

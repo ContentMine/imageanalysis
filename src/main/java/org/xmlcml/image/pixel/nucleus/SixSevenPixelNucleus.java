@@ -4,7 +4,6 @@ import org.xmlcml.image.pixel.Pixel;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelList;
 import org.xmlcml.image.pixel.PixelNucleus;
-import org.xmlcml.image.pixel.PixelNucleus.PixelJunctionType;
 
 
 /** two rightangle triangles joined by tips.

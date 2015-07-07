@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 public class PixelNucleusFactoryAndSpikesTest {
 	
