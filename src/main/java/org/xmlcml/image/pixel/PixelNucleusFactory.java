@@ -627,7 +627,7 @@ public class PixelNucleusFactory {
 				} else if (pixel.equals(centrePixel)) {
 					// this is fine
 				} else if (!pixel.isNeighbour(centrePixel)) {
-					LOG.error("edgeEnd: " + pixel + " is not joined to node "
+					LOG.trace("edgeEnd: " + pixel + " is not joined to node "
 							+ node);
 				}
 			}
@@ -885,7 +885,7 @@ public class PixelNucleusFactory {
 			if (pixel.getOrthogonalNeighbours(island).size() == 3) {
 				if (centrePixel != null) {
 					// there are 2 or more, error
-					throw new RuntimeException("Not a filled TJunction " + this);
+					LOG.trace("Not a filled TJunction " + this);
 				}
 				centrePixel = pixel;
 			}
