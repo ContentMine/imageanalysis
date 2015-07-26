@@ -232,10 +232,13 @@ public class ImageProcessor {
 	 * currently sets binarize=true, thinning=ZhangSuenThinning(), threshold=128
 	 * But use getters to query actual values
 	 * 
-	 * @return
+	 * @return 
+	 * @throws RuntimeException if null image
 	 */
-	public static ImageProcessor createDefaultProcessorAndProcess(
-			BufferedImage image) {
+	public static ImageProcessor createDefaultProcessorAndProcess(BufferedImage image) {
+		if (image == null) {
+			throw new RuntimeException("null image ");
+		}
 		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessor();
 		imageProcessor.processImage(image);
 		return imageProcessor;
