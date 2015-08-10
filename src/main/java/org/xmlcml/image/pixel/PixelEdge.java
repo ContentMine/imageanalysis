@@ -124,7 +124,7 @@ public class PixelEdge {
 	}
 	
 	public String toString() {
-		String s = ""+pixelList+"/"+nodeList;
+		String s = "pixelList: "+pixelList+"; nodeList: "+nodeList;
 		return s;
 	}
 

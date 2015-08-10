@@ -7,13 +7,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.colour.ColourAnalyzer;
-import org.xmlcml.image.colour.HueChromaLuminance;
 
 import boofcv.io.image.UtilImageIO;
 
@@ -92,11 +91,13 @@ public class ColorAnalyzerTest {
 	}
 
 	@Test
+	@Ignore
 	public void testPosterize22249() throws IOException {
 		testPosterize0("22249");
 	}
 
 	@Test
+	@Ignore
 	public void testPosterize36933() throws IOException {
 		testPosterize0("36933");
 	}

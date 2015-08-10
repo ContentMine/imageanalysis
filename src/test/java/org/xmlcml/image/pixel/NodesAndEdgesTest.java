@@ -89,7 +89,7 @@ public class NodesAndEdgesTest {
 		PixelNodeList nodeList = factory.getOrCreateNodeListFromNuclei();
 		Assert.assertEquals("nodes", "[<(0,0)><(4,0)><(1,2)><(3,2)>]", nodeList.toString());
 		PixelEdgeList edgeList = factory.getEdgeList();
-		Assert.assertEquals("edges", "(1,2)(0,1)(0,0)/[<(1,2)><(0,0)>](3,2)(4,1)(4,0)/[<(3,2)><(4,0)>](3,2)(2,2)(1,2)/[<(3,2)><(1,2)>](1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2)/[<(1,2)><(3,2)>]", edgeList.toString());
+		Assert.assertEquals("edges", "pixelList: (1,2)(0,1)(0,0); nodeList: [<(1,2)><(0,0)>]pixelList: (3,2)(4,1)(4,0); nodeList: [<(3,2)><(4,0)>]pixelList: (3,2)(2,2)(1,2); nodeList: [<(3,2)><(1,2)>]pixelList: (1,2)(0,3)(1,4)(2,4)(3,4)(4,3)(3,2); nodeList: [<(1,2)><(3,2)>]", edgeList.toString());
 		Assert.assertEquals(4, edgeList.size());
 	}
 
