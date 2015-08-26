@@ -43,7 +43,7 @@ https://en.wikipedia.org/wiki/Color_quantization
  */
 public class ColourAnalyzer {
 
-	public final static Logger LOG = Logger.getLogger(ColourAnalyzer.class);
+	private final static Logger LOG = Logger.getLogger(ColourAnalyzer.class);
 	private BufferedImage currentImage;
 	private BufferedImage inputImage;
 	private BufferedImage flattenedImage;

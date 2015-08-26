@@ -14,7 +14,7 @@ import org.xmlcml.euclid.Int2;
  *
  */
 public class NeighbourPixelTest {
-	public final static Logger LOG = Logger.getLogger(NeighbourPixelTest.class);
+	private final static Logger LOG = Logger.getLogger(NeighbourPixelTest.class);
 
 	private static PixelIsland DOT1;
 	private static PixelIsland LINE2; // 2-pixel Line

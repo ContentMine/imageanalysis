@@ -110,7 +110,11 @@ public class MainPixelProcessor {
 			FloodFill floodFill = new ImageFloodFill(this.image);
 			floodFill.setDiagonal(true);
 			pixelIslandList = floodFill.getIslandList();
-			LOG.trace("after floodfill islands: "+pixelIslandList.size());
+			ImageParameters parameters = this.getParameters();
+			if (parameters != null) {
+				pixelIslandList.removeIslandsLessThan(parameters.getMinimumIslandSize());
+				LOG.trace("after remove islands: "+pixelIslandList.size());
+			}
 			if (superThinning) {
 				pixelIslandList.thinThickStepsOld();
 				pixelIslandList.trimOrthogonalStubs();

@@ -7,7 +7,7 @@ import org.xmlcml.image.Fixtures;
 
 public class PixelNucleusFactoryAndSpikesTest {
 	
-	public final static Logger LOG = Logger.getLogger(PixelNucleusFactoryAndSpikesTest.class);
+	private final static Logger LOG = Logger.getLogger(PixelNucleusFactoryAndSpikesTest.class);
 
 	@Test
 	public void testPixelNucleusListDot() {

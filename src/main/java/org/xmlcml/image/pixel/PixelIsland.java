@@ -746,13 +746,18 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 	}
 
+	//FIXME this is timeconsuming if not thinned before use
 	public void removeCorners() {
+		int count = 0;
 		while (true) {
 			makeCornerSet();
+			LOG.trace("cornerSet: "+cornerSet.size()+"; "+this.size());
 			if (cornerSet.size() == 0)
 				break;
 			removeCornerSet();
+			count++;
 		}
+		LOG.trace("removeCornerCount "+count);
 	}
 
 	/**

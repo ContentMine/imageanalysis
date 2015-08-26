@@ -11,7 +11,7 @@ import org.xmlcml.image.Fixtures;
 
 public class JunctionTest {
 
-	public final static Logger LOG = Logger.getLogger(JunctionTest.class);
+	private final static Logger LOG = Logger.getLogger(JunctionTest.class);
 	
 	private final static File G002_DIR = new File(Fixtures.COMPOUND_DIR, "journal.pone.0095565.g002");
 	private PixelIsland island1;

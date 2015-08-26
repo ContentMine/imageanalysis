@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 public class ZernikeTest {
 
-	public final static Logger LOG = Logger.getLogger(ZernikeTest.class);
+	private final static Logger LOG = Logger.getLogger(ZernikeTest.class);
 	
 //	@Test
 //	public void testZernikeOrig1() throws Exception {

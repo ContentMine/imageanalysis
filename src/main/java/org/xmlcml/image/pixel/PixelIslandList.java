@@ -490,9 +490,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	public void thinThickStepsOld() {
 		LOG.trace("removing steps; current Pixel size()"
 				+ this.getPixelList().size());
-		removeStepsIteratively();
+//		removeStepsIteratively();
+		this.removeCorners();
 		createCleanIslandList();
-		LOG.trace("finish");
 	}
 
 	/**
@@ -701,6 +701,17 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			sb.append("["+island.size()+"; "+island.getIntBoundingBox()+"]");
 		}
 		return sb.toString();
+	}
+
+	public void removeIslandsLessThan(Real2Range minimumIslandSize) {
+		for (int i = list.size() - 1; i >= 0; i--) {
+			PixelIsland island = list.get(i);
+			Real2Range bbox = island.getBoundingBox();
+			if (bbox.isLessThan(minimumIslandSize)) {
+				list.remove(island);
+			}
+			
+		}
 	}
 
 }

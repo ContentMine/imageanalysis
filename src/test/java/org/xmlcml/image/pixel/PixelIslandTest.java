@@ -35,7 +35,7 @@ import com.google.common.collect.Multimap;
 
 public class PixelIslandTest {
 
-	public final static Logger LOG = Logger.getLogger(PixelIslandTest.class);
+	private final static Logger LOG = Logger.getLogger(PixelIslandTest.class);
 
 	private static final int MAX_PIXEL_ITER = 20;
 	private static final double DP_EPSILON = 1.5;
@@ -512,11 +512,11 @@ public class PixelIslandTest {
 	public void testLargePhyloJpg() throws IOException {
 		File phyloDir = new File("target/phylo/");
 		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		imageProcessor.setParameters(null);
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		Collections.sort(islands.getList(), new PixelIslandComparator(
 				PixelComparator.ComparatorType.SIZE));
-		Assert.assertTrue(islands.size() > 1000);
-		Assert.assertEquals(2003, islands.size());
+		Assert.assertEquals("islands:"+islands.size(), 2003, islands.size());
 		SVGSVG.wrapAndWriteAsSVG(islands.getOrCreateSVGG(), new File(phyloDir, "largePhyloBoxes.svg"));
 	}
 
@@ -563,9 +563,10 @@ public class PixelIslandTest {
 		File charDir = new File("target/chars/");
 		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
+		imageProcessor.setParameters(null);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				20.), new RealRange(0., 1.));
-		Assert.assertEquals("all chars", 196, characters.size());
+		Assert.assertEquals("all chars "+characters.size(), 196, characters.size());
 		plotBoxes(characters, new File(charDir, "chars0-1.svg"));
 	}
 
@@ -580,7 +581,7 @@ public class PixelIslandTest {
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				20.), new RealRange(12., 25.));
-		Assert.assertEquals("all chars", 60, characters.size());
+		Assert.assertEquals("all chars "+characters.size(), 60, characters.size());
 		plotBoxes(characters, new File(charDir, "charsHeightLarge.svg"));
 	}
 

@@ -1,11 +1,15 @@
 package org.xmlcml.image;
 
+import org.xmlcml.euclid.Real2Range;
+import org.xmlcml.euclid.RealRange;
+
 public class ImageParameters extends AbstractParameters {
 
 	private double segmentTolerance;
 	private String stroke;
 	private double lineWidth;
 	private String fill;
+	private Real2Range minimumIslandSize;
 
 	public ImageParameters() {
 		setDefaults();
@@ -16,8 +20,18 @@ public class ImageParameters extends AbstractParameters {
 		stroke = "green";
 		lineWidth = 1.0;
 		fill = "none";
+//		minimumIslandSize = new Real2Range(new RealRange(0, 100), new RealRange(0, 100));
+		minimumIslandSize = null;
 	}
 	
+	public Real2Range getMinimumIslandSize() {
+		return minimumIslandSize;
+	}
+
+	public void setMinimumIslandSize(Real2Range minimumIslandSize) {
+		this.minimumIslandSize = minimumIslandSize;
+	}
+
 	public double getSegmentTolerance() {
 		return segmentTolerance;
 	}
