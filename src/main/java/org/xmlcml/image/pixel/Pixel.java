@@ -232,11 +232,17 @@ public class Pixel {
 	}
 
 	public boolean isOrthogonalNeighbour(Pixel pixel) {
+		if (pixel == null || pixel.getInt2() == null || this.getInt2() == null) {
+			return false;
+		}
 		Int2 vector = this.getInt2().subtract(pixel.getInt2());
 		return Math.abs(vector.getX()) + Math.abs(vector.getY()) == 1;
 	}
 
 	public boolean isDiagonalNeighbour(Pixel pixel) {
+		if (pixel == null || pixel.getInt2() == null || this.getInt2() == null) {
+			return false;
+		}
 		Int2 vector = this.getInt2().subtract(pixel.getInt2());
 		return Math.abs(vector.getX()) == 1 && Math.abs(vector.getY()) == 1;
 	}

@@ -109,12 +109,12 @@ public class PixelNodeList implements Iterable<PixelNode> {
 
 	public PixelNode get(int i) {
 		ensureList();
-		return nodeList.get(i);
+		return (i < 0 || i >= nodeList.size()) ? null : nodeList.get(i);
 	}
 
 	public void remove(int i) {
 		ensureList();
-		nodeList.remove(i);
+		if (i < 0 || i >= nodeList.size()) nodeList.remove(i);
 	}
 
 	public void addAll(Collection<PixelNode> nodeSet) {

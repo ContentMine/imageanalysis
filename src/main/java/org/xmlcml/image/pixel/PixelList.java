@@ -144,7 +144,9 @@ public class PixelList implements Iterable<Pixel> {
 
 	private void addToMap(Pixel pixel) {
 		ensurePixelByCoordinateMap();
-		this.pixelByCoordinateMap.put(pixel.getInt2(), pixel);
+		if (pixel != null && pixel.getInt2() != null) {
+			this.pixelByCoordinateMap.put(pixel.getInt2(), pixel);
+		}
 	}
 
 	private void checkFromSameIsland(Pixel pixel) {
@@ -260,7 +262,7 @@ public class PixelList implements Iterable<Pixel> {
 		StringBuilder sb = new StringBuilder();
 		if (list.size() == 0) sb.append(START_STRING);
 		for (Pixel pixel : this) {
-			sb.append(pixel.toString());
+			sb.append(String.valueOf(pixel));
 		}
 		if (list.size() == 0) sb.append(END_STRING);
 		return sb.toString();
