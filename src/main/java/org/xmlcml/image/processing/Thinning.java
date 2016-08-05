@@ -36,6 +36,15 @@ public abstract class Thinning {
 	public int[][] getBinary() {
 		return binary;
 	}
+	
+	public int getBinary(int y, int x) {
+		try {
+			return binary[y][x];
+		} catch (IndexOutOfBoundsException e) {
+			return 0;
+		}
+	}
+	
 	public BufferedImage getThinnedImage() {
 	    copyBinaryToImage(image, binary);
 		return image;
@@ -81,9 +90,9 @@ public abstract class Thinning {
 
 	protected int getNeighbourSum(int y, int x) {
 	
-	    return binary[y - 1][x] + binary[y - 1][x + 1] + binary[y][x + 1]
-	            + binary[y + 1][x + 1] + binary[y + 1][x] + binary[y + 1][x - 1]
-	            + binary[y][x - 1] + binary[y - 1][x - 1];
+	    return getBinary(y - 1, x) + getBinary(y - 1, x + 1) + getBinary(y, x + 1)
+	            + getBinary(y + 1, x + 1) + getBinary(y + 1, x) + getBinary(y + 1, x - 1)
+	            + getBinary(y, x - 1) + getBinary(y - 1, x - 1);
 	}
 
 	/**
@@ -100,35 +109,35 @@ public abstract class Thinning {
 	
 	    int count = 0;
 	    //p2 p3
-	    if (binary[y - 1][x] == 0 && binary[y - 1][x + 1] == 1) {
+	    if (getBinary(y - 1, x) == 0 && getBinary(y - 1, x + 1) == 1) {
 	        count++;
 	    }
 	    //p3 p4
-	    if (binary[y - 1][x + 1] == 0 && binary[y][x + 1] == 1) {
+	    if (getBinary(y - 1, x + 1) == 0 && getBinary(y, x + 1) == 1) {
 	        count++;
 	    }
 	    //p4 p5
-	    if (binary[y][x + 1] == 0 && binary[y + 1][x + 1] == 1) {
+	    if (getBinary(y, x + 1) == 0 && getBinary(y + 1, x + 1) == 1) {
 	        count++;
 	    }
 	    //p5 p6
-	    if (binary[y + 1][x + 1] == 0 && binary[y + 1][x] == 1) {
+	    if (getBinary(y + 1, x + 1) == 0 && getBinary(y + 1, x) == 1) {
 	        count++;
 	    }
 	    //p6 p7
-	    if (binary[y + 1][x] == 0 && binary[y + 1][x - 1] == 1) {
+	    if (getBinary(y + 1, x) == 0 && getBinary(y + 1, x - 1) == 1) {
 	        count++;
 	    }
 	    //p7 p8
-	    if (binary[y + 1][x - 1] == 0 && binary[y][x - 1] == 1) {
+	    if (getBinary(y + 1, x - 1) == 0 && getBinary(y, x - 1) == 1) {
 	        count++;
 	    }
 	    //p8 p9
-	    if (binary[y][x - 1] == 0 && binary[y - 1][x - 1] == 1) {
+	    if (getBinary(y, x - 1) == 0 && getBinary(y - 1, x - 1) == 1) {
 	        count++;
 	    }
 	    //p9 p2
-	    if (binary[y - 1][x - 1] == 0 && binary[y - 1][x] == 1) {
+	    if (getBinary(y - 1, x - 1) == 0 && getBinary(y - 1, x) == 1) {
 	        count++;
 	    }
 	

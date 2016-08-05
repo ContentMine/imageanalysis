@@ -49,10 +49,10 @@ public class ZhangSuenThinning extends Thinning {
 	private boolean iterateOverPoints(String trbl, boolean all) {
 		List<Int2> pointsToChange = new ArrayList<Int2>();
 		if (all) {
-			for (int y = 1; y + 1 < binary.length; y++) {
-			    for (int x = 1; x + 1 < binary[y].length; x++) {
+			for (int y = 0; y < binary.length; y++) {
+			    for (int x = 0; x < binary[y].length; x++) {
 			        processPoint(trbl, pointsToChange, y, x);
-			        if (binary[y][x] == 1) {
+			        if (getBinary(y, x) == 1) {
 			        	blackPixels.add(new Int2(x, y));
 			        }
 			    }
@@ -96,35 +96,35 @@ public class ZhangSuenThinning extends Thinning {
 
 	private boolean checkForPathologicalCase(int y, int x) {
 		try {
-			if (binary[y + 1][x] == 0) {
+			if (getBinary(y + 1, x) == 0) {
 				return false;
-			} else if (binary[y][x + 1] == 0) {
+			} else if (getBinary(y, x + 1) == 0) {
 				return false;
-			} else if (binary[y + 1][x + 1] == 0) {
+			} else if (getBinary(y + 1, x + 1) == 0) {
 				return false;
-			} else if (binary[y + 2][x] == 1) {
+			} else if (getBinary(y + 2, x) == 1) {
 				return false;
-			} else if (binary[y + 2][x + 1] == 1) {
+			} else if (getBinary(y + 2, x + 1) == 1) {
 				return false;
-			} else if (binary[y + 2][x + 2] == 1) {
+			} else if (getBinary(y + 2, x + 2) == 1) {
 				return false;
-			} else if (binary[y + 1][x + 2] == 1) {
+			} else if (getBinary(y + 1, x + 2) == 1) {
 				return false;
-			} else if (binary[y][x + 2] == 1) {
+			} else if (getBinary(y, x + 2) == 1) {
 				return false;
-			} else if (binary[y - 1][x - 1] == 1) {
+			} else if (getBinary(y - 1, x - 1) == 1) {
 				return false;
-			} else if (binary[y - 1][x] == 1) {
+			} else if (getBinary(y - 1, x) == 1) {
 				return false;
-			} else if (binary[y - 1][x + 1] == 1) {
+			} else if (getBinary(y - 1, x + 1) == 1) {
 				return false;
-			} else if (binary[y - 1][x + 2] == 1) {
+			} else if (getBinary(y - 1, x + 2) == 1) {
 				return false;
-			} else if (binary[y][x - 1] == 1) {
+			} else if (getBinary(y, x - 1) == 1) {
 				return false;
-			} else if (binary[y + 1][x - 1] == 1) {
+			} else if (getBinary(y + 1, x - 1) == 1) {
 				return false;
-			} else if (binary[y + 2][x - 1] == 1) {
+			} else if (getBinary(y + 2, x - 1) == 1) {
 				return false;
 			}
 			return true;
@@ -135,19 +135,19 @@ public class ZhangSuenThinning extends Thinning {
 
 	private boolean getNeighbourContrast(int y, int x, int sumCyclicChanges,
 			int neighbourSum) {
-		boolean neighbourFunction = binary[y][x]==1 && 3 <= neighbourSum && neighbourSum <= 6 && sumCyclicChanges == 1;
+		boolean neighbourFunction = getBinary(y, x)==1 && 3 <= neighbourSum && neighbourSum <= 6 && sumCyclicChanges == 1;
 		return neighbourFunction;
 	}
 
 	private boolean leftTopTriangles(int y, int x) {
-		return (binary[y - 1][x] * binary[y][x + 1] * binary[y][x - 1] == 0)
-		    && (binary[y - 1][x] * binary[y + 1][x] * binary[y][x - 1] == 0);
+		return (getBinary(y - 1, x) * getBinary(y, x + 1) * getBinary(y, x - 1) == 0)
+		    && (getBinary(y - 1, x) * getBinary(y + 1, x) * getBinary(y, x - 1) == 0);
 	}
 
 
 	private boolean rightBottomTriangles(int y, int x) {
-		return (binary[y - 1][x] * binary[y][x + 1] * binary[y + 1][x] == 0)
-		    && (binary[y][x + 1] * binary[y + 1][x] * binary[y][x - 1] == 0);
+		return (getBinary(y - 1, x) * getBinary(y, x + 1) * getBinary(y + 1, x) == 0)
+		    && (getBinary(y, x + 1) * getBinary(y + 1, x) * getBinary(y, x - 1) == 0);
 	}
 
 	private void resetChangedPointsToZeroAndClearList(List<Int2> pointsToChange) {

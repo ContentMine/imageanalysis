@@ -29,9 +29,9 @@ public class HilditchThinning extends Thinning {
                 for (int jx = 1; jx + 1 < binary[iy].length; jx++) {
                     a = getSumCyclicChanges(iy, jx);
                     b = getNeighbourSum(iy, jx);
-                    if (binary[iy][jx]==1 && 2 <= b && b <= 6 && a == 1
-                        && ((binary[iy - 1][jx] * binary[iy][jx + 1] * binary[iy][jx - 1] == 0) || (getSumCyclicChanges(iy - 1, jx) != 1))
-                        && ((binary[iy - 1][jx] * binary[iy][jx + 1] * binary[iy + 1][jx] == 0) || (getSumCyclicChanges(iy, jx + 1) != 1)))
+                    if (getBinary(iy, jx)==1 && 2 <= b && b <= 6 && a == 1
+                        && ((getBinary(iy - 1, jx) * getBinary(iy, jx + 1) * getBinary(iy, jx - 1) == 0) || (getSumCyclicChanges(iy - 1, jx) != 1))
+                        && ((getBinary(iy - 1, jx) * getBinary(iy, jx + 1) * getBinary(iy + 1, jx) == 0) || (getSumCyclicChanges(iy, jx + 1) != 1)))
                     {
                         binary[iy][jx] = 0;
                         hasChange = true;
