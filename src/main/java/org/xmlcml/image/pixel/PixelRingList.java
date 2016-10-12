@@ -77,7 +77,7 @@ public class PixelRingList implements Iterable<PixelList> {
 	 * @param fill list of colours; if null, defaults are used
 	 */
 	public SVGG plotPixels(SVGG gg, String[] fill) {
-		if (gg != null) {
+		if (gg == null) {
 			gg = new SVGG();
 		}
 		if (fill == null) {
