@@ -47,7 +47,7 @@ public class PixelGraphTest {
 	}
 
 	@Test
-	// 2 Y's joined
+	// 2 Y shapes joined
 	/**
 	 * +     +
 	 *  +   +

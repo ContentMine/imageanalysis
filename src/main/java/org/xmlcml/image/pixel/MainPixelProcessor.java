@@ -1,7 +1,9 @@
 package org.xmlcml.image.pixel;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.image.ArgIterator;
@@ -107,14 +109,25 @@ public class MainPixelProcessor {
 	 */
 	public PixelIslandList getOrCreatePixelIslandList(boolean superThinning) {
 		if (pixelIslandList == null && getImage() != null) {
-			FloodFill floodFill = new ImageFloodFill(this.image);
+			FloodFill floodFill = new ImageFloodFill(image);
 			floodFill.setDiagonal(true);
 			pixelIslandList = floodFill.getIslandList();
-			ImageParameters parameters = this.getParameters();
+			ImageParameters parameters = getParameters();
 			if (parameters != null) {
 				pixelIslandList.removeIslandsLessThan(parameters.getMinimumIslandSize());
-				LOG.trace("after remove islands: "+pixelIslandList.size());
+				LOG.trace("after remove islands: " + pixelIslandList.size());
 			}
+			/*BufferedImage b = new BufferedImage(450, 170, BufferedImage.TYPE_INT_ARGB);
+			java.awt.Graphics g = b.getGraphics();
+			g.setColor(Color.BLACK);
+			for (PixelIsland i : pixelIslandList.getList()) {
+				g.drawRect((int)(double) i.getBoundingBox().getXMin(), (int)(double) i.getBoundingBox().getYMin(), (int)(double) i.getBoundingBox().getXRange().getRange(), (int)(double) i.getBoundingBox().getYRange().getRange());
+			}
+			try {
+				javax.imageio.ImageIO.write(b, "PNG", new File("C:/workspace/foxboxes.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}*/
 			if (superThinning) {
 				pixelIslandList.thinThickStepsOld();
 				pixelIslandList.trimOrthogonalStubs();

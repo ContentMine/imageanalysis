@@ -208,6 +208,15 @@ public class Pixel {
 		return rect;
 	}
 
+	public SVGRect getSVGRect(double width, double height, String color) {
+		SVGRect rect = new SVGRect(
+				new Real2(this.point.getX(), this.point.getY()),
+				new Real2(this.point.getX() + width, this.point.getY() + height));
+		rect.setFill(color);
+		rect.setStroke(null);
+		return rect;
+	}
+
 	public static Real2Array createReal2Array(PixelList pixelList) {
 		Real2Array array = null;
 		if (pixelList != null) {
@@ -335,14 +344,15 @@ public class Pixel {
 
 	public Pixel getNextNeighbourIn2ConnectedChain(Pixel last) {
 		Pixel next = null;
-		if (this.is2ConnectedAny(island)) {
-			PixelList neighbours = this.getOrCreateNeighbours(island);
-			next = (neighbours.get(0) == last) ? neighbours.get(1) : neighbours.get(0);
+		if (is2ConnectedAny(island)) {
+			PixelList neighbours = getOrCreateNeighbours(island);
+			next = (neighbours.get(0) == last ? neighbours.get(1) : neighbours.get(0));
 		}
 		return next;
 	}
 
-	/** sets pixel in image to black.
+	/** 
+	 * Sets pixel in image to black.
 	 * 
 	 * subtracts offset
 	 * 

@@ -1,6 +1,7 @@
 package org.xmlcml.image.pixel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -474,8 +475,8 @@ public class PixelGraph {
 	}
 
 	public void createAndDrawGraph(SVGG g) {
-		PixelEdgeList edgeList = this.getEdgeList();
-		PixelNodeList nodeList = this.getNodeList();
+		PixelEdgeList edgeList = getEdgeList();
+		PixelNodeList nodeList = getNodeList();
 		for (PixelNode node : nodeList) {			
 			String color = node.getEdges().size() == 0 ? "red" : "green";
 			SVGG gg = node.createSVG(2.0, color);
@@ -575,7 +576,7 @@ public class PixelGraph {
 		ensureNodeList();
 		int i = 0;
 		for (PixelNode node : nodeList) {
-			node.setLabel("n"+(i++));
+			node.setLabel("n" + (i++));
 		}
 	}
 
@@ -714,42 +715,74 @@ public class PixelGraph {
 		//nucleusFactory.getNucleusByPixel(line.get(line.size())).createSpikePixelList()
 	}
 
-	public void tidyNodesAndEdges(double d) {
-		tidyEdges();
+	public void tidyNodesAndEdges(int largestSmallEdgeAllowed) {
+		getEdgeList();
+		getNodeList();
+		tidyEdges(largestSmallEdgeAllowed);
 		tidyNodes();
-		
 	}
 
-	private void tidyEdges() {
+	private void tidyEdges(int largestSmallEdgeAllowed) {
+		List<PixelEdge> smallEdges = new ArrayList<PixelEdge>();
 		for (PixelEdge edge : edgeList) {
 			if (edge.getNodes().size() != 2) {
-				LOG.trace("edge with missing node/s "+edge.getNodes().size());
+				LOG.trace("Edge with missing node or nodes: " + edge.getNodes().size());
+			} else {
+				PixelNode first = edge.getNodes().get(0);
+				PixelNode last = edge.getNodes().get(1);
+				if ((first.getEdges().size() == 1 || last.getEdges().size() == 1) && edge.size() <= largestSmallEdgeAllowed) {
+					smallEdges.add(edge);
+				}
 			}
+		}
+		for (PixelEdge e : smallEdges) {
+			removeEdge(e);
 		}
 	}
 
 	private void tidyNodes() {
-		LOG.trace("nodes: "+nodeList.size());
+		LOG.trace("Nodes: " + nodeList.size());
 		PixelNodeList copyList = new PixelNodeList(nodeList);
 		for (PixelNode node : copyList) {
 			remove2ConnectedNode(node);
+			if (node.getEdges().size() == 0) {
+				removeNode(node);
+			}
 		}
-		LOG.trace("nodes after: "+nodeList.size());
+		LOG.trace("Nodes after: " + nodeList.size());
 	}
 
 	private void remove2ConnectedNode(PixelNode node) {
 		if (node.getEdges().size() == 2) {
 			PixelEdge edge0 = node.getEdges().get(0);
-			PixelNode node0 = edge0.getOtherNode(node);
 			PixelEdge edge1 = node.getEdges().get(1);
-			PixelNode node1 = edge1.getOtherNode(node);
-			LOG.trace("others "+node0+"; "+node1);
-			PixelEdge edge01 = this.createEdgeWithoutPixels(node0, node1);
-			this.addEdge(edge01);
-			this.removeEdge(edge0);
-			this.removeEdge(edge1);
-			this.removeNode(node);
-			LOG.trace("*** removed: "+node);
+			if (edge0 != edge1) {
+				PixelNode node0 = edge0.getOtherNode(node);
+				PixelNode node1 = edge1.getOtherNode(node);
+				LOG.trace("Others: " + node0 + ", " + node1);
+				PixelEdge edge01 = createEdgeWithoutPixels(node0, node1);
+				Pixel first0 = edge0.getFirst();
+				Pixel first1 = edge1.getFirst();
+				Pixel last0 = edge0.getLast();
+				Pixel last1 = edge1.getLast();
+				double dist1 = first0.getInt2().getEuclideanDistance(first1.getInt2());
+				double dist2 = first0.getInt2().getEuclideanDistance(last1.getInt2());
+				double dist3 = last0.getInt2().getEuclideanDistance(first1.getInt2());
+				double dist4 = last0.getInt2().getEuclideanDistance(last1.getInt2());
+				if (dist1 < dist2 && dist1 < dist3 && dist1 <= dist4 || dist2 < dist1 && dist2 < dist3 && dist2 < dist4) {
+					Collections.reverse(edge0.getPixelList().getList());
+				}
+				if (dist2 < dist1 && dist2 < dist3 && dist2 < dist4 || dist4 < dist1 && dist4 < dist2 && dist4 < dist3) {
+					Collections.reverse(edge1.getPixelList().getList());
+				}
+				edge01.addPixelList(edge0.getPixelList());
+				edge01.addPixelList(edge1.getPixelList());
+				addEdge(edge01);
+				removeEdge(edge0);
+				removeEdge(edge1);
+				removeNode(node);
+				LOG.trace("Removed: " + node);
+			}
 		}
 	}
 
