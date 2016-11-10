@@ -52,7 +52,7 @@ public class MainPixelProcessor {
 
 	public void setDefaults() {
 		this.setMaxIsland(getDefaultMaxIsland());
-		this.setIsland(-1); // because 0 is a valid island
+		this.setSelectedIsland(-1); // because 0 is a valid island
 		this.parameters = new ImageParameters();
 	}
 	
@@ -163,7 +163,7 @@ public class MainPixelProcessor {
 		} else if (arg.equals(MainPixelProcessor.ISLAND) || arg.equals(MainPixelProcessor.ISLAND1)) {
 			Integer value = argIterator.getSingleIntegerValue();
 			if (value != null) {
-				setIsland(value);
+				setSelectedIsland(value);
 			}
 			
 		} else {
@@ -172,7 +172,7 @@ public class MainPixelProcessor {
 		return found;
 	}
 
-	private void setIsland(int island) {
+	public void setSelectedIsland(int island) {
 		this.selectedIslandIndex = island;
 		LOG.trace("PPxx "+this.hashCode()+" "+island);
 	}

@@ -15,6 +15,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.pixel.MainPixelProcessor;
+import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
@@ -69,6 +70,12 @@ public class ImageProcessor {
 	private ImageParameters parameters;
 	private PixelIslandList islandList = null;
 	private XSliceList xSliceList;
+
+	private PixelIsland selectedPixelIsland;
+
+	private BufferedImage binarizedImage;
+
+	private BufferedImage thinnedImage;
 
 	public ImageProcessor() {
 		setDefaults();
@@ -178,6 +185,8 @@ public class ImageProcessor {
 	public BufferedImage processImage(BufferedImage img) {
 		islandList = null;
 		mainProcessor.clearVariables();
+		binarizedImage = null;
+		thinnedImage = null;
 		this.setImage(img);
 		if (debug) {
 			String filename = TARGET + "/" + base + "/" + RAW_IMAGE_PNG;
@@ -187,6 +196,7 @@ public class ImageProcessor {
 		if (this.binarize) {
 			ColorUtilities.convertTransparentToWhite(image);
 			this.image = ImageUtil.boofCVBinarization(this.image, threshold);
+			this.binarizedImage = this.image;
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + BINARIZED_PNG;
 				ImageUtil.writeImageQuietly(this.image, filename);
@@ -195,6 +205,7 @@ public class ImageProcessor {
 		}
 		if (thinning != null) {
 			image = ImageUtil.thin(this.image, thinning);
+			this.thinnedImage = this.image;
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + THINNED_PNG;
 				ImageUtil.writeImageQuietly(this.image, filename);
@@ -498,9 +509,10 @@ public class ImageProcessor {
 		} else {
 			processImage(image);
 		}
-		PixelIslandList islandList = mainProcessor
-				.getOrCreatePixelIslandList();
-		LOG.trace("islandList " + islandList.size());
+		islandList = mainProcessor.getOrCreatePixelIslandList();
+		islandList.sortBySizeDescending();
+		int selectedIslandIndex = mainProcessor.getSelectedIslandIndex();
+		selectedPixelIsland = (selectedIslandIndex == -1) ? null : islandList.get(selectedIslandIndex);
 	}
 
 	public void parseArgs(String[] args) {
@@ -513,6 +525,19 @@ public class ImageProcessor {
 	public void parseArgsAndRun(String[] args) {
 		this.parseArgs(args);
 		this.runCommands();
+	}
+
+
+	public void parseArgs(String argString) {
+		if (argString != null) {
+			parseArgs(argString.trim().split("\\s+"));
+		}
+	}
+
+	public void parseArgsAndRun(String argString) {
+		if (argString != null) {
+			parseArgsAndRun(argString.trim().split("\\s+"));
+		}
 	}
 
 	public ImageParameters getParameters() {
@@ -542,4 +567,15 @@ public class ImageProcessor {
 		return xSliceList;
 	}
 
+	public PixelIsland getPixelIsland() {
+		return selectedPixelIsland;
+	}
+
+	public BufferedImage getBinarizedImage() {
+		return binarizedImage;
+	}
+
+	public BufferedImage getThinnedImage() {
+		return thinnedImage;
+	}
 }
