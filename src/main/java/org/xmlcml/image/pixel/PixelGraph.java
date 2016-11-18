@@ -765,14 +765,14 @@ public class PixelGraph {
 				Pixel first1 = edge1.getFirst();
 				Pixel last0 = edge0.getLast();
 				Pixel last1 = edge1.getLast();
-				double dist1 = first0.getInt2().getEuclideanDistance(first1.getInt2());
-				double dist2 = first0.getInt2().getEuclideanDistance(last1.getInt2());
-				double dist3 = last0.getInt2().getEuclideanDistance(first1.getInt2());
-				double dist4 = last0.getInt2().getEuclideanDistance(last1.getInt2());
-				if (dist1 < dist2 && dist1 < dist3 && dist1 <= dist4 || dist2 < dist1 && dist2 < dist3 && dist2 < dist4) {
+				double dist1 = first0.getInt2().getEuclideanDistance(node.getInt2());
+				double dist2 = last0.getInt2().getEuclideanDistance(node.getInt2());
+				double dist3 = first1.getInt2().getEuclideanDistance(node.getInt2());
+				double dist4 = last1.getInt2().getEuclideanDistance(node.getInt2());
+				if (dist1 < dist2) {
 					Collections.reverse(edge0.getPixelList().getList());
 				}
-				if (dist2 < dist1 && dist2 < dist3 && dist2 < dist4 || dist4 < dist1 && dist4 < dist2 && dist4 < dist3) {
+				if (dist4 < dist3) {
 					Collections.reverse(edge1.getPixelList().getList());
 				}
 				edge01.addPixelList(edge0.getPixelList());
