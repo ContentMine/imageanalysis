@@ -2,6 +2,8 @@ package org.xmlcml.image.pixel;
 
 import java.io.File;
 import java.io.ObjectInputStream.GetField;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.graphics.svg.SVGG;
@@ -16,6 +18,12 @@ import org.xmlcml.graphics.svg.SVGSVG;
  *
  */
 public class PixelPlotter {
+	
+	public abstract static class PixelColourer {
+		
+		public abstract List<String> colour(Pixel pixel);
+		
+	}
 
 	private final static Logger LOG = Logger.getLogger(PixelPlotter.class);
 	
@@ -236,6 +244,18 @@ public class PixelPlotter {
 		return g;
 	}
 
+	public SVGG plotPixels(PixelList pixelList, PixelColourer pixelColor) {
+		SVGG g = new SVGG();
+		LOG.trace("pixelList " + pixelList.size());
+		for (Pixel pixel : pixelList) {
+			List<SVGRect> rectangles = plotPixel(pixel, pixelColor.colour(pixel));
+			for (SVGRect rectangle : rectangles) {
+				g.appendChild(rectangle);
+			}
+		}
+		return g;
+	}
+
 	public SVGRect plotPixel(Pixel pixel) {
 		return plotPixel(pixel, currentColour);
 	}
@@ -253,6 +273,27 @@ public class PixelPlotter {
 			rect.setStrokeWidth(strokeWidth);
 		}
 		return rect;
+	}
+
+	public List<SVGRect> plotPixel(Pixel pixel, List<String> pixelColours) {
+		List<SVGRect> rectangles = new ArrayList<SVGRect>();
+		int i = 0;
+		for (String colour : pixelColours) {
+			SVGRect rect = pixel.getSVGRect(1 / ((double) pixelColours.size()), 1, "black");
+			rect.setX(rect.getX() + (i++ * (1 / ((double) pixelColours.size()))));
+			rect.setFill(colour);
+			rectangles.add(rect);
+			if (opacity != null) {
+				rect.setOpacity(opacity);
+			}
+			if (stroke != null) {
+				rect.setStroke(stroke);
+			}
+			if (strokeWidth != null) {
+				rect.setStrokeWidth(strokeWidth);
+			}
+		}
+		return rectangles;
 	}
 
 	private SVGG ensureSVGG(SVGG g) {

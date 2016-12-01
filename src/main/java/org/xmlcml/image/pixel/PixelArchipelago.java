@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-/** a collection of PIxelIslands and/or PIxelArchipelagos.
+/** a collection of PixelIslands and/or PixelArchipelagos.
  * 
  * 
  * @author pm286

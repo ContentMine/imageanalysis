@@ -109,35 +109,43 @@ public abstract class Thinning {
 	
 	    int count = 0;
 	    //p2 p3
-	    if (getBinary(y - 1, x) == 0 && getBinary(y - 1, x + 1) == 1) {
+	    int binary2 = getBinary(y - 1, x);
+		int binary3 = getBinary(y - 1, x + 1);
+		if (binary2 == 0 && binary3 == 1) {
 	        count++;
 	    }
 	    //p3 p4
-	    if (getBinary(y - 1, x + 1) == 0 && getBinary(y, x + 1) == 1) {
+	    int binary4 = getBinary(y, x + 1);
+		if (binary3 == 0 && binary4 == 1) {
 	        count++;
 	    }
 	    //p4 p5
-	    if (getBinary(y, x + 1) == 0 && getBinary(y + 1, x + 1) == 1) {
+	    int binary5 = getBinary(y + 1, x + 1);
+		if (binary4 == 0 && binary5 == 1) {
 	        count++;
 	    }
 	    //p5 p6
-	    if (getBinary(y + 1, x + 1) == 0 && getBinary(y + 1, x) == 1) {
+	    int binary6 = getBinary(y + 1, x);
+		if (binary5 == 0 && binary6 == 1) {
 	        count++;
 	    }
 	    //p6 p7
-	    if (getBinary(y + 1, x) == 0 && getBinary(y + 1, x - 1) == 1) {
+	    int binary7 = getBinary(y + 1, x - 1);
+		if (binary6 == 0 && binary7 == 1) {
 	        count++;
 	    }
 	    //p7 p8
-	    if (getBinary(y + 1, x - 1) == 0 && getBinary(y, x - 1) == 1) {
+	    int binary8 = getBinary(y, x - 1);
+		if (binary7 == 0 && binary8 == 1) {
 	        count++;
 	    }
 	    //p8 p9
-	    if (getBinary(y, x - 1) == 0 && getBinary(y - 1, x - 1) == 1) {
+	    int binary9 = getBinary(y - 1, x - 1);
+		if (binary8 == 0 && binary9 == 1) {
 	        count++;
 	    }
 	    //p9 p2
-	    if (getBinary(y - 1, x - 1) == 0 && getBinary(y - 1, x) == 1) {
+	    if (binary9 == 0 && binary2 == 1) {
 	        count++;
 	    }
 	

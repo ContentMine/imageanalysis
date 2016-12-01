@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -14,41 +15,54 @@ import org.xmlcml.euclid.Real2Array;
  * http://www.phpriot.com/articles/reducing-map-path-douglas-peucker-algorithm/4<br>
  * Ported from PHP to Java. "marked" array added to optimize.
  * 
- * @author M.Kergall
+ * @author M. Kergall
  */
 public class DouglasPeucker {
+	
+	private static class Corner {
+		int index;
+		double deviation;
+
+		public Corner(int index, double deviation) {
+			this.index = index;
+			this.deviation = deviation;
+		}
+	}
 
 	private double tolerance;
 	int cornerFindingWindow;
 	double relativeCornernessThresholdForCornerAggregation;
+	double allowedDifferenceCornerMaximumDeviating;
+	int maxNumberCornersToSearch;
 	private boolean[] marked;
 	private List<Real2> shape;
 	private List<Real2> newShape;
 	private double maxDeviation;
 	private int indexOfMaxDeviation;
 	double[] cornernesses;
-	int[] cornerPositions;
+	int[] positionsCorners;
 	private double secondGreatestCornerness;
-	private int secondGreatestCornernessPosition;
+	private int positionSecondGreatestCornerness;
 	private double greatestCornerness;
-	private int greatestCornernessPosition;
+	private int positionGreatestCornerness;
 
 	public DouglasPeucker(double tolerance) {
 		this.tolerance = tolerance;
 	}
 	
-	public DouglasPeucker(double tolerance, int cornerFindingWindow, double relativeCornernessThresholdForCornerAggregation) {
+	public DouglasPeucker(double tolerance, int cornerFindingWindow, double relativeCornernessThresholdForCornerAggregation, double allowedDifferenceCornerMaximumDeviating, int maxNumberCornersToSearch) {
 		this.tolerance = tolerance;
 		this.cornerFindingWindow = cornerFindingWindow;
 		this.relativeCornernessThresholdForCornerAggregation = relativeCornernessThresholdForCornerAggregation;
+		this.allowedDifferenceCornerMaximumDeviating = allowedDifferenceCornerMaximumDeviating;
+		this.maxNumberCornersToSearch = maxNumberCornersToSearch;
 	}
 	
 	/**
 	 * Reduce the number of points in a shape using the Douglas-Peucker
 	 * algorithm
 	 * 
-	 * @param shape
-	 *            The shape to reduce
+	 * @param shape The shape to reduce
 	 * @return the reduced shape
 	 */
 	public List<Real2> reduce(List<Real2> shape) {
@@ -67,11 +81,11 @@ public class DouglasPeucker {
 		calculateCornernesses(shape, n);
 		
 		if (shape.get(0).isEqualTo(shape.get(shape.size() - 1), 1.5)) {
-			Collections.rotate(shape, -greatestCornernessPosition);
+			Collections.rotate(shape, -positionGreatestCornerness);
 			// first and last points
 			marked[0] = true;
 			marked[n - 1] = true;
-			int split = (secondGreatestCornernessPosition - greatestCornernessPosition >= 0 ? secondGreatestCornernessPosition - greatestCornernessPosition : secondGreatestCornernessPosition - greatestCornernessPosition + shape.size());
+			int split = (positionSecondGreatestCornerness - positionGreatestCornerness >= 0 ? positionSecondGreatestCornerness - positionGreatestCornerness : positionSecondGreatestCornerness - positionGreatestCornerness + shape.size());
 			marked[split] = true;
 
 			calculateCornernesses(shape, n);
@@ -91,7 +105,7 @@ public class DouglasPeucker {
 
 	private void calculateCornernesses(List<Real2> shape, int n) {
 		cornernesses = new double[shape.size()];
-		cornerPositions = new int[shape.size()];
+		positionsCorners = new int[shape.size()];
 		greatestCornerness = 0;
 		secondGreatestCornerness = 0;
 		for (int idx = 1; idx < n - 1; idx++) {
@@ -146,15 +160,15 @@ public class DouglasPeucker {
 						return Double.compare(o2.getY(), o1.getY());
 					}
 				});
-				cornerPositions[idx - cornerFindingWindow] = (int) ((corners.size() == 1 || corners.get(1).getY() < relativeCornernessThresholdForCornerAggregation * corners.get(0).getY()) ? corners.get(0).getX() : corners.get(0).getMidPoint(corners.get(1)).getX());
+				positionsCorners[idx - cornerFindingWindow] = (int) ((corners.size() == 1 || corners.get(1).getY() < relativeCornernessThresholdForCornerAggregation * corners.get(0).getY()) ? corners.get(0).getX() : corners.get(0).getMidPoint(corners.get(1)).getX());
 				if (cornernesses[idx - cornerFindingWindow] > greatestCornerness) {
 					secondGreatestCornerness = greatestCornerness;
-					secondGreatestCornernessPosition = greatestCornernessPosition;
+					positionSecondGreatestCornerness = positionGreatestCornerness;
 					greatestCornerness = cornernesses[idx - cornerFindingWindow];
-					greatestCornernessPosition = cornerPositions[idx - cornerFindingWindow];
+					positionGreatestCornerness = positionsCorners[idx - cornerFindingWindow];
 				} else if (cornernesses[idx - cornerFindingWindow] > secondGreatestCornerness) {
 					secondGreatestCornerness = cornernesses[idx - cornerFindingWindow];
-					secondGreatestCornernessPosition = cornerPositions[idx - cornerFindingWindow];
+					positionSecondGreatestCornerness = positionsCorners[idx - cornerFindingWindow];
 				}
 			}
 		}
@@ -201,6 +215,7 @@ public class DouglasPeucker {
 			douglasPeuckerReduction(idxMax, lastIdx);
 		}
 	}
+	
 	private void douglasPeuckerReductionOld(int firstIdx, int lastIdx) {
 		// overlapping indexes
 		if (lastIdx <= firstIdx + 1) {
@@ -215,11 +230,19 @@ public class DouglasPeucker {
 			douglasPeuckerReduction(indexOfMaxDeviation, lastIdx);
 		}
 	}
+	
 	private int findMaximallyDeviatingPoint(List<Real2> shape, int firstIdx, int lastIdx) {
 		maxDeviation = 0.0;
 		indexOfMaxDeviation = 0;
-		int indexOfMaxCornerness = 0;
-		double maxCornerness = 0.0;
+		//int indexOfMaxCornerness = 0;
+		//double deviationOfMaxCornerness = 0.0;
+		PriorityQueue<Corner> queue = new PriorityQueue<Corner>(shape.size(), new Comparator<Corner>() {
+
+			public int compare(Corner o1, Corner o2) {
+				return Double.compare(cornernesses[o2.index], cornernesses[o1.index]);
+			}
+			
+		});
 
 		Real2 firstPoint = shape.get(firstIdx);
 		Real2 lastPoint = shape.get(lastIdx);
@@ -234,15 +257,26 @@ public class DouglasPeucker {
 				indexOfMaxDeviation = idx;
 			}
 			
-			if (cornernesses[idx] > maxCornerness && idx > firstIdx + cornerFindingWindow && idx < lastIdx - cornerFindingWindow) {
-				maxCornerness = cornernesses[idx];
-				indexOfMaxCornerness = cornerPositions[idx];
+			//cornernesses[idx] > cornernesses[indexOfMaxCornerness] && 
+			if (idx > firstIdx + cornerFindingWindow && idx < lastIdx - cornerFindingWindow) {
+				queue.add(new Corner(positionsCorners[idx], distance));
+				//indexOfMaxCornerness = positionsCorners[idx];
+				//deviationOfMaxCornerness = distance;
 			}
 		}
 		
-		if (indexOfMaxCornerness != 0) {
-			indexOfMaxDeviation = indexOfMaxCornerness;
+		if (queue.size() > 0) {
+			int i = 0;
+			int previousIndex;
+			for (Corner c = queue.poll(); c != null && i < maxNumberCornersToSearch; previousIndex = c.index, c = queue.poll(), i += (c != null && c.index != previousIndex ? 1 : 0)) {
+				if (maxDeviation - c.deviation < allowedDifferenceCornerMaximumDeviating && c.deviation > tolerance) {
+					indexOfMaxDeviation = c.index;
+				}
+			}
 		}
+		/*if (indexOfMaxCornerness != 0 && maxDeviation - deviationOfMaxCornerness < allowedDifferenceCornerMaximumDeviating && deviationOfMaxCornerness > tolerance) {
+			indexOfMaxDeviation = indexOfMaxCornerness;
+		}*/
 		return indexOfMaxDeviation;
 	}
 

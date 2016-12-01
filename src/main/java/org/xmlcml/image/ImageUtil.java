@@ -260,7 +260,7 @@ public class ImageUtil {
 			throw new RuntimeException("Cannot write null image: "+file);
 		}
 		try {
-			// DONT EDIT!
+			// DON'T EDIT!
 			String type = FilenameUtils.getExtension(file.getName());
 			if (type == null || type.equals("")) {
 				type ="png";

@@ -60,7 +60,7 @@ public class ImageProcessor {
 
 	private String base;
 	private boolean binarize;
-	private boolean debug;
+	private boolean debug = true;
 	private BufferedImage image;
 	private Thinning thinning;
 	private int threshold;
@@ -169,12 +169,12 @@ public class ImageProcessor {
 						+ file);
 		}
 		try {
-			this.inputFile = file;
+			inputFile = file;
 			image = ImageIO.read(file);
 			processImage(image);
 			return image;
 		} catch (Exception e) {
-			throw new RuntimeException("bad image: " + file, e);
+			throw new RuntimeException("Bad image: " + file, e);
 		}
 	}
 
