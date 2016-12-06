@@ -142,7 +142,20 @@ public class PixelEdge {
 	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
 		return getOrCreateSegmentList(tolerance, null, null, null, null);
 	}
+
 	
+	/** think this is what it was before Andy changed the signature.
+	 * 
+	 * @param tolerance
+	 * @param cornerFindingWindow
+	 * @param relativeCornernessThresholdForCornerAggregation
+	 * @return
+	 */
+	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, 
+			Double relativeCornernessThresholdForCornerAggregation) {
+		return getOrCreateSegmentList(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation);
+	}
+
 	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
 		if (segmentList == null) {
 			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null && allowedDifferenceCornerMaximumDeviating != null && maxNumberCornersToSearch != null;
