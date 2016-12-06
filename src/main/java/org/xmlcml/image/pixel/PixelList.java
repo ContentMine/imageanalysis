@@ -23,17 +23,16 @@ import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
 /**
- * container for a lit of pixels. 
- * can have additional attributes such as colour or value.
+ * Container for a list of pixels. 
+ * Can have additional attributes such as colour or value.
  * 
  * @author pm286
- *
  */
 public class PixelList implements Iterable<Pixel> {
 
 	final static Logger LOG = Logger.getLogger(PixelList.class);
 
-	// these may not be needed
+	//These may not be needed
 	private static final String START_STRING = ":";
 	private static final String END_STRING = ":";
 	public final static Pattern COORD_PATTERN = Pattern.compile("\\((\\d+),(\\d+)\\)");
@@ -107,7 +106,7 @@ public class PixelList implements Iterable<Pixel> {
 			if (x < w && y < h) {
 				binary[x][y] = 1;
 			} else {
-				LOG.error("Tried to write pixel outside image area "+xy);
+				LOG.error("Tried to write pixel outside image area " + xy);
 			}
 		}
 		return binary;
@@ -218,7 +217,8 @@ public class PixelList implements Iterable<Pixel> {
 		return touchingList;
 	}
 	
-	/** plots pixels as squares
+	/** 
+	 * Plots pixels as squares.
 	 * 
 	 * @param g if null creates one
 	 * @param fill colour
@@ -528,11 +528,12 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public PixelList getOrCreateNeighbours() {
 		PixelShell pixelShell = new PixelShell(this);
+		pixelShell.expandOnePixelFromCurrent();
 		return new PixelList(pixelShell.getExpandedSetWithoutSeed());
 	}
 
 	public PixelIsland getIsland() {
-		this.checkFromSameIsland(this.get(0));
+		this.checkFromSameIsland(get(0));
 		return island;
 	}
 	
@@ -561,10 +562,11 @@ public class PixelList implements Iterable<Pixel> {
 		return touchingPixelList;
 	}
 
-	/** removes islands in list as small or smaller than limit
-	 * only renoves from PixelList (does not delete the actual Pixel
+	/**
+	 * Removes islands in list that are smaller than or equal to limit.
+	 * Only removes from PixelList (does not delete the actual Pixel).
 	 * 
-	 * @param size maximum size of islands to remove��
+	 * @param size maximum size of islands to remove
 	 */
 	public void removeMinorIslands(int size) {
 		if (island == null) {

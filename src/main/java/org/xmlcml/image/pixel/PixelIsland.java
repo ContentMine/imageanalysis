@@ -32,12 +32,12 @@ import org.xmlcml.image.ImageUtil;
  * 
  * Islands can consist of:
  * <ul>
- * <li>A single pixel</li<
- * <li>A connected chain of pixels (with 2 terminal pixels</li<
- * <li>A tree of pixels with braching nodes (3-8 connected, but likely 3)</li<
- * <li>The above with nuclei (ganglia) in chains or nodes. The nuclei arise from
+ * <li>A single pixel</li>
+ * <li>A connected chain of pixels (with 2 terminal pixels)</li>
+ * <li>A tree of pixels with braching nodes (3-8 connected, but likely 3)</li>
+ * <li>The above with nuclei (ganglia) in chains or nodes; the nuclei arise from
  * incomplete thinning and are to be reduced to single pixels or chains while
- * retaining connectivity</li<
+ * retaining connectivity</li>
  * </ul>
  * 
  * @author pm286
@@ -54,7 +54,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		RIDGE,
 		THINNED,
 	}
-	private static final int NEIGHBOUR8 = -1;
+	public static final int NEIGHBOUR8 = -1;
 	
 	private static final String DEFAULT_OUTPUT_DIRECTORY_FILENAME = "target/island/";
 	private static final String DEFAULT_INTERNAL_RING_NAME = "internalRings";
@@ -598,19 +598,21 @@ public class PixelIsland implements Iterable<Pixel> {
 	 * 
 	 * @return all pixels 
 	 */
-	public PixelList getNeighbouringShells(int thickness) {
-		PixelList exposedList = this.createExposedPixelList();
+	public PixelRingList getNeighbouringShells(int thickness) {
+		PixelRingList rings = new PixelRingList();
+		PixelList exposedList = createExposedPixelList();
 		for (int i = 0; i < thickness; i++) {
 			PixelList neighbours = exposedList.getOrCreateNeighbours();
+			exposedList = new PixelList();
 			for (Pixel neighbour : neighbours) {
-				if (!this.contains(neighbour)) {
-					this.addPixelWithoutComputingNeighbours(neighbour);
+				if (!contains(neighbour)) {
+					addPixelWithoutComputingNeighbours(neighbour);
+					exposedList.add(neighbour);
 				}
 			}
+			rings.add(exposedList);
 		}
-		throw new RuntimeException("NYI");
-
-//		return exposedList;
+		return rings;
 	}
 			
 

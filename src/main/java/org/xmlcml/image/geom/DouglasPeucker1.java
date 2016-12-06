@@ -9,7 +9,7 @@ import org.xmlcml.euclid.Real2;
 	/*
 	*** Ramer Douglas Peucker
 
-	The Ramer-Douglas�Peucker algorithm is an algorithm for reducing the number of points in a curve that is approximated by a series of points. 
+	The Ramer-Douglas-Peucker algorithm is an algorithm for reducing the number of points in a curve that is approximated by a series of points. 
 	It does so by "thinking" of a line between the first and last point in a set of points that form the curve. 
 	It checks which point in between is farthest away from this line. 
 	If the point (and as follows, all other in-between points) is closer than a given distance 'epsilon', it removes all these in-between points. 
@@ -25,7 +25,7 @@ import org.xmlcml.euclid.Real2;
 	Even the original example on Wikipedia was BAD! 
 	The bugs were ranging from bad calculation of the perpendicular distance of a point to a line (often they contained a devide by zero error for vertical lines), 
 	to discarding points that should not be removed at all. 
-	To see this in action, just try running the algorithm on it's own result with the same epsilon, 
+	To see this in action, just try running the algorithm on its own result with the same epsilon, 
 	many implementations will keep on reducing more and more points until there is no spline left. 
 	A correct implementation of RDP will remove *all* points that it can remove given a certain epsilon in the first run.
 

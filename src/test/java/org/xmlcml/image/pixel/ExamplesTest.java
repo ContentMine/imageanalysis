@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlcml.euclid.Transform2;
+import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
@@ -88,6 +90,10 @@ public class ExamplesTest {
 			for (PixelEdge edge : edgeList) {
 				PixelSegmentList segmentList = PixelSegmentList.createSegmentList(edge.getPixelList(), tolerance);
 				SVGG g = segmentList.getSVGG();
+				for (int i = 0; i < g.getChildCount(); i++) {
+					((SVGElement) g.getChild(i)).setTransform(Transform2.applyScale(0.5));
+					((SVGElement) g.getChild(i)).applyTransformAttributeAndRemove();
+				}
 				svgg.appendChild(g);
 			}
 		}

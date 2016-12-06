@@ -689,7 +689,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 
 	public void debugIslands() {
 		for (PixelIsland island : this) {
-			if (island.islandList == null) LOG.debug("******NULL ISLAND LIST");
+			if (island.islandList == null) {
+				LOG.debug("******NULL ISLAND LIST");
+			}
 		}
 		LOG.trace("DEBUG ISLAND LIST");
 	}
@@ -697,9 +699,9 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("islands: "+this.size());
+		sb.append("islands: " + size());
 		for (PixelIsland island : this) {
-			sb.append("["+island.size()+"; "+island.getIntBoundingBox()+"]");
+			sb.append("[" + island.size() + "; " + island.getIntBoundingBox() + "]");
 		}
 		return sb.toString();
 	}

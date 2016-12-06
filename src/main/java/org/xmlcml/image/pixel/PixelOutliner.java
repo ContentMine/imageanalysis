@@ -85,11 +85,12 @@ public class PixelOutliner {
 				startPixel);
 		int count = 0;
 		Pixel previousPixel = line.getCurrentPixel();
+		usedPixels.add(previousPixel);
 		while (!next.equals(current)) {
 			lineList.add(line);
 			IntLine nextLine = createNextLine(line);
 			if (nextLine == null) {
-				throw new RuntimeException("no line found");
+				throw new RuntimeException("No line found");
 			}
 			Pixel currentPixel = nextLine.getCurrentPixel();
 			if (currentPixel != null) {

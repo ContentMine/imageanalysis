@@ -20,10 +20,10 @@ import org.xmlcml.image.pixel.nucleus.ThreeWayNucleus;
 import org.xmlcml.image.pixel.nucleus.TwoWayNucleus;
 
 /**
- * an intermediate object which identifies and manages PixelNucleus's and
- * PixelNodes.
+ * an intermediate object which identifies and manages PixelNucleus and
+ * PixelNode objects.
  * 
- * PixelNodes can exist independently of PixelGraph (though normally they are
+ * PixelNode objects can exist independently of a PixelGraph (though normally they are
  * then used to create a graph). The node can be either:
  * <ul>
  * <li>Dot (a single isolated pixel)</li>
@@ -127,7 +127,7 @@ public class PixelNucleusFactory {
 	private void indexJunctions() {
 		ensureNucleusByPixelMap();
 		getOrCreateNucleusList();
-		ensureJunctionLists();
+		//ensureJunctionLists();
 		for (PixelNucleus nucleus : allNucleusList) {
 			// indexNucleusTypeAndAddToLists(nucleus);
 			for (Pixel pixel : nucleus.getPixelList()) {
@@ -218,7 +218,9 @@ public class PixelNucleusFactory {
 		PixelList dotPixelList = get0ConnectedPixelList();
 		for (Pixel pixel : dotPixelList) {
 			unusedPixelSet.remove(pixel);
-			PixelNucleus nucleus = new PixelNucleus(island);
+			PixelList list = new PixelList();
+			list.add(pixel);
+			PixelNucleus nucleus = new DotNucleus(pixel, list, island);
 			nucleus.setJunctionType(PixelJunctionType.DOT);
 			nucleus.add(pixel);
 			LOG.trace("made dot: " + nucleus);
@@ -559,7 +561,13 @@ public class PixelNucleusFactory {
 				LOG.error("No neighbour in nucleus");
 			}
 			if (nucleusNeighbourIndex != -1) {
-				line = findLine(neighbours.get(nucleusNeighbourIndex), spike);
+				Pixel nucleusPixel = neighbours.get(nucleusNeighbourIndex);
+				//Pixel nucleusCentre = getNucleusByPixel(nucleusPixel).getCentrePixel();
+				//if (nucleusCentre != nucleusPixel) {
+					//line = findLine(nucleusCentre, nucleusPixel);
+				//} else {
+					line = findLine(nucleusPixel, spike);
+				//}
 			}
 		}
 		return line;
@@ -570,13 +578,23 @@ public class PixelNucleusFactory {
 		PixelList line = new PixelList();
 		line.add(lastPixel);
 		while (true) {
+			if (thisPixel == null) {
+				break;
+			}
 			line.add(thisPixel);
 			// have we hit another nucleus?
-			if (thisPixel == null || getNucleusByPixel(thisPixel) != null) {
+			if (getNucleusByPixel(thisPixel) != null) {//(getNucleusByPixel(thisPixel) != null && (getNucleusByPixel(lastPixel) == null || getNucleusByPixel(thisPixel) != getNucleusByPixel(lastPixel)))) {
+				/*if (thisPixel != null && thisPixel != getNucleusByPixel(thisPixel).getCentrePixel()) {
+					line.add(getNucleusByPixel(thisPixel).getCentrePixel());
+				}*/
 				break;
 			}
 			Pixel nextPixel = thisPixel
 					.getNextNeighbourIn2ConnectedChain(lastPixel);
+			/*if (nextPixel == null) {
+				PixelList neighbours = thisPixel.getOrthogonalNeighbours(thisPixel.getIsland());
+				nextPixel = (neighbours.get(0) == lastPixel ? neighbours.get(1) : neighbours.get(0));
+			}*/
 			lastPixel = thisPixel;
 			thisPixel = nextPixel;
 		}
@@ -808,8 +826,10 @@ public class PixelNucleusFactory {
 
 		} else if (diagNeighbours.size() == 3) {
 			newNucleus = new ThreeWayNucleus(centrePixel, pixelList, island);
-			LOG.trace("made TILTED T");
-
+			LOG.trace("made TILTED_T");
+		} else if (diagNeighbours.size() == 4) {
+			newNucleus = new CrossNucleus(centrePixel, pixelList, island);
+			LOG.trace("made CROSS");
 		} else if ((diagNeighbours.size() == 1 && orthNeighbours.size() == 2)
 				|| (diagNeighbours.size() == 2 && orthNeighbours.size() == 1)
 				&& centrePixel.createNeighbourNeighbourList(island).size() == 4) {
@@ -946,7 +966,7 @@ public class PixelNucleusFactory {
 	}
 
 	/**
-	 * two diagonal Y's joined by stems.
+	 * two diagonal Ys joined by stems.
 	 * 
 	 * + ++ ++ +
 	 * 

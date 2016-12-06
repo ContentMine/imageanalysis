@@ -75,6 +75,7 @@ public class PixelEdge {
 	}
 
 	public void addPixelList(PixelList pixelList) {
+		ensurePixelList();
 		this.pixelList.addAll(pixelList);
 	}
 	
@@ -139,16 +140,16 @@ public class PixelEdge {
 	}
 
 	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
-		return getOrCreateSegmentList(tolerance, null, null);
+		return getOrCreateSegmentList(tolerance, null, null, null, null);
 	}
 	
-	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation) {
+	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
 		if (segmentList == null) {
-			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null;
-			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation) : new DouglasPeucker(tolerance));
+			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null && allowedDifferenceCornerMaximumDeviating != null && maxNumberCornersToSearch != null;
+			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, allowedDifferenceCornerMaximumDeviating, maxNumberCornersToSearch) : new DouglasPeucker(tolerance));
 			Real2Array points = pixelList.getReal2Array();
 			if (nodeList == null || nodeList.size() != 2) {
-				throw new RuntimeException("segmentation requires 2 nodes");
+				throw new RuntimeException("Segmentation requires 2 nodes");
 			}
 			boolean isCyclic = nodeList.get(0).getInt2().equals(nodeList.get(1).getInt2());
 			Real2Array pointArray = douglasPeucker.reduceToArray(points);
