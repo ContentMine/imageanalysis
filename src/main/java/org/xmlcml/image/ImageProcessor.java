@@ -1,19 +1,17 @@
 package org.xmlcml.image;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.IntRange;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.colour.ColorUtilities;
+import org.xmlcml.image.colour.ColorAnalyzer;
 import org.xmlcml.image.pixel.MainPixelProcessor;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
@@ -46,6 +44,7 @@ public class ImageProcessor {
 	public static final String INPUT1 = "--input";
 	public static final String OUTPUT = "-o";
 	public static final String OUTPUT1 = "--output";
+	public static final String COLOR = "--color";
 	public static final String BINARIZE = "-b";
 	public static final String BINARIZE1 = "--binarize";
 	public static final String THRESH = "-t";
@@ -70,6 +69,7 @@ public class ImageProcessor {
 	private ImageParameters parameters;
 	private PixelIslandList islandList = null;
 	private XSliceList xSliceList;
+	private ColorAnalyzer colorAnalyzer;
 
 	private PixelIsland selectedPixelIsland;
 
@@ -297,6 +297,21 @@ public class ImageProcessor {
 	}
 
 	public BufferedImage processImageFile() {
+		readImageFile();
+		if (image != null) {
+			if (colorAnalyzer != null) {
+				colorAnalyzer.setInputImage(image);
+				colorAnalyzer.setOutputDirectory(outputDir);
+				colorAnalyzer.run();
+			} else {
+				image = processImage(image);
+			}
+		}
+
+		return image;
+	}
+
+	public void readImageFile() {
 		if (image == null) {
 			if (inputFile == null || !inputFile.exists()) {
 				throw new RuntimeException("File does not exist: " + inputFile);
@@ -312,10 +327,6 @@ public class ImageProcessor {
 						+ inputFile, e);
 			}
 		}
-		if (image != null) {
-			image = processImage(image);
-		}
-		return image;
 	}
 
 	public void debug() {
@@ -450,6 +461,9 @@ public class ImageProcessor {
 			if (value != null) {
 				setOutputDir(new File(value));
 			}
+		} else if (arg.equals(COLOR)) {
+			List<String> values = argIterator.getValues();
+			parsePoster(values);
 		} else if (arg.equals(THINNING) || arg.equals(THINNING1)) {
 			String value = argIterator.getSingleValue();
 			if (value != null) {
@@ -468,6 +482,17 @@ public class ImageProcessor {
 			}
 		}
 		return found;
+	}
+
+	private void parsePoster(List<String> values) {
+		ensureColorAnalyzer();
+		colorAnalyzer.parse(values);
+	}
+
+	private void ensureColorAnalyzer() {
+		if (colorAnalyzer == null) {
+			colorAnalyzer = new ColorAnalyzer();
+		}
 	}
 
 	private void setThin(String thinningS) {
@@ -506,9 +531,8 @@ public class ImageProcessor {
 			} else {
 				throw new RuntimeException("no image file to process");
 			}
-		} else {
-			processImage(image);
 		}
+		
 		islandList = mainProcessor.getOrCreatePixelIslandList();
 		islandList.sortBySizeDescending();
 		int selectedIslandIndex = mainProcessor.getSelectedIslandIndex();

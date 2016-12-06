@@ -22,7 +22,7 @@ public abstract class FloodFill {
 	
 	protected abstract boolean isBlack(int posX, int posY);
 	
-	protected void fill() {
+	public void fill() {
 		painted = new boolean[height][width];
 
 		for (int i = 0; i < height; i++) {

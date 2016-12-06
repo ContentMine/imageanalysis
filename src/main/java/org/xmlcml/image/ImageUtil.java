@@ -13,6 +13,7 @@ import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.Real2;
@@ -31,6 +32,17 @@ import boofcv.struct.image.ImageUInt8;
 
 public class ImageUtil {
 	private final static Logger LOG = Logger.getLogger(ImageUtil.class);
+
+	public static final IntArray SMEAR_ARRAY = new IntArray(new int[]{1,3,6,10,20,10,6,3,1});
+	public static final IntArray DOUBLE_ARRAY = new IntArray(new int[]{1,2,1});
+	public static final IntArray IDENT_ARRAY = new IntArray(new int[]{1});
+	public static final IntArray EDGE_ARRAY = new IntArray(new int[]{1,0,-1});
+	public static final IntArray SHARPEN_ARRAY = new IntArray(new int[]{-10, 20, -10});
+
+	public static int RED = 0;
+	public static int GREEN = 1;
+	public static int BLUE = 2;
+	public static int[] RGB = {RED, GREEN, BLUE};
 
 	public static BufferedImage zhangSuenThin(BufferedImage image) {
 		Thinning thinningService = new ZhangSuenThinning(image);
@@ -158,10 +170,10 @@ public class ImageUtil {
 		if (rgb == 0) {
 			gray = 255; // assume transparent?
 		} else {
-			int alpha = ((rgb & 0xff000000) >> 24) & 0x000000ff;
-			int r = ((rgb & 0x00ff0000) >> 16) & 0x000000ff;
-			int g = ((rgb & 0x0000ff00) >> 8) & 0x000000ff;
-			int b = (rgb & 0x000000ff) & 0x000000ff;
+			int alpha = getAlpha(rgb);
+			int r = getRed(rgb);
+			int g = getGreen(rgb);
+			int b = getBlue(rgb);
 			if (r == 0 && g == 0 && b == 0) {
 				gray = 255 - alpha; // black seems to be #ff000000
 			} else if (r == g && g == b) {
@@ -177,6 +189,26 @@ public class ImageUtil {
 //			System.out.print(gray+" ");
 		}
 		return gray;
+	}
+
+	public static int getBlue(int rgb) {
+		int blue = rgb;
+		return (blue & 0xff) ;
+	}
+
+	public static int getGreen(int rgb) {
+		int green = rgb >> 8;
+		return (green & 0xff);
+	}
+
+	public static int getRed(int rgb) {
+		int red = rgb >> 16;
+		return (red & 0xff) ;
+	}
+
+	private static int getAlpha(int rgb) {
+		int alpha = rgb >> 24;
+		return (alpha & 0xff) ;
 	}
 	
 	public static int getGray(BufferedImage image, int x, int y) {
@@ -317,6 +349,61 @@ public class ImageUtil {
 		return image;
 	}
 
+	/** average colours locally.
+	 * 
+	 * 
+	 * @param image
+	 * @param 
+ 	 * @return new BufferedImage
+	 */
+	public static BufferedImage averageImageColors(BufferedImage image) {
+
+		int width = image.getWidth();
+		int height = image.getHeight();
+		BufferedImage image1 = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		for (int i = 1; i < width - 1; i++) {
+			for (int j = 1; j < height - 1; j++) {
+				int rgbij = image.getRGB(i, j);
+				if (!isWhite(ImageUtil.getRGBChannels(rgbij), 200)) {
+					int[] rgbx =  averageOverNeighbours(image, i, j);
+					rgbij = ImageUtil.setRgb(rgbx[0], rgbx[1], rgbx[2]);
+				}
+				image1.setRGB(i, j, rgbij); 
+			}
+		}
+		return image1;
+	}
+
+	private static int[] averageOverNeighbours(BufferedImage image, int i, int j) {
+		int count = 0;
+		int[] rgbs = new int[3];
+		for (int k = -1; k <= 1; k++) {
+			for (int l = -1; l <= 1; l++) {
+				int rgb = image.getRGB(i + k, j + l);
+				int[] rgbx = ImageUtil.getRGBChannels(rgb);
+				if (!isWhite(rgbx, 250)) {
+					for (int m = 0; m < 3; m++) {
+						rgbs[m] += rgbx[m];
+					}
+					count++;
+				}
+			}
+		}
+		if (count != 0) {
+			for (int m = 0; m < 3; m++) {
+				rgbs[m] /= count;
+			}
+		} else {
+			rgbs = ImageUtil.getRGBChannels(image.getRGB(i, j));
+		}
+		return rgbs;
+	}
+
+
+	private static boolean isWhite(int[] rgbx, int thresh) {
+		return rgbx[0] > thresh && rgbx[1] > thresh && rgbx[2] > thresh;
+	}
+
 	/** flatten colours in image.
 	 * 
 	 * uses ImageUtil.flattenPixel
@@ -356,9 +443,9 @@ public class ImageUtil {
 	 */
 	public static void flattenPixel(BufferedImage image, int i, int j, int delta, BufferedImage image1) {
 		int rgb = image.getRGB(i, j);
-		int r = (rgb & 0x00ff0000) >> 16;
-		int g = (rgb & 0x0000ff00) >> 8;
-		int b = (rgb & 0x000000ff);
+		int r = getRed(rgb);
+		int g = getGreen(rgb);
+		int b = getBlue(rgb);
 		
 		r = flattenChannel(r, delta);
 		g = flattenChannel(g, delta);
@@ -380,6 +467,33 @@ public class ImageUtil {
 		return rr == 0 ? 0 : rr - 1;
 	}
 
+	public static int setRgb(int red, int green, int blue) {
+		int rgb = red * 256 * 256 + green * 256 + blue;
+//		LOG.debug(red+", "+green+", "+blue+"//"+Integer.toHexString(rgb)+"/"+ImageUtil.debugRGB(rgb));
+		return rgb;
+	}
+
+	/** flip to (255-r), (255.g), (255,b)
+	 * 
+	 * @param rgb
+	 * @return
+	 */
+	public static int invertRgb(int rgb) {
+		int flip = setRgb(255 - getRed(rgb), 255 - getGreen(rgb), 255 - getBlue(rgb));
+		return flip;
+	}
 	
+	public static int[] getRGBChannels(int rgb) {
+		int red = getRed(rgb);
+		int green = getGreen(rgb);
+		int blue = getBlue(rgb);
+		int[] channels = new int[] {red, green, blue};
+		return channels;
+	}
+
+	public static String debugRGB(int rgb) {
+		int[] channels = ImageUtil.getRGBChannels(rgb);
+		return "r="+channels[RED]+",g="+channels[GREEN]+",b="+channels[BLUE];
+	}
 
 }

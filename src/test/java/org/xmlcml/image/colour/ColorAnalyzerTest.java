@@ -29,9 +29,9 @@ public class ColorAnalyzerTest {
 	private final static Logger LOG = Logger.getLogger(ColorAnalyzerTest.class);
 	
 	@Test
-	public void countColours() throws Exception {
+	public void countColors() throws Exception {
 		BufferedImage image = ImageIO.read(new File(Fixtures.TEXT_DIR, "phylo.jpg"));
-		ColourAnalyzer analyzer = new ColourAnalyzer(image);
+		ColorAnalyzer analyzer = new ColorAnalyzer(image);
 		analyzer.setXYRange(new Int2Range(new IntRange(0, 300), new IntRange(50, 300)));
 		LOG.trace(analyzer.getWidth()+"/"+analyzer.getHeight());
 		analyzer.set4Bits(true);
@@ -55,7 +55,7 @@ public class ColorAnalyzerTest {
 			nvalues = 2;
 			BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "phylo.jpg").toString());
 			ImageUtil.flattenImage(image, nvalues);
-			ColourAnalyzer colorAnalyzer = new ColourAnalyzer(image);
+			ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
 			Multiset<Integer> set = colorAnalyzer.createColorSetNew();
 			for (Entry<Integer> entry : set.entrySet()) {
 				int ii = ((int) entry.getElement()) & 0x00ffffff;
@@ -118,16 +118,10 @@ public class ColorAnalyzerTest {
 	}
 
 	private void testPosterize0(String filename) throws IOException {
-		ColourAnalyzer colorAnalyzer = new ColourAnalyzer();
+		ColorAnalyzer colorAnalyzer = new ColorAnalyzer();
 		colorAnalyzer.readImage(new File(Fixtures.PROCESSING_DIR, filename+".png"));
-		colorAnalyzer.setStartPlot(1);
-		colorAnalyzer.setMaxPixelSize(1000000);
-		colorAnalyzer.setIntervalCount(4);
-		colorAnalyzer.setEndPlot(15);
-		colorAnalyzer.setMinPixelSize(300);
-		colorAnalyzer.flattenImage();
 		colorAnalyzer.setOutputDirectory(new File("target/"+filename));
-		colorAnalyzer.analyzeFlattenedColours();
+		colorAnalyzer.defaultPosterize();
 	}
 
 	

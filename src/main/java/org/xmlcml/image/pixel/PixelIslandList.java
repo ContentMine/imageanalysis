@@ -51,6 +51,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 	private MainPixelProcessor mainProcessor;
 	private boolean diagonal;
 	private List<PixelGraph> graphList;
+	private List<PixelList> outlineList;
 
 	public PixelIslandList() {
 		list = new ArrayList<PixelIsland>();
@@ -712,6 +713,18 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 			}
 			
 		}
+	}
+
+	public List<PixelList> getOrCreateOutlineList() {
+		if (outlineList == null) {
+			outlineList = new ArrayList<PixelList>();
+		}
+		return outlineList;
+	}
+
+	public void addOutline(PixelList outline) {
+		getOrCreateOutlineList();
+		outlineList.add(outline);
 	}
 
 }

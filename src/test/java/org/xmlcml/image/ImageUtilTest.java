@@ -8,13 +8,21 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.eclipse.jetty.util.log.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
+import org.xmlcml.image.colour.RGBMatrix;
 
 public class ImageUtilTest {
+	private static final Logger LOG = Logger.getLogger(ImageUtilTest.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
 
 	@Test
 	/** clip rectangle out of image.
@@ -73,6 +81,21 @@ public class ImageUtilTest {
 		BufferedImage shiftedImage = ImageUtil.scaleAndInterpolate(image, 17, 13);
 		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/scaledImage.png");
 	}
-
+	
+	@Test
+	/** invert colors
+	 * 
+	 */
+	public void testInvertRGB() {
+		int blackRgb = ImageUtil.setRgb(0, 0, 0);
+		int blackFlip = ImageUtil.invertRgb(blackRgb);
+		Assert.assertEquals(0x00ffffff, blackFlip);
+		int whiteRgb = ImageUtil.setRgb(255, 255, 255);
+		int whiteFlip = ImageUtil.invertRgb(whiteRgb);
+		Assert.assertEquals(0x00000000, whiteFlip);
+		int redRgb = ImageUtil.setRgb(255, 0, 0);
+		int redFlip = ImageUtil.invertRgb(redRgb);
+		Assert.assertEquals(0x0000ffff, redFlip);
+	}
 
 }
