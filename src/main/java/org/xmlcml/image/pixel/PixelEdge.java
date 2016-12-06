@@ -153,7 +153,7 @@ public class PixelEdge {
 	 */
 	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, 
 			Double relativeCornernessThresholdForCornerAggregation) {
-		return getOrCreateSegmentList(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation);
+		return getOrCreateSegmentList(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, null, null);
 	}
 
 	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
