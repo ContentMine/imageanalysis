@@ -2,22 +2,20 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-<!-- 
 	<parent>
-		<groupId>uk.ac.cam.ch.wwmm</groupId>
-		<artifactId>wwmm-parent</artifactId>
-		<version>5-SNAPSHOT</version>
+		<groupId>org.contentmine</groupId>
+		<artifactId>cm-parent</artifactId>
+		<version>6</version>
 	</parent>
-	-->
 
-	<groupId>org.xml-cml</groupId>
+	<groupId>org.contentmine</groupId>
 	<artifactId>imageanalysis</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1</version>
 	<packaging>jar</packaging>
 
 	<name>ImageAnalysis</name>
 	<description> Image analysis and IO routines </description>
-	<url>http://bitbucket.org/petermr/imageanalysis</url>
+	<url>http://github.com/contentMine/imageanalysis</url>
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -26,9 +24,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://bitbucket.org/petermr/imageanalysis/src</url>
-		<connection>scm:hg:http://bitbucket.org/petermr/imageanalysis</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/petermr/imageanalysis</developerConnection>
+		<url>https://bgithub.com/contentMin/imageanalysis/src</url>
+		<connection>scm:hg:http://github.com/contentMin/imageanalysis</connection>
+		<developerConnection>scm:hg:https://github.com/contentMin/imageanalysis</developerConnection>
 	</scm>
 	<developers>
 		<developer>
@@ -36,16 +34,6 @@
 			<name>Peter Murray-Rust</name>
 		</developer>
 	</developers>
-
-	<ciManagement>
-		<system>jenkins</system>
-		<url>https://jenkins.ch.cam.ac.uk/job/imageanalysis</url>
-	</ciManagement>
-
-	<organization>
-		<name>Peter Murray-Rust</name>
-		<url>http://wwmm.ch.cam.ac.uk/blogs/murrayrust/ </url>
-	</organization>
 
 	<build>
 		<plugins>
@@ -78,25 +66,11 @@
 	</repositories>
 
 	<dependencies>
-	<!-- 
 		<dependency>
-			<groupId>org.xml-cml</groupId>
-			<artifactId>euclid</artifactId>
-			<version>1.1-SNAPSHOT</version>
-		</dependency>
--->
-		<dependency>
-			<groupId>org.xml-cml</groupId>
+			<groupId>org.contentmine</groupId>
 			<artifactId>html</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>2</version>
 		</dependency>
-<!-- 
-		<dependency>
-			<groupId>org.xml-cml</groupId>
-			<artifactId>svg</artifactId>
-			<version>0.2-SNAPSHOT</version>
-		</dependency>
--->
 		<dependency>
 			<groupId>org.boofcv</groupId>
 			<artifactId>io</artifactId>
@@ -119,32 +93,6 @@
 			<version>4.2</version>
 		</dependency>
 		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-
-<!-- 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
-		</dependency>
--->
 	</dependencies>
 
 	<profiles>
