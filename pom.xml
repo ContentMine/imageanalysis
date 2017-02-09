@@ -2,9 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>org.contentmine</groupId>
+		<artifactId>cm-parent</artifactId>
+		<version>7.0.3</version>
+	</parent>
+
 	<groupId>org.contentmine</groupId>
 	<artifactId>imageanalysis</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
     <packaging>jar</packaging>
 	<name>ImageAnalysis</name>
 	<description> Image analysis and IO routines </description>
@@ -14,7 +20,7 @@
     </properties>
 
 	<url>http://github.com/contentMine/imageanalysis</url>
-	
+
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -38,7 +44,7 @@
 		<dependency>
 			<groupId>org.contentmine</groupId>
 			<artifactId>html</artifactId>
-			<version>2.0.1</version>
+			<version>2.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.boofcv</groupId>
@@ -61,7 +67,7 @@
 			<artifactId>imgscalr-lib</artifactId>
 			<version>4.2</version>
 		</dependency>
-		
+
 	</dependencies>
 
 	<profiles>
@@ -87,5 +93,15 @@
 		</plugins>
 	</reporting>
 
+	<repositories>
+    <repository>
+        <id>cm-pom</id>
+        <url>https://raw.github.com/ContentMine/cm-pom/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+	</repositories>
 
 </project>
