@@ -161,7 +161,6 @@ public class ImageProcessorTest {
 
 	private void runColours(String input, int count) {
 		String filename = FilenameUtils.getBaseName(input);
-		LOG.debug(input);
 		String argString = "--input "+input+" --color count "+count+" minpixel 10 maxpixel 1000000"
 				+ " average"
 				+ " --output target/colors/"+filename+"";

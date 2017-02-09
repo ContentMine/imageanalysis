@@ -2,20 +2,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.contentmine</groupId>
-		<artifactId>cm-parent</artifactId>
-		<version>6</version>
-	</parent>
-
 	<groupId>org.contentmine</groupId>
 	<artifactId>imageanalysis</artifactId>
-	<version>1</version>
-	<packaging>jar</packaging>
-
+	<version>1.0.1</version>
+    <packaging>jar</packaging>
 	<name>ImageAnalysis</name>
 	<description> Image analysis and IO routines </description>
+
+    <properties>
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
 	<url>http://github.com/contentMine/imageanalysis</url>
+	
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -23,11 +22,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<scm>
-		<url>https://bgithub.com/contentMin/imageanalysis/src</url>
-		<connection>scm:hg:http://github.com/contentMin/imageanalysis</connection>
-		<developerConnection>scm:hg:https://github.com/contentMin/imageanalysis</developerConnection>
-	</scm>
 	<developers>
 		<developer>
 			<id>pm286</id>
@@ -37,39 +31,14 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<configuration>
-					<header>src/main/resources/header.txt</header>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
-	<!-- remove <repositories> for releases to central -->
-	<repositories>
-		<repository>
-			<id>ucc-repo</id>
-			<name>UCC Repository</name>
-			<url>https://maven.ch.cam.ac.uk/m2repo</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.contentmine</groupId>
 			<artifactId>html</artifactId>
-			<version>2</version>
+			<version>2.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.boofcv</groupId>
@@ -115,30 +84,6 @@
 
 	<reporting>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<configuration>
-					<targetJdk>1.5</targetJdk>
-					<linkXRef>true</linkXRef>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>apt-maven-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</reporting>
 

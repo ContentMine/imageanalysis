@@ -80,19 +80,15 @@ public class PixelListFloodFillTest {
 		SVGG g = new SVGG();
 		int i = 0;
 		for (PixelIsland island2 : pixelIslandList) {
-			LOG.debug(island2.size());
 			// island plotting needs pixelPlotter
-//			SVGG gg = island2.plotIsland();
 			SVGG gg = new SVGG();
 			PixelList pixelList2 = island2.getPixelList();
 			Int2Range bbox = pixelList2.getIntBoundingBox();
 			Int2 centroid = new Int2(bbox.getXRange().getMidPoint(), bbox.getYRange().getMidPoint());
-			LOG.debug(centroid);
 			pixelList2.plotPixels(gg, FILL[i++ % FILL.length]);
 			g.appendChild(gg);
 		}
 		SVGSVG.wrapAndWriteAsSVG(g, new File("target/islandFlood/fill.svg"));
-//		pixelIslandList.
 	}
 
 }

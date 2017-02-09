@@ -161,7 +161,7 @@ public class ImageProcessor {
 			throw new RuntimeException("Image file is null: "
 					+ file);
 		} else if (!file.exists()) {
-			LOG.debug(file.getAbsolutePath().toString());
+			LOG.error(file.getAbsolutePath().toString());
 			throw new RuntimeException("Image file is missing: "
 					+ file);
 		} else if (file.isDirectory()) {
@@ -191,7 +191,6 @@ public class ImageProcessor {
 		if (debug) {
 			String filename = TARGET + "/" + base + "/" + RAW_IMAGE_PNG;
 			ImageUtil.writeImageQuietly(this.image, filename);
-			System.err.println("wrote raw image file: " + filename);
 		}
 		if (this.binarize) {
 			ColorUtilities.convertTransparentToWhite(image);
@@ -200,7 +199,6 @@ public class ImageProcessor {
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + BINARIZED_PNG;
 				ImageUtil.writeImageQuietly(this.image, filename);
-				System.err.println("wrote binarized file: " + filename);
 			}
 		}
 		if (thinning != null) {
@@ -209,7 +207,6 @@ public class ImageProcessor {
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + THINNED_PNG;
 				ImageUtil.writeImageQuietly(this.image, filename);
-				System.err.println("wrote thinned file: " + filename);
 			}
 		}
 		return this.image;
@@ -580,7 +577,6 @@ public class ImageProcessor {
 			for (int x = 0; x < width; x++) {
 				XSlice xSlice = XSlice.getBinarySlice(image, x);
 				if (xSlice.size() > 0) {
-					LOG.debug(x+": "+xSlice);
 					xSliceList.add(xSlice);
 					SVGG gg = xSlice.getSVGG();
 					g.appendChild(gg);

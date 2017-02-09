@@ -237,14 +237,12 @@ public class ColorAnalyzer {
 	}
 
 	private void writePixelListsAsSVG() {
-		LOG.debug("pixelIslands "+pixelListList.size());
 		for (int i = 0; i < pixelListList.size(); i++) {
 			String hexColorS = Integer.toHexString(colorValues.elementAt(i));
 			hexColorS = "000000"+hexColorS;
 			hexColorS = hexColorS.substring(hexColorS.length() - 6);
 			PixelList pixelList = pixelListList.get(i);
 			int size = pixelList.size();
-			LOG.debug(i + " size "+size+"; "+hexColorS);
 			if (size <= maxPixelSize && size >= minPixelSize) {
 				if (i >= startPlot && i <= endPlot) {
 					SVGG g = new SVGG();
