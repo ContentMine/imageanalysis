@@ -53,7 +53,7 @@ public class RGBMatrixTest {
 //			rgbMatrix1 = rgbMatrix;
 			newImage = rgbMatrix1.createImage(image.getType());
 		}
-		ImageUtil.writeImageQuietly(newImage, new File("target/sharpen/sharpened.png"));
+		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(newImage, new File("target/sharpen/sharpened.png"));
 	}
 
 

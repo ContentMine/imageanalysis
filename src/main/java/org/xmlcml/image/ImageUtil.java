@@ -1,6 +1,7 @@
 package org.xmlcml.image;
 
 import java.awt.Color;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -287,7 +288,8 @@ public class ImageUtil {
 	 * @param image
 	 * @param file
 	 */
-	public static void writeImageQuietly(BufferedImage image, File file) {
+	@Deprecated // use org.xmlcml.image.ImageUtil
+	private static void writeImageQuietly(BufferedImage image, File file) {
 		if (image == null) {
 			throw new RuntimeException("Cannot write null image: "+file);
 		}

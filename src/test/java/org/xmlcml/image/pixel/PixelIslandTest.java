@@ -734,7 +734,7 @@ public class PixelIslandTest {
 				LOG.trace(ibbox);
 				File file = new File(clipDir, charA + ".png");
 				try {
-					ImageUtil.writeImageQuietly(subImage1, file);
+					org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(subImage1, file);
 				} catch (Exception e) {
 					LOG.error("couldn't write character: " + charA + " " + e);
 					continue;
@@ -780,7 +780,7 @@ public class PixelIslandTest {
 			Assert.assertNotNull("charsA[i] not null", charsA[i]);
 			subImageList.add(subImage1);
 			File file = new File(charsAADir, +charsA[i] + ".png");
-			ImageUtil.writeImageQuietly(subImage1, file);
+			org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(subImage1, file);
 		}
 		int nchar = islandsA.size();
 		// System.out.println("size: "+nchar);

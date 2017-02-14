@@ -17,6 +17,6 @@ public class ColorUtilitiesTest {
 	public void testFlipBlackWhite() throws IOException {
 		BufferedImage image  = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
 		ColorUtilities.flipWhiteBlack(image);
-		ImageUtil.writeImageQuietly(image, new File("target/colourutils/maltoryzineFlipped.png"));
+		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(image, new File("target/colourutils/maltoryzineFlipped.png"));
 	}
 }

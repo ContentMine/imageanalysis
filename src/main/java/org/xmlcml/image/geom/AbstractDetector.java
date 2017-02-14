@@ -32,7 +32,7 @@ public abstract class AbstractDetector {
 	protected abstract void process();
 	
 	public void writeFile(File outfile) {
-		ImageUtil.writeImageQuietly(outputImage, outfile);
+		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(outputImage, outfile);
 	}
 
 	public void writeSvg(File file) throws IOException {

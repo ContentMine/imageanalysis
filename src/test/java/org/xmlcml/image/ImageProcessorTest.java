@@ -103,9 +103,9 @@ public class ImageProcessorTest {
 		 PROCESSOR.parseArgsAndRun(argString);
 		 File T36933 = new File("target/36933");
 		 File B36933 = new File(T36933, "binarized.png");
-		 ImageUtil.writeImageQuietly(PROCESSOR.getBinarizedImage(), B36933);
+		 org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(PROCESSOR.getBinarizedImage(), B36933);
 		 File TH36933 = new File(T36933, "thinned.png");
-		 ImageUtil.writeImageQuietly(PROCESSOR.getThinnedImage(), TH36933);
+		 org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(PROCESSOR.getThinnedImage(), TH36933);
 		 // and some extra 
 		 PixelIsland pixelIsland = PROCESSOR.getPixelIsland();
 		 Assert.assertEquals("pixelIsland",  23670, pixelIsland.size());

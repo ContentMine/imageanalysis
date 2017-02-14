@@ -82,7 +82,7 @@ public class ColorAnalyzerTest {
 			ffffff  937110  white
 			*/
 	
-			ImageUtil.writeImageQuietly(image, new File("target/posterize.png"));
+			org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(image, new File("target/posterize.png"));
 		}
 
 	@Test

@@ -208,7 +208,7 @@ public class PixelGraphTest {
 		BufferedImage image = ImageIO.read(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2.png"));
 		image = ImageUtil.boofCVBinarization(image, 160);
 		image = ImageUtil.thin(image, new ZhangSuenThinning());
-		ImageUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
+		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
 		LOG.trace("islands: "+pixelIslandList.size());
 		PixelIsland island = pixelIslandList.getLargestIsland();
