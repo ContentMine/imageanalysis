@@ -4,7 +4,7 @@
 
     <groupId>org.contentmine</groupId>
     <artifactId>imageanalysis</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
     <name>ImageAnalysis</name>
     <description> Image analysis and IO routines </description>
@@ -13,21 +13,21 @@
        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <url>http://github.com/contentMine/imageanalysis</url>
-    
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <developers>
-        <developer>
-            <id>pm286</id>
-            <name>Peter Murray-Rust</name>
-        </developer>
-    </developers>
+	<url>http://github.com/contentMine/imageanalysis</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>pm286</id>
+			<name>Peter Murray-Rust</name>
+		</developer>
+	</developers>
 
     <build>
         <plugins>
@@ -87,5 +87,15 @@
         </plugins>
     </reporting>
 
+	<repositories>
+    <repository>
+        <id>cm-pom</id>
+        <url>https://raw.github.com/ContentMine/cm-pom/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+	</repositories>
 
 </project>
