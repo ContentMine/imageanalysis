@@ -8,10 +8,11 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.colour.ColorAnalyzer;
+import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.pixel.MainPixelProcessor;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
@@ -190,7 +191,7 @@ public class ImageProcessor {
 		this.setImage(img);
 		if (debug) {
 			String filename = TARGET + "/" + base + "/" + RAW_IMAGE_PNG;
-			ImageUtil.writeImageQuietly(this.image, filename);
+			ImageIOUtil.writeImageQuietly(this.image, filename);
 		}
 		if (this.binarize) {
 			ColorUtilities.convertTransparentToWhite(image);
@@ -198,7 +199,7 @@ public class ImageProcessor {
 			this.binarizedImage = this.image;
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + BINARIZED_PNG;
-				ImageUtil.writeImageQuietly(this.image, filename);
+				ImageIOUtil.writeImageQuietly(this.image, filename);
 			}
 		}
 		if (thinning != null) {
@@ -206,7 +207,7 @@ public class ImageProcessor {
 			this.thinnedImage = this.image;
 			if (debug) {
 				String filename = TARGET + "/" + base + "/" + THINNED_PNG;
-				ImageUtil.writeImageQuietly(this.image, filename);
+				ImageIOUtil.writeImageQuietly(this.image, filename);
 			}
 		}
 		return this.image;
@@ -260,13 +261,17 @@ public class ImageProcessor {
 	 * @return
 	 */
 	public static ImageProcessor createDefaultProcessorAndProcess(File imageFile) {
-		if (imageFile == null || !imageFile.exists() || imageFile.isDirectory()) {
-			throw new RuntimeException("Cannot find/open file " + imageFile);
+		if (imageFile == null) {
+			throw new RuntimeException("null image file");
+		} else if (!imageFile.exists()) {
+			throw new RuntimeException("Cfile does not exist " + imageFile);
+		} else if (imageFile.isDirectory()) {
+			throw new RuntimeException("File is directory " + imageFile);
 		} else {
 			try {
 				return ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(imageFile));
 			} catch (Exception e) {
-				throw new RuntimeException("Cannot read image file: "
+				throw new RuntimeException("image file exists but cannot read as image: "
 						+ imageFile, e);
 			}
 		}

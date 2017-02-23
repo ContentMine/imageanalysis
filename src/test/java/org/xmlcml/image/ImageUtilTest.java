@@ -10,13 +10,12 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.util.log.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
-import org.xmlcml.image.colour.RGBMatrix;
+import org.xmlcml.graphics.image.ImageIOUtil;
 
 public class ImageUtilTest {
 	private static final Logger LOG = Logger.getLogger(ImageUtilTest.class);
@@ -37,7 +36,7 @@ public class ImageUtilTest {
 		Assert.assertEquals(85, raster.getHeight());
 		BufferedImage subImage = new BufferedImage(raster.getWidth(), raster.getHeight(), image.getType());
 		subImage.setData(raster);
-		ImageUtil.writeImageQuietly(subImage, "target/subimage/subImage.png");
+		ImageIOUtil.writeImageQuietly(subImage, "target/subimage/subImage.png");
 	}
 	
 	@Test
@@ -49,7 +48,7 @@ public class ImageUtilTest {
 		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
 		Int2Range boundingBox = new Int2Range(new IntRange(20, 80), new IntRange(50, 135));
 		BufferedImage subImage = ImageUtil.clipSubImage(image, boundingBox);
-		ImageUtil.writeImageQuietly(subImage, "target/subimage/subImage1.png");
+		ImageIOUtil.writeImageQuietly(subImage, "target/subimage/subImage1.png");
 	}
 
 	@Test
@@ -69,7 +68,7 @@ public class ImageUtilTest {
 	public void testShiftGrayImage() throws IOException {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.shiftImage(image, 0.1, 0.2);
-		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/shiftedImage.png");
+		ImageIOUtil.writeImageQuietly(shiftedImage, "target/shiftscale/shiftedImage.png");
 	}
 
 	@Test
@@ -79,7 +78,7 @@ public class ImageUtilTest {
 	public void testScaleAndInterpolate() throws IOException {
 		BufferedImage image = ImageIO.read(new File(Fixtures.CHAR_DIR, "65.png"));
 		BufferedImage shiftedImage = ImageUtil.scaleAndInterpolate(image, 17, 13);
-		ImageUtil.writeImageQuietly(shiftedImage, "target/shiftscale/scaledImage.png");
+		ImageIOUtil.writeImageQuietly(shiftedImage, "target/shiftscale/scaledImage.png");
 	}
 	
 	@Test

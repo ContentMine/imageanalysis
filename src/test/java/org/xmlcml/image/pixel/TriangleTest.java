@@ -3,16 +3,11 @@ package org.xmlcml.image.pixel;
 import java.awt.Point;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2;
-import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelIsland;
-import org.xmlcml.image.pixel.PixelList;
-import org.xmlcml.image.pixel.PixelTriangle;
 
 public class TriangleTest {
 

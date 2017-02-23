@@ -282,29 +282,29 @@ public class ImageUtil {
 		return shiftedImage;
 	}
 
-	/** makes parent directly if not exists.
-	 * 
-	 * selects type from extension; chooses ".png" if none 
-	 * @param image
-	 * @param file
-	 */
-	@Deprecated // use org.xmlcml.image.ImageUtil
-	private static void writeImageQuietly(BufferedImage image, File file) {
-		if (image == null) {
-			throw new RuntimeException("Cannot write null image: "+file);
-		}
-		try {
-			// DON'T EDIT!
-			String type = FilenameUtils.getExtension(file.getName());
-			if (type == null || type.equals("")) {
-				type ="png";
-			}
-			file.getParentFile().mkdirs();
-			ImageIO.write(image, type, new FileOutputStream(file));
-		} catch (Exception e) {
-			throw new RuntimeException("cannot write image "+file, e);
-		}
-	}
+//	/** makes parent directly if not exists.
+//	 * 
+//	 * selects type from extension; chooses ".png" if none 
+//	 * @param image
+//	 * @param file
+//	 */
+//	@Deprecated // use org.xmlcml.image.ImageUtil
+//	private static void writeImageQuietlyX(BufferedImage image, File file) {
+//		if (image == null) {
+//			throw new RuntimeException("Cannot write null image: "+file);
+//		}
+//		try {
+//			// DON'T EDIT!
+//			String type = FilenameUtils.getExtension(file.getName());
+//			if (type == null || type.equals("")) {
+//				type ="png";
+//			}
+//			file.getParentFile().mkdirs();
+//			ImageIO.write(image, type, new FileOutputStream(file));
+//		} catch (Exception e) {
+//			throw new RuntimeException("cannot write image "+file, e);
+//		}
+//	}
 	/** uses Imgscalr to scale.
 	 * 
 	 * @param width
@@ -319,17 +319,17 @@ public class ImageUtil {
 		return scaledGenImage;
 	}
 
-	/** writes file making dirs if required
-	 * 
-	 * @param image creates filetype from filename suffix
-	 * @param filename
-	 * @return
-	 */
-	public static File writeImageQuietly(BufferedImage image, String filename) {
-		File file = new File(filename);
-		writeImageQuietly(image, file);
-		return file;
-	}
+//	/** writes file making dirs if required
+//	 * 
+//	 * @param image creates filetype from filename suffix
+//	 * @param filename
+//	 * @return
+//	 */
+//	public static File writeImageQuietlyXX(BufferedImage image, String filename) {
+//		File file = new File(filename);
+//		writeImageQuietlyX(image, file);
+//		return file;
+//	}
 
 	public static BufferedImage addBorders(BufferedImage image0, int xmargin, int ymargin, int color) {
 		if (image0 == null) {

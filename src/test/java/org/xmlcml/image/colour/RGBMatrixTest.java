@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 
@@ -53,7 +54,7 @@ public class RGBMatrixTest {
 //			rgbMatrix1 = rgbMatrix;
 			newImage = rgbMatrix1.createImage(image.getType());
 		}
-		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(newImage, new File("target/sharpen/sharpened.png"));
+		ImageIOUtil.writeImageQuietly(newImage, new File("target/sharpen/sharpened.png"));
 	}
 
 

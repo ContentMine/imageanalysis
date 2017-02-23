@@ -2,16 +2,20 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+       <imageanalysis.version>1.0.3</imageanalysis.version>
+       <!--  upstream -->
+       <html.version>2.0.6</html.version>
+    </properties>
+
     <groupId>org.contentmine</groupId>
     <artifactId>imageanalysis</artifactId>
-    <version>1.0.2</version>
+    <version>${imageanalysis.version}</version>
     <packaging>jar</packaging>
     <name>ImageAnalysis</name>
     <description> Image analysis and IO routines </description>
 
-    <properties>
-       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
 	<url>http://github.com/contentMine/imageanalysis</url>
 
@@ -38,7 +42,7 @@
         <dependency>
             <groupId>org.contentmine</groupId>
             <artifactId>html</artifactId>
-            <version>2.0.4</version>
+            <version>${html.version}</version>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>

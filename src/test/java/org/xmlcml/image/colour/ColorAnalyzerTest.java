@@ -11,13 +11,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 
-import boofcv.io.image.UtilImageIO;
-
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
+
+import boofcv.io.image.UtilImageIO;
 
 /** classifies the colours used in a diagram.
  * 
@@ -82,7 +83,7 @@ public class ColorAnalyzerTest {
 			ffffff  937110  white
 			*/
 	
-			org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(image, new File("target/posterize.png"));
+			ImageIOUtil.writeImageQuietly(image, new File("target/posterize.png"));
 		}
 
 	@Test

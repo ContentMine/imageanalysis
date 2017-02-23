@@ -534,7 +534,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 //		thinThickStepsOld();
 //		File outputDir = pixelProcessor.getOutputDir();
 //		outputDir.mkdirs();
-//		ImageUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir,
+//		ImageIOUtil.writeImageQuietly(createImageAtOrigin(), new File(outputDir,
 //				"cleaned.png"));
 //		// main tree
 //		SVGG g = new SVGG();
@@ -544,7 +544,7 @@ public class PixelIslandList implements Iterable<PixelIsland> {
 //			BufferedImage image1 = island.createImage();
 //			if (image1 == null)
 //				continue;
-//			ImageUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"
+//			ImageIOUtil.writeImageQuietly(image1, new File(outputDir, "cleaned"
 //					+ i + ".png"));
 //			g.appendChild(island.createSVG());
 //			PixelGraph graph = island.getOrCreateGraph();

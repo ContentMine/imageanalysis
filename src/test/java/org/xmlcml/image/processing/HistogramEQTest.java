@@ -3,8 +3,8 @@ package org.xmlcml.image.processing;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.ImageUtil;
 
 public class HistogramEQTest {
 
@@ -18,7 +18,7 @@ public class HistogramEQTest {
     	HistogramEqualization histogramEQ = new HistogramEqualization();
         histogramEQ.readImage(Fixtures.HISTOGRAM_PNG);
         histogramEQ.histogramEqualization();
-        ImageUtil.writeImageQuietly(histogramEQ.getEqualized(), "target/histogram/histogram.png");
+        ImageIOUtil.writeImageQuietly(histogramEQ.getEqualized(), "target/histogram/histogram.png");
 
 	}
 	/** histogram on photograph.
@@ -32,7 +32,7 @@ public class HistogramEQTest {
     	HistogramEqualization histogramEQ = new HistogramEqualization();
         histogramEQ.readImage(Fixtures.MOLECULE_20131119_JPG);
         histogramEQ.histogramEqualization();
-        ImageUtil.writeImageQuietly(histogramEQ.getEqualized(), "target/histogram/molecule.png");
+        ImageIOUtil.writeImageQuietly(histogramEQ.getEqualized(), "target/histogram/molecule.png");
 
 	}
 

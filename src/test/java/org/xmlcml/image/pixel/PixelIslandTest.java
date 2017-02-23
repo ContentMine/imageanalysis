@@ -23,6 +23,7 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
@@ -247,7 +248,7 @@ public class PixelIslandTest {
 //			SVGG g0 = islandList.plotPixels(t2);
 //			g0.setOpacity(0.5);
 //			gg.appendChild(g0);
-////			ImageUtil.writeImageQuietly(islandList.getImage(), new File(
+////			ImageIOUtil.writeImageQuietly(islandList.getImage(), new File(
 ////					"target/charRecog/char" + i + ".thin.png"));
 //			Assert.assertEquals("islands", 1, islandList.size());
 //			List<List<SVGPolyline>> polylineListList = islandList
@@ -312,7 +313,7 @@ public class PixelIslandTest {
 //		// BufferedImage image0 = ImageIO.read(new
 //		// File("src/test/resources/org/xmlcml/image/trec/images/US06335364-20020101-C00020.TIF"));
 //		Assert.assertNotNull(image0);
-//		ImageUtil.writeImageQuietly(image0, new File(
+//		ImageIOUtil.writeImageQuietly(image0, new File(
 //				"target/segments/trec.thin.png"));
 //		Thinning thinning = new HilditchThinning();
 //		PixelIslandList islandList = PixelIslandList
@@ -734,7 +735,7 @@ public class PixelIslandTest {
 				LOG.trace(ibbox);
 				File file = new File(clipDir, charA + ".png");
 				try {
-					org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(subImage1, file);
+					ImageIOUtil.writeImageQuietly(subImage1, file);
 				} catch (Exception e) {
 					LOG.error("couldn't write character: " + charA + " " + e);
 					continue;
@@ -780,7 +781,7 @@ public class PixelIslandTest {
 			Assert.assertNotNull("charsA[i] not null", charsA[i]);
 			subImageList.add(subImage1);
 			File file = new File(charsAADir, +charsA[i] + ".png");
-			org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(subImage1, file);
+			ImageIOUtil.writeImageQuietly(subImage1, file);
 		}
 		int nchar = islandsA.size();
 		// System.out.println("size: "+nchar);
@@ -860,7 +861,7 @@ public class PixelIslandTest {
 						ix.getMax() + 1), new IntRange(iy.getMin(),
 						iy.getMax() + 1));
 				BufferedImage image = ImageUtil.clipSubImage(rawImage, i2ra);
-				ImageUtil.writeImageQuietly(image, "target/rawChars/" + h + "/"
+				ImageIOUtil.writeImageQuietly(image, "target/rawChars/" + h + "/"
 						+ c + ".png");
 				c++;
 			}
@@ -1010,7 +1011,7 @@ public class PixelIslandTest {
 			);
 			if (corr > correlationCutoff) {
 				LOG.trace("corr " + i + " " + Util.format(corr, 2));
-				ImageUtil.writeImageQuietly(subImage, "target/charACorr/"
+				ImageIOUtil.writeImageQuietly(subImage, "target/charACorr/"
 						+ charname + "/" + i + ".png");
 			}
 			i++;

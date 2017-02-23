@@ -10,12 +10,9 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.euclid.Int2;
-import org.xmlcml.euclid.Int2Range;
-import org.xmlcml.euclid.IntRange;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
-import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
 public class PixelGraphTest {
@@ -208,7 +205,7 @@ public class PixelGraphTest {
 		BufferedImage image = ImageIO.read(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2.png"));
 		image = ImageUtil.boofCVBinarization(image, 160);
 		image = ImageUtil.thin(image, new ZhangSuenThinning());
-		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
+		ImageIOUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
 		LOG.trace("islands: "+pixelIslandList.size());
 		PixelIsland island = pixelIslandList.getLargestIsland();

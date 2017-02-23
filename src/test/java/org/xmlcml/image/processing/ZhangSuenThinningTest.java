@@ -8,8 +8,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.ImageUtil;
 
 public class ZhangSuenThinningTest {
 
@@ -20,7 +20,7 @@ public class ZhangSuenThinningTest {
 	       Thinning thinningService = new ZhangSuenThinning(image);
 	       thinningService.doThinning();
 	       image = thinningService.getThinnedImage();
-	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thinning/zhangSuenMaltoryzine.png");
+	       File thinnedPng = ImageIOUtil.writeImageQuietly(image, "target/thinning/zhangSuenMaltoryzine.png");
 	       Assert.assertTrue(thinnedPng.exists());
 	}
 

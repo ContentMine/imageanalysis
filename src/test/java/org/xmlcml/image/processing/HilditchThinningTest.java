@@ -8,8 +8,8 @@ import javax.imageio.ImageIO;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
-import org.xmlcml.image.ImageUtil;
 
 public class HilditchThinningTest {
 
@@ -20,7 +20,7 @@ public class HilditchThinningTest {
 	       Thinning thinningService = new HilditchThinning(image);
 	       thinningService.doThinning();
 	       image = thinningService.getThinnedImage();
-	       File thinnedPng = ImageUtil.writeImageQuietly(image, "target/thin/maltoryzineHilditch.png");
+	       File thinnedPng = ImageIOUtil.writeImageQuietly(image, "target/thin/maltoryzineHilditch.png");
 	       Assert.assertTrue(thinnedPng.exists());
 	}
 

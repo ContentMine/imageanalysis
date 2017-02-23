@@ -7,9 +7,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.SVGUtil;
-import org.xmlcml.image.ImageUtil;
 
 public abstract class AbstractDetector {
 
@@ -32,7 +32,7 @@ public abstract class AbstractDetector {
 	protected abstract void process();
 	
 	public void writeFile(File outfile) {
-		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(outputImage, outfile);
+		ImageIOUtil.writeImageQuietly(outputImage, outfile);
 	}
 
 	public void writeSvg(File file) throws IOException {

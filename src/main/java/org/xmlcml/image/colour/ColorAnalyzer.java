@@ -16,6 +16,7 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.IntSet;
+import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.ImageUtil;
@@ -214,10 +215,10 @@ public class ColorAnalyzer {
 	}
 
 	public void flattenImage() {
-		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(currentImage, new File("target/flatten/before.png"));
+		ImageIOUtil.writeImageQuietly(currentImage, new File("target/flatten/before.png"));
 		this.flattenedImage = ImageUtil.flattenImage(currentImage, intervalCount);
 		currentImage = flattenedImage;
-		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(currentImage, new File("target/flatten/after.png"));
+		ImageIOUtil.writeImageQuietly(currentImage, new File("target/flatten/after.png"));
 	}
 	
 	public void analyzeFlattenedColours() {
@@ -231,7 +232,7 @@ public class ColorAnalyzer {
 	}
 
 	private void writeMainImage(String outputName) {
-		org.xmlcml.graphics.image.ImageUtil.writeImageQuietly(currentImage, new File(outputDirectory, outputName));
+		ImageIOUtil.writeImageQuietly(currentImage, new File(outputDirectory, outputName));
 	}
 
 	private void writePixelListsAsSVG() {

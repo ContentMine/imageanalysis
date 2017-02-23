@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.image.ImageUtil;
+import org.xmlcml.graphics.image.ImageIOUtil;
  
 /**
  * Image histogram equalization
@@ -220,7 +220,7 @@ public class HistogramEqualization {
         String outfileName = args[1];
         histogramEQ.readImage(infileName);
         histogramEQ.histogramEqualization();
-        ImageUtil.writeImageQuietly(histogramEQ.equalizedImage, outfileName);
+        ImageIOUtil.writeImageQuietly(histogramEQ.equalizedImage, outfileName);
     }
 
 	public BufferedImage getEqualized() {
