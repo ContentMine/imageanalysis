@@ -4,9 +4,9 @@
 
     <properties>
        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-       <imageanalysis.version>1.0.3</imageanalysis.version>
+       <imageanalysis.version>1.0.4</imageanalysis.version>
        <!--  upstream -->
-       <html.version>2.0.6</html.version>
+       <html.version>2.0.7</html.version>
     </properties>
 
     <groupId>org.contentmine</groupId>
