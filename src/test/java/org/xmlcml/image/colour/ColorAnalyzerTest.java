@@ -87,6 +87,11 @@ public class ColorAnalyzerTest {
 		}
 
 	@Test
+	/** LONG
+	 * 
+	 * @throws IOException
+	 */
+	@Ignore // LONG
 	public void testPosterizePhylo() throws IOException {
 		testPosterize0("phylo");
 	}

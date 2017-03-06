@@ -122,11 +122,13 @@ public class ImageProcessorTest {
 	@Test
 	public void testColorAnalyzeThroughCommandLine() {
 		String[] inputs = {
+				
 				"src/test/resources/org/xmlcml/image/processing/phylo.png", // not too bad
-				"src/test/resources/org/xmlcml/image/compound/c3dt32741h.png",
-				"src/test/resources/org/xmlcml/image/compound/c6ee02494g-f6_hi-res.gif",
-				"src/test/resources/org/xmlcml/image/compound/c5ee02740c-f8_hi-res.gif", 
-				"src/test/resources/org/xmlcml/image/compound/JV_6.gif", 
+				// OMIT too long
+//				"src/test/resources/org/xmlcml/image/compound/c3dt32741h.png",
+//				"src/test/resources/org/xmlcml/image/compound/c6ee02494g-f6_hi-res.gif",
+//				"src/test/resources/org/xmlcml/image/compound/c5ee02740c-f8_hi-res.gif", 
+//				"src/test/resources/org/xmlcml/image/compound/JV_6.gif", 
 		};
 		for (String input : inputs) {
 			runColours(input, 2);
@@ -164,6 +166,7 @@ public class ImageProcessorTest {
 		String argString = "--input "+input+" --color count "+count+" minpixel 10 maxpixel 1000000"
 				+ " average"
 				+ " --output target/colors/"+filename+"";
+		LOG.debug("writing colours to "+filename);
 		 new ImageProcessor().parseArgsAndRun(argString);
 	}
 	

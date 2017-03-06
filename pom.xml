@@ -3,7 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
        <imageanalysis.version>1.0.4</imageanalysis.version>
        <!--  upstream -->
        <html.version>2.0.7</html.version>
@@ -15,28 +14,14 @@
     <packaging>jar</packaging>
     <name>ImageAnalysis</name>
     <description> Image analysis and IO routines </description>
-
-
 	<url>http://github.com/contentMine/imageanalysis</url>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
 	<developers>
 		<developer>
 			<id>pm286</id>
 			<name>Peter Murray-Rust</name>
 		</developer>
 	</developers>
-
-    <build>
-        <plugins>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
@@ -67,39 +52,5 @@
         </dependency>
         
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>src</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
-    <reporting>
-        <plugins>
-        </plugins>
-    </reporting>
-
-	<repositories>
-    <repository>
-        <id>cm-pom</id>
-        <url>https://raw.github.com/ContentMine/cm-pom/mvn-repo/</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
-    </repository>
-	</repositories>
 
 </project>
