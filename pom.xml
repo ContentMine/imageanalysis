@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-       <imageanalysis.version>1.1.0</imageanalysis.version>
+       <imageanalysis.version>1.2.0-SNAPSHOT</imageanalysis.version>
        <!--  upstream -->
-       <html.version>2.1.0</html.version>
+       <html.version>2.2.0-SNAPSHOT</html.version>
     </properties>
 
     <groupId>org.contentmine</groupId>
