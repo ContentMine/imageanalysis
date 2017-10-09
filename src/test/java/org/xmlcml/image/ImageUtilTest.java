@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.IntRange;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 
 public class ImageUtilTest {
 	private static final Logger LOG = Logger.getLogger(ImageUtilTest.class);

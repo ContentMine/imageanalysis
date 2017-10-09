@@ -1,6 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -17,10 +16,10 @@ public class PixelEdge {
 
 	private final static Logger LOG = Logger.getLogger(PixelEdge.class);
 	
-	private static Pattern EDGE_PATTERN = Pattern.compile("\\{([^\\}]*)\\}\\/\\[([^\\]]*)\\]");
+	static Pattern EDGE_PATTERN = Pattern.compile("\\{([^\\}]*)\\}\\/\\[([^\\]]*)\\]");
 
-	private PixelNodeList nodeList;
-	private PixelList pixelList; // pixels in order
+	PixelNodeList nodeList;
+	PixelList pixelList; // pixels in order
 	private PixelIsland island;
 	private PixelSegmentList segmentList;
 	private String id;
@@ -271,30 +270,6 @@ public class PixelEdge {
 
 	public String getId() {
 		return id;
-	}
-
-	/** creates edge from string representation.
-	 * 
-	 * {(2,0)(1,0)(0,1)(-1,2)(0,3)(0,4)}/[(2,0)(0,4)]
-	 * 
-	 * @param edge
-	 * @return
-	 */
-	public static PixelEdge createEdge(String edgeS, PixelIsland island) {
-		PixelEdge edge = null;
-		if (edgeS != null) {
-			Matcher matcher = EDGE_PATTERN.matcher(edgeS);
-			if (matcher.matches()) {
-				edge = new PixelEdge(island);
-				String pixelListS = matcher.group(1);
-				edge.pixelList = PixelList.createPixelList(pixelListS, island);
-				LOG.trace("pixelList "+edge.pixelList);
-				String nodeListS = matcher.group(2);
-				edge.nodeList = PixelNodeList.createNodeList(nodeListS, island);
-				LOG.trace("nodeList "+edge.nodeList);
-			}
-		}
-		return edge;
 	}
 
 	public SVGG getOrCreateSVG() {

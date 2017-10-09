@@ -8,9 +8,9 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.colour.ColorAnalyzer;
 import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.pixel.MainPixelProcessor;

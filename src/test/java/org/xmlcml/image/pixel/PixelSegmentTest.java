@@ -1,12 +1,15 @@
 package org.xmlcml.image.pixel;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.image.Fixtures;
 
 public class PixelSegmentTest {
@@ -33,7 +36,7 @@ public class PixelSegmentTest {
 	@Test
 	public void testSegmentFromEdge() {
 		PixelIsland island = new PixelIsland();
-		PixelEdge pixelEdge = PixelEdge.createEdge(EDGE_STRING, island);
+		PixelEdge pixelEdge = island.createEdge(EDGE_STRING);
 		PixelList pixelList = pixelEdge.getPixelList();
 		PixelSegmentList segmentList = PixelSegmentList.createSegmentList(pixelList, 1.0);
 		Assert.assertEquals("segments", 3, segmentList.size());
@@ -47,12 +50,18 @@ public class PixelSegmentTest {
 	@Test
 	public void testSegmentFromEdgeToSVG() {
 		PixelIsland island = new PixelIsland();
-		PixelEdge pixelEdge = PixelEdge.createEdge(EDGE_STRING, island);
+		PixelEdge pixelEdge = island.createEdge(EDGE_STRING);
 		PixelList pixelList = pixelEdge.getPixelList();
 		PixelSegmentList segmentList = PixelSegmentList.createSegmentList(pixelList, 1.0);
 		List<SVGLine> lineList = segmentList.getSVGLineList();
 		Assert.assertEquals("lines", 3, lineList.size());
 		Assert.assertTrue("line", new Real2(44.0, 130.0).isEqualTo(lineList.get(0).getXY(0), 0.001));
+		SVGG g = new SVGG();
+		g.setCSSStyle("stroke:red;stroke-width:1;");
+		for (SVGLine line : lineList) {
+			g.appendChild(line.copy());
+		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/segment/edge.svg"));
 		
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
@@ -1309,6 +1310,30 @@ public class PixelIsland implements Iterable<Pixel> {
 	 */
 	public void setPlotThinned(boolean plotThinned) {
 		this.plotThinned = plotThinned;
+	}
+
+	/** creates edge from string representation.
+	 * 
+	 * {(2,0)(1,0)(0,1)(-1,2)(0,3)(0,4)}/[(2,0)(0,4)]
+	 * <-         pixelList           -> <- nodes ->
+	 * 
+	 * @param edge
+	 * @param edgeS TODO
+	 * @param pixelEdge TODO
+	 * @return
+	 */
+	public PixelEdge createEdge(String edgeS) {
+		if (edgeS == null) return null;
+		PixelEdge edge = null;
+		Matcher matcher = PixelEdge.EDGE_PATTERN.matcher(edgeS);
+		if (matcher.matches()) {
+			edge = new PixelEdge(this);
+			String pixelListS = matcher.group(1);
+			edge.pixelList = PixelList.createPixelList(pixelListS, this);
+			String nodeListS = matcher.group(2);
+			edge.nodeList = PixelNodeList.createNodeList(nodeListS, this);
+		}
+		return edge;
 	}
 
 	

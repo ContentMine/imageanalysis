@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 

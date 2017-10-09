@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.ZhangSuenThinning;

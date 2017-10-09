@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
  
 /**
  * Image histogram equalization

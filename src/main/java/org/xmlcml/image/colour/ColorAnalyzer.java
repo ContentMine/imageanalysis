@@ -16,9 +16,9 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.IntSet;
-import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.pixel.PixelList;
 

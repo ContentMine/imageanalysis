@@ -3,7 +3,7 @@ package org.xmlcml.image.processing;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 
 public class HistogramEQTest {

@@ -67,6 +67,8 @@ public class PixelNucleusFactory {
 	private Map<Pixel, PixelNucleus> nucleusBySpikePixelMap;
 	private PixelSet unusedPixelSet;
 
+	private PixelList unusedPixels;
+
 	public PixelNucleusFactory(PixelIsland island) {
 		this.island = island;
 		island.setNucleusFactory(this);
@@ -673,12 +675,15 @@ public class PixelNucleusFactory {
 	}
 
 	public void createNodesAndEdges() {
+		unusedPixels = new PixelList(island.getPixelList());
 		if (nodeList != null) {
 			for (PixelNode node : nodeList) {
-				Iterator<PixelEdge> it = node.getEdges().iterator();
-				while (it.hasNext()) {
-					it.next();
-					it.remove();
+				Iterator<PixelEdge> edgeIterator = node.getEdges().iterator();
+				while (edgeIterator.hasNext()) {
+					PixelEdge edge = edgeIterator.next();
+					edgeIterator.remove();
+					PixelList edgePixels = edge.getPixelList();
+					unusedPixels.removeAll(edgePixels);
 				}
 			}
 		}
@@ -686,9 +691,11 @@ public class PixelNucleusFactory {
 		PixelSet spikeSet = new PixelSet(spikeList);
 		LOG.trace("made spikeSet");
 		int maxCount = 1000000;
+		unusedPixels.removeAll(spikeSet);
 		while (!spikeSet.isEmpty() && maxCount-- > 0) {
 			getNextSpikeTraceEdgeAndDeleteBothSpikeEnds(spikeSet);
 		}
+		LOG.debug("UNUSED "+unusedPixels.size());
 		LOG.trace("createdEdges");
 	}
 

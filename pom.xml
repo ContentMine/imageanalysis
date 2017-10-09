@@ -5,7 +5,7 @@
     <properties>
        <imageanalysis.version>1.2.0-SNAPSHOT</imageanalysis.version>
        <!--  upstream -->
-       <html.version>2.2.0-SNAPSHOT</html.version>
+       <svghtml.version>1.0.0-SNAPSHOT</svghtml.version>
     </properties>
 
     <groupId>org.contentmine</groupId>
@@ -26,8 +26,8 @@
     <dependencies>
         <dependency>
             <groupId>org.contentmine</groupId>
-            <artifactId>html</artifactId>
-            <version>${html.version}</version>
+            <artifactId>svghtml</artifactId>
+            <version>${svghtml.version}</version>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>

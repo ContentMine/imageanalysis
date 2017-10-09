@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 import org.xmlcml.image.ImageUtil;
 

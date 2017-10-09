@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.Fixtures;
 
 public class ZhangSuenThinningTest {

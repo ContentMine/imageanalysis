@@ -668,6 +668,19 @@ public class PixelList implements Iterable<Pixel> {
 		}
 	}
 
+	public void removeAll(PixelList pixels) {
+		for (Pixel pixel : pixels) {
+			remove(pixel);
+		}
+	}
+
+	public void removeAll(PixelSet pixels) {
+		Iterator<Pixel> pixelIterator = pixels.iterator();
+		while (pixelIterator.hasNext()) {
+			remove(pixelIterator.next());
+		}
+	}
+
 //	public void removeAll(PixelList pixelList) {
 //		if (pixelList != null) {
 //			list.removeAll(pixelList.getList());

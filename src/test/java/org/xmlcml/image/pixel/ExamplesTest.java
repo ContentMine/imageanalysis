@@ -77,6 +77,8 @@ public class ExamplesTest {
 	@Test
 	/** extracts SVGLines from pixels of molecule.
 	 * 
+	 * SHOWCASE
+	 * 
 	 */
 	public void testExtractMaltoryzineSVGLines() {
 		double tolerance = 2.0; //this takes care of the bends
@@ -101,6 +103,8 @@ public class ExamplesTest {
 	}
 	
 	/** simple phylotree. Here we are just counting nodes and edges.
+	 * 
+	 * PARTIAL SHOWCASE
 	 * 
 	 */
 	@Test
