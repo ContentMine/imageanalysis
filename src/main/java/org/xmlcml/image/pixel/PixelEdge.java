@@ -21,7 +21,7 @@ public class PixelEdge {
 	PixelNodeList nodeList;
 	PixelList pixelList; // pixels in order
 	private PixelIsland island;
-	private PixelSegmentList segmentList;
+	private EdgeSegments segmentList;
 	private String id;
 	private PixelGraph pixelGraph;
 	private SVGG svgg;
@@ -138,7 +138,7 @@ public class PixelEdge {
 		return equals;
 	}
 
-	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
+	public EdgeSegments getOrCreateSegmentList(double tolerance) {
 		return getOrCreateSegmentList(tolerance, null, null, null, null);
 	}
 
@@ -150,12 +150,12 @@ public class PixelEdge {
 	 * @param relativeCornernessThresholdForCornerAggregation
 	 * @return
 	 */
-	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, 
+	public EdgeSegments getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, 
 			Double relativeCornernessThresholdForCornerAggregation) {
 		return getOrCreateSegmentList(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, null, null);
 	}
 
-	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
+	public EdgeSegments getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
 		if (segmentList == null) {
 			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null && allowedDifferenceCornerMaximumDeviating != null && maxNumberCornersToSearch != null;
 			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, allowedDifferenceCornerMaximumDeviating, maxNumberCornersToSearch) : new DouglasPeucker(tolerance));
@@ -170,7 +170,7 @@ public class PixelEdge {
 				pointArray.setElement(pointArray.size() - 1, new Real2(point0));
 			}
 			LOG.trace(pointArray);
-			segmentList = new PixelSegmentList(pointArray);
+			segmentList = new EdgeSegments(pointArray);
 		}
 		return segmentList;
 	}

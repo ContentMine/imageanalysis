@@ -83,6 +83,8 @@ public class PixelIsland implements Iterable<Pixel> {
 	private PixelNucleusFactory nucleusFactory;
 	private PixelList orthogonalStubList;
 	private PixelGraph pixelGraph;
+	private PixelNodeList nodeList;
+	private PixelEdgeList edgeList;
 
 	private SVGG svgg;
 	private String id;
@@ -101,6 +103,7 @@ public class PixelIsland implements Iterable<Pixel> {
 	private boolean plotRidge;
 	private String thinnedName;
 	private boolean plotThinned;
+
 	
 	
 	public PixelIsland() {
@@ -1046,24 +1049,19 @@ public class PixelIsland implements Iterable<Pixel> {
 	}
 
 
-	public PixelNodeList createNodeList() {
-		return getOrCreateNucleusFactory().getOrCreateNodeListFromNuclei();
+	public PixelNodeList getOrCreateNodeList() {
+		if (nodeList == null) {
+			nodeList = getOrCreateNucleusFactory().getOrCreateNodeListFromNuclei();
+		}
+		return nodeList;
 	}
 
 	public PixelEdgeList createEdgeList() {
-		return getOrCreateNucleusFactory().createPixelEdgeListFromNodeList();
+		if (edgeList == null) {
+			edgeList = getOrCreateNucleusFactory().createPixelEdgeListFromNodeList();
+		}
+		return edgeList;
 	}
-
-//	public void rearrangeYJunctions() {
-//		getOrCreateNucleusFactory();
-//		PixelNucleusList yJunctionList = nucleusFactory.getOrCreateYJunctionList();
-//		for (PixelNucleus yJunction : yJunctionList) {
-//			LOG.trace("rearrange Y "+yJunction);
-//			if (yJunction.rearrangeYJunction(this)) {
-//				LOG.trace("rearranged Y junction: "+yJunction);
-//			}
-//		}
-//	}
 
 	private boolean isOrthogonalStub(Pixel pixel) {
 		PixelList neighbours = pixel.getOrCreateNeighbours(this);
@@ -1335,6 +1333,11 @@ public class PixelIsland implements Iterable<Pixel> {
 		}
 		return edge;
 	}
+
+//	public boolean isCyclic() {
+//		if (edgeList !=  null) LOG.debug("E "+edgeList.size());
+//		return edgeList != null && edgeList.size() == 1 && nodeList != null && nodeList.size() == 1;
+//	}
 
 	
 

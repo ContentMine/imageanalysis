@@ -1,5 +1,6 @@
 package org.xmlcml.image.pixel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class PixelNucleusFactory {
 	private Map<Pixel, PixelNucleus> nucleusBySpikePixelMap;
 	private PixelSet unusedPixelSet;
 
-	private PixelList unusedPixels;
+//	private PixelList unusedPixels;
 
 	public PixelNucleusFactory(PixelIsland island) {
 		this.island = island;
@@ -675,28 +676,36 @@ public class PixelNucleusFactory {
 	}
 
 	public void createNodesAndEdges() {
-		unusedPixels = new PixelList(island.getPixelList());
+//		unusedPixels = new PixelList(island.getPixelList());
 		if (nodeList != null) {
+			if (nodeList.size() == 0) {
+				LOG.warn("NO NODES");
+			}
 			for (PixelNode node : nodeList) {
 				Iterator<PixelEdge> edgeIterator = node.getEdges().iterator();
+				if (node.getEdges().size() != 0) {
+					LOG.trace("NODE EDGES: "+node.getEdges());
+				}
 				while (edgeIterator.hasNext()) {
 					PixelEdge edge = edgeIterator.next();
 					edgeIterator.remove();
 					PixelList edgePixels = edge.getPixelList();
-					unusedPixels.removeAll(edgePixels);
+//					unusedPixels.removeAll(edgePixels);
 				}
 			}
+		} else {
+			LOG.debug("Null NODELIST");
 		}
 		PixelList spikeList = getOrCreateSpikePixelList();
 		PixelSet spikeSet = new PixelSet(spikeList);
-		LOG.trace("made spikeSet");
 		int maxCount = 1000000;
-		unusedPixels.removeAll(spikeSet);
 		while (!spikeSet.isEmpty() && maxCount-- > 0) {
 			getNextSpikeTraceEdgeAndDeleteBothSpikeEnds(spikeSet);
 		}
-		LOG.debug("UNUSED "+unusedPixels.size());
-		LOG.trace("createdEdges");
+	}
+
+	private boolean isCycle() {
+		return edgeList.size() == 1 && nodeList.size() == 1;
 	}
 
 	private void getNextSpikeTraceEdgeAndDeleteBothSpikeEnds(PixelSet spikeSet) {

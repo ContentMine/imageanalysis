@@ -90,7 +90,7 @@ public class ExamplesTest {
 			PixelNucleusFactory factory = new PixelNucleusFactory(island);
 			PixelEdgeList edgeList = factory.getEdgeList();
 			for (PixelEdge edge : edgeList) {
-				PixelSegmentList segmentList = PixelSegmentList.createSegmentList(edge.getPixelList(), tolerance);
+				EdgeSegments segmentList = EdgeSegments.createSegmentList(edge.getPixelList(), tolerance);
 				SVGG g = segmentList.getSVGG();
 				for (int i = 0; i < g.getChildCount(); i++) {
 					((SVGElement) g.getChild(i)).setTransform(Transform2.applyScale(0.5));

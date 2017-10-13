@@ -341,8 +341,12 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public PixelList getPixelsBefore(Pixel pixel) {
 		int mid = this.indexOf(pixel);
-		PixelList pixelList = getPixelList(mid, -1, -1);
+		PixelList pixelList = this.getPixelsBackToStartInclusive(mid);
 		return pixelList;
+	}
+
+	PixelList getPixelsBackToStartInclusive(int mid) {
+		return this.getPixelList(mid, -1, -1);
 	}
 
 	/** finds all pixels in list After pixel.
@@ -354,8 +358,12 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public PixelList getPixelsAfter(Pixel pixel) {
 		int mid = this.indexOf(pixel);
-		PixelList pixelList = getPixelList(mid, size(), 1);
+		PixelList pixelList = getPixelsForwardToEndInclusive(mid);
 		return pixelList;
+	}
+
+	PixelList getPixelsForwardToEndInclusive(int mid) {
+		return getPixelList(mid, size(), 1);
 	}
 
 	private PixelList getPixelList(int start, int end, int delta) {

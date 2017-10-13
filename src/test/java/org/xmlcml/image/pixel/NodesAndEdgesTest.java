@@ -74,7 +74,7 @@ public class NodesAndEdgesTest {
 	 */
 	@Test
 	public void testNodes() {
-		PixelNodeList nodeList = A12.createNodeList();//  getNodes();
+		PixelNodeList nodeList = A12.getOrCreateNodeList();//  getNodes();
 		Assert.assertEquals("nodes", 4, nodeList.size());
 		Assert.assertNotNull(nodeList.getPixelNode(new Pixel(0,0)));
 		Assert.assertNotNull(nodeList.getPixelNode(new Pixel(1,2)));
@@ -110,7 +110,7 @@ public class NodesAndEdgesTest {
 		Assert.assertEquals("node 3", 12, island.getPixelsWithNeighbourCount(3).size());
 		Assert.assertEquals("node 4", 0, island.getPixelsWithNeighbourCount(4).size());
 		Assert.assertEquals("node 5", 0, island.getPixelsWithNeighbourCount(5).size());
-		PixelNodeList nodeList = island.createNodeList();
+		PixelNodeList nodeList = island.getOrCreateNodeList();
 		for (PixelNode node : nodeList) {
 			LOG.trace("c65 "+node);
 		}
@@ -360,7 +360,7 @@ public class NodesAndEdgesTest {
 			PixelNucleusFactory factory = new PixelNucleusFactory(island);
 			try {
 				edgeList = factory.getEdgeList();
-				nodeList = island.createNodeList();
+				nodeList = island.getOrCreateNodeList();
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 				LOG.error("**** Bad node: "+i+", "+e);

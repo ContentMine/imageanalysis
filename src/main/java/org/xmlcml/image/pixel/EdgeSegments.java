@@ -22,24 +22,24 @@ import org.xmlcml.image.geom.DouglasPeucker;
  * @author pm286
  *
  */
-public class PixelSegmentList implements List<PixelSegment> {
+public class EdgeSegments implements List<PixelSegment> {
 
-	private final static Logger LOG = Logger.getLogger(PixelSegmentList.class);
+	private final static Logger LOG = Logger.getLogger(EdgeSegments.class);
 	private List<PixelSegment> segmentList;
 	private Real2Array real2Array;
 	private List<SVGLine> svgLineList;
 	private SVGG g;
 	
-	public PixelSegmentList() {
+	public EdgeSegments() {
 		super();
 	}
 
-	public PixelSegmentList(List<PixelSegment> segmentList) {
+	public EdgeSegments(List<PixelSegment> segmentList) {
 		super();
 		this.segmentList = segmentList;
 	}
 	
-	public PixelSegmentList(Real2Array pointArray) {
+	public EdgeSegments(Real2Array pointArray) {
 		ensureSegmentList();
 		if (pointArray == null) {
 			throw new RuntimeException("Null pointArray");
@@ -380,13 +380,13 @@ public class PixelSegmentList implements List<PixelSegment> {
 		return g;
 	}
 
-	public static PixelSegmentList createSegmentList(PixelList pixelList, double tolerance) {
-		PixelSegmentList segmentList = null;
+	public static EdgeSegments createSegmentList(PixelList pixelList, double tolerance) {
+		EdgeSegments segmentList = null;
 		if (pixelList != null) {
 			Real2Array points = pixelList.getReal2Array();
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array newPoints = douglasPeucker.reduceToArray(points);
-			segmentList = new PixelSegmentList(newPoints);
+			segmentList = new EdgeSegments(newPoints);
 		}
 		return segmentList;
 	}

@@ -32,6 +32,8 @@ import org.xmlcml.image.pixel.PixelNucleus.PixelJunctionType;
 public class PixelGraph {
 
 
+	private static final int MIN_CYCLE = 6;
+
 	private static final String NODE_PREFIX = "zn";
 
 	private final static Logger LOG = Logger.getLogger(PixelGraph.class);
@@ -45,6 +47,12 @@ public class PixelGraph {
 	private PixelIsland island;
 	private Stack<PixelNode> nodeStack;
 	private PixelNode rootNode;
+
+	private Boolean isSingleCycle = null;
+
+	private boolean createdSegments;
+
+	private EdgeSegmentsList edgeSegmentsList;
 	
 	private PixelGraph() {
 		
@@ -133,6 +141,7 @@ public class PixelGraph {
 		if (island != null) {
 			nodeList = getNucleusFactory().getOrCreateNodeListFromNuclei();
 		} else {
+			LOG.debug("NULL ISLAND");
 			ensureNodes();
 		}
 		return nodeList;
@@ -249,7 +258,7 @@ public class PixelGraph {
 		double extreme = Double.MAX_VALUE;
 		for (PixelEdge edge : edgeList) {
 			LOG.trace(edge);
-			PixelSegmentList segmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
+			EdgeSegments segmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
 			LOG.trace("PL "+segmentList.size()+"  /  "+segmentList.getReal2Array());
 			// look for goal post edge
 			if (segmentList.size() != 3) {
@@ -297,7 +306,7 @@ public class PixelGraph {
 		PixelNode midNode = null;
 		for (PixelEdge edge : edgeList) {
 			LOG.trace(edge.getNodes());
-			PixelSegmentList segmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
+			EdgeSegments segmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
 			Angle deviation = segmentList.getSignedAngleOfDeviation();
 			if (Math.abs(deviation.getRadian()) < 2.0) continue;
 			LOG.trace("POLY "+segmentList.get(0)+"/"+segmentList.getLast()+"/"+deviation);
@@ -305,7 +314,7 @@ public class PixelGraph {
 				SVGLine midline = segmentList.get(1).getSVGLine();
 				Pixel midPixel = edge.getNearestPixelToMidPoint(midline.getMidPoint());
 				midNode = new PixelNode(midPixel, this);
-				nodeList.add(midNode);
+				addNode(nodeList, midNode);
 				rootEdge = edge;
 			}
 		}
@@ -315,6 +324,16 @@ public class PixelGraph {
 			removeOldEdgeAndAddNewEdge(rootNode, rootEdge, 1);
 		}
 		return nodeList;
+	}
+
+	private void addNode(PixelNodeList nodeList, PixelNode node) {
+		if (node == null) {
+			throw new RuntimeException("Cannot add null node");
+		}
+		if (nodeList == null) {
+			throw new RuntimeException("Null nodeList");
+		}
+		nodeList.add(node);
 	}
 
 	private void removeOldEdgeAndAddNewEdge(PixelNode rootNode, PixelEdge rootEdge, int nodeNum) {
@@ -346,7 +365,7 @@ public class PixelGraph {
 	public void addNode(PixelNode node) {
 		ensureNodes();
 		if (!nodeList.contains(node)) {
-			nodeList.add(node);
+			addNode(nodeList, node);
 		}
 	}
 
@@ -465,7 +484,7 @@ public class PixelGraph {
 	public SVGG createSegmentedEdges() {
 		SVGG g = new SVGG();
 		for (PixelEdge edge: edgeList) {
-			PixelSegmentList pixelSegmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
+			EdgeSegments pixelSegmentList = edge.getOrCreateSegmentList(getParameters().getSegmentTolerance());
 			pixelSegmentList.setStroke(getParameters().getStroke());
 			pixelSegmentList.setWidth(getParameters().getLineWidth());
 			pixelSegmentList.setFill(getParameters().getFill());
@@ -477,23 +496,24 @@ public class PixelGraph {
 	public void createAndDrawGraph(SVGG g) {
 		PixelEdgeList edgeList = getEdgeList();
 		PixelNodeList nodeList = getNodeList();
-		for (PixelNode node : nodeList) {			
+		for (PixelNode node : nodeList) {	
+			if (node == null) {
+				throw new RuntimeException("null node in list size "+nodeList.size());
+			}
 			String color = node.getEdges().size() == 0 ? "red" : "green";
-			SVGG gg = node.createSVG(2.0, color);
-			gg.setOpacity(0.3);
-			g.appendChild(gg);
+			SVGG nodeCircle = node.createSVG(2.0, color);
+			nodeCircle.setOpacity(0.3);
+			g.appendChild(nodeCircle);
 		}
-		for (PixelEdge edge : edgeList) {
-			SVGG gg = edge.createLineSVG();
-			gg.setFill("blue");
-			gg.setStroke("purple");
-			gg.setStrokeWidth(2.0);
-			g.appendChild(gg);
+		if (nodeList.size() > 1) {
+			for (PixelEdge edge : edgeList) {
+				SVGG edgeLine = edge.createLineSVG();
+				edgeLine.setFill("blue");
+				edgeLine.setStroke("purple");
+				edgeLine.setStrokeWidth(2.0);
+				g.appendChild(edgeLine);
+			}
 		}
-//		SVGText text = new SVGText(new Real2(300, 300), "createAndDrawGraph NYI");
-//		text.setFontSize(50.);
-//		g.appendChild(text);
-//		LOG.error("createAndDrawGraph NYI");
 	}
 
 	private PixelNode getNode(Pixel pixel) {
@@ -566,6 +586,7 @@ public class PixelGraph {
 	public PixelEdgeList getEdgeList() {
 		if (island != null) {
 			edgeList = getNucleusFactory().getEdgeList();
+//			LOG.debug("EL "+edgeList.size());
 		} else {
 			ensureEdges();
 		}
@@ -791,6 +812,137 @@ public class PixelGraph {
 		pixelEdge.addNode(node0, 0);
 		pixelEdge.addNode(node1, 1);
 		return pixelEdge;
+		
+	}
+
+	public Boolean getOrCreateIsSingleCycle() {
+		if (isSingleCycle == null) {
+			isSingleCycle = false;
+			if (edgeList == null) {
+				LOG.debug("NULL EDGE");
+			} else if (edgeList.size() == 1) {
+				if (nodeList == null || nodeList.size() == 1) {
+					// before creation of segments
+					isSingleCycle = true;
+				}
+			} else if (edgeList.size() == nodeList.size()) {
+				// all nodes must be 2-connected
+				isSingleCycle = true;
+				for (PixelNode node : nodeList) {
+					if (node.getEdges().size() != 2) {
+						isSingleCycle = false;
+						break;
+					}
+				}
+			}
+		}
+		return isSingleCycle;
+	}
+
+	/** used when the graph is a single cycle.
+	 * ignore very small <=6 rings
+	 * @param tolerance
+	 */
+	public void createCyclicSegments(double tolerance) {
+		if (!getOrCreateIsSingleCycle()) {
+			return;
+		}
+		createdSegments = false;
+		if (createdSegments) {
+			return;
+		}
+		createdSegments = true;
+		PixelEdge edge = edgeList.get(0);
+		if (edge.size() <= MIN_CYCLE) return;// ignore small cycles
+		
+		PixelNode node = getOrCreateSingleCyclicNode(edge.get(0));
+		int midPointIndex = edge.size() / 2;
+		
+		PixelList totalPixelList = edge.pixelList;
+		Pixel midPixel = totalPixelList.get(midPointIndex);
+		PixelNode midNode = new PixelNode(midPixel, this);
+		this.addNode(midNode);
+		
+		PixelList pixelList0 = totalPixelList.getPixelsBackToStartInclusive(midPointIndex);
+		PixelEdge edge0 = createEdge(node, midNode, pixelList0);
+		this.addEdge(edge0);
+		edge0.getOrCreateSegmentList(tolerance);
+		
+		PixelList pixelList1 = totalPixelList.getPixelsForwardToEndInclusive(midPointIndex);
+		PixelEdge edge1 = createEdge(node, midNode, pixelList1);
+		this.addEdge(edge1);
+		edge1.getOrCreateSegmentList(tolerance);
+		
+		this.removeEdge(edge);
+
+	}
+
+	private PixelNode getOrCreateSingleCyclicNode(Pixel startPixel) {
+		if (nodeList == null || nodeList.size() == 0) {
+			PixelNode node = new PixelNode(startPixel, this);
+			this.addNode(node);
+		}
+		return nodeList.get(0);
+	}
+
+	public EdgeSegmentsList getOrCreateEdgeSegmentsList(double tolerance) {
+		if (edgeSegmentsList == null) {
+			PixelEdgeList edgeList = getEdgeList();
+			if (getOrCreateIsSingleCycle()) {
+				createCyclicSegments(tolerance);
+			}
+			edgeSegmentsList = new EdgeSegmentsList(this);
+			for (PixelEdge edge : edgeList) {
+				EdgeSegments segments = edge.getOrCreateSegmentList(tolerance);
+				edgeSegmentsList.add(segments);
+			}
+			// REMOVE OLD NODES AND EDGES
+			if (getOrCreateIsSingleCycle() && edgeSegmentsList.size() == 2) {
+				edgeSegmentsList = createNewEdgeSegmentsList(edgeSegmentsList);
+				removeOldNodesAndEdgesAndAddNewSingleNodeAndEdge();
+			}
+		}
+		return edgeSegmentsList;
+	}
+
+	private EdgeSegmentsList createNewEdgeSegmentsList(EdgeSegmentsList edgeSegmentsList) {
+		EdgeSegmentsList newEdgeSegmentsList = new EdgeSegmentsList(this);
+		EdgeSegments newEdgeSegments = new EdgeSegments();
+		// note addition in reverse order
+		EdgeSegments segments0 = edgeSegmentsList.get(0);
+		for (int i = segments0.size() - 1; i >= 0; i--) {
+			newEdgeSegments.add(segments0.get(i));
+		}
+		// normal order
+		EdgeSegments segments1 = edgeSegmentsList.get(1);
+		for (int i = 0; i < segments1.size(); i++) {
+			newEdgeSegments.add(segments1.get(i));
+		}
+		newEdgeSegmentsList.add(newEdgeSegments);
+		edgeSegmentsList = newEdgeSegmentsList;
+		return edgeSegmentsList;
+	}
+
+	private void removeOldNodesAndEdgesAndAddNewSingleNodeAndEdge() {
+		PixelEdge newPixelEdge = new PixelEdge(this);
+		newPixelEdge.addPixelList(edgeList.get(0).getPixelList());
+		edgeList.get(1).getPixelList().reverse();
+		newPixelEdge.addPixelList(edgeList.get(1).getPixelList());
+		PixelNode newPixelNode = new PixelNode(newPixelEdge.get(0), this);
+		// create filled objects before adding
+		newPixelEdge.addNode(newPixelNode, 0);
+		newPixelEdge.addNode(newPixelNode, 1);
+		newPixelNode.addEdge(newPixelEdge);
+		
+		LOG.debug("addEdge: "+newPixelEdge);
+		this.addEdge(newPixelEdge);
+		LOG.debug("addNode: "+newPixelNode);
+		this.addNode(newPixelNode);
+		
+		this.removeNode(edgeList.get(0).getPixelNode(1));
+		this.removeNode(edgeList.get(0).getPixelNode(0));
+		this.removeEdge(edgeList.get(1));
+		this.removeEdge(edgeList.get(0));
 		
 	}
 
