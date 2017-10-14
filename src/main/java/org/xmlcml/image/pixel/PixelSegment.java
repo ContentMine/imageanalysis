@@ -158,5 +158,11 @@ public class PixelSegment {
 		return line == null ? null : line.getEuclidLine();
 	}
 
+//	public void swapPoints() {
+//		if (line != null) {
+//			line.getEuclidLine().swapPoints();
+//		}
+//	}
+
 	
 }

@@ -8,9 +8,9 @@ import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
 
-public class EdgeSegmentsList  implements Iterable<EdgeSegments> {
+public class EdgeSegmentsList  implements Iterable<PixelSegmentList> {
 
-	private List<EdgeSegments> list;
+	private List<PixelSegmentList> list;
 	private SVGG svgg;
 	private PixelGraph graph;
 
@@ -22,18 +22,18 @@ public class EdgeSegmentsList  implements Iterable<EdgeSegments> {
 		this.graph = graph;
 	}
 
-	public Iterator<EdgeSegments> iterator() {
+	public Iterator<PixelSegmentList> iterator() {
 		ensureList();
 		return list.iterator();
 	}
 
 	private void ensureList() {
 		if (list == null) {
-			list = new ArrayList<EdgeSegments>();
+			list = new ArrayList<PixelSegmentList>();
 		}
 	}
 
-	public void add(EdgeSegments edgeSegments) {
+	public void add(PixelSegmentList edgeSegments) {
 		ensureList();
 		list.add(edgeSegments);
 	}
@@ -43,7 +43,7 @@ public class EdgeSegmentsList  implements Iterable<EdgeSegments> {
 		return list.size();
 	}
 
-	public List<EdgeSegments> getList() {
+	public List<PixelSegmentList> getList() {
 		ensureList();
 		return list;
 	}
@@ -68,7 +68,7 @@ public class EdgeSegmentsList  implements Iterable<EdgeSegments> {
 //		return edgeList;
 	}
 
-	public EdgeSegments get(int i) {
+	public PixelSegmentList get(int i) {
 		ensureList();
 		return list.get(i);
 	}
@@ -76,18 +76,18 @@ public class EdgeSegmentsList  implements Iterable<EdgeSegments> {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (EdgeSegments edge : this) {
+		for (PixelSegmentList edge : this) {
 			sb.append(edge.toString());
 		}
 		return sb.toString();
 	}
 
-	public boolean contains(EdgeSegments edge) {
+	public boolean contains(PixelSegmentList edge) {
 		ensureList();
 		return list.contains(edge);
 	}
 
-	public boolean remove(EdgeSegments edge) {
+	public boolean remove(PixelSegmentList edge) {
 		ensureList();
 		return list.remove(edge);
 	}
@@ -95,7 +95,7 @@ public class EdgeSegmentsList  implements Iterable<EdgeSegments> {
 	public SVGElement getOrCreateSVG() {
 		if (svgg == null) {
 			svgg = new SVGG();
-			for (EdgeSegments edge : this) {
+			for (PixelSegmentList edge : this) {
 				svgg.appendChild(edge.getOrCreateSVG());
 			}
 		}

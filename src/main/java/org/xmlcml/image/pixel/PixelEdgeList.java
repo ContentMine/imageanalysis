@@ -108,5 +108,11 @@ public class PixelEdgeList implements Iterable<PixelEdge> {
 		Collections.sort(list, new PixelEdgeComparator(comparatorType));
 	}
 
+	void segmentAllEdges(double segmentCreationTolerance) {
+		for (PixelEdge edge : this) {
+			PixelSegmentList segments = edge.getOrCreateSegmentList(segmentCreationTolerance);
+		}
+	}
+
 
 }

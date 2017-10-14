@@ -23,7 +23,7 @@ public class PixelGraphTest {
 	public void testSingleCycle() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_CYCLE_ISLAND());
 		Assert.assertNotNull(graph);
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 1, "[<(0,-1)>]"); 
 	}
 
@@ -31,7 +31,7 @@ public class PixelGraphTest {
 	// simple line
 	public void test2Nodes() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_LINE_ISLAND());
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 2, "[<(2,0)><(0,4)>]"); 
 	}
 
@@ -39,7 +39,7 @@ public class PixelGraphTest {
 	// Y-shaped tree
 	public void test3Terminals() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_Y_ISLAND());
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 4, "[<(0,3)><(-3,-3)><(3,-3)><(0,0)>]"); 
 	}
 
@@ -59,7 +59,7 @@ public class PixelGraphTest {
 	 */
 	public void testDoubleYGraph() {
 		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_DOUBLE_Y_ISLAND());
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 6, "[<(3,5)><(-3,5)><(3,-5)><(-3,-5)><(0,2)><(0,-2)>]"); 
 //		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals("edges", 5, edgeList.size()); 
@@ -157,7 +157,7 @@ public class PixelGraphTest {
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,3));
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(7, graph.getPixelList().size());
-		Assert.assertEquals(5, graph.getNodeList().size());
+		Assert.assertEquals(5, graph.getOrCreateNodeList().size());
 //		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
 //		Assert.assertEquals(5, nucleusByJunctionMap.size());
 //		if (graph.getNucleusSet() == null) {

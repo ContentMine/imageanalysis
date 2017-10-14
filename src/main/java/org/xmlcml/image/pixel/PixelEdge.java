@@ -3,12 +3,12 @@ package org.xmlcml.image.pixel;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.image.geom.DouglasPeucker;
 
@@ -21,7 +21,7 @@ public class PixelEdge {
 	PixelNodeList nodeList;
 	PixelList pixelList; // pixels in order
 	private PixelIsland island;
-	private EdgeSegments segmentList;
+	private PixelSegmentList segmentList;
 	private String id;
 	private PixelGraph pixelGraph;
 	private SVGG svgg;
@@ -138,11 +138,23 @@ public class PixelEdge {
 		return equals;
 	}
 
-	public EdgeSegments getOrCreateSegmentList(double tolerance) {
-		return getOrCreateSegmentList(tolerance, null, null, null, null);
+	/** assume segmentList has already been calculated.
+	 * use getOrCreateSegmentList if new lists wanted.
+	 * 
+	 * @return list or null
+	 */
+	public PixelSegmentList getExistingSegmentList() {
+		return segmentList;
 	}
 
-	
+
+	public PixelSegmentList getOrCreateSegmentList(double tolerance) {
+		if (segmentList == null) {
+			segmentList = getOrCreateSegmentList(tolerance, null, null, null, null);
+		}
+		return segmentList;
+	}
+
 	/** think this is what it was before Andy changed the signature.
 	 * 
 	 * @param tolerance
@@ -150,12 +162,15 @@ public class PixelEdge {
 	 * @param relativeCornernessThresholdForCornerAggregation
 	 * @return
 	 */
-	public EdgeSegments getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, 
+	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, 
 			Double relativeCornernessThresholdForCornerAggregation) {
-		return getOrCreateSegmentList(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, null, null);
+		if (segmentList == null) {
+			segmentList = getOrCreateSegmentList(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, null, null);
+		}
+		return segmentList;
 	}
 
-	public EdgeSegments getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
+	public PixelSegmentList getOrCreateSegmentList(double tolerance, Integer cornerFindingWindow, Double relativeCornernessThresholdForCornerAggregation, Double allowedDifferenceCornerMaximumDeviating, Integer maxNumberCornersToSearch) {
 		if (segmentList == null) {
 			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null && allowedDifferenceCornerMaximumDeviating != null && maxNumberCornersToSearch != null;
 			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, allowedDifferenceCornerMaximumDeviating, maxNumberCornersToSearch) : new DouglasPeucker(tolerance));
@@ -170,7 +185,7 @@ public class PixelEdge {
 				pointArray.setElement(pointArray.size() - 1, new Real2(point0));
 			}
 			LOG.trace(pointArray);
-			segmentList = new EdgeSegments(pointArray);
+			segmentList = new PixelSegmentList(pointArray);
 		}
 		return segmentList;
 	}
@@ -294,5 +309,26 @@ public class PixelEdge {
 	public boolean removeNode(PixelNode node) {
 		return nodeList.remove(node);
 	}
+
+	public SVGPolyline createPolylineFromSegmentList() {
+		SVGPolyline polyline = null;
+		if (segmentList != null) {
+			
+		}
+		return polyline;
+	}
+	
+	SVGLine createLine(double maxMeanDeviation) {
+		SVGLine line = new SVGLine();
+		PixelSegmentList segmentList = getOrCreateSegmentList(maxMeanDeviation);
+		PixelGraph.LOG.debug("segmentList: "+segmentList);
+		line = new SVGLine(segmentList.get(0).getPoint(0), segmentList.getLast().getPoint(1));
+		return line;
+	}
+
+	public void setPixelSegmentList(PixelSegmentList newSegmentList) {
+		this.segmentList = newSegmentList;
+	}
+
 
 }
