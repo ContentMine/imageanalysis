@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.xmlcml.graphics.svg.util.ImageIOUtil;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class HistogramEQTest {
 
@@ -16,7 +16,7 @@ public class HistogramEQTest {
 	
 	public void testHistogram() throws IOException {
     	HistogramEqualization histogramEQ = new HistogramEqualization();
-        histogramEQ.readImage(Fixtures.HISTOGRAM_PNG);
+        histogramEQ.readImage(ImageAnalysisFixtures.HISTOGRAM_PNG);
         histogramEQ.histogramEqualization();
         ImageIOUtil.writeImageQuietly(histogramEQ.getEqualized(), "target/histogram/histogram.png");
 
@@ -30,7 +30,7 @@ public class HistogramEQTest {
 	@Test
 	public void testMoleculePhotograph() throws IOException {
     	HistogramEqualization histogramEQ = new HistogramEqualization();
-        histogramEQ.readImage(Fixtures.MOLECULE_20131119_JPG);
+        histogramEQ.readImage(ImageAnalysisFixtures.MOLECULE_20131119_JPG);
         histogramEQ.histogramEqualization();
         ImageIOUtil.writeImageQuietly(histogramEQ.getEqualized(), "target/histogram/molecule.png");
 

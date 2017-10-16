@@ -5,11 +5,10 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.xmlcml.image.pixel.Pixel;
-import org.xmlcml.image.pixel.PixelGraph;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelList;
 
-public class Fixtures {
+public class ImageAnalysisFixtures {
 
 	public final static File TEST_RESOURCE_DIR = new File("src/test/resources");
 	public final static File TEST_IMAGE_DIR = new File(TEST_RESOURCE_DIR, "org/xmlcml/image");
@@ -64,7 +63,10 @@ public class Fixtures {
 	public static final File MONOSPACE_PNG = new File(TEXT_DIR, "monospace.png");
 	public static final File TIMESROMAN_JPG = new File(TEXT_DIR, "timesroman.jpg");
 	public static final File TIMES_GIF = new File(TEXT_DIR, "times.gif");
-	public static final File LARGE_PHYLO_JPG = new File(Fixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
+	public static final File LARGE_PHYLO_JPG = new File(ImageAnalysisFixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
+
+	public final static File DIAGRAMS_DIR = new File(TEST_IMAGE_DIR, "diagrams/");
+	public final static File FUNNEL_DIR = new File(DIAGRAMS_DIR, "funnel/");
 
 	public static final File GENERAL_DIR = new File(TEST_IMAGE_DIR, "general");
 	public static final File REFFONT_DIR = new File(GENERAL_DIR, "refFont");
@@ -74,7 +76,7 @@ public class Fixtures {
 	public static final File FONTS_MAIN_DIR = new File(IMAGE_MAIN_DIR, "text/fonts");
 	public static final File HELVETICA_MAIN_DIR = new File(FONTS_MAIN_DIR, "helvetica");
 
-	public static final File TEST_HELVETICA = new File(Fixtures.TEST_IMAGE_DIR, "text/fonts/helvetica");
+	public static final File TEST_HELVETICA = new File(ImageAnalysisFixtures.TEST_IMAGE_DIR, "text/fonts/helvetica");
 	public static final String[] FILL = {
 		"red",
 		"green",
@@ -150,7 +152,7 @@ public class Fixtures {
 			new Pixel(new Point(2, 3)), 
 			}));
 	
-	public static File CHAR_DIR = new File(Fixtures.TEXT_DIR, "chars");
+	public static File CHAR_DIR = new File(ImageAnalysisFixtures.TEXT_DIR, "chars");
 
 	public static PixelIsland CREATE_DOUBLE_Y_ISLAND() {
 		PixelIsland island = new PixelIsland();
@@ -333,6 +335,91 @@ public class Fixtures {
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(20,5));
 		return island;
 	}
+
+	/**
+	 *$     $
+	 * $   $
+	 *  $ $
+	 *   $
+	 *   $
+	 *   $
+	 *   $
+	 *   $
+	 *  $ $
+	 * $   $
+	 *$     $
+	 *
+	 * @return
+	 */
+	public static PixelIsland CREATE_SHORTEDGE_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3,5));
+		
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,-3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,-3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,-4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,-4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,-5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3,-5));
+		return island;
+	}
+
+
+	/**
+	 *   $
+	 *   $
+	 *   $
+	 *  $$$
+	 * $ $ $
+	 *$  $  $
+	 * $ $ $
+	 *  $$$
+	 *   $
+	 *   $
+	 *   $
+	 *
+	 * @return
+	 */
+	public static PixelIsland CREATE_PHI_ISLAND() {
+		PixelIsland island = new PixelIsland();
+		island.setDiagonal(true);
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-3,0));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-5));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-4));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-3));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(1,-2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-1,-2));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(0,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(2,-1));
+		island.addPixelAndComputeNeighbourNeighbours(new Pixel(-2,-1));
+		
+		
+		return island;
+	}
+
 
 	
 }

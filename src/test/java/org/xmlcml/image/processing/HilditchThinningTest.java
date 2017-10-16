@@ -9,14 +9,14 @@ import javax.imageio.ImageIO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.graphics.svg.util.ImageIOUtil;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class HilditchThinningTest {
 
 
 	@Test
 	public void testMolecule() throws IOException {
-	       BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
+	       BufferedImage image = ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_BINARY_PNG);
 	       Thinning thinningService = new HilditchThinning(image);
 	       thinningService.doThinning();
 	       image = thinningService.getThinnedImage();

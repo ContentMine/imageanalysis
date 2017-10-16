@@ -10,7 +10,7 @@ import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class PixelSegmentTest {
 
@@ -21,7 +21,7 @@ public class PixelSegmentTest {
 
 	@Test
 	public void testSegmentFromPixelList() {
-		PixelList pixelList = Fixtures.CREATE_ZIGZAG_ISLAND().getPixelList();
+		PixelList pixelList = ImageAnalysisFixtures.CREATE_ZIGZAG_ISLAND().getPixelList();
 		PixelSegmentList segmentList = PixelSegmentList.createSegmentList(pixelList, 1.0);
 		Assert.assertEquals("segments", 5, segmentList.size());
 		Assert.assertEquals("segments", "PixelSegmentList [segmentList=["

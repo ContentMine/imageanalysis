@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.graphics.svg.util.ImageIOUtil;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageUtil;
 
 public class RGBMatrixTest {
@@ -26,7 +26,7 @@ public class RGBMatrixTest {
 	 * 
 	 */
 	public void testRGB() throws IOException {
-		BufferedImage  image = ImageIO.read(new File(Fixtures.COMPOUND_DIR, "journal.pone.0095816.g002.png"));
+		BufferedImage  image = ImageIO.read(new File(ImageAnalysisFixtures.COMPOUND_DIR, "journal.pone.0095816.g002.png"));
 		RGBMatrix rgbMatrix = RGBMatrix.extractMatrix(image);
 		IntMatrix red = rgbMatrix.getMatrix(ImageUtil.RED);
 		rgbMatrix.invertRgb();
@@ -47,7 +47,7 @@ public class RGBMatrixTest {
 //		array = ImageUtil.DOUBLE_ARRAY;
 //		array = ImageUtil.SMEAR_ARRAY;
 		array = ImageUtil.EDGE_ARRAY;
-		BufferedImage  image = ImageIO.read(new File(Fixtures.COMPOUND_DIR, "journal.pone.0095816.g002.png"));
+		BufferedImage  image = ImageIO.read(new File(ImageAnalysisFixtures.COMPOUND_DIR, "journal.pone.0095816.g002.png"));
 		if (image != null) {
 			RGBMatrix rgbMatrix = RGBMatrix.extractMatrix(image);
 			RGBMatrix rgbMatrix1 = rgbMatrix.applyFilter(array);

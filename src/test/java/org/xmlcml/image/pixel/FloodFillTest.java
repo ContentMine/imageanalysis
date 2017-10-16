@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class FloodFillTest {
 	private static final Logger LOG = Logger.getLogger(FloodFillTest.class);
@@ -19,7 +19,7 @@ public class FloodFillTest {
 	 */
 	@Test
 	public void testThinnedMaltoryzineDiagonal() throws IOException {
-		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
+		BufferedImage image = ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_THINNED_PNG);
 		FloodFill floodFill = new ImageFloodFill(image);
 		floodFill.setDiagonal(true);
 		Assert.assertEquals("pixelIslands", 5, floodFill.getIslandList().size());
@@ -34,7 +34,7 @@ public class FloodFillTest {
 	 */
 	@Test
 	public void testBinaryMaltoryzine() throws IOException {
-		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_BINARY_PNG);
+		BufferedImage image = ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_BINARY_PNG);
 		FloodFill floodFill = new ImageFloodFill(image);
 		Assert.assertEquals("pixelIslands", 5, floodFill.getIslandList().size());
 	}
@@ -46,7 +46,7 @@ public class FloodFillTest {
 	 */
 	@Test
 	public void testThinnedMaltoryzineNoDiagnal() throws IOException {
-		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
+		BufferedImage image = ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_THINNED_PNG);
 		FloodFill floodFill = new ImageFloodFill(image);
 		Assert.assertEquals("pixelIslands", 202, floodFill.getIslandList().size());
 	}

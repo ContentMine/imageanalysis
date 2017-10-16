@@ -1,6 +1,5 @@
 package org.xmlcml.image.pixel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -542,6 +541,9 @@ public class PixelNucleusFactory {
 		getOrCreateNodeListFromNuclei();
 		edgeList = new PixelEdgeList();
 		getOrCreateSpikePixelList();
+		if (edgeList.size() > 0) {
+			LOG.debug("EDGELIST "+edgeList.size());
+		}
 		return edgeList;
 	}
 
@@ -694,7 +696,7 @@ public class PixelNucleusFactory {
 				}
 			}
 		} else {
-			LOG.debug("Null NODELIST");
+			LOG.trace("Null NODELIST");
 		}
 		PixelList spikeList = getOrCreateSpikePixelList();
 		PixelSet spikeSet = new PixelSet(spikeList);

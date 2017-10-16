@@ -174,7 +174,7 @@ public class PixelEdge {
 		if (segmentList == null) {
 			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null && allowedDifferenceCornerMaximumDeviating != null && maxNumberCornersToSearch != null;
 			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, allowedDifferenceCornerMaximumDeviating, maxNumberCornersToSearch) : new DouglasPeucker(tolerance));
-			Real2Array points = pixelList.getReal2Array();
+			Real2Array points = pixelList.getOrCreateReal2Array();
 			if (nodeList == null || nodeList.size() != 2) {
 				throw new RuntimeException("Segmentation requires 2 nodes");
 			}
@@ -328,6 +328,20 @@ public class PixelEdge {
 
 	public void setPixelSegmentList(PixelSegmentList newSegmentList) {
 		this.segmentList = newSegmentList;
+	}
+
+	/** gets index of node.
+	 * 
+	 * @param node search node
+	 * @return 0 or 1 if found else -1
+	 */
+	public int indexOf(PixelNode node) {
+		return nodeList.get(0) == node ? 0 : (nodeList.get(1) == node ? 1 : -1);
+	}
+
+	public void replaceNode(PixelNode newNode, int inode) {
+		nodeList.set(inode, newNode);
+		newNode.addEdge(this);
 	}
 
 

@@ -14,7 +14,7 @@ import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class DouglasPeuckerTest {
 	
@@ -98,7 +98,7 @@ public class DouglasPeuckerTest {
 
 	@Test
 	public void testContours() {
-		SVGElement contour = SVGElement.readAndCreateSVG(new File(Fixtures.LINES_DIR, "contours/1.svg"));
+		SVGElement contour = SVGElement.readAndCreateSVG(new File(ImageAnalysisFixtures.LINES_DIR, "contours/1.svg"));
 		List<SVGLine> lines = SVGLine.extractSelfAndDescendantLines(contour);
 		Real2Array points0 = SVGLine.extractPoints(lines, 0.00001);
 		List<Real2> points = points0.getList(); 

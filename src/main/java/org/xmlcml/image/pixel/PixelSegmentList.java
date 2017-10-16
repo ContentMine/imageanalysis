@@ -16,7 +16,9 @@ import org.xmlcml.euclid.RealArray;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPoly;
 import org.xmlcml.graphics.svg.SVGPolygon;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.image.geom.DouglasPeucker;
 
 /** a list of PixelSegments.
@@ -401,7 +403,7 @@ public class PixelSegmentList implements List<PixelSegment> {
 	public static PixelSegmentList createSegmentList(PixelList pixelList, double tolerance) {
 		PixelSegmentList segmentList = null;
 		if (pixelList != null) {
-			Real2Array points = pixelList.getReal2Array();
+			Real2Array points = pixelList.getOrCreateReal2Array();
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array newPoints = douglasPeucker.reduceToArray(points);
 			segmentList = new PixelSegmentList(newPoints);
@@ -478,5 +480,15 @@ public class PixelSegmentList implements List<PixelSegment> {
 		}
 		LOG.debug("polygon ("+size+") "+polygonXY);
 		return new SVGPolygon(polygonXY);
+	}
+
+	public SVGPolyline getOrCreatePolyline() {
+		SVGPolyline polyline = null;
+		getReal2Array();
+		getSVGLineList();
+		if (real2Array.size() >= 2) {
+			polyline = new SVGPolyline(real2Array) ;
+		}
+		return polyline;
 	}
 }

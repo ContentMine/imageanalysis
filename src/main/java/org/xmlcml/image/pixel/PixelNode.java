@@ -215,4 +215,23 @@ public class PixelNode implements Comparable<PixelNode> {
 		}
 		return svgg;
 	}
+
+	/** get all nodes connected to this by an edge.
+	 * if a node is connected twice by >= 2 edges it occurs multiple times
+	 * if a node is connected to itself (ouroboros) it is also included
+	 * 
+	 * thus "A" would have 2 multiply connected nodes and two spikes
+	 * thus "O" would have 1 node connected to itself 
+	 * thus "P" would have 1 node connected to itself and one spike
+	 * 
+	 * @return
+	 */
+	public PixelNodeList getConnectedNodes() {
+		PixelNodeList nodeList = new PixelNodeList();
+		for (PixelEdge edge : edgeList) {
+			PixelNode node = edge.getOtherNode(this);
+			nodeList.add(node);
+		}
+		return nodeList;
+	}
 }

@@ -264,7 +264,7 @@ public class ImageProcessor {
 		if (imageFile == null) {
 			throw new RuntimeException("null image file");
 		} else if (!imageFile.exists()) {
-			throw new RuntimeException("Cfile does not exist " + imageFile);
+			throw new RuntimeException("file does not exist " + imageFile);
 		} else if (imageFile.isDirectory()) {
 			throw new RuntimeException("File is directory " + imageFile);
 		} else {

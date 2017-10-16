@@ -1056,7 +1056,8 @@ public class PixelIsland implements Iterable<Pixel> {
 		return nodeList;
 	}
 
-	public PixelEdgeList createEdgeList() {
+	public PixelEdgeList getOrCreateEdgeList() {
+		getOrCreateNodeList();
 		if (edgeList == null) {
 			edgeList = getOrCreateNucleusFactory().createPixelEdgeListFromNodeList();
 		}
@@ -1334,12 +1335,7 @@ public class PixelIsland implements Iterable<Pixel> {
 		return edge;
 	}
 
-//	public boolean isCyclic() {
-//		if (edgeList !=  null) LOG.debug("E "+edgeList.size());
-//		return edgeList != null && edgeList.size() == 1 && nodeList != null && nodeList.size() == 1;
-//	}
 
-	
 
 //	/** create rings of pixels starting at the outside.
 //	 * 

@@ -6,7 +6,10 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.IntMatrix;
+import org.xmlcml.euclid.RealArray;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.image.ImageAnalysisFixtures;
+import org.xmlcml.image.diagram.DiagramAnalyzer;
 
 public class PixelListTest {
 
@@ -149,5 +152,25 @@ public class PixelListTest {
 		outliner.createOutline();
 	}
 
+	@Test
+	public void testCreateCurvature() {
+		String filename = "crossing1.png";
+		String [] filenames = filename.split("\\.");
+		File imageFile = new File(ImageAnalysisFixtures.FUNNEL_DIR, filenames[0] + "." + filenames[1]);
+		DiagramAnalyzer diagramAnalyzer = new DiagramAnalyzer();
+		diagramAnalyzer.getOrCreateGraphList(imageFile);
+		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
+		Assert.assertEquals(4, pixelIslandList.size());
+		PixelIsland pixelIsland = pixelIslandList.get(0);
+		PixelGraph graph = new PixelGraph(pixelIsland);
+		graph.compactCloseNodes(3);
+		LOG.debug(graph);
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
+		PixelEdgeList edgeList = graph.getOrCreateEdgeList();
+		for (PixelEdge edge : edgeList) {
+			RealArray curvature = edge.getPixelList().createCurvature();
+			LOG.debug("curve:"+curvature);
+		}
+	}
 
 }

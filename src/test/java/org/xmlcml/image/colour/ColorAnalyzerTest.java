@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.graphics.svg.util.ImageIOUtil;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageUtil;
 
 import com.google.common.collect.Multiset;
@@ -31,7 +31,7 @@ public class ColorAnalyzerTest {
 	
 	@Test
 	public void countColors() throws Exception {
-		BufferedImage image = ImageIO.read(new File(Fixtures.TEXT_DIR, "phylo.jpg"));
+		BufferedImage image = ImageIO.read(new File(ImageAnalysisFixtures.TEXT_DIR, "phylo.jpg"));
 		ColorAnalyzer analyzer = new ColorAnalyzer(image);
 		analyzer.setXYRange(new Int2Range(new IntRange(0, 300), new IntRange(50, 300)));
 		LOG.trace(analyzer.getWidth()+"/"+analyzer.getHeight());
@@ -54,7 +54,7 @@ public class ColorAnalyzerTest {
 		public void testPosterize() {
 			int nvalues = 4; // i.e. 16-bit color
 			nvalues = 2;
-			BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "phylo.jpg").toString());
+			BufferedImage image = UtilImageIO.loadImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, "phylo.jpg").toString());
 			ImageUtil.flattenImage(image, nvalues);
 			ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
 			Multiset<Integer> set = colorAnalyzer.createColorSetNew();
@@ -125,7 +125,7 @@ public class ColorAnalyzerTest {
 
 	private void testPosterize0(String filename) throws IOException {
 		ColorAnalyzer colorAnalyzer = new ColorAnalyzer();
-		colorAnalyzer.readImage(new File(Fixtures.PROCESSING_DIR, filename+".png"));
+		colorAnalyzer.readImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, filename+".png"));
 		colorAnalyzer.setOutputDirectory(new File("target/"+filename));
 		colorAnalyzer.defaultPosterize();
 	}

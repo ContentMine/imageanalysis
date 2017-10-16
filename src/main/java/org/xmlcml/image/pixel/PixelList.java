@@ -13,10 +13,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -323,11 +326,13 @@ public class PixelList implements Iterable<Pixel> {
 		return isCycle;
 	}
 
-	public Real2Array getReal2Array() {
-		points = new Real2Array();
-		for (Pixel pixel : list) {
-			Real2 point = new Real2(pixel.getInt2());
-			points.add(point);
+	public Real2Array getOrCreateReal2Array() {
+		if (points == null) {
+			points = new Real2Array();
+			for (Pixel pixel : list) {
+				Real2 point = new Real2(pixel.getInt2());
+				points.addElement(point);
+			}
 		}
 		return points;
 	}
@@ -513,7 +518,7 @@ public class PixelList implements Iterable<Pixel> {
 	}
 
 	private Real2 getCentreCoordinate() {
-		return size() == 0 ? null : getReal2Array().getMean();
+		return size() == 0 ? null : getOrCreateReal2Array().getMean();
 	}
 
 
@@ -688,12 +693,25 @@ public class PixelList implements Iterable<Pixel> {
 			remove(pixelIterator.next());
 		}
 	}
-
-//	public void removeAll(PixelList pixelList) {
-//		if (pixelList != null) {
-//			list.removeAll(pixelList.getList());
-//		}
-//	}
-
+	
+	public RealArray createCurvature() {
+		getOrCreateReal2Array();
+		int size = points.size();
+		RealArray curvature = new RealArray(size);
+		for (int j = 1; j < size - 1; j++) {
+			int i = (j - 1) % size;
+			int k = (j + 1) % size;
+			Real2 xy = points.get(i);
+			Angle angle = Real2.getAngle(points.get(i), points.get(j), points.get(k));
+			angle.normalizeTo2Pi();
+			double ang = angle.getRadian() - Math.PI;
+			curvature. setElementAt(j, ang);
+		}
+		curvature = curvature.format(2);
+		RealArray cumsum = curvature.cumulativeSum().format(2);
+		LOG.debug("cum "+Util.format(cumsum.getLast() / size, 3) +"; "+ cumsum);
+		
+		return curvature;
+	}
 
 }
