@@ -1,13 +1,20 @@
 package org.xmlcml.image.pixel;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xmlcml.euclid.IntMatrix;
+import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealArray;
+import org.xmlcml.graphics.svg.SVGElement;
+import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.util.ColorStore;
+import org.xmlcml.graphics.svg.util.ColorStore.ColorizerType;
 import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.diagram.DiagramAnalyzer;
 
@@ -154,6 +161,7 @@ public class PixelListTest {
 
 	@Test
 	public void testCreateCurvature() {
+		Iterator<String> iterator = ColorStore.createColorizer(ColorizerType.CONTRAST).getColorIterator();
 		String filename = "crossing1.png";
 		String [] filenames = filename.split("\\.");
 		File imageFile = new File(ImageAnalysisFixtures.FUNNEL_DIR, filenames[0] + "." + filenames[1]);
@@ -161,16 +169,27 @@ public class PixelListTest {
 		diagramAnalyzer.getOrCreateGraphList(imageFile);
 		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
 		Assert.assertEquals(4, pixelIslandList.size());
+		// largest is a "phi-like" shape of line crossing circle
 		PixelIsland pixelIsland = pixelIslandList.get(0);
-		PixelGraph graph = new PixelGraph(pixelIsland);
-		graph.compactCloseNodes(3);
+		PixelGraph graph = pixelIsland.copyGraphAndTidy();
 		LOG.debug(graph);
-		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelEdgeList edgeList = graph.getOrCreateEdgeList();
+		SVGG g = new SVGG();
 		for (PixelEdge edge : edgeList) {
-			RealArray curvature = edge.getPixelList().createCurvature();
-			LOG.debug("curve:"+curvature);
+			PixelList pixelList = edge.getPixelList();
+//			LOG.debug(pixelList.get(0)+"/"+pixelList.get(pixelList.size()-1));
+			RealArray radiansPerPixel = pixelList.calculateCurvatureRadiansPerPixel().format(2);
+			LOG.debug("curvature rads/pixel:"+radiansPerPixel);
+			List<Real2> directionRadians = edge.getPixelList().calculateDirectionInRadians();
+			SVGElement edgeSVG = pixelList.getOrCreateSVG();
+			edgeSVG.setStrokeWidth(0.6);
+			edgeSVG.setFill(iterator.next());
+			edgeSVG.setStroke(iterator.next());
+			edgeSVG.setOpacity(0.3);
+			g.appendChild(edgeSVG);
 		}
+		SVGSVG.wrapAndWriteAsSVG(g, new File("target/funnel/crossing1.lines.svg"));
+		// extract circle
 	}
 
 }

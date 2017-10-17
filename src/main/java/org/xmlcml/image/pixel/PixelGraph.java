@@ -69,6 +69,7 @@ public class PixelGraph {
 	
 	public PixelGraph(PixelIsland island) {
 		this(island.getPixelList(), island);
+
 	}
 	
 	public PixelGraph(PixelList list) {
@@ -92,6 +93,9 @@ public class PixelGraph {
 		}
 		this.pixelList = pixelList;
 		this.createNodesAndEdges();
+//		this.tidyEdgePixelLists();
+//		this.compactCloseNodes(3);
+		return;
 	}
 
 	/** creates graph without pixels
@@ -1197,6 +1201,18 @@ public class PixelGraph {
 		SVGCircle circle = cyclicSegmentList.createCircle(startXY, 2 * maxMeanDeviation);
 		LOG.info("CYCLE: "+(circle == null ? null : circle.toXML()));
 		return circle;
+	}
+
+	/**sometimes the nodes don't correspond with the pixel lists, so add new pixels to lists
+	 * this is presumably a bug from PixelNuclei which haven't been properly processed
+	 * 
+	 */
+	public void tidyEdgePixelLists() {
+		getOrCreateEdgeList();
+		for (PixelEdge edge : edgeList) {
+			edge.tidyPixelList();
+		}
+		
 	}
 
 }

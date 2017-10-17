@@ -19,7 +19,6 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.euclid.RealArray;
-import org.xmlcml.euclid.Util;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -694,24 +693,43 @@ public class PixelList implements Iterable<Pixel> {
 		}
 	}
 	
-	public RealArray createCurvature() {
+	/** curvature is radians per pixel.
+	 * 
+	 * @return
+	 */
+	public RealArray calculateCurvatureRadiansPerPixel() {		
 		getOrCreateReal2Array();
-		int size = points.size();
-		RealArray curvature = new RealArray(size);
-		for (int j = 1; j < size - 1; j++) {
-			int i = (j - 1) % size;
-			int k = (j + 1) % size;
-			Real2 xy = points.get(i);
-			Angle angle = Real2.getAngle(points.get(i), points.get(j), points.get(k));
-			angle.normalizeTo2Pi();
-			double ang = angle.getRadian() - Math.PI;
-			curvature. setElementAt(j, ang);
-		}
-		curvature = curvature.format(2);
-		RealArray cumsum = curvature.cumulativeSum().format(2);
-		LOG.debug("cum "+Util.format(cumsum.getLast() / size, 3) +"; "+ cumsum);
-		
+		RealArray curvature = points.calculateDeviationsRadiansPerElement();
 		return curvature;
 	}
+
+	
+
+	/** direction (essentially a bearing) defined by polar angle between points i and i+1.
+	 * direction j = point(i) -> point(i+1)
+	 * direction 0 = point0 -> point1 // offset by half a point
+	 * RealArray is therefore of size size-1
+	 * 
+	 * @return
+	 */
+	public List<Real2> calculateDirectionInRadians() {
+//		RealArray directions = new RealArray(size() - 1); 
+		List<Real2> angleList =  new ArrayList<Real2>(size() - 1);
+		for (int i = 0; i < size() - 1; i++) {
+			Int2 i0 = get(i).getInt2();
+			Int2 i1 = get(i + 1).getInt2();
+			Real2 delta = new Real2(i1.subtract(i0));
+			if (i > 0) {
+//				Real2 
+			}
+			angleList.add(delta);
+		}
+		return angleList;
+	}
+
+	public Pixel getLast() {
+		return list == null || list.size() == 0 ? null : list.get(list.size() - 1);
+	}
+
 
 }

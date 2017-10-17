@@ -1335,6 +1335,14 @@ public class PixelIsland implements Iterable<Pixel> {
 		return edge;
 	}
 
+	public PixelGraph copyGraphAndTidy() {
+		PixelGraph graph = new PixelGraph(this);
+		// these fail if they are actually in the constructor. No idea why yet.
+		graph.tidyEdgePixelLists();
+		graph.compactCloseNodes(3);
+		return graph;
+	}
+
 
 
 //	/** create rings of pixels starting at the outside.

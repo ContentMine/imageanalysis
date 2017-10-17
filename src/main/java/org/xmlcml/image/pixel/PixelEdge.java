@@ -3,6 +3,7 @@ package org.xmlcml.image.pixel;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
@@ -321,7 +322,7 @@ public class PixelEdge {
 	SVGLine createLine(double maxMeanDeviation) {
 		SVGLine line = new SVGLine();
 		PixelSegmentList segmentList = getOrCreateSegmentList(maxMeanDeviation);
-		PixelGraph.LOG.debug("segmentList: "+segmentList);
+//		PixelGraph.LOG.debug("segmentList: "+segmentList);
 		line = new SVGLine(segmentList.get(0).getPoint(0), segmentList.getLast().getPoint(1));
 		return line;
 	}
@@ -342,6 +343,49 @@ public class PixelEdge {
 	public void replaceNode(PixelNode newNode, int inode) {
 		nodeList.set(inode, newNode);
 		newNode.addEdge(this);
+	}
+
+	/** sometimes the node is not actually in the pixel list, so add it and intervening pixels.
+	 * 
+	 */
+	public void tidyPixelList() {
+		tidyPixelList(nodeList.get(0).getCentrePixel());
+		tidyPixelList(nodeList.get(1).getCentrePixel());
+	}
+
+	private void tidyPixelList(Pixel nodePixel) {
+		Pixel pixel0 = pixelList.get(0);
+		Pixel pixel1 = pixelList.getLast();
+		if (pixel0 == nodePixel) {
+			// found 0
+		} else if (pixel1 == nodePixel) {
+				// found last
+		} else {
+//			LOG.debug("Cannot find pixel: " + nodePixel + " in: " + pixelList);
+			Int2 delta0 = pixel0.subtract(nodePixel);
+			Int2 delta1 = pixel1.getInt2().subtract(nodePixel.getInt2());
+			if (delta0.getManhattanDistance(Int2.ZERO) < 3) {
+				addPixels(nodePixel, pixel0);
+			} else if (delta1.getManhattanDistance(Int2.ZERO) < 3) {
+				addPixels(nodePixel, pixel1);
+			}
+//			LOG.debug(">"+delta0+" // "+delta1);
+		}
+	}
+
+	private void addPixels(Pixel nodePixel, Pixel edgePixel) {
+		Int2 nodeXY = nodePixel.getInt2();
+		Int2 edgeXY = edgePixel.getInt2();
+		Int2 delta = nodeXY.subtract(edgeXY);
+		while (!delta.equals(Int2.ZERO)) {
+			Int2 delta1 = new Int2(delta);
+			delta1.stepToZero();
+			Int2 shift = delta.subtract(delta1);
+			edgeXY = edgeXY.plus(shift);
+			Pixel newPixel = new Pixel(edgeXY);
+			this.addPixel(newPixel);
+			delta = nodeXY.subtract(edgeXY);
+		}
 	}
 
 

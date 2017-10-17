@@ -472,4 +472,8 @@ public class Pixel {
 		return listOfNeighboursOfNeighbours;
 	}
 
+	public Int2 subtract(Pixel pixel) {
+		return this.getInt2().subtract(pixel.getInt2());
+	}
+
 }
