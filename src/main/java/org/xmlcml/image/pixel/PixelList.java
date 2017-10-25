@@ -731,5 +731,21 @@ public class PixelList implements Iterable<Pixel> {
 		return list == null || list.size() == 0 ? null : list.get(list.size() - 1);
 	}
 
+	public boolean remove(int i) {
+		Pixel pixel = this.get(i);
+		if (pixel != null) {
+			return remove(pixel);
+		}
+		return false;
+	}
+
+	public boolean removeLast() {
+		Pixel pixel = this.get(size() - 1);
+		if (pixel != null) {
+			return remove(pixel);
+		}
+		return false;
+	}
+
 
 }

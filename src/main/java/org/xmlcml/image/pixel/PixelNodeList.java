@@ -208,5 +208,31 @@ public class PixelNodeList implements Iterable<PixelNode> {
 		}
 		return multipleNodeSet;
 	}
+	
+	/** reverses order of nodes
+	 * 
+	 */
+	public void reverse() {
+		Collections.reverse(nodeList);
+	}
+
+	/** finds index of node with given coordinate.
+	 * 
+	 * @param pixel 
+	 * @return -1 if not found else 0, 1, 2...
+	 */
+	public int indexOf(Pixel pixel) {
+		if (pixel == null) {
+			return -1;
+		}
+		for (int i = 0; i < nodeList.size(); i++) {
+			PixelNode node = nodeList.get(i);
+			if (pixel.hasEqualCoordinates(node.getCentrePixel())) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
 
 }

@@ -476,4 +476,14 @@ public class Pixel {
 		return this.getInt2().subtract(pixel.getInt2());
 	}
 
+	/**
+	 * 
+	 * @return true if coordinates are equal
+	 */
+	public boolean hasEqualCoordinates(Pixel pixel) {
+		if (pixel == null) {
+			return false;
+		}
+		return pixel.getInt2().equals(this.getInt2());
+	}
 }

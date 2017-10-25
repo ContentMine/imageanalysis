@@ -1,10 +1,13 @@
 package org.xmlcml.image.pixel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
+import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGG;
@@ -29,14 +32,34 @@ public class PixelEdge {
 
 	private Int2Range boundingBox;
 
+	PixelEdge() {
+		
+	}
+	
 	public PixelEdge(PixelIsland island) {
+		this();
 		this.island = island;
 		this.pixelList = new PixelList();
 		this.nodeList = new PixelNodeList();
 	}
 
 	public PixelEdge(PixelGraph pixelGraph) {
+		this();
 		this.pixelGraph = pixelGraph;
+	}
+	
+	/** copy constructor.
+	 * deep copies edge and node lists.
+	 * does not copy id, segments, svgg
+	 * 
+	 * @param edge
+	 */
+	public PixelEdge(PixelEdge edge) {
+		this();
+		this.pixelList = new PixelList(edge.pixelList);
+		this.nodeList = new PixelNodeList(edge.nodeList);
+		this.island = edge.island;
+		this.pixelGraph = edge.pixelGraph;
 	}
 
 	/** adds node and pixel contained within it.
@@ -333,6 +356,8 @@ public class PixelEdge {
 
 	/** gets index of node.
 	 * 
+	 * uses identity (==) not equals()
+	 * 
 	 * @param node search node
 	 * @return 0 or 1 if found else -1
 	 */
@@ -388,5 +413,224 @@ public class PixelEdge {
 		}
 	}
 
+	/** creates a (segmented) set of points at regular positions.
+	 * 
+	 * npoints must be >= 2 (normally <= size / 2, allowing for segments of 2 or more pixels)
+	 * 
+	 * 
+	 * NOT TESTED
+	 * @param npoints >=2 ideally less than size() / 2
+	 * @return
+	 */
+	public PixelEdge createSegmentedEdge(int nsegments) {
+		// copy the pixelEdge
+		PixelEdge subEdge = new PixelEdge(this);
+		IntArray integers = IntArray.naturalNumbers(size() - 1);
+		IntArray segmentIndexes = integers.createSegmentedArray(nsegments);
+		PixelList segmentedPixelList = new PixelList();
+		for (int i = 0; i < segmentIndexes.size(); i++) {
+			Pixel pixel = this.get(segmentIndexes.elementAt(i));
+			segmentedPixelList.add(pixel);
+		}
+		subEdge.pixelList = segmentedPixelList;
+		return subEdge;
+	}
+
+	public PixelEdge join(PixelEdge edge, PixelNode thisNode, PixelNode edgeNode) {
+		PixelEdge newPixelEdge = null;
+		if (thisNode.getCentrePixel().equals(edgeNode.getCentrePixel())) {
+			LOG.debug("JOIN "+this.size()+"; "+edge.size());
+			newPixelEdge = new PixelEdge();
+			PixelNode thisOther = this.getOtherNode(thisNode);
+			newPixelEdge.addNode(thisOther, 0);
+			PixelList newEdgePixelList0 = new PixelList(this.pixelList);
+			newPixelEdge.addPixelList(newEdgePixelList0);
+			PixelList newEdgePixelList1 = new PixelList(edge.pixelList);
+			LOG.debug("newEdgePixelList1 "+newEdgePixelList1.size());
+			newEdgePixelList1.remove(0);
+			newPixelEdge.addPixelList(newEdgePixelList1);
+			LOG.debug(newPixelEdge.size());
+			PixelNode edgeOther = edge.getOtherNode(edgeNode);
+			newPixelEdge.addNode(edgeOther, 1);
+		}
+		return newPixelEdge;
+	}
+
+	/** join a list of edges to give a single edge.
+	 * order is irrelevant.
+	 * if all nodes in edges (B..D, C..F, D..A, etc.), except 2 (A..M , N..Z)  belong to exactly 2 edges 
+	 * join to give A..Z
+	 * If any edge is ouroboros return null
+	 *
+	 * 
+	 * 
+	 * @param edges
+	 * @return
+	 */
+	public static PixelEdge join(PixelEdge... edges) {
+		PixelEdgeList edgeList = createPixelEdgeList(edges);
+		List<PixelEdge> singleEndedEdgeList = PixelEdge.getSingleEndedEdgeList(edgeList);
+		if (singleEndedEdgeList == null) {
+			return null;
+		}
+		PixelEdge growingEdge = singleEndedEdgeList.get(0);
+		IntArray singleNodeIndexes = growingEdge.getSinglyConnectedNodeIndexes();
+		if (singleNodeIndexes.size() == 2) {
+			if (edgeList.size() > 1) {
+				throw new RuntimeException("OUROBOROS edge");
+			} else {
+				growingEdge = growingEdge.createOuroboros();
+				return growingEdge;
+			}
+		}
+		return growingEdge;
+//		return edgeList;
+	}
+//		List<PixelEdge> singleEndedEdgeList = new ArrayList<PixelEdge>();
+//		if (thisNode.getCentrePixel().equals(edgeNode.getCentrePixel())) {
+//			LOG.debug("JOIN "+this.size()+"; "+edge.size());
+//			newPixelEdge = new PixelEdge();
+//			PixelNode thisOther = this.getOtherNode(thisNode);
+//			newPixelEdge.addNode(thisOther, 0);
+//			PixelList newEdgePixelList0 = new PixelList(this.pixelList);
+//			newPixelEdge.addPixelList(newEdgePixelList0);
+//			PixelList newEdgePixelList1 = new PixelList(edge.pixelList);
+//			LOG.debug("newEdgePixelList1 "+newEdgePixelList1.size());
+//			newEdgePixelList1.remove(0);
+//			newPixelEdge.addPixelList(newEdgePixelList1);
+//			LOG.debug(newPixelEdge.size());
+//			PixelNode edgeOther = edge.getOtherNode(edgeNode);
+//			newPixelEdge.addNode(edgeOther, 1);
+//		}
+//		return null;
+//	}
+
+	private PixelEdge createOuroboros() {
+		throw new RuntimeException("Ouroboros not yet supported");
+	}
+
+	public IntArray getSinglyConnectedNodeIndexes() {
+		IntArray singlyConnectedIndexes = new IntArray();
+		for (int i = 0; i < 2; i++) {
+			int nodeCount = this.getEdgesForNode(i).size();
+			if (nodeCount == 1) {
+				singlyConnectedIndexes.addElement(i);
+			}
+		}
+		return singlyConnectedIndexes;
+	}
+
+	private static PixelEdgeList createPixelEdgeList(PixelEdge... edges) {
+		PixelEdgeList edgeList = new PixelEdgeList();
+		for (PixelEdge edge : edges) {
+			edgeList.add(edge);
+		}
+		return edgeList;
+	}
+
+	/** gets edges from given node.
+	 * 
+	 * @param nodeIndex
+	 * @return
+	 */
+	public PixelEdgeList getEdgesForNode(int nodeIndex) {
+		PixelEdgeList edgeList = new PixelEdgeList();
+		PixelNodeList nodeList = getNodes();
+		if (nodeList == null || nodeList.size() - 1 < nodeIndex) {
+			LOG.warn("Too few edges "+nodeList.size()+" for index: "+nodeIndex);
+			return edgeList;
+		}
+		return nodeList.get(nodeIndex).getEdges();
+	}
+
+	/** gets list of exactly 2 edges with single nodes.
+	 * any errors returns null
+	 * 
+	 * @param edgeList list of edges
+	 * @return
+	 */
+	private static List<PixelEdge> getSingleEndedEdgeList(PixelEdgeList edgeList) {
+		List<PixelEdge> singleEndedEdgeList = new ArrayList<PixelEdge>();
+		if (edgeList.size() == 1) {
+			LOG.error("only one edge: cannot join");
+			return null;
+		}
+		int totalSingleNodeCount = 0;
+		for (PixelEdge edge : edgeList) {
+			int singleNodeCount = 0;
+			if (edge.getEdgesForNode(0).size() == 1) {
+				singleNodeCount++;
+			}
+			if (edge.getEdgesForNode(1).size() == 1) {
+				singleNodeCount++;
+			}
+			if (singleNodeCount == 2) {
+				LOG.error("OUROBOROS edge");
+				return null;
+			}
+			totalSingleNodeCount += singleNodeCount;
+			if (totalSingleNodeCount == 1) {
+				singleEndedEdgeList.add(edge);
+			}
+		}
+		if (totalSingleNodeCount != 2) {
+			LOG.error("need exactly 2 singleNode edges: found: "+totalSingleNodeCount);
+			return null;
+		}
+		return singleEndedEdgeList;
+	}
+
+	public void reverse() {
+		nodeList.reverse();
+		pixelList.reverse();
+	}
+
+	/**
+	 * 
+	 * @param node to match
+	 * @return -1 if not found
+	 */
+	public int matchByCoordinate(PixelNode node) {
+		if (node == null) {
+			return -1;
+		}
+		int nodeIndex = nodeList.indexOf(node.getCentrePixel());
+		return nodeIndex;
+	}
+
+	/** join two edges.
+	 * assumes that joining nod on "this" is node 1.
+	 * 
+	 * @param edge to join
+	 * @return
+	 */
+	public PixelEdge join(PixelEdge edge) {
+		PixelNode node1 = this.getPixelNode(1);
+		int nodeIndex = edge.matchByCoordinate(node1);
+		if (nodeIndex == -1) {
+			throw new RuntimeException("Cannot find joining node");
+		}
+		if (nodeIndex == 1) {
+			edge.reverse();
+		}
+		PixelEdge newEdge = join(edge, node1, node1);
+		return newEdge;
+	}
+
+	/** turn edge into a cycle with single node.
+	 * for this to work has to have two singly connected nodes with identical coordinates
+	 * @return null if impossible
+	 */
+	public PixelEdge cyclise() {
+		PixelEdge newEdge = null;
+		PixelNode node0 = this.getPixelNode(0);
+		PixelNode node1 = this.getPixelNode(1);
+		if (node0.getInt2().equals(node1.getInt2())) {
+			newEdge = new PixelEdge(this);
+			newEdge.removeNode(node1);
+			newEdge.pixelList.remove(newEdge.pixelList.size() -1);
+		}
+		return newEdge;
+	}
 
 }

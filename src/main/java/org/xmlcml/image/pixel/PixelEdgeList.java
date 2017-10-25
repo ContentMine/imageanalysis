@@ -114,5 +114,8 @@ public class PixelEdgeList implements Iterable<PixelEdge> {
 		}
 	}
 
+	public void reverse() {
+		Collections.reverse(list);
+	}
 
 }

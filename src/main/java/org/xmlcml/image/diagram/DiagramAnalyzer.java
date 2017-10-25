@@ -437,43 +437,24 @@ public class DiagramAnalyzer {
 //		}
 	}
 
-	public List<PixelGraph> processGraphList() {
-		// this is required because the commands are now obsolete and we have to laod the image
-		if (imageProcessor == null || imageProcessor.getImage() == null) {
-			imageProcessor  = ImageProcessor.createDefaultProcessorAndProcess(inputFile);
-		}
-		// this is debug only
-		new File("target/diagramAnalyzer/").mkdirs();
-		BufferedImage image = imageProcessor.getImage();
-		if (image != null) {
-			ImageIOUtil.writeImageQuietly(image, new File("target/diagramAnalyzer/processGraphList.png"));
-		} else {
-			LOG.debug("Cannot create image from "+inputFile.getAbsolutePath());
-		}
-		LOG.trace("start pixel island list");
-		PixelIslandList pixelIslandList = imageProcessor.getOrCreatePixelIslandList();
-		LOG.trace("created pixel island list");
-		pixelIslandList.sortBySizeDescending();
-		pixelIslandList.setDiagonal(true);
-		LOG.trace("got sorted graphs");
-		pixelGraphList = pixelIslandList.getOrCreateGraphList();
-		LOG.trace("pixel graph list "+pixelGraphList.size());
-		int i = 0;
-		for (PixelGraph pixelGraph : pixelGraphList) {
-			LOG.trace(" >>> "+pixelGraph.getOrCreateNodeList().size()+" / "+pixelGraph.getOrCreateEdgeList().size()+" / "+pixelGraph.getPixelList().size());
-			SVGG g = new SVGG();
-			pixelGraph.createAndDrawGraph(g);
-			if (i == 1) {
-				LOG.trace("analyzing first graph only");
-				break;
-			}
-		}
-		PixelGraph graph0 = pixelGraphList.get(0);
-		for (PixelEdge pixelEdge : graph0.getOrCreateEdgeList()) {
-			SVGG line = pixelEdge.createLineSVG();
-			LOG.trace("edge "+pixelEdge.getNodes().get(0)+"/"+pixelEdge.getNodes().get(1)+"; "+line.toXML());
+	public List<PixelGraph> getOrCreateGraphList() {
+		// this is required because the commands are now obsolete and we have to load the image
+		if (pixelGraphList == null) {
+			getOrCreateImageProcessorFromInputFile();
+			PixelIslandList pixelIslandList = imageProcessor.getOrCreatePixelIslandList();
+			pixelIslandList.sortBySizeDescending();
+			pixelIslandList.setDiagonal(true);
+			pixelGraphList = pixelIslandList.getOrCreateGraphList();
 		}
 		return pixelGraphList;
+	}
+
+	private ImageProcessor getOrCreateImageProcessorFromInputFile() {
+		if ((imageProcessor == null || imageProcessor.getImage() == null) &&
+				inputFile != null) {
+			imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(inputFile);
+		}
+		return imageProcessor;
 	}
 	
 	public SVGSVG convertPixelsToSVG() {
@@ -1392,7 +1373,7 @@ public class DiagramAnalyzer {
 	
 	public List<PixelGraph> getOrCreateGraphList(File inputFile) {
 		this.setInputFile(inputFile);
-		return this.processGraphList();
+		return this.getOrCreateGraphList();
 	}
 
 	public static void main(String[] args) throws Exception {

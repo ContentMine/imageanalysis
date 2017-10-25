@@ -234,4 +234,5 @@ public class PixelNode implements Comparable<PixelNode> {
 		}
 		return nodeList;
 	}
+	
 }
