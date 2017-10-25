@@ -16,7 +16,6 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGRect;
 
 public class Pixel {
-
 	private final static Logger LOG = Logger.getLogger(Pixel.class);
 	
 	enum Marked {
