@@ -466,15 +466,15 @@ public class PixelSegmentList implements List<PixelSegment> {
 		}
 		Real2Array polygonXY = new Real2Array();
 		for (int i = 0; i < size - 1 ; i++) {			
-			PixelSegment segment = get(i + 1);
-			Real2 xy0 = segment.getPoint(0);
-			Real2 xy1 = segment.getPoint(1);
-			if (xy0.isEqualTo(nodeXY, tolerance)) {
-				nodeXY = xy1;
-			} else if(xy1.isEqualTo(nodeXY, tolerance)) {
-				nodeXY  = xy0;
+			PixelSegment segmentNext = get(i + 1);
+			Real2 xy0Next = segmentNext.getPoint(0);
+			Real2 xy1Next = segmentNext.getPoint(1);
+			if (xy0Next.isEqualTo(nodeXY, tolerance)) {
+				nodeXY = xy1Next;
+			} else if(xy1Next.isEqualTo(nodeXY, tolerance)) {
+				nodeXY  = xy0Next;
 			} else {
-				throw new RuntimeException("Cannot find next coord "+i+": "+nodeXY+" in "+xy0+" or "+xy1);
+				throw new RuntimeException("Cannot find next coord "+i+": "+nodeXY+" in "+xy0Next+" or "+xy1Next);
 			}
 			polygonXY.addElement(nodeXY);
 		}
@@ -490,5 +490,19 @@ public class PixelSegmentList implements List<PixelSegment> {
 			polyline = new SVGPolyline(real2Array) ;
 		}
 		return polyline;
+	}
+
+	SVGCircle createCircle(double maxMeanDeviation) {
+		List<PixelSegment> segmentList = new ArrayList<PixelSegment>();
+		int size = size();
+		for (int i = 0; i < size ; i++) {
+			segmentList.add(get(i));
+		}
+		LOG.debug("SL"+segmentList);
+		Real2 startXY = segmentList.get(0).getPoint(0);
+		LOG.debug("START"+startXY);
+		SVGCircle circle = createCircle(startXY, 2 * maxMeanDeviation);
+		LOG.info("CYCLE: "+(circle == null ? null : circle.toXML()));
+		return circle;
 	}
 }

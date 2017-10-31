@@ -1006,7 +1006,7 @@ public class PixelGraph {
 		double maxMeanDeviation = MAX_MEAN_CIRCLE_DEVIATION;
 		if (nodeList.size() == 1 && edgeList.size() == 1) {
 			PixelSegmentList cyclicSegmentList = edgeList.get(0).getOrCreateSegmentList(segmentCreationTolerance);
-			SVGCircle circle = createCircle(maxMeanDeviation, cyclicSegmentList);
+			SVGCircle circle = cyclicSegmentList.createCircle(maxMeanDeviation);
 			if (circle != null) {
 				plotCircle(g, circle);
 			}
@@ -1018,6 +1018,9 @@ public class PixelGraph {
 				line.setCSSStyle("stroke:green;stroke-width:1.2;");
 			} else {
 				SVGPolyline polyline = edge.createPolylineFromSegmentList();
+				if (polyline != null) {
+					line.setCSSStyle("blue;stroke-width:1.2;");					
+				}
 			}
 			g.appendChild(line);
 		} else {
@@ -1189,18 +1192,6 @@ public class PixelGraph {
 	private void plotCircle(SVGG g, SVGCircle circle) {
 		g.appendChild(circle);
 		circle.setCSSStyle("fill:none;stroke:red;stroke-width:0.8;");
-	}
-
-	private SVGCircle createCircle(double maxMeanDeviation, PixelSegmentList cyclicSegmentList) {
-		List<PixelSegment> segmentList = new ArrayList<PixelSegment>();
-		int size = cyclicSegmentList.size();
-		for (int i = 0; i < size ; i++) {
-			segmentList.add(cyclicSegmentList.get(i));
-		}
-		Real2 startXY = segmentList.get(0).getPoint(0);
-		SVGCircle circle = cyclicSegmentList.createCircle(startXY, 2 * maxMeanDeviation);
-		LOG.info("CYCLE: "+(circle == null ? null : circle.toXML()));
-		return circle;
 	}
 
 	/**sometimes the nodes don't correspond with the pixel lists, so add new pixels to lists

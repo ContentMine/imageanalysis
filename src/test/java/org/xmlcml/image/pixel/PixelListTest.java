@@ -6,14 +6,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.IntMatrix;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.RealArray;
 import org.xmlcml.euclid.Util;
+import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.util.ColorStore;
 import org.xmlcml.graphics.svg.util.ColorStore.ColorizerType;
@@ -298,18 +301,30 @@ E straight 16: (39,31)(38,32)(39,33)(39,34)(39,35)(39,36)(39,37)(39,38)(39,39)(3
 		PixelEdge edge2 = new PixelEdge(edgeList.get(2)); // should be curved
 		PixelEdge edge3 = new PixelEdge(edgeList.get(3)); // should be curved
 		Assert.assertEquals("edge2", "pixelList: (39,31)(40,30)(41,30)(42,30)(43,30)(44,31)(45,31)(46,32)(47,33)(48,34)(48,35)(49,36)(49,37)(49,38)(49,39)(49,40)(49,41)(49,42)(48,43)(48,44)(47,45)(46,46)(45,47)(44,47)(43,47)(42,47)(41,47)(40,47)(39,46); nodeList: [<(39,31)><(39,46)>]", edge2.toString());
+		Assert.assertEquals("edge2", 29, edge2.size());
 		Assert.assertEquals("edge3", "pixelList: (39,31)(38,32)(37,32)(36,33)(35,34)(34,35)(34,36)(33,37)(33,38)(33,39)(33,40)(33,41)(34,42)(34,43)(35,44)(35,45)(36,46)(37,46)(38,46)(39,46); nodeList: [<(39,31)><(39,46)>]", edge3.toString());
+		Assert.assertEquals("edge3", 20, edge3.size());
 		PixelEdge edge = edge2.join(edge3);
 		Assert.assertEquals("edge", "pixelList: (39,31)(40,30)(41,30)(42,30)(43,30)(44,31)(45,31)(46,32)(47,33)(48,34)(48,35)(49,36)(49,37)(49,38)(49,39)(49,40)(49,41)(49,42)(48,43)(48,44)(47,45)(46,46)(45,47)(44,47)(43,47)(42,47)(41,47)(40,47)(39,46)(38,46)(37,46)(36,46)(35,45)(35,44)(34,43)(34,42)(33,41)(33,40)(33,39)(33,38)(33,37)(34,36)(34,35)(35,34)(36,33)(37,32)(38,32)(39,31); nodeList: [<(39,31)><(39,31)>]", edge.toString());
+		Assert.assertEquals("edge", 20 + 29 - 1, edge.size());
+		Assert.assertEquals("edge nodes", 2, edge.getNodes().size());
 		edge = edge.cyclise();
+		Assert.assertEquals("edge", 20 + 29 - 1 - 1, edge.size());
+		LOG.debug(edge);
+		Assert.assertEquals("edge nodes", 1, edge.getNodes().size());
+		Assert.assertEquals("node 0", "<(39,31)>", edge.getNodes().get(0).toString());
 	}
 	
 	@Test
+	/** separates line and circle and draws SVG.
+	 * 
+	 */
+	@Ignore // not yet fixed
 	public void testSeparationOfOverlap() {
 		SVGG g = new SVGG();
 		PixelEdgeList edgeList = getSortedCrossing1PixelEdges();
 		SVGElement gg = edgeList.getOrCreateSVG();
-		gg.setStroke("yellow");
+		gg.setStroke("black");
 		gg.setStrokeWidth(0.5);
 		g.appendChild(gg);
 		
@@ -321,20 +336,47 @@ E straight 16: (39,31)(38,32)(39,33)(39,34)(39,35)(39,36)(39,37)(39,38)(39,39)(3
 		SVGElement gline = line.getOrCreateSVG();
 		gline.setStroke("red");
 		gline.setStrokeWidth(0.3);
+		gline.setOpacity(0.4);
 		g.appendChild(gline.copy());
 		gline.setOpacity(0.4);
+		PixelSegmentList segmentList = line.getOrCreateSegmentList(1.0);
+		if (segmentList.size() == 1) {
+			SVGLine svgLine = segmentList.get(0).getSVGLine();
+			svgLine.setStrokeWidth(4.0);
+			svgLine.setStroke("cyan");
+			svgLine.setOpacity(0.4);
+			g.appendChild(svgLine);
+		}
+		
+		LOG.debug("SEG "+segmentList);
+		
 		SVGSVG.wrapAndWriteAsSVG(gline, new File("target/pixelList/line.svg"));
 		
 		PixelEdge edge2 = new PixelEdge(edgeList.get(2));
+		LOG.debug("e2 "+edge2.size()+"; "+edge2);
 		PixelEdge edge3 = new PixelEdge(edgeList.get(3));
+		LOG.debug("e3 "+edge3.size()+"; "+edge3);
 		PixelEdge cycle = edge2.join(edge3);
-		cycle = cycle.join(edge3);
-		cycle.cyclise();
+		LOG.debug("cyc "+cycle.size()+"; "+cycle);
+		cycle = cycle.cyclise();
+		LOG.debug("cyc "+cycle.size()+"; "+cycle);
+		double segmentCreationTolerance = 1.0;
+		PixelSegmentList cyclicSegmentList = cycle.getOrCreateSegmentList(segmentCreationTolerance);
+		LOG.debug("pse "+cyclicSegmentList.size()+"; "+cyclicSegmentList);
+		SVGElement svgPse = cyclicSegmentList.getSVGG();
+		LOG.debug(svgPse.toXML());
+		svgPse.setStrokeWidth(0.5);
+		svgPse.setStroke("yellow");
+		SVGCircle circle = cyclicSegmentList.createCircle(/*segmentCreationTolerance*/3.0);
+		LOG.debug("cyc"+circle);
 		SVGElement gcycle = cycle.getOrCreateSVG();
-		gcycle.setStroke("green");
-		gcycle.setStrokeWidth(0.3);
+		gcycle.setStroke("pink");
+		gcycle.setStrokeWidth(3.0);
 		g.appendChild(gcycle.copy());
+		g.appendChild(svgPse);
 		gcycle.setOpacity(0.4);
+		gcycle.setOpacity(0.4);
+		g.appendChild(gcycle);
 		SVGSVG.wrapAndWriteAsSVG(gcycle, new File("target/pixelList/cycle.svg"));
 		SVGSVG.wrapAndWriteAsSVG(g, new File("target/pixelList/lineCycle.svg"));
 	}

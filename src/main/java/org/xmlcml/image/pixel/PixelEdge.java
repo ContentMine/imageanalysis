@@ -29,8 +29,8 @@ public class PixelEdge {
 	private String id;
 	private PixelGraph pixelGraph;
 	private SVGG svgg;
-
 	private Int2Range boundingBox;
+	private Boolean cyclic;
 
 	PixelEdge() {
 		
@@ -199,12 +199,12 @@ public class PixelEdge {
 			boolean improvedDouglasPeucker = cornerFindingWindow != null && relativeCornernessThresholdForCornerAggregation != null && allowedDifferenceCornerMaximumDeviating != null && maxNumberCornersToSearch != null;
 			DouglasPeucker douglasPeucker = (improvedDouglasPeucker ? new DouglasPeucker(tolerance, cornerFindingWindow, relativeCornernessThresholdForCornerAggregation, allowedDifferenceCornerMaximumDeviating, maxNumberCornersToSearch) : new DouglasPeucker(tolerance));
 			Real2Array points = pixelList.getOrCreateReal2Array();
-			if (nodeList == null || nodeList.size() != 2) {
-				throw new RuntimeException("Segmentation requires 2 nodes");
-			}
-			boolean isCyclic = nodeList.get(0).getInt2().equals(nodeList.get(1).getInt2());
-			Real2Array pointArray = douglasPeucker.reduceToArray(points);
-			if (isCyclic) {
+			Real2Array pointArray = null;
+			if (nodeList == null) {
+				throw new RuntimeException("Segmentation requires nodes");
+			} else if (nodeList.size() == 2 || true) {
+				pointArray = douglasPeucker.reduceToArray(points);
+			} else if (isCyclic()) {
 				Real2 point0 = pointArray.get(0);
 				pointArray.setElement(pointArray.size() - 1, new Real2(point0));
 			}
@@ -629,8 +629,24 @@ public class PixelEdge {
 			newEdge = new PixelEdge(this);
 			newEdge.removeNode(node1);
 			newEdge.pixelList.remove(newEdge.pixelList.size() -1);
+			newEdge.cyclic = true;
 		}
 		return newEdge;
 	}
 
+	/** use stored value or compute 
+	 * cyclic if one node and pixel0 is joined to last pixel.
+	 * will not force cyclize() 
+	 * 
+	 * @return not null
+	 */
+	public Boolean isCyclic() {
+		if (cyclic == null) {
+			cyclic = false;
+			if (nodeList.size() == 1 && size() >= 3 && pixelList.get(0).isNeighbour(pixelList.last())) {
+				cyclic = true;
+			} 
+		}
+		return cyclic;
+	}
 }
