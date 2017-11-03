@@ -25,7 +25,6 @@ import org.xmlcml.image.pixel.PixelList;
 import org.xmlcml.image.pixel.PixelNodeList;
 import org.xmlcml.image.pixel.PixelRingList;
 import org.xmlcml.image.pixel.PixelSegmentList;
-import org.xmlcml.image.plot.PlotTest;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 import org.xmlcml.image.slice.XSlice;
