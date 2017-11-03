@@ -12,6 +12,7 @@ public class ImageAnalysisFixtures {
 
 	public final static File TEST_RESOURCE_DIR = new File("src/test/resources");
 	public final static File TEST_IMAGE_DIR = new File(TEST_RESOURCE_DIR, "org/xmlcml/image");
+	public final static File TARGET_DIR = new File("target/");
 	
 	public final static File JOURNAL_HTML = new File(TEST_IMAGE_DIR, "journal.html");
 	
@@ -66,6 +67,16 @@ public class ImageAnalysisFixtures {
 	public static final File LARGE_PHYLO_JPG = new File(ImageAnalysisFixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
 
 	public final static File DIAGRAMS_DIR = new File(TEST_IMAGE_DIR, "diagrams/");
+	public final static File BIO_DIR = new File(DIAGRAMS_DIR, "bio/");
+	
+	public final static String ELECTRONIC = "electronic";
+	public final static File ELECTRONIC_DIR = getDiagramsDirectory();
+
+	private static File getDiagramsDirectory() {
+		return new File(DIAGRAMS_DIR, ELECTRONIC+"/");
+	}
+	public final static File TARGET_ELECTRONIC_DIR = new File(TARGET_DIR, ELECTRONIC+"/");
+	
 	public final static File FUNNEL_DIR = new File(DIAGRAMS_DIR, "funnel/");
 
 	public static final File GENERAL_DIR = new File(TEST_IMAGE_DIR, "general");
@@ -420,6 +431,5 @@ public class ImageAnalysisFixtures {
 		return island;
 	}
 
-
-	
 }
+

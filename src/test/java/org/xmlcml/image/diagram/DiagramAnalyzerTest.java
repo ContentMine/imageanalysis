@@ -1,23 +1,38 @@
 package org.xmlcml.image.diagram;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Iterator;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.graphics.svg.SVGCircle;
+import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.util.ColorStore;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.graphics.svg.util.ColorStore.ColorizerType;
 import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageProcessor;
+import org.xmlcml.image.ImageUtil;
+import org.xmlcml.image.colour.ColorAnalyzer;
+import org.xmlcml.image.pixel.PixelEdge;
 import org.xmlcml.image.pixel.PixelGraph;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.pixel.PixelList;
 import org.xmlcml.image.pixel.PixelRingList;
+import org.xmlcml.image.pixel.PixelSegment;
+import org.xmlcml.image.pixel.PixelSegmentList;
 
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multiset.Entry;
+
+import boofcv.io.image.UtilImageIO;
 import junit.framework.Assert;
 
 public class DiagramAnalyzerTest {
@@ -25,8 +40,11 @@ public class DiagramAnalyzerTest {
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
+	public static File TARGET_DIR = new File("target");
 	public static String FUNNEL = "funnel";
-	public static File TARGET_FUNNEL = new File("target", FUNNEL+"/");
+	public static File TARGET_FUNNEL = new File(TARGET_DIR, FUNNEL+"/");
+	public static String ELECTRONIC = "electronic";
+	public static File TARGET_ELECTRONIC = new File(TARGET_DIR, ELECTRONIC+"/");
 	
 	@Test
 	public void testFunnelSegments() {
@@ -128,12 +146,137 @@ public class DiagramAnalyzerTest {
 		Assert.assertEquals(4,  graph.getOrCreateNodeList().size());
 		Assert.assertEquals(5,  graph.getOrCreateEdgeList().size());
 		PixelIslandList newIslandLists = graph.resolveCyclicCrossing();
-		SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(TARGET_FUNNEL, filenames[0] + ".crossing.svg"));
+		SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(TARGET_FUNNEL, filenames[0] + ".svg"));
 
 	}
 
+	@Test
+	public void testDrainSource() {
+		String filename = "drainsource.png";
+		String [] filenames = filename.split("\\.");
+		File imageFile = new File(ImageAnalysisFixtures.ELECTRONIC_DIR, filenames[0] + "." + filenames[1]);
+		DiagramAnalyzer diagramAnalyzer = new DiagramAnalyzer();
+		diagramAnalyzer.getOrCreateGraphList(imageFile);
+		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
+		Assert.assertEquals(115, pixelIslandList.size());
+		PixelIsland pixelIsland = pixelIslandList.get(0);
+		PixelGraph graph = new PixelGraph(pixelIsland);
+		graph.compactCloseNodes(3);
+		LOG.debug(graph);
+	}
 
-// ==================================
+	@Test
+	/**
+	 * Single line, segmented OK
+	 */
+	public void testDrainSource1() {
+		String filename = "drainsource1.png";
+		String [] filenames = filename.split("\\.");
+		File imageFile = new File(ImageAnalysisFixtures.ELECTRONIC_DIR, filenames[0] + "." + filenames[1]);
+		DiagramAnalyzer diagramAnalyzer = new DiagramAnalyzer();
+		diagramAnalyzer.getOrCreateGraphList(imageFile);
+		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
+		Assert.assertEquals(11, pixelIslandList.size());
+		for (int i = 0; i < pixelIslandList.size(); i++) {
+			PixelIsland pixelIsland = pixelIslandList.get(i);
+			SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(TARGET_ELECTRONIC, filenames[0] + "."+i+".svg"));
+		}
+		// extract segments
+		extractSegments(pixelIslandList, 0);
+		extractSegments(pixelIslandList, 1);
+		
+		// analyze pixels
+		int nvalues = 4; // i.e. 16-bit color
+		nvalues = 2;
+		BufferedImage image = UtilImageIO.loadImage(imageFile.toString());
+		image = ImageUtil.flattenImage(image, nvalues);
+		ImageIOUtil.writeImageQuietly(image, new File(TARGET_ELECTRONIC, filenames[0] + "."+"colors"+".png"));
+
+	}
+
+	@Test
+	/** messy, because linewidth not analyzed.
+	 * 
+	 */
+	public void testDrainSource2() {
+		String filename = "drainsource2.png";
+		String [] filenames = filename.split("\\.");
+		File imageFile = new File(ImageAnalysisFixtures.ELECTRONIC_DIR, filenames[0] + "." + filenames[1]);
+		DiagramAnalyzer diagramAnalyzer = new DiagramAnalyzer();
+		diagramAnalyzer.getOrCreateGraphList(imageFile);
+		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
+		Assert.assertEquals(40, pixelIslandList.size());
+		// smaller islands are characters
+		for (int i = 0; i < pixelIslandList.size(); i++) {
+			PixelIsland pixelIsland = pixelIslandList.get(i);
+			SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(TARGET_ELECTRONIC, filenames[0] + "."+i+".svg"));
+		}
+		// extract segments
+		extractSegments(pixelIslandList, 0);
+		extractSegments(pixelIslandList, 1);
+	}
+	
+	@Test
+	/** tricolor diagram
+	 * 
+	 */
+	public void testTricolor() {
+		String filename = "tricolor.png";
+		String [] filenames = filename.split("\\.");
+		File imageFile = new File(ImageAnalysisFixtures.BIO_DIR, filenames[0] + "." + filenames[1]);
+		int nvalues = 4; // i.e. 16-bit color
+		nvalues = 2;
+		BufferedImage image = UtilImageIO.loadImage(imageFile.toString());
+		image = ImageUtil.flattenImage(image, nvalues);
+		ImageIOUtil.writeImageQuietly(image, new File("target/bio/"+filenames[0]+"/poster.png"));
+		
+		ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
+		Multiset<Integer> set = colorAnalyzer.createColorSetNew();
+		for (Entry<Integer> entry : set.entrySet()) {
+			int ii = ((int) entry.getElement()) & 0x00ffffff;
+			// uncomment for debug
+//			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount()); 
+		}
+//		ImageIOUtil.writeImageQuietly(image, new File("target/bio/filenames[0]/poster.png"));
+
+		DiagramAnalyzer diagramAnalyzer = new DiagramAnalyzer();
+		diagramAnalyzer.getOrCreateGraphList(imageFile);
+		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
+//		Assert.assertEquals(40, pixelIslandList.size());
+		for (int i = 0; i < pixelIslandList.size(); i++) {
+			PixelIsland pixelIsland = pixelIslandList.get(i);
+			SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(TARGET_ELECTRONIC, filenames[0] + "."+i+".svg"));
+		}
+		// extract segments
+		extractSegments(pixelIslandList, 0);
+		extractSegments(pixelIslandList, 1);
+	}
+
+
+	//======================================
+	
+	private void extractSegments(PixelIslandList pixelIslandList, int serial) {
+		PixelEdge edge = pixelIslandList.get(serial).getOrCreateGraph().getOrCreateEdgeList().get(0);
+		PixelEdge edge1 = edge.cyclise();
+		edge = edge1 == null ? edge : edge1;
+		LOG.debug("edge "+edge);
+		LOG.debug("cycle "+edge.isCyclic());
+		LOG.debug("node "+edge.getNodes().size()+"; "+edge.getNodes());
+		PixelSegmentList segmentList = edge.getOrCreateSegmentList(1.0);
+		LOG.debug("S: "+segmentList.size()+"; "+segmentList);
+		SVGElement g = segmentList.getOrCreateSVG();
+		for (PixelSegment segment : segmentList) {
+			plotPoint(g, segment, 0);
+		}
+		plotPoint(g, segmentList.getLast(), 1);
+		SVGSVG.wrapAndWriteAsSVG(g, new File(TARGET_ELECTRONIC, "edge" + "."+serial+".svg"));
+	}
+
+	private void plotPoint(SVGElement g, PixelSegment segment, int serial) {
+		SVGLine line = segment.getSVGLine();
+		SVGCircle c = new SVGCircle(line.getXY(serial), 3.0);
+		g.appendChild(c);
+	}
 	
 	private SVGG plotRings(File imageFile) {
 		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessor();

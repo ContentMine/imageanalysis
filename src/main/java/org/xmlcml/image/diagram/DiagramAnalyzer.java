@@ -229,6 +229,7 @@ public class DiagramAnalyzer {
 	protected void runCommandsIteratively() {
 		this.fileroot = null;
 		List<File> inputFiles = getInputFiles();
+		LOG.debug("input"+inputFiles);
 		if (inputFiles.size() == 0) {
 			LOG.debug("No input file given");
 		} else if (inputFiles.size() == 1) {
@@ -240,7 +241,7 @@ public class DiagramAnalyzer {
 			for (File file : inputFiles) {
 				clearVariables();
 				inputFile = file;
-				LOG.trace("===========INPUT " + inputFile + "================");
+				LOG.debug("===========INPUT " + inputFile + "================");
 				this.fileroot = FilenameUtils.getBaseName(inputFile.toString());
 				this.skipFile = generateFileWithSubstitutions(skipFileString);
 				runCommandsAndOutput();

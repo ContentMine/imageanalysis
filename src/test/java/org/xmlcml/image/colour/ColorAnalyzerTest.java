@@ -61,28 +61,8 @@ public class ColorAnalyzerTest {
 			for (Entry<Integer> entry : set.entrySet()) {
 				int ii = ((int) entry.getElement()) & 0x00ffffff;
 				// uncomment for debug
-	//			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount()); 
+//				System.out.println(Integer.toHexString(ii)+"  "+entry.getCount()); 
 			}
-			/**
-			    ff  26      BLUE
-			  7f7f  351     cyan
-			7f7f7f  34019   grey
-			7fffff  80      cyanw
-			  7fff  49      cyan
-			    7f  2301    blue
-			7fff7f  586     greenw
-			7f7fff  102006  cyanw
-			7f007f  27      magenta
-			     0  25578   BLACK
-			ffff7f  40      yellow
-			ff7fff  37      magenta
-			7f0000  2863    red
-			  7f00  489     green
-			ff7f7f  1562    redw
-			7f7f00  1676    yellow
-			ffffff  937110  white
-			*/
-	
 			ImageIOUtil.writeImageQuietly(image, new File("target/posterize.png"));
 		}
 
