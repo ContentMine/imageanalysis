@@ -7,19 +7,20 @@ import java.util.Iterator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.xmlcml.euclid.Real2;
 import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.util.ColorStore;
-import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.graphics.svg.util.ColorStore.ColorizerType;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.colour.ColorAnalyzer;
+import org.xmlcml.image.colour.ColorFrequenciesMap;
+import org.xmlcml.image.colour.RGBColor;
 import org.xmlcml.image.pixel.PixelEdge;
 import org.xmlcml.image.pixel.PixelGraph;
 import org.xmlcml.image.pixel.PixelIsland;
@@ -29,14 +30,13 @@ import org.xmlcml.image.pixel.PixelRingList;
 import org.xmlcml.image.pixel.PixelSegment;
 import org.xmlcml.image.pixel.PixelSegmentList;
 
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multiset.Entry;
+import com.google.common.collect.Multimap;
 
 import boofcv.io.image.UtilImageIO;
 import junit.framework.Assert;
 
 public class DiagramAnalyzerTest {
-	private static final Logger LOG = Logger.getLogger(DiagramAnalyzerTest.class);
+	public static final Logger LOG = Logger.getLogger(DiagramAnalyzerTest.class);
 	static {
 		LOG.setLevel(Level.DEBUG);
 	}
@@ -218,39 +218,203 @@ public class DiagramAnalyzerTest {
 	
 	@Test
 	/** tricolor diagram
+	 *  3 red/blue/black lines overlapping in some places
 	 * 
 	 */
 	public void testTricolor() {
-		String filename = "tricolor.png";
-		String [] filenames = filename.split("\\.");
-		File imageFile = new File(ImageAnalysisFixtures.BIO_DIR, filenames[0] + "." + filenames[1]);
+		String fileroot = "tricolor1";
+		File imageFile = new File(ImageAnalysisFixtures.BIO_DIR, fileroot+".png");
 		int nvalues = 4; // i.e. 16-bit color
-		nvalues = 2;
+		nvalues = 2; // reduce to 2
 		BufferedImage image = UtilImageIO.loadImage(imageFile.toString());
 		image = ImageUtil.flattenImage(image, nvalues);
-		ImageIOUtil.writeImageQuietly(image, new File("target/bio/"+filenames[0]+"/poster.png"));
+		
+		File poster0 = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/poster.orig.png");
+		ImageIOUtil.writeImageQuietly(image, poster0);
 		
 		ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
-		Multiset<Integer> set = colorAnalyzer.createColorSetNew();
-		for (Entry<Integer> entry : set.entrySet()) {
-			int ii = ((int) entry.getElement()) & 0x00ffffff;
-			// uncomment for debug
-//			System.out.println(Integer.toHexString(ii)+"  "+entry.getCount()); 
-		}
-//		ImageIOUtil.writeImageQuietly(image, new File("target/bio/filenames[0]/poster.png"));
+		image = colorAnalyzer.getBinaryImage();
+		File file = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+".binary.png");
+		ImageIOUtil.writeImageQuietly(image, file);
+		
+		SVGG g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/colors.orig.svg"));
+		
+		image = colorAnalyzer.mergeMinorColours(image);
+		
+		colorAnalyzer = new ColorAnalyzer(image);
+		g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/colors.svg"));
+		file = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+".poster.png");
+		ImageIOUtil.writeImageQuietly(image, file);
+		
+		//flatten color map
+		image = colorAnalyzer.mergeMinorColours(image);
+		image = colorAnalyzer.mergeMinorColours(image);
+		image = colorAnalyzer.mergeMinorColours(image);
+			
+		colorAnalyzer = new ColorAnalyzer(image);
+		g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/colors.1.svg"));
+		file = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/poster.1.png");
+		ImageIOUtil.writeImageQuietly(image, file);
 
+		if (1 == 1) return;
 		DiagramAnalyzer diagramAnalyzer = new DiagramAnalyzer();
 		diagramAnalyzer.getOrCreateGraphList(imageFile);
 		PixelIslandList pixelIslandList = diagramAnalyzer.getOrCreatePixelIslandList();
-//		Assert.assertEquals(40, pixelIslandList.size());
 		for (int i = 0; i < pixelIslandList.size(); i++) {
 			PixelIsland pixelIsland = pixelIslandList.get(i);
-			SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(TARGET_ELECTRONIC, filenames[0] + "."+i+".svg"));
+			SVGSVG.wrapAndWriteAsSVG(pixelIsland.createSVG(), new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot + "/island."+i+".svg"));
 		}
 		// extract segments
 		extractSegments(pixelIslandList, 0);
 		extractSegments(pixelIslandList, 1);
 	}
+
+	@Test
+	/** tricolor diagram
+	 */
+	public void testCmap0() {
+		String fileroot = "cmap1";
+		File imageFile = new File(ImageAnalysisFixtures.BIO_DIR, fileroot+".png");
+		int nvalues = 2;
+		BufferedImage image = UtilImageIO.loadImage(imageFile.toString());
+		image = ImageUtil.flattenImage(image, nvalues);
+		File poster0 = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/poster.orig.png");
+		ImageIOUtil.writeImageQuietly(image, poster0);
+		
+		ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
+		SVGG g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/colors.orig.svg"));
+		
+		image = colorAnalyzer.mergeMinorColours(image);
+		image = colorAnalyzer.mergeMinorColours(image);
+		image = colorAnalyzer.mergeMinorColours(image);
+		
+		colorAnalyzer = new ColorAnalyzer(image);
+		ColorFrequenciesMap colorFrequencies = colorAnalyzer.getOrCreateColorFrequenciesMap();
+		for (RGBColor color : colorFrequencies.keySet()) {
+			String hex = color.getHex();
+			LOG.debug(hex+": "+colorFrequencies.get(color));
+			BufferedImage image1 = colorAnalyzer.getImage(color);
+			File hexFile = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/.poster."+hex+".png");
+			ImageIOUtil.writeImageQuietly(image1, hexFile);
+		}
+		g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/colors.svg"));
+		File file = new File(ImageAnalysisFixtures.TARGET_BIO_DIR, fileroot+"/poster.png");
+		ImageIOUtil.writeImageQuietly(image, file);
+		
+	}
+
+
+	@Test
+	/** 
+	 *  red black and blue lines. touch at LH end.
+	 */
+	public void testCmap1() {
+		String fileroot = "cmap1";
+		File indir = ImageAnalysisFixtures.BIO_DIR;
+		File targetDir = ImageAnalysisFixtures.TARGET_BIO_DIR;
+		
+		flattenAndWriteSubImages(fileroot, indir, targetDir, "png");
+		
+	}
+	
+	@Test
+	/** 
+	 *  red and blue lines. slight overlap
+	 */
+	public void testCmap2() {
+		String fileroot = "cmap2";
+		File indir = ImageAnalysisFixtures.BIO_DIR;
+		File targetDir = ImageAnalysisFixtures.TARGET_BIO_DIR;
+		
+		flattenAndWriteSubImages(fileroot, indir, targetDir, "png");
+		
+	}
+	
+	@Test
+	/** black gray red darkgreen
+	 *  4 well-separated lines
+	 */
+	public void testJV7() {
+		String fileroot = "JV_7";
+		File indir = new File(ImageAnalysisFixtures.PLOT_DIR, "rscopen");
+		File targetDir = new File(ImageAnalysisFixtures.TARGET_PLOT_DIR, "rscopen/");
+		
+		flattenAndWriteSubImages(fileroot, indir, targetDir, "png");
+		
+	}
+	
+	@Test
+	/** 4 clean antialiased lines
+	 *  fairly well-separated lines
+	 */
+	public void testJV4() {
+		String fileroot = "JV_4";
+		File indir = new File(ImageAnalysisFixtures.PLOT_DIR, "rscopen");
+		File targetDir = new File(ImageAnalysisFixtures.TARGET_PLOT_DIR, "rscopen/");
+		
+		flattenAndWriteSubImages(fileroot, indir, targetDir, "gif");
+		
+	}
+
+	@Test
+	/** bicolor diagram blue/red
+	 *   well-separated lines except at left
+	 */
+	public void testBicolor() {
+		String fileroot = "bicolor";
+		File indir = ImageAnalysisFixtures.BIO_DIR;
+		File targetDir = ImageAnalysisFixtures.TARGET_BIO_DIR;
+		
+		flattenAndWriteSubImages(fileroot, indir, targetDir, "png");
+		
+	}
+
+	private void flattenAndWriteSubImages(String fileroot, File indir, File targetDir, String suffix) {
+		File imageFile = new File(indir, fileroot+"."+suffix);
+		File outdir = new File(targetDir, fileroot+"/");
+		Assert.assertTrue(""+imageFile+" exists", imageFile.exists());
+		int nvalues = 2;
+		BufferedImage image = UtilImageIO.loadImage(imageFile.toString());
+		if (image == null) {
+			throw new RuntimeException("null image");
+		}
+		image = ImageUtil.flattenImage(image, nvalues);
+		File poster0 = new File(outdir, "poster.orig.png");
+		ImageIOUtil.writeImageQuietly(image, poster0);
+		
+		ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
+		// write binary image
+		image = colorAnalyzer.getBinaryImage();
+		File file = new File(outdir, "binary.png");
+		ImageIOUtil.writeImageQuietly(image, file);
+		
+		SVGG g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(outdir, "colors.orig.svg"));
+		
+		image = colorAnalyzer.mergeMinorColours(image);
+		image = colorAnalyzer.mergeMinorColours(image);
+		image = colorAnalyzer.mergeMinorColours(image);
+		
+		colorAnalyzer = new ColorAnalyzer(image);
+		ColorFrequenciesMap colorFrequencies = colorAnalyzer.getOrCreateColorFrequenciesMap();
+		for (RGBColor color : colorFrequencies.keySet()) {
+			String hex = color.getHex();
+			LOG.debug(hex+": "+colorFrequencies.get(color));
+			BufferedImage image1 = colorAnalyzer.getImage(color);
+			File hexFile = new File(outdir, "poster."+hex+".png");
+			ImageIOUtil.writeImageQuietly(image1, hexFile);
+		}
+		g = colorAnalyzer.createColorFrequencyPlot();
+		SVGSVG.wrapAndWriteAsSVG(g, new File(outdir, "colors.svg"));
+		file = new File(outdir, "poster.png");
+		ImageIOUtil.writeImageQuietly(image, file);
+	}
+
 
 
 	//======================================

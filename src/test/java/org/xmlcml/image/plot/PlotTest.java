@@ -19,7 +19,7 @@ import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
 import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.ImageAnalysisFixtures;
-import org.xmlcml.image.ImageAnalysisFixturesDTO;
+import org.xmlcml.image.OutlineTester;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.diagram.DiagramAnalyzer;
 import org.xmlcml.image.pixel.PixelEdge;
@@ -45,7 +45,7 @@ public class PlotTest {
 
 	private static final String CYAN = "cyan";
 
-	private final static Logger LOG = Logger.getLogger(PlotTest.class);
+	public final static Logger LOG = Logger.getLogger(PlotTest.class);
 
 	private final static String SHARK = "0095565.g002";
 	private final static File G002_DIR = new File(ImageAnalysisFixtures.COMPOUND_DIR,
@@ -809,7 +809,7 @@ public class PlotTest {
 	}
 
 	@Test
-	@Ignore // toolong and broken
+	@Ignore // too long and broken
 	public void testDrainSource1OutlinesArgs() {
 		// MUST use thinning for graphs ATM.
 		String[] args = { "--input",
@@ -840,108 +840,55 @@ public class PlotTest {
 
 	@Test
 	public void testDrainSource1OutlinesCode() {
-		ImageAnalysisFixturesDTO dto = new ImageAnalysisFixturesDTO();
+		OutlineTester outlineTester = new OutlineTester();
 		
-		dto.expectedRingSizes = new int[][] {
+		outlineTester.expectedRingSizes = new int[][] {
 			new int[]{7400,7375,7343},
 			new int[]{3174,3165,1},
 		};
-		dto.nodes = new int[] {4,3,0,0};
-		dto.edges = new int[] {4,3,0,0};
-		dto.outlines = new int[] {7388, 3174};
+		outlineTester.nodes = new int[] {4,3,0,0};
+		outlineTester.edges = new int[] {4,3,0,0};
+		outlineTester.outlines = new int[] {7388, 3174};
 		
-		dto.dir = "electronic";
-		dto.inname = "drainsource1";
-		dto.outdir = ImageAnalysisFixtures.TARGET_ELECTRONIC_DIR;
-		dto.indir = ImageAnalysisFixtures.ELECTRONIC_DIR;
+		outlineTester.dir = "electronic";
+		outlineTester.inname = "drainsource1";
+		outlineTester.outdir = ImageAnalysisFixtures.TARGET_ELECTRONIC_DIR;
+		outlineTester.indir = ImageAnalysisFixtures.ELECTRONIC_DIR;
 		
-		dto.islandCount = 11;
-		
-		analyzeAndAssertFile(dto);
+		outlineTester.islandCount = 11;
+		outlineTester.analyzeAndAssertFile();
 	
 	}
 	
-	
+	/** several lines emerging from one point.
+	 * creates nested outlines.
+	 * 
+	 * xyplot with gridlines.
+	 * 
+	 */
 
 	@Test
 	public void testDrainSource2OutlinesCode() {
-		ImageAnalysisFixturesDTO dto = new ImageAnalysisFixturesDTO();
-		dto.expectedRingSizes = new int[][] {
+		OutlineTester outlineTester = new OutlineTester();
+		outlineTester.expectedRingSizes = new int[][] {
 			new int[]{32104,13784,7343},
 			new int[]{92,50,1},
 		};
-		dto.nodes = new int[] {19,1,0,0};
-		dto.edges = new int[] {20,1,0,0};
-		dto.outlines = new int[] {7388, 3174};
+		outlineTester.nodes = new int[] {19,1,0,0};
+		outlineTester.edges = new int[] {20,1,0,0};
+		outlineTester.outlines = new int[] {7388, 3174};
 		
-		dto.dir = "electronic";
-		dto.inname = "drainsource2";
-		dto.outdir = ImageAnalysisFixtures.TARGET_ELECTRONIC_DIR;
-		dto.indir = ImageAnalysisFixtures.ELECTRONIC_DIR;
+		outlineTester.dir = "electronic";
+		outlineTester.inname = "drainsource2";
+		outlineTester.outdir = ImageAnalysisFixtures.TARGET_ELECTRONIC_DIR;
+		outlineTester.indir = ImageAnalysisFixtures.ELECTRONIC_DIR;
 		
-		dto.islandCount = 40;
-		dto.mainIslandCount = 2;
-		dto.pixelRingListCount = new int[] {8, 2};
+		outlineTester.islandCount = 40;
+		outlineTester.mainIslandCount = 2;
+		outlineTester.pixelRingListCount = new int[] {8, 2};
 
-		analyzeAndAssertFile(dto);
+		outlineTester.analyzeAndAssertFile();
 	
-	}
-
-	//=======================================
-	
-	private void analyzeAndAssertFile(ImageAnalysisFixturesDTO dto) {
-		dto.imageFile = new File(dto.indir, dto.inname+".png");
-
-		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessor();
-		imageProcessor.setThinning(null);
-		imageProcessor.readAndProcessFile(dto.imageFile);
-		PixelIslandList islandList = imageProcessor.getOrCreatePixelIslandList();
-		Assert.assertEquals( dto.islandCount,  islandList.size());
-		for (int islandIndex = 0; islandIndex < dto.mainIslandCount; islandIndex++) {
-			displayAndAssertIslands(dto, islandList, islandIndex);
-		}
-	}
-
-	private void displayAndAssertIslands(ImageAnalysisFixturesDTO dto, PixelIslandList islandList, int islandIndex) {
-		PixelIsland islandSerial = new PixelIsland(islandList.get(islandIndex));
-
-		SVGG g = new SVGG();
-		PixelRingList pixelRingList = islandSerial.getOrCreateInternalPixelRings();
-		Assert.assertEquals(dto.pixelRingListCount[islandIndex], pixelRingList.size());
-		for (int i = 0; i < pixelRingList.size(); i++) {
-			pixelRingList.get(i).plotPixels(g, PlotTest.FILL[i % FILL.length]);
-		}
-		SVGSVG.wrapAndWriteAsSVG(g, new File(dto.outdir, dto.inname + "AllRings."+islandIndex+".svg"));
-
-		PixelList outline = pixelRingList.get(1).getPixelsTouching(pixelRingList.get(0));
-		for (int iRing = 0; iRing < Math.min(dto.expectedRingSizes.length, pixelRingList.size()); iRing++) {
-			LOG.debug("ser "+islandIndex+", iRing "+iRing);
-			Assert.assertEquals("ring"+iRing, dto.expectedRingSizes[islandIndex][iRing], pixelRingList.get(iRing).size());
-		}
-//		Assert.assertEquals("outline1", 47, pixelRingList.get(1).size());
-//			Assert.assertEquals("outline", 7388, outline.size());
-		g = new SVGG();
-		outline.plotPixels(g, "blue");
-		// this is the outline of the symbol 
-		SVGSVG.wrapAndWriteAsSVG(g, new File(dto.outdir, dto.inname+"Outline."+islandIndex+".a.svg"));
-
-		// just plots the diamond
-		g = new SVGG();
-		outline = pixelRingList.get(0).getPixelsWithOrthogonalContactsTo(pixelRingList.get(1), islandSerial);
-		outline.plotPixels(g, PlotTest.BLUE);
-		PixelIsland outlineIsland = PixelIsland.createSeparateIslandWithClonedPixels(outline, true);
-		PixelGraph graph = PixelGraph.createGraph(outlineIsland);
-		PixelNodeList nodeList = graph.getOrCreateNodeList();
-		Assert.assertEquals("nodes", dto.nodes[islandIndex], nodeList.size());
-		PixelEdgeList edgeList = graph.getOrCreateEdgeList();
-		Assert.assertEquals("edges", dto.edges[islandIndex], edgeList.size());
-		for (PixelEdge edge : edgeList) {
-			PixelSegmentList segmentList = edge.getOrCreateSegmentList(2);
-//				Assert.assertEquals("segments "+segmentList, 1, segmentList.size());
-			g.appendChild(segmentList.getOrCreateSVG());
-		}
-		
-		SVGSVG.wrapAndWriteAsSVG(g, new File(dto.outdir, dto.inname+"Outline."+islandIndex+".b.svg"));
 	}
 
 	// =========================

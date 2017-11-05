@@ -67,15 +67,19 @@ public class ImageAnalysisFixtures {
 	public static final File LARGE_PHYLO_JPG = new File(ImageAnalysisFixtures.LINES_DIR, "1471-2148-13-93-1-l.jpg");
 
 	public final static File DIAGRAMS_DIR = new File(TEST_IMAGE_DIR, "diagrams/");
-	public final static File BIO_DIR = new File(DIAGRAMS_DIR, "bio/");
+	
+	public final static String BIO = "bio";
+	public final static File BIO_DIR = getDiagramsDirectory(BIO);
+	public final static File TARGET_BIO_DIR = new File(TARGET_DIR, BIO+"/");
 	
 	public final static String ELECTRONIC = "electronic";
-	public final static File ELECTRONIC_DIR = getDiagramsDirectory();
+	public final static File ELECTRONIC_DIR = getDiagramsDirectory(ELECTRONIC);
 
-	private static File getDiagramsDirectory() {
-		return new File(DIAGRAMS_DIR, ELECTRONIC+"/");
-	}
 	public final static File TARGET_ELECTRONIC_DIR = new File(TARGET_DIR, ELECTRONIC+"/");
+	public final static String PLOT = "plot";
+	public final static File PLOT_DIR = getDiagramsDirectory(PLOT);
+	public final static File TARGET_PLOT_DIR = new File(TARGET_DIR, PLOT+"/");
+
 	
 	public final static File FUNNEL_DIR = new File(DIAGRAMS_DIR, "funnel/");
 
@@ -86,6 +90,11 @@ public class ImageAnalysisFixtures {
 	private static final File IMAGE_MAIN_DIR = new File("src/main/resources/org/xmlcml/image");
 	public static final File FONTS_MAIN_DIR = new File(IMAGE_MAIN_DIR, "text/fonts");
 	public static final File HELVETICA_MAIN_DIR = new File(FONTS_MAIN_DIR, "helvetica");
+	
+	private static File getDiagramsDirectory(String subtopic) {
+		return new File(DIAGRAMS_DIR, subtopic+"/");
+	}
+
 
 	public static final File TEST_HELVETICA = new File(ImageAnalysisFixtures.TEST_IMAGE_DIR, "text/fonts/helvetica");
 	public static final String[] FILL = {

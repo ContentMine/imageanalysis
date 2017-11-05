@@ -1,14 +1,11 @@
 package org.xmlcml.image;
 
 import java.awt.Color;
-
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
-import java.io.FileOutputStream;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
@@ -496,6 +493,20 @@ public class ImageUtil {
 	public static String debugRGB(int rgb) {
 		int[] channels = ImageUtil.getRGBChannels(rgb);
 		return "r="+channels[RED]+",g="+channels[GREEN]+",b="+channels[BLUE];
+	}
+	
+	/** deep copy image.
+	 * 
+	 * thanks to https://stackoverflow.com/questions/3514158/how-do-you-clone-a-bufferedimage
+	 * 
+	 * @param bi input image
+	 * @return deep copy
+	 */
+	public static BufferedImage deepCopy(BufferedImage bi) {
+		 ColorModel cm = bi.getColorModel();
+		 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		 WritableRaster raster = bi.copyData(null);
+		 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
 }

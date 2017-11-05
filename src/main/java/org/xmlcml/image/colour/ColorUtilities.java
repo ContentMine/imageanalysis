@@ -15,10 +15,19 @@ import org.apache.log4j.Logger;
  */
 public class ColorUtilities {
 
+
+	private static final int ARGB_WHITE = 0xffffffff;
+
 	private final static Logger LOG = Logger.getLogger(ColorUtilities.class);
 	
     private static final int RGB_WHITE = 255 + 255*256 + 255*256*256;
 	private static final int RGB_BLACK = 0;
+	
+	static final public double Y0 = 100;
+	static final public double gamma = 3;
+	static final public double Al = 1.4456;
+	static final public double Ach_inc = 0.16;
+
 	private BufferedImage colorFrame;
     private int width;
     private int height;
@@ -40,45 +49,104 @@ public class ColorUtilities {
         for(int x = 0; x < raster.getWidth(); x++) {
             for(int y = 0; y < raster.getHeight(); y++){
                 int argb = colorFrame.getRGB(x,y);
-                int r = (argb >> 16) & 0xff;
-                int g = (argb >>  8) & 0xff;
-                int b = (argb      ) & 0xff;
+                int r = getRed(argb);
+                int g = getGreen(argb);
+                int b = getBlue(argb);
 
                 int l = (int) (.299 * r + .587 * g + .114 * b);
                 raster.setSample(x, y, 0, l);
             }
         }
     }
-	
-	static final public double Y0 = 100;
-	static final public double gamma = 3;
-	static final public double Al = 1.4456;
-	static final public double Ach_inc = 0.16;
 
-	// =======================================
+	/** gets green channnel only.
+	 * masks out alpha
+	 * @param argb
+	 * @return green
+	 */
+
+	/** gets red channnel only.
+	 * masks out alpha
+	 * @param argb
+	 * @return red
+	 */
+	public static int getRed(int argb) {
+		return (argb >> 16) & 0xff;
+	}
+	
+	/** sets red channnel only.
+	 * @param argb
+	 * 
+	 * @return red
+	 */
+	public static int setRed(int argb, int red) {
+		red = red << 16;
+		argb = argb & 0xff00ffff;
+		argb += red;
+		return argb;
+	}
+	
+	public static int getGreen(int argb) {
+		return (argb >>  8) & 0xff;
+	}
+
+	/** sets green channnel only.
+	 * @param argb
+	 * 
+	 * @return green 0-255
+	 */
+	public static int setGreen(int argb, int green) {
+		green = green << 8;
+		argb = argb & 0xffff00ff;
+		argb += green;
+		return argb;
+	}
+	
+	/** gets blue channnel only.
+	 * masks out alpha
+	 * @param argb
+	 * @return blue
+	 */
+
+	public static int getBlue(int argb) {
+		return argb & 0xff;
+	}
+	
+	/** sets blue channnel only.
+	 * @param argb
+	 * 
+	 * @return blue 0-255
+	 */
+	public static int setBlue(int argb, int blue) {
+		argb = argb & 0xffffff00;
+		argb += blue;
+		return argb;
+	}
+	
+
 		
-		private void binarizeImage(BufferedImage image, int minBlack, int maxBlack) {
-			Integer height = image.getHeight();
-			Integer width = image.getWidth();
-			Raster raster = image.getRaster();
-			int numdata = raster.getNumDataElements();
-			int[] values = new int[numdata];
-			for (int i = 0; i < width; i++) {
-				for (int j = 0; j < height; j++) {
-					LOG.trace(i+" "+j);
-					values = raster.getPixel(i, j, values);
-					int value = ColorUtilities.getValue(values);
-					if (value >= minBlack && value <= maxBlack) {
-						values = new int[]{0, 0, 0,255};
-					} else {
-						values = new int[]{255, 255, 255, 255};
-					}
-					image.setRGB(i, j, ColorUtilities.getValue(values));
+	private void binarizeImage(BufferedImage image, int minBlack, int maxBlack) {
+		Integer height = image.getHeight();
+		Integer width = image.getWidth();
+		Raster raster = image.getRaster();
+		int numdata = raster.getNumDataElements();
+		int[] values = new int[numdata];
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				LOG.trace(i+" "+j);
+				values = raster.getPixel(i, j, values);
+				int value = ColorUtilities.getValue(values);
+				if (value >= minBlack && value <= maxBlack) {
+					values = new int[]{0, 0, 0,255};
+				} else {
+					values = new int[]{255, 255, 255, 255};
 				}
+				image.setRGB(i, j, ColorUtilities.getValue(values));
 			}
 		}
+	}
 
-	public static int getValue(int[] pix) {
+	private static int getValue(int[] pix) {
 		int sum = 0;
 		for (Integer i : pix) {
 			sum += i;
@@ -93,14 +161,18 @@ public class ColorUtilities {
 			for (int i = 0; i < image.getWidth(); i++) {
 				for (int j = 0; j < image.getHeight(); j++) {
 					int rgb = image.getRGB(i, j);
-					int trans = rgb & 0xff000000;
+					int trans = getAlphaChannel(rgb);
 					if (trans == 0) {
-						rgb = 0xffffffff;
+						rgb = ARGB_WHITE;
 					}
 					image.setRGB(i, j, rgb);
 				}
 			}
 		}
+	}
+
+	private static int getAlphaChannel(int rgb) {
+		return rgb & 0xff000000;
 	}
 
 	/** flips black pixels to white and vice versa.
@@ -116,10 +188,11 @@ public class ColorUtilities {
 				int[] pix = new int[0];
 				for (int i = 0; i <image.getWidth(); i++) {
 					for (int j = 0; j <image.getHeight(); j++) {
-						int rgb = image.getRGB(i, j) & 0x00ffffff;
+						int rgb = image.getRGB(i, j);
+						rgb = removeAlpha(rgb);
 						if (rgb == 0) {
-							rgb = 0xffffff;
-						} else if (rgb == 0xffffff) {
+							rgb = RGB_WHITE;
+						} else if (rgb == RGB_WHITE) {
 							rgb = 0;
 						}
 						image.setRGB(i, j, rgb);
@@ -143,6 +216,40 @@ public class ColorUtilities {
 				throw new RuntimeException("I don't understand Raster yet "+numData);
 			}
 		}
+	}
+
+	public static int removeAlpha(int rgb) {
+		return rgb & 0x00ffffff;
+	}
+
+	/** creates a 6-character representation of color.
+	 * leading zero-fill 
+	 * @param rgb
+	 * @return
+	 */
+	public static String createHexColor(int rgb) {
+		String color = createPaddedHex(rgb);
+		return "#"+color;
+	}
+
+	public static String createPaddedHex(int rgb) {
+		String color = Integer.toHexString(rgb);
+		while (color.length() < 6) {
+			color = "0"+color;
+		}
+		return color;
+	}
+
+	/** not tested
+	 * 
+	 * @param r
+	 * @param g
+	 * @param b
+	 * @return
+	 */
+	public static Integer createRGB(int r, int g, int b) {
+		int i = (r << 16) + (g << 8) + b;
+		return new Integer(i);
 	}
 
 }
