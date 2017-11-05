@@ -389,10 +389,11 @@ public class DiagramAnalyzerTest {
 		
 		ColorAnalyzer colorAnalyzer = new ColorAnalyzer(image);
 		// write binary image
-		image = colorAnalyzer.getBinaryImage();
+		BufferedImage image1 = colorAnalyzer.getBinaryImage();
 		File file = new File(outdir, "binary.png");
-		ImageIOUtil.writeImageQuietly(image, file);
+		ImageIOUtil.writeImageQuietly(image1, file);
 		
+		colorAnalyzer.readImage(image);
 		SVGG g = colorAnalyzer.createColorFrequencyPlot();
 		SVGSVG.wrapAndWriteAsSVG(g, new File(outdir, "colors.orig.svg"));
 		
