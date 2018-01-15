@@ -9,7 +9,7 @@
        <boofcv-feature.version>0.17</boofcv-feature.version>
        <boofcv-visualize.version>0.17</boofcv-visualize.version>
        <imgscalr-lib.version>4.2</imgscalr-lib.version>
-              
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>              
     </properties>
 
 
