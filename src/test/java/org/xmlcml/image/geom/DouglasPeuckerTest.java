@@ -105,7 +105,7 @@ public class DouglasPeuckerTest {
 		DouglasPeucker douglasPeucker = new DouglasPeucker(0.1);
 		List<Real2> reducedList = douglasPeucker.reduce(points);
 		boolean close = true;
-		SVGG g = SVGLine.plotPointsAsTouchingLines(reducedList, close);
+		SVGElement g = SVGLine.plotPointsAsTouchingLines(reducedList, close);
 		Assert.assertEquals("lines", 11, reducedList.size());
 		File file = new File("target/contours/");
 		file.mkdirs();

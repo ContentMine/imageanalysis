@@ -406,9 +406,9 @@ public class DiagramAnalyzerTest {
 		for (RGBColor color : colorFrequencies.keySet()) {
 			String hex = color.getHex();
 			LOG.debug(hex+": "+colorFrequencies.get(color));
-			BufferedImage image1 = colorAnalyzer.getImage(color);
+			BufferedImage image2 = colorAnalyzer.getImage(color);
 			File hexFile = new File(outdir, "poster."+hex+".png");
-			ImageIOUtil.writeImageQuietly(image1, hexFile);
+			ImageIOUtil.writeImageQuietly(image2, hexFile);
 		}
 		g = colorAnalyzer.createColorFrequencyPlot();
 		SVGSVG.wrapAndWriteAsSVG(g, new File(outdir, "colors.svg"));
