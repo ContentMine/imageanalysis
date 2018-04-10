@@ -58,7 +58,7 @@ public class PixelSegment {
 
 	/**
 	 * @param fill
-	 * @see org.xmlcml.graphics.svg.GraphicsElement#setFill(java.lang.String)
+	 * @see org.xmlcml.graphics.svg.SVGElement#setFill(java.lang.String)
 	 */
 	public void setFill(String fill) {
 		line.setFill(fill);
@@ -66,7 +66,7 @@ public class PixelSegment {
 
 	/**
 	 * @param stroke
-	 * @see org.xmlcml.graphics.svg.GraphicsElement#setStroke(java.lang.String)
+	 * @see org.xmlcml.graphics.svg.SVGElement#setStroke(java.lang.String)
 	 */
 	public void setStroke(String stroke) {
 		line.setStroke(stroke);
@@ -157,6 +157,12 @@ public class PixelSegment {
 	public Line2 getEuclidLine() {
 		return line == null ? null : line.getEuclidLine();
 	}
+
+//	public void swapPoints() {
+//		if (line != null) {
+//			line.getEuclidLine().swapPoints();
+//		}
+//	}
 
 	
 }

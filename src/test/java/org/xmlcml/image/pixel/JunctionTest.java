@@ -7,13 +7,13 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class JunctionTest {
 
 	private final static Logger LOG = Logger.getLogger(JunctionTest.class);
 	
-	private final static File G002_DIR = new File(Fixtures.COMPOUND_DIR, "journal.pone.0095565.g002");
+	private final static File G002_DIR = new File(ImageAnalysisFixtures.COMPOUND_DIR, "journal.pone.0095565.g002");
 	private PixelIsland island1;
 	private Pixel p1_00;
 	private Pixel p1_10;

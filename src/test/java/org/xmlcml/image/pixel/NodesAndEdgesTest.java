@@ -14,7 +14,7 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.ImageUtil;
 
@@ -74,7 +74,7 @@ public class NodesAndEdgesTest {
 	 */
 	@Test
 	public void testNodes() {
-		PixelNodeList nodeList = A12.createNodeList();//  getNodes();
+		PixelNodeList nodeList = A12.getOrCreateNodeList();//  getNodes();
 		Assert.assertEquals("nodes", 4, nodeList.size());
 		Assert.assertNotNull(nodeList.getPixelNode(new Pixel(0,0)));
 		Assert.assertNotNull(nodeList.getPixelNode(new Pixel(1,2)));
@@ -96,7 +96,7 @@ public class NodesAndEdgesTest {
 	@Test
 	@Ignore // borders don't work
 	public void testCharacter65() {
-		File png65 = new File(Fixtures.HELVETICA_MAIN_DIR, "65.png");
+		File png65 = new File(ImageAnalysisFixtures.HELVETICA_MAIN_DIR, "65.png");
 		Assert.assertTrue(png65.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(png65);
 		image = ImageUtil.addBorders(image, 1, 1, 0/*0xffffff*/);
@@ -110,7 +110,7 @@ public class NodesAndEdgesTest {
 		Assert.assertEquals("node 3", 12, island.getPixelsWithNeighbourCount(3).size());
 		Assert.assertEquals("node 4", 0, island.getPixelsWithNeighbourCount(4).size());
 		Assert.assertEquals("node 5", 0, island.getPixelsWithNeighbourCount(5).size());
-		PixelNodeList nodeList = island.createNodeList();
+		PixelNodeList nodeList = island.getOrCreateNodeList();
 		for (PixelNode node : nodeList) {
 			LOG.trace("c65 "+node);
 		}
@@ -119,7 +119,7 @@ public class NodesAndEdgesTest {
 	@Test
 	@Ignore // too variable
 	public void testCharacterHelveticaNeighbourCounts() {
-		File helvetica = new File(Fixtures.FONTS_MAIN_DIR, "_helvetica.png");
+		File helvetica = new File(ImageAnalysisFixtures.FONTS_MAIN_DIR, "_helvetica.png");
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image, "Y");
@@ -336,7 +336,7 @@ public class NodesAndEdgesTest {
 		String CHARX = CHARS/*AB*/ ;
 		int NCHARS = CHARX.length();
 		
-		File helvetica = new File(Fixtures.FONTS_MAIN_DIR, "_helvetica.png");
+		File helvetica = new File(ImageAnalysisFixtures.FONTS_MAIN_DIR, "_helvetica.png");
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
 		if (CHARX.equals(CHARSAB)) {
@@ -360,7 +360,7 @@ public class NodesAndEdgesTest {
 			PixelNucleusFactory factory = new PixelNucleusFactory(island);
 			try {
 				edgeList = factory.getEdgeList();
-				nodeList = island.createNodeList();
+				nodeList = island.getOrCreateNodeList();
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 				LOG.error("**** Bad node: "+i+", "+e);
@@ -507,7 +507,7 @@ public class NodesAndEdgesTest {
 	@Test
 	public void testTrimStubs() {
 		// too large
-		File helvetica = new File(Fixtures.FONTS_MAIN_DIR, "_helvetica.png");
+		File helvetica = new File(ImageAnalysisFixtures.FONTS_MAIN_DIR, "_helvetica.png");
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
 		BufferedImage image57 = ImageUtil.clipSubImage(image, new Int2Range(new IntRange(205, 230), new IntRange(210, 260)));
@@ -522,7 +522,7 @@ public class NodesAndEdgesTest {
 	
 	@Test
 	public void testCharacterHelveticaMini() {
-		File helvetica = new File(Fixtures.TEXT_DIR, "fonts/helvetica/minihelvetica.png");
+		File helvetica = new File(ImageAnalysisFixtures.TEXT_DIR, "fonts/helvetica/minihelvetica.png");
 		Assert.assertTrue(helvetica.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(helvetica);
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);
@@ -531,7 +531,7 @@ public class NodesAndEdgesTest {
 
 	@Test
 	public void testCharacterTimes() {
-		File timesRoman = new File(Fixtures.FONTS_MAIN_DIR, "_timesNewRoman.gif");
+		File timesRoman = new File(ImageAnalysisFixtures.FONTS_MAIN_DIR, "_timesNewRoman.gif");
 		Assert.assertTrue(timesRoman.exists());
 		BufferedImage image = DEFAULT_PROCESSOR.processImageFile(timesRoman);
 		PixelIslandList pixelIslandList = PixelIslandList.createSuperThinnedPixelIslandList(image);

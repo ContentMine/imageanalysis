@@ -26,8 +26,6 @@ public class RGBMatrix {
 	 * 
 	 */
 	private IntMatrix[] mrgb;
-//	private int rows = 0;
-//	private int cols;
 
 /** create matrix with references.
 	 * requires at least one row and column

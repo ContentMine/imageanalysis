@@ -6,13 +6,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Line2;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.RealArray;
+import org.xmlcml.graphics.svg.SVGCircle;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGLine;
+import org.xmlcml.graphics.svg.SVGPoly;
+import org.xmlcml.graphics.svg.SVGPolygon;
+import org.xmlcml.graphics.svg.SVGPolyline;
 import org.xmlcml.image.geom.DouglasPeucker;
 
 /** a list of PixelSegments.
@@ -23,12 +29,18 @@ import org.xmlcml.image.geom.DouglasPeucker;
  *
  */
 public class PixelSegmentList implements List<PixelSegment> {
+	private static final Logger LOG = Logger.getLogger(PixelSegmentList.class);
 
-	private final static Logger LOG = Logger.getLogger(PixelSegmentList.class);
+	static {
+		LOG.setLevel(Level.DEBUG);
+	}
+	private static final double DEFAULT_SEGMENT_JOINING_TOLERANCE = 0.1;
+
 	private List<PixelSegment> segmentList;
 	private Real2Array real2Array;
 	private List<SVGLine> svgLineList;
 	private SVGG g;
+	private double segmentJoiningTolerance = DEFAULT_SEGMENT_JOINING_TOLERANCE;
 	
 	public PixelSegmentList() {
 		super();
@@ -241,6 +253,14 @@ public class PixelSegmentList implements List<PixelSegment> {
 		return segmentList.set(index, element);
 	}
 
+	public double getSegmentJoiningTolerance() {
+		return segmentJoiningTolerance;
+	}
+
+	public void setSegmentJoiningTolerance(double segmentJoiningTolerance) {
+		this.segmentJoiningTolerance = segmentJoiningTolerance;
+	}
+
 	/**
 	 * @param index
 	 * @param element
@@ -383,7 +403,7 @@ public class PixelSegmentList implements List<PixelSegment> {
 	public static PixelSegmentList createSegmentList(PixelList pixelList, double tolerance) {
 		PixelSegmentList segmentList = null;
 		if (pixelList != null) {
-			Real2Array points = pixelList.getReal2Array();
+			Real2Array points = pixelList.getOrCreateReal2Array();
 			DouglasPeucker douglasPeucker = new DouglasPeucker(tolerance);
 			Real2Array newPoints = douglasPeucker.reduceToArray(points);
 			segmentList = new PixelSegmentList(newPoints);
@@ -409,5 +429,80 @@ public class PixelSegmentList implements List<PixelSegment> {
 			g.appendChild(segment.getSVGLine());
 		}
 		return g;
+	}
+
+	/** create a circle from chained PixelSegments.
+	 * 
+	 * @param nodeXY
+	 * @param maxMeanDevation TODO
+	 */
+	SVGCircle createCircle(Real2 nodeXY, double maxMeanDevation) {
+		SVGCircle circle = null;
+		SVGPolygon polygon = createPolygon(nodeXY, segmentJoiningTolerance);
+		circle = polygon.createCircle(maxMeanDevation);
+		if (circle != null) {
+			RealArray deviations = circle.calculateUnSignedDistancesFromCircumference(polygon.getReal2Array());
+			LOG.debug("DEVIATION from circle "+deviations.format(1));
+			circle.format(3);
+		}
+		return circle;
+	}
+
+	/** create polygon from coordinates.
+	 * currently requires coordinates in order
+	 * each node has a coordinate equivalent to one in the next segment.
+	 * if the order is broken, throws an exception (ideally should fix it)
+	 * 
+	 * 
+	 * @param nodeXY starting node coordinates
+	 * @param tolerance to determine whether coords are equivalent (normally very small)
+	 * @return
+	 */
+	SVGPolygon createPolygon(Real2 nodeXY, double tolerance) {
+		int size = size();
+		if (size <= 1) {
+			LOG.warn("empty polygon");
+			return new SVGPolygon();
+		}
+		Real2Array polygonXY = new Real2Array();
+		for (int i = 0; i < size - 1 ; i++) {			
+			PixelSegment segmentNext = get(i + 1);
+			Real2 xy0Next = segmentNext.getPoint(0);
+			Real2 xy1Next = segmentNext.getPoint(1);
+			if (xy0Next.isEqualTo(nodeXY, tolerance)) {
+				nodeXY = xy1Next;
+			} else if(xy1Next.isEqualTo(nodeXY, tolerance)) {
+				nodeXY  = xy0Next;
+			} else {
+				throw new RuntimeException("Cannot find next coord "+i+": "+nodeXY+" in "+xy0Next+" or "+xy1Next);
+			}
+			polygonXY.addElement(nodeXY);
+		}
+		LOG.debug("polygon ("+size+") "+polygonXY);
+		return new SVGPolygon(polygonXY);
+	}
+
+	public SVGPolyline getOrCreatePolyline() {
+		SVGPolyline polyline = null;
+		getReal2Array();
+		getSVGLineList();
+		if (real2Array.size() >= 2) {
+			polyline = new SVGPolyline(real2Array) ;
+		}
+		return polyline;
+	}
+
+	SVGCircle createCircle(double maxMeanDeviation) {
+		List<PixelSegment> segmentList = new ArrayList<PixelSegment>();
+		int size = size();
+		for (int i = 0; i < size ; i++) {
+			segmentList.add(get(i));
+		}
+		LOG.debug("SL"+segmentList);
+		Real2 startXY = segmentList.get(0).getPoint(0);
+		LOG.debug("START"+startXY);
+		SVGCircle circle = createCircle(startXY, 2 * maxMeanDeviation);
+		LOG.info("CYCLE: "+(circle == null ? null : circle.toXML()));
+		return circle;
 	}
 }

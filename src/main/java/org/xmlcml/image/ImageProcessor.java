@@ -8,14 +8,23 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.junit.Assert;
+import org.junit.Test;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.colour.ColorAnalyzer;
 import org.xmlcml.image.colour.ColorUtilities;
 import org.xmlcml.image.pixel.MainPixelProcessor;
+import org.xmlcml.image.pixel.PixelEdge;
+import org.xmlcml.image.pixel.PixelEdgeList;
+import org.xmlcml.image.pixel.PixelGraph;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
+import org.xmlcml.image.pixel.PixelList;
+import org.xmlcml.image.pixel.PixelNodeList;
+import org.xmlcml.image.pixel.PixelRingList;
+import org.xmlcml.image.pixel.PixelSegmentList;
 import org.xmlcml.image.processing.Thinning;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 import org.xmlcml.image.slice.XSlice;
@@ -264,7 +273,7 @@ public class ImageProcessor {
 		if (imageFile == null) {
 			throw new RuntimeException("null image file");
 		} else if (!imageFile.exists()) {
-			throw new RuntimeException("Cfile does not exist " + imageFile);
+			throw new RuntimeException("file does not exist " + imageFile);
 		} else if (imageFile.isDirectory()) {
 			throw new RuntimeException("File is directory " + imageFile);
 		} else {
@@ -603,4 +612,5 @@ public class ImageProcessor {
 	public BufferedImage getThinnedImage() {
 		return thinnedImage;
 	}
+
 }

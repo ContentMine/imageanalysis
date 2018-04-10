@@ -140,7 +140,7 @@ public class PixelRingList implements Iterable<PixelList> {
 			PixelIsland outlineIsland = PixelIsland.createSeparateIslandWithClonedPixels(outline, true);
 			PixelGraph graph = PixelGraph.createGraph(outlineIsland);
 //			PixelNodeList nodeList = graph.getNodeList();
-			PixelEdgeList edgeList = graph.getEdgeList();
+			PixelEdgeList edgeList = graph.getOrCreateEdgeList();
 			for (PixelEdge edge : edgeList) {
 				PixelSegmentList segmentList = edge.getOrCreateSegmentList(2);
 				g.appendChild(segmentList.getOrCreateSVG());
@@ -163,6 +163,17 @@ public class PixelRingList implements Iterable<PixelList> {
 		outline = getOrCreateOutline();
 		outline.plotPixels(g, colour);
 		return g;
+	}
+
+	public PixelList getOuterPixelRing() {
+		return get(0);
+	}
+	
+	public PixelList getRing(int i) {
+		PixelList ring1 = get(i);
+		PixelList ring0 = get(i-1);
+		PixelList ring = ring0 == null ? ring1 : ring1.getPixelsTouching(ring0);
+		return ring;
 	}
 
 }

@@ -5,7 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 
@@ -16,9 +18,13 @@ import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.IntArray;
 import org.xmlcml.euclid.IntRange;
 import org.xmlcml.euclid.IntSet;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.euclid.Real2;
+import org.xmlcml.euclid.util.MultisetUtil;
 import org.xmlcml.graphics.svg.SVGG;
+import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
+import org.xmlcml.graphics.svg.SVGText;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.pixel.PixelList;
 
@@ -60,16 +66,13 @@ public class ColorAnalyzer {
 	private BufferedImage flattenedImage;
 	private int height;
 	private int width;
-	private Multiset<Integer> colorSet;
-	private Int2 xRange;
-	private Int2Range xyRange;
-	private boolean fourbits;
 	private File outputDirectory;
 	private File inputFile;
 	private int intervalCount;
 	private IntSet sortedFrequencyIndex;
 	private IntArray colorValues;
 	private IntArray colorCounts;
+	private Int2Range xyRange;
 	private List<PixelList> pixelListList;
 	private int maxPixelSize = 100000;
 	private int minPixelSize = 100;
@@ -77,6 +80,9 @@ public class ColorAnalyzer {
 	private int endPlot = 100;
 	private int count = 0;
 	private boolean flatten;
+	private Multiset<RGBColor> colorSet;
+	private RGBNeighbourMap rgbNeighbourMap;
+	private ColorFrequenciesMap colorFrequenciesMap;
 
 /**
  * 	
@@ -91,13 +97,38 @@ public class ColorAnalyzer {
 //		colorAnalyzer.setOutputDirectory(new File("target/"+filename));
 //		colorAnalyzer.analyzeFlattenedColours();
  */
-	@Deprecated
 	public ColorAnalyzer(Image image) {
+		readImage(image);
+	}
+
+	public void readImage(Image image) {
+		clearVariables();
 		setInputImage(image);
 		this.height = image.getHeight(null);
 		this.width = image.getWidth(null);
-		this.colorSet = HashMultiset.create();
+		getOrCreateColorSet();
 		this.xyRange = new Int2Range(new IntRange(0, width), new IntRange(0, height));
+	}
+
+	private void clearVariables() {
+		currentImage = null;
+		inputImage = null;
+		flattenedImage = null;
+		height = 0;
+		width = 0;
+		xyRange = null;
+		outputDirectory = null;
+		inputFile = null;
+		intervalCount = 0;
+		sortedFrequencyIndex = null;
+		colorValues = null;
+		colorCounts = null;
+		pixelListList = null;
+		count = 0;
+		flatten = false;
+		colorSet = null;
+		rgbNeighbourMap = null;
+		colorFrequenciesMap = null;
 	}
 
 	public void setInputImage(Image image) {
@@ -108,31 +139,14 @@ public class ColorAnalyzer {
 	public ColorAnalyzer() {
 	}
 
-	/**
-	 * @deprecated
-	 * @return
-	 */
-	public Multiset<Integer> createColorSet() {
-		IntRange xRange = xyRange.getXRange();
-		IntRange yRange = xyRange.getYRange();
-		for (int jy = yRange.getMin(); jy <= yRange.getMax(); jy++) {
-			for (int ix = xRange.getMin(); ix <= xRange.getMax(); ix++) {
-				int color = inputImage.getRGB(ix, jy);
-				if (fourbits) {
-					color = color & 0xF0F0F0;
+	public Multiset<RGBColor> getOrCreateColorSet() {
+		if (colorSet == null || colorSet.size() == 0) {
+			this.colorSet = HashMultiset.create();
+			for (int jy = 0; jy < currentImage.getHeight(); jy++) {
+				for (int ix = 0; ix < currentImage.getWidth(); ix++) {
+					RGBColor color = new RGBColor(currentImage.getRGB(ix, jy));
+					colorSet.add(color);
 				}
-				colorSet.add(color);
-			}
-		}
-		return colorSet;
-	}
-
-	public Multiset<Integer> createColorSetNew() {
-		this.colorSet = HashMultiset.create();
-		for (int jy = 0; jy < currentImage.getHeight(); jy++) {
-			for (int ix = 0; ix < currentImage.getWidth(); ix++) {
-				int color = currentImage.getRGB(ix, jy);
-				colorSet.add(color);
 			}
 		}
 		return colorSet;
@@ -162,15 +176,6 @@ public class ColorAnalyzer {
 		this.xyRange = xyRange;
 	}
 
-	/** map all colours onto 4 bits.
-	 * 
-	 * @param b
-	 * @deprecated
-	 */
-	public void set4Bits(boolean b) {
-		this.fourbits = b;
-	}
-	
 	public void setStartPlot(int start) {
 		this.startPlot = start;
 	}
@@ -222,7 +227,7 @@ public class ColorAnalyzer {
 	}
 	
 	public void analyzeFlattenedColours() {
-		createColorSetNew();
+		getOrCreateColorSet();
 		createSortedFrequencies();
 		createSortedPixelLists();
 		if (outputDirectory != null) {
@@ -269,8 +274,8 @@ public class ColorAnalyzer {
 	private void createSortedFrequencies() {
 		colorValues = new IntArray();
 		colorCounts = new IntArray();
-		for (Entry<Integer> entry : colorSet.entrySet()) {
-			int ii = ((int) entry.getElement()) & 0x00ffffff;
+		for (Entry<RGBColor> entry : colorSet.entrySet()) {
+			int ii = entry.getElement().getRGB();
 			colorValues.addElement(ii);
 			colorCounts.addElement(entry.getCount());
 			int size = colorValues.size();
@@ -294,6 +299,8 @@ public class ColorAnalyzer {
 		outputDirectory.mkdirs();
 		
 	}
+	
+	
 
 	public void defaultPosterize() {
 		setStartPlot(1);
@@ -335,4 +342,129 @@ public class ColorAnalyzer {
 
 	}
 	
+	public SVGG createColorFrequencyPlot() {
+		Multiset<RGBColor> set = this.getOrCreateColorSet();
+		SVGG g = new SVGG();
+		double x0 = 10.;
+		double y0 = 10.;
+		double ydelta = 20.;
+		double x = x0;
+		double y = y0;
+		double xscale = 50.;
+		double yscale = 0.9;
+		double height = ydelta * yscale;
+		double fontSize = ydelta * 0.75;
+		double strokeWidth = 0.5;
+		double fontOffset = ydelta * 0.75;
+		String stroke = "black";
+		List<Entry<RGBColor>> rgb = RGBColor.createRGBListSortedByCount(set);
+		for (Entry<RGBColor> entry : rgb) {			// uncomment for debug
+			double percent = (100. * (double) entry.getCount() / (double) set.size()); 
+			RGBColor color = entry.getElement();
+			if (!color.getHex().equals("#ffffff")) {
+				y = plotRectangleAndText(g, ydelta, x, y, xscale, height, fontSize, strokeWidth, fontOffset, stroke, percent,
+						color.getHex());
+			}
+		}
+		return g;
+	}
+
+	private double plotRectangleAndText(SVGG g, double ydelta, double x, double y, double xscale, double height, double fontSize,
+			double strokeWidth, double fontOffset, String stroke, double percent, String color) {
+		double width = percent * xscale;
+		SVGRect rect = new SVGRect(x, y, width, height);
+		SVGText text = new SVGText(new Real2(x, y + fontOffset), color);
+		text.setFontSize(fontSize);
+		text.setFontWeight("bold");
+		text.setFill("white");
+		text.setStrokeWidth(strokeWidth);
+		text.setStroke(stroke);
+		text.setFontFamily("monospace");
+		
+		rect.setFill(color);
+		rect.setStrokeWidth(strokeWidth);
+		rect.setStroke(stroke);
+		y += ydelta;
+		g.appendChild(rect);
+		g.appendChild(text);
+		return y;
+	}
+
+	public RGBNeighbourMap getOrCreateNeighbouringColorMap() {
+		if (rgbNeighbourMap == null) {
+			getOrCreateColorFrequenciesMap();
+			rgbNeighbourMap = new RGBNeighbourMap(colorSet);
+//			LOG.debug("size "+rgbNeighbourMap.size());
+//			LOG.debug("Keys "+rgbNeighbourMap.keySet());
+		}
+		return rgbNeighbourMap;
+	}
+
+	/** frequencies of colours.
+	 * count indexed by rgbValue
+	 * @return
+	 */
+	public ColorFrequenciesMap getOrCreateColorFrequenciesMap() {
+		if (colorFrequenciesMap == null) {
+			colorFrequenciesMap = ColorFrequenciesMap.createMap(colorSet);
+		}
+		return colorFrequenciesMap;
+	}
+
+	public BufferedImage mergeMinorColours(BufferedImage image) {
+		readImage(image);
+		getOrCreateNeighbouringColorMap();
+//		Set<RGBColor> rgbNeighbourKeys = rgbNeighbourMap.keySet();
+//		List<RGBColor> rgbNeighbourKeyList = new ArrayList<RGBColor>(rgbNeighbourKeys);
+		BufferedImage newImage = ImageUtil.deepCopy(image);
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				RGBColor rgbColor = new RGBColor(image.getRGB(i, j));
+				RGBColor rgbColor1 = rgbNeighbourMap.getMoreFrequentRGBNeighbour(colorFrequenciesMap, rgbColor);
+				newImage.setRGB(i, j, rgbColor1.getRGB());
+			}
+		}
+		return newImage;
+	}
+
+	/** extracts the image corresponding to the color.
+	 * all other colors are set to WHITE
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public BufferedImage getImage(RGBColor color) {
+		BufferedImage newImage = ImageUtil.deepCopy(inputImage);
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				RGBColor rgbColor = new RGBColor(inputImage.getRGB(i, j));
+				if (!rgbColor.equals(color)) {
+					newImage.setRGB(i, j, RGBColor.HEX_WHITE);
+				}
+			}
+		}
+		return newImage;
+	}
+
+	/** output all pixels as black unless white.
+	 * 
+	 * @return
+	 */
+	public BufferedImage getBinaryImage() {
+		BufferedImage newImage = ImageUtil.deepCopy(inputImage);
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				RGBColor rgbColor = new RGBColor(inputImage.getRGB(i, j));
+				if (rgbColor.equals(RGBColor.RGB_WHITE)) {
+					newImage.setRGB(i, j, RGBColor.HEX_WHITE);
+				} else {
+					newImage.setRGB(i, j, RGBColor.HEX_BLACK);
+				}
+			}
+		}
+		return newImage;
+	}
+
+
+
 }

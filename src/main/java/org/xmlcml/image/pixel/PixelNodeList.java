@@ -3,13 +3,19 @@ package org.xmlcml.image.pixel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.image.pixel.PixelComparator.ComparatorType;
+
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multiset.Entry;
 
 public class PixelNodeList implements Iterable<PixelNode> {
 
@@ -173,6 +179,60 @@ public class PixelNodeList implements Iterable<PixelNode> {
 	public boolean remove(PixelNode node) {
 		ensureList();
 		return nodeList.remove(node);
+	}
+
+	/** replace existing node.
+	 * 
+	 * @param inode
+	 * @param newNode
+	 * @return
+	 */
+	public PixelNode set(int inode, PixelNode newNode) {
+		return nodeList.set(inode, newNode);
+	}
+
+	public Multiset<PixelNode> getMultipleNodes() {
+		Multiset<PixelNode> multipleNodeSet = HashMultiset.create();
+		for (PixelNode node : this) {
+			multipleNodeSet.add(node);
+		}
+		
+		Set<Entry<PixelNode>> singletons = new HashSet<Entry<PixelNode>>();
+		for (Entry<PixelNode> e : multipleNodeSet.entrySet()) {
+			if (e.getCount() <= 1) {
+				singletons.add(e);
+			}
+		}
+		for (Entry<PixelNode> e : singletons) {
+			multipleNodeSet.remove(e.getElement());
+		}
+		return multipleNodeSet;
+	}
+	
+	/** reverses order of nodes
+	 * 
+	 */
+	public void reverse() {
+		Collections.reverse(nodeList);
+	}
+
+	/** finds index of node with given coordinate.
+	 * 
+	 * @param pixel 
+	 * @return -1 if not found else 0, 1, 2...
+	 */
+	public int indexOf(Pixel pixel) {
+		if (pixel == null) {
+			return -1;
+		}
+		for (int i = 0; i < nodeList.size(); i++) {
+			PixelNode node = nodeList.get(i);
+			if (pixel.hasEqualCoordinates(node.getCentrePixel())) {
+				return i;
+			}
+		}
+		
+		return -1;
 	}
 
 }

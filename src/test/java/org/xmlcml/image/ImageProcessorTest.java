@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
-import org.xmlcml.graphics.image.ImageIOUtil;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
 import org.xmlcml.image.pixel.PixelIsland;
 import org.xmlcml.image.pixel.PixelIslandList;
 import org.xmlcml.image.processing.ZhangSuenThinning;

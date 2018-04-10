@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.graphics.image.ImageIOUtil;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
+import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageUtil;
 import org.xmlcml.image.processing.ZhangSuenThinning;
 
@@ -21,25 +21,25 @@ public class PixelGraphTest {
 	
 	@Test
 	public void testSingleCycle() {
-		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_CYCLE_ISLAND());
+		PixelGraph graph = PixelGraph.createGraph(ImageAnalysisFixtures.CREATE_CYCLE_ISLAND());
 		Assert.assertNotNull(graph);
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 1, "[<(0,-1)>]"); 
 	}
 
 	@Test
 	// simple line
 	public void test2Nodes() {
-		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_LINE_ISLAND());
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelGraph graph = PixelGraph.createGraph(ImageAnalysisFixtures.CREATE_LINE_ISLAND());
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 2, "[<(2,0)><(0,4)>]"); 
 	}
 
 	@Test
 	// Y-shaped tree
 	public void test3Terminals() {
-		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_Y_ISLAND());
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelGraph graph = PixelGraph.createGraph(ImageAnalysisFixtures.CREATE_Y_ISLAND());
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 4, "[<(0,3)><(-3,-3)><(3,-3)><(0,0)>]"); 
 	}
 
@@ -58,8 +58,8 @@ public class PixelGraphTest {
 	 * +     +
 	 */
 	public void testDoubleYGraph() {
-		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_DOUBLE_Y_ISLAND());
-		PixelNodeList nodeList = graph.getNodeList();
+		PixelGraph graph = PixelGraph.createGraph(ImageAnalysisFixtures.CREATE_DOUBLE_Y_ISLAND());
+		PixelNodeList nodeList = graph.getOrCreateNodeList();
 		PixelTestUtils.assertNodeList(nodeList, 6, "[<(3,5)><(-3,5)><(3,-5)><(-3,-5)><(0,2)><(0,-2)>]"); 
 //		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals("edges", 5, edgeList.size()); 
@@ -92,7 +92,7 @@ public class PixelGraphTest {
 	 *   X       X
 	 */
 	public void test135TrimethylBenzene() {
-		PixelGraph graph = PixelGraph.createGraph(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
+		PixelGraph graph = PixelGraph.createGraph(ImageAnalysisFixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
 //		PixelEdgeList edgeList = graph.getEdgeList();
 //		Assert.assertEquals(6, edgeList.size()); 
 //		Assert.assertEquals("{(0,0)(0,1)(0,2)}/[(0,0), (0,2)]", edgeList.get(0).toString());
@@ -114,7 +114,7 @@ public class PixelGraphTest {
 	 * 
 	 */
 	public void testRhombus() {
-		PixelIsland island = Fixtures.CREATE_RHOMBUS_ISLAND();
+		PixelIsland island = ImageAnalysisFixtures.CREATE_RHOMBUS_ISLAND();
 		try {
 			PixelGraph graph = PixelGraph.createGraph(island);
 			Assert.assertTrue("should not throw exception", true);
@@ -131,7 +131,7 @@ public class PixelGraphTest {
 	 * 
 	 */
 	public void testZNucleus() {
-		PixelIsland island = Fixtures.CREATE_ZNUCLEUS_ISLAND();
+		PixelIsland island = ImageAnalysisFixtures.CREATE_ZNUCLEUS_ISLAND();
 		try {
 			PixelGraph graph = PixelGraph.createGraph(island);
 			Assert.assertTrue("should not throw exception", true);
@@ -157,7 +157,7 @@ public class PixelGraphTest {
 		island.addPixelAndComputeNeighbourNeighbours(new Pixel(3,3));
 		PixelGraph graph = PixelGraph.createGraph(island);
 		Assert.assertEquals(7, graph.getPixelList().size());
-		Assert.assertEquals(5, graph.getNodeList().size());
+		Assert.assertEquals(5, graph.getOrCreateNodeList().size());
 //		Map<JunctionNode, PixelNucleus> nucleusByJunctionMap = graph.getNucleusByJunctionMap();
 //		Assert.assertEquals(5, nucleusByJunctionMap.size());
 //		if (graph.getNucleusSet() == null) {
@@ -202,7 +202,7 @@ public class PixelGraphTest {
 	@Test
 	@Ignore // out of memory on Jenkins
 	public void testExtremeEdge() throws IOException {
-		BufferedImage image = ImageIO.read(new File(Fixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2.png"));
+		BufferedImage image = ImageIO.read(new File(ImageAnalysisFixtures.COMPOUND_DIR, "journal.pone.0094172.g002-2.png"));
 		image = ImageUtil.boofCVBinarization(image, 160);
 		image = ImageUtil.thin(image, new ZhangSuenThinning());
 		ImageIOUtil.writeImageQuietly(image, new File("target/edge/0094172.png"));
@@ -218,4 +218,43 @@ public class PixelGraphTest {
 		}
 	}
 	
+	@Test
+	public void testShortEdge() {
+		PixelIsland shortEdgeIsland = ImageAnalysisFixtures.CREATE_SHORTEDGE_ISLAND();
+		PixelGraph graph = new PixelGraph(shortEdgeIsland);
+		graph.createNodesAndEdges();
+		Assert.assertEquals(17, graph.getPixelList().size());
+		
+		Assert.assertEquals(6,  graph.getOrCreateNodeList().size());
+		Assert.assertEquals(5,  graph.getOrCreateEdgeList().size());
+		graph.compactCloseNodes(5);
+		Assert.assertEquals(5,  graph.getOrCreateNodeList().size());
+		Assert.assertEquals(4,  graph.getOrCreateEdgeList().size());
+		Assert.assertEquals(17, graph.getPixelList().size()); // pixels not changed
+//		LOG.debug(graph);
+		PixelEdgeList edgeList = graph.getOrCreateEdgeList().getEdges(new Pixel(0,0), new Pixel(3,5));
+	}
+	
+	@Test
+	public void testMultipleConnections() {
+		PixelIsland phiIsland = ImageAnalysisFixtures.CREATE_PHI_ISLAND();
+		PixelGraph graph = new PixelGraph(phiIsland);
+		graph.createNodesAndEdges();
+		Assert.assertEquals(21, graph.getPixelList().size());
+		
+		Assert.assertEquals(4,  graph.getOrCreateNodeList().size());
+		Assert.assertEquals(5,  graph.getOrCreateEdgeList().size());
+		
+		PixelNode node02 = graph.getOrCreateNodeList().getPixelNode(new Pixel(0,2));
+		Assert.assertEquals("<(0,2)>", node02.toString());
+		PixelNodeList connectedList = node02.getConnectedNodes();
+		Assert.assertEquals("[<(0,5)><(0,-2)><(0,-2)><(0,-2)>]", connectedList.toString());
+		
+		node02 = graph.getOrCreateNodeList().getPixelNode(new Pixel(0,5));
+		Assert.assertEquals("<(0,5)>", node02.toString());
+		connectedList = node02.getConnectedNodes();
+		Assert.assertEquals("[<(0,2)>]", connectedList.toString());
+		
+		
+	}
 }

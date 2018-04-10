@@ -23,12 +23,12 @@ import org.xmlcml.euclid.Real2Range;
 import org.xmlcml.euclid.RealRange;
 import org.xmlcml.euclid.RealSquareMatrix;
 import org.xmlcml.euclid.Util;
-import org.xmlcml.graphics.image.ImageIOUtil;
 import org.xmlcml.graphics.svg.SVGElement;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.graphics.svg.util.ImageIOUtil;
+import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.ImageProcessor;
 import org.xmlcml.image.ImageUtil;
 
@@ -48,7 +48,7 @@ public class PixelIslandTest {
 	@Ignore
 	// non-deterministic?
 	public void testAddPixel() {
-		PixelList longTList = Fixtures.LONG_T_LIST;
+		PixelList longTList = ImageAnalysisFixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList);
 		PixelList n0 = longTList.get(0).getOrCreateNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
@@ -74,7 +74,7 @@ public class PixelIslandTest {
 	// non-deterministic?
 	public void testAddPixelWithDiagonal() {
 		boolean diagonal = true;
-		PixelList longTList = Fixtures.LONG_T_LIST;
+		PixelList longTList = ImageAnalysisFixtures.LONG_T_LIST;
 		PixelIsland island = new PixelIsland(longTList, diagonal);
 		PixelList n0 = longTList.get(0).getOrCreateNeighbours(island);
 		Assert.assertEquals("0", 1, n0.size());
@@ -90,7 +90,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testgetTerminalPixels() {
-		PixelList lineList = Fixtures.LINE_LIST;
+		PixelList lineList = ImageAnalysisFixtures.LINE_LIST;
 		PixelIsland island = new PixelIsland(lineList);
 		PixelList terminalPixels = island.getTerminalPixels();
 		Assert.assertEquals("terminal", 2, terminalPixels.size());
@@ -98,7 +98,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testgetTerminalPixelsL() {
-		PixelList lList = Fixtures.L_LIST;
+		PixelList lList = ImageAnalysisFixtures.L_LIST;
 		PixelIsland island = new PixelIsland(lList);
 		Assert.assertNotNull("island", island);
 		PixelList terminalPixels = island.getTerminalPixels();
@@ -107,7 +107,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testgetTerminalPixelsT() {
-		PixelList tList = Fixtures.T_LIST;
+		PixelList tList = ImageAnalysisFixtures.T_LIST;
 		PixelIsland island = new PixelIsland(tList);
 		PixelList terminalPixels = island.getTerminalPixels();
 		Assert.assertEquals("terminal", 3, terminalPixels.size());
@@ -121,7 +121,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testgetTerminalMaltoryzine1() throws Exception {
-		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
+		BufferedImage image = ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_THINNED_PNG);
 		FloodFill floodFill = new ImageFloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
@@ -133,7 +133,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testgetTerminalMaltoryzine0() throws Exception {
-		BufferedImage image = ImageIO.read(Fixtures.MALTORYZINE_THINNED_PNG);
+		BufferedImage image = ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_THINNED_PNG);
 		FloodFill floodFill = new ImageFloodFill(image);
 		floodFill.setDiagonal(true);
 		floodFill.fill();
@@ -483,7 +483,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testBoundingBox2() throws IOException {
-		PixelIsland island = createFirstPixelIsland(Fixtures.MALTORYZINE0_PNG);
+		PixelIsland island = createFirstPixelIsland(ImageAnalysisFixtures.MALTORYZINE0_PNG);
 		Real2Range bbox = island.getBoundingBox();
 		Assert.assertEquals("bbox", "((13.0,238.0),(34.0,154.0))",
 				bbox.toString());
@@ -492,7 +492,7 @@ public class PixelIslandTest {
 
 	@Test
 	public void testBoundingBoxes() throws IOException {
-		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.MALTORYZINE_PNG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(ImageAnalysisFixtures.MALTORYZINE_PNG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		Assert.assertEquals("islands", 5, islands.size());
 		for (PixelIsland island : islands) {
@@ -512,7 +512,7 @@ public class PixelIslandTest {
 	
 	public void testLargePhyloJpg() throws IOException {
 		File phyloDir = new File("target/phylo/");
-		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		imageProcessor.setParameters(null);
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		Collections.sort(islands.getList(), new PixelIslandComparator(
@@ -536,7 +536,7 @@ public class PixelIslandTest {
 				333, // boxes 0-9
 				112, 35, 8, 11, 12, 9, 5, 0, 2, 8, // 10-19
 				1, 3, 2, 1, 1, 1 };
-		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				25.), new RealRange(0., 25.));
@@ -562,7 +562,7 @@ public class PixelIslandTest {
 	@Test
 	public void testExtractZeroHeightCharacterBoxes() throws IOException {
 		File charDir = new File("target/chars/");
-		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		imageProcessor.setParameters(null);
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
@@ -578,7 +578,7 @@ public class PixelIslandTest {
 	@Test
 	public void testExtractLargeCharacters() throws IOException {
 		File charDir = new File("target/chars/");
-		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		ImageProcessor imageProcessor = ImageProcessor.createDefaultProcessorAndProcess(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = imageProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				20.), new RealRange(12., 25.));
@@ -596,7 +596,7 @@ public class PixelIslandTest {
 	 */
 	@Ignore // null pointer
 	public void testInterboxCorrelations() throws IOException {
-		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				5.), new RealRange(20., 25.));
@@ -709,7 +709,7 @@ public class PixelIslandTest {
 		// "A"s selected manually
 		int[] charsA = { 90, 274, 97, 98, 133, 202, 283, 136, 143, 1, 2 // dummies
 		};
-		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		BufferedImage rawImage = ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG);
 		MainPixelProcessor pixelProcessor = new MainPixelProcessor(rawImage);
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
@@ -768,7 +768,7 @@ public class PixelIslandTest {
 		int[] charsA = { 90, 274, 97, 98, 133, 202, 283, 136, 143,
 		// 1,2 // dummies
 		};
-		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		BufferedImage rawImage = ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG);
 		Assert.assertNotNull("rawImage not null", rawImage);
 		PixelIslandList islandsA = createAs(charsA);
 		List<BufferedImage> subImageList = new ArrayList<BufferedImage>();
@@ -802,7 +802,7 @@ public class PixelIslandTest {
 	 * 
 	 */
 	public void testFindCharsA() throws IOException {
-		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		BufferedImage rawImage = ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG);
 		MainPixelProcessor pixelProcessor = new MainPixelProcessor(rawImage);
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		extractCharactersAndCorrelate(rawImage, islands, "65", 0.27);
@@ -813,7 +813,7 @@ public class PixelIslandTest {
 	 * 
 	 */
 	public void testFindCharsAny() throws IOException {
-		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
+		BufferedImage rawImage = ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG);
 		MainPixelProcessor pixelProcessor = new MainPixelProcessor(rawImage);
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		extractCharactersAndCorrelate(rawImage, islands, "65", 0.30);
@@ -846,8 +846,8 @@ public class PixelIslandTest {
 	@Test
 	@Ignore // this takes a long time
 	public void extractCharsToImages() throws IOException {
-		BufferedImage rawImage = ImageIO.read(Fixtures.LARGE_PHYLO_JPG);
-		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		BufferedImage rawImage = ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG);
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		for (int h = 5; h < 10; h++) {
 			PixelIslandList characters = islands.isContainedIn(new RealRange(
@@ -1019,7 +1019,7 @@ public class PixelIslandTest {
 	}
 
 	private PixelIslandList createAs(int[] charsA) throws IOException {
-		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(Fixtures.LARGE_PHYLO_JPG));
+		MainPixelProcessor pixelProcessor = new MainPixelProcessor(ImageIO.read(ImageAnalysisFixtures.LARGE_PHYLO_JPG));
 		PixelIslandList islands = pixelProcessor.getOrCreatePixelIslandList();
 		PixelIslandList characters = islands.isContainedIn(new RealRange(0.,
 				15.), new RealRange(0., 12.));

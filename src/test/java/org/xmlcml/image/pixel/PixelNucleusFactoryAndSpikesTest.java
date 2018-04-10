@@ -3,7 +3,7 @@ package org.xmlcml.image.pixel;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 
 public class PixelNucleusFactoryAndSpikesTest {
 	
@@ -11,9 +11,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testPixelNucleusListDot() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_DOT_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_DOT_ISLAND());
 		Assert.assertEquals("island", "(0,0)",
-				Fixtures.CREATE_DOT_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_DOT_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		Assert.assertEquals("nucleusList", 1, nucleusList.size());
 		Assert.assertEquals("nucleusList: ", "[{(0,0)}]", 
@@ -22,9 +22,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testPixelNucleusListLine() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_LINE_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_LINE_ISLAND());
 		Assert.assertEquals("island", "(2,0)(1,0)(0,1)(-1,2)(0,3)(0,4)",
-				Fixtures.CREATE_LINE_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_LINE_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		nucleusList.sortYX(3);
 		Assert.assertEquals("nucleusList", 2, nucleusList.size());
@@ -34,9 +34,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testPixelNucleusListCycle() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_CYCLE_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_CYCLE_ISLAND());
 		Assert.assertEquals("island", "(1,0)(0,1)(-1,0)(0,-1)",
-				Fixtures.CREATE_CYCLE_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_CYCLE_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		Assert.assertEquals("nucleusList", 1, nucleusList.size());
 //		Assert.assertEquals("nucleusList: ", "[{(1,0)}]", // position is arbitrary
@@ -45,9 +45,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testPixelNucleusListY() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_Y_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_Y_ISLAND());
 		Assert.assertEquals("island", "(0,0)(0,1)(0,2)(0,3)(-1,-1)(-2,-2)(-3,-3)(1,-1)(2,-2)(3,-3)",
-				Fixtures.CREATE_Y_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_Y_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		nucleusList.sortYX(3);
 		Assert.assertEquals("nucleusList", 4, nucleusList.size());
@@ -57,9 +57,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testPixelNucleusListDoubleY() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_DOUBLE_Y_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_DOUBLE_Y_ISLAND());
 		Assert.assertEquals("island", "(0,0)(0,1)(0,2)(1,3)(-1,3)(2,4)(-2,4)(3,5)(-3,5)(0,-1)(0,-2)(1,-3)(-1,-3)(2,-4)(-2,-4)(3,-5)(-3,-5)",
-				Fixtures.CREATE_DOUBLE_Y_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_DOUBLE_Y_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(3);
 		nucleusList.sortYX(3);
 		Assert.assertEquals("nucleusList", 6, nucleusList.size());
@@ -69,9 +69,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testPixelNucleusListSpikedHexagon() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
 		Assert.assertEquals("island", "(0,0)(0,1)(0,2)(1,3)(-1,3)(1,4)(-1,4)(-2,5)(0,5)(2,5)(-3,6)(3,6)(-4,7)(4,7)",
-				Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_TRISPIKED_HEXAGON_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		nucleusList.sortYX(3);
 		Assert.assertEquals("nucleusList", 6, nucleusList.size());
@@ -89,9 +89,9 @@ public class PixelNucleusFactoryAndSpikesTest {
 	 *     +
 	 */
 	public void testPixelNucleusListT() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_T_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_T_ISLAND());
 		Assert.assertEquals("island", "(-1,-1)(0,0)(1,0)(2,1)(3,1)(4,1)(5,1)(6,0)(7,0)(3,2)(3,3)(3,4)(3,5)",
-				Fixtures.CREATE_T_ISLAND().getPixelList().toString());
+				ImageAnalysisFixtures.CREATE_T_ISLAND().getPixelList().toString());
 		PixelNucleusList nucleusList = nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		nucleusList.sortYX(3);
 		LOG.trace("nucleusList "+nucleusList.size()+"; "+nucleusList);
@@ -103,38 +103,38 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testSpikesDot() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_DOT_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_DOT_ISLAND());
 		Assert.assertEquals("dot", "::", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
 	public void testSpikesLine() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_LINE_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_LINE_ISLAND());
 		Assert.assertEquals("line", "(1,0)(0,3)", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
 	public void testSpikesCycle() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_CYCLE_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_CYCLE_ISLAND());
 		Assert.assertEquals("cycle", "(-1,0)(1,0)", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
 	public void testSpikesY() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_Y_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_Y_ISLAND());
 		Assert.assertEquals("Y", "(-2,-2)(2,-2)(-1,-1)(1,-1)(0,1)(0,2)", nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
 	public void testSpikesDoubleY() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_DOUBLE_Y_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_DOUBLE_Y_ISLAND());
 		Assert.assertEquals("doubleY", "(-2,-4)(2,-4)(-1,-3)(1,-3)(0,-1)(0,1)(-1,3)(1,3)(-2,4)(2,4)", 
 				nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
 
 	@Test
 	public void testSpikesSpikedHexagon() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
 		nucleusFactory.getOrCreateYXSortedNucleusList(2);
 		Assert.assertEquals("spikedHexagon", "(0,1)(0,1)(-1,3)(-1,3)(1,3)(1,3)(-2,5)(0,5)(0,5)(2,5)(-3,6)(3,6)", 
 				nucleusFactory.createYXSortedSpikePixelList().toString());
@@ -142,7 +142,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	
 	@Test
 	public void testSpikesT() {
-		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(Fixtures.CREATE_T_ISLAND());
+		PixelNucleusFactory nucleusFactory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_T_ISLAND());
 		Assert.assertEquals("T", "(0,0)(1,0)(6,0)(5,1)(3,3)(3,4)",     // ?????
 				nucleusFactory.createYXSortedSpikePixelList().toString());
 	}
@@ -150,7 +150,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 	// -----------
 	@Test
 	public void testJoinSpikesDot() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_DOT_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_DOT_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "", 
 				factory.getEdgeList().toString());
@@ -158,7 +158,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testJoinSpikesLine() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_LINE_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_LINE_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "pixelList: (2,0)(1,0)(0,1)(-1,2)(0,3)(0,4); nodeList: [<(2,0)><(0,4)>]", 
 				factory.getEdgeList().toString());
@@ -166,7 +166,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testJoinSpikesCycle() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_CYCLE_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_CYCLE_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "pixelList: (0,-1)(1,0)(0,1)(-1,0)(0,-1); nodeList: [<(0,-1)><(0,-1)>]", 
 				factory.getEdgeList().toString());
@@ -174,7 +174,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testJoinSpikesY() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_Y_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_Y_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "pixelList: (0,3)(0,2)(0,1)(0,0); nodeList: [<(0,3)><(0,0)>]pixelList: (-3,-3)(-2,-2)(-1,-1)(0,0); nodeList: [<(-3,-3)><(0,0)>]pixelList: (3,-3)(2,-2)(1,-1)(0,0); nodeList: [<(3,-3)><(0,0)>]", 
 				factory.getEdgeList().toString());
@@ -182,7 +182,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testJoinSpikesDoubleY() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_DOUBLE_Y_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_DOUBLE_Y_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "pixelList: (3,5)(2,4)(1,3)(0,2); nodeList: [<(3,5)><(0,2)>]pixelList: (-3,5)(-2,4)(-1,3)(0,2); nodeList: [<(-3,5)><(0,2)>]pixelList: (3,-5)(2,-4)(1,-3)(0,-2); nodeList: [<(3,-5)><(0,-2)>]pixelList: (-3,-5)(-2,-4)(-1,-3)(0,-2); nodeList: [<(-3,-5)><(0,-2)>]pixelList: (0,2)(0,1)(0,0)(0,-1)(0,-2); nodeList: [<(0,2)><(0,-2)>]", 
 				factory.getEdgeList().toString());
@@ -190,7 +190,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testJoinSpikesSpikedHexagon() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_TRISPIKED_HEXAGON_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "pixelList: (0,2)(0,1)(0,0); nodeList: [<(0,2)><(0,0)>]pixelList: (-4,7)(-3,6)(-2,5)(-1,4); nodeList: [<(-4,7)><(-1,4)>]pixelList: (4,7)(3,6)(2,5)(1,4); nodeList: [<(4,7)><(1,4)>]pixelList: (1,4)(1,3)(0,2); nodeList: [<(1,4)><(0,2)>]pixelList: (-1,4)(-1,3)(0,2); nodeList: [<(-1,4)><(0,2)>]pixelList: (1,4)(0,5)(-1,4); nodeList: [<(1,4)><(-1,4)>]",
 				factory.getEdgeList().toString());
@@ -198,7 +198,7 @@ public class PixelNucleusFactoryAndSpikesTest {
 
 	@Test
 	public void testJoinSpikesT() {
-		PixelNucleusFactory factory = new PixelNucleusFactory(Fixtures.CREATE_T_ISLAND());
+		PixelNucleusFactory factory = new PixelNucleusFactory(ImageAnalysisFixtures.CREATE_T_ISLAND());
 	    factory.createNodesAndEdges();
 		Assert.assertEquals("edges", "pixelList: (-1,-1)(0,0)(1,0)(2,1); nodeList: [<(-1,-1)><(3,1)>]pixelList: (7,0)(6,0)(5,1)(4,1); nodeList: [<(7,0)><(3,1)>]pixelList: (3,5)(3,4)(3,3)(3,2); nodeList: [<(3,5)><(3,1)>]", 
 				factory.getEdgeList().toString());

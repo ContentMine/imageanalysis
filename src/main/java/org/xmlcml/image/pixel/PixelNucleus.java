@@ -102,7 +102,7 @@ public class PixelNucleus implements Comparable<PixelNucleus> {
 	public Real2 getCentre() {
 		centre = null;
 		if (centrePixel == null) {
-			Real2Array real2Array = pixelList.getReal2Array();
+			Real2Array real2Array = pixelList.getOrCreateReal2Array();
 			centre = real2Array.getMean();
 		} else {
 			centre = new Real2(centrePixel.getInt2());

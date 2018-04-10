@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.xmlcml.image.Fixtures;
+import org.xmlcml.image.ImageAnalysisFixtures;
 import org.xmlcml.image.colour.ColorUtilities;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
@@ -38,7 +38,7 @@ public class BoofCVTest {
 	@Test
 	@Ignore // takes 3 secs
 	public void testInt2() {
-		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
+		BufferedImage image = UtilImageIO.loadImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 imageInt2 = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		BufferedImage outImage = ConvertBufferedImage.convertTo(imageInt2,null);
 		UtilImageIO.saveImage(outImage, new File(BOOFCV_OUT_DIR, "postermol.png").toString());
@@ -46,7 +46,7 @@ public class BoofCVTest {
 
 	@Test
 	public void testBinarize() {
-		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
+		BufferedImage image = UtilImageIO.loadImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
@@ -81,7 +81,7 @@ public class BoofCVTest {
 	@Test
 	public void testMoreBinary() {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
+		BufferedImage image = UtilImageIO.loadImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, "postermol.png").toString());
  
 		// convert into a usable format
 		ImageFloat32 input = ConvertBufferedImage.convertFromSingle(image, null, ImageFloat32.class);
@@ -126,7 +126,7 @@ public class BoofCVTest {
 	@Test
 	@Ignore
 	public void testBlobs() {
-		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "postermol.png").toString());
+		BufferedImage image = UtilImageIO.loadImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, "postermol.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(input.getWidth(), input.getHeight());
 //		Creates a binary image by thresholding the input image. Binary must be of type ImageUInt8.
@@ -147,7 +147,7 @@ public class BoofCVTest {
 	
 	@Test
 	public void testNatprod() {
-		BufferedImage image = UtilImageIO.loadImage(new File(Fixtures.PROCESSING_DIR, "natprod1.png").toString());
+		BufferedImage image = UtilImageIO.loadImage(new File(ImageAnalysisFixtures.PROCESSING_DIR, "natprod1.png").toString());
 		ImageUInt8 input = ConvertBufferedImage.convertFrom(image,(ImageUInt8)null);
 		ImageUInt8 binary = new ImageUInt8(image.getWidth(), input.getHeight());
 		for (int i = 70; i <= 130; i+= 20) {

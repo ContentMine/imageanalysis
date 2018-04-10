@@ -13,10 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.xmlcml.euclid.Angle;
 import org.xmlcml.euclid.Int2;
 import org.xmlcml.euclid.Int2Range;
 import org.xmlcml.euclid.Real2;
 import org.xmlcml.euclid.Real2Array;
+import org.xmlcml.euclid.RealArray;
 import org.xmlcml.graphics.svg.SVGG;
 import org.xmlcml.graphics.svg.SVGRect;
 import org.xmlcml.graphics.svg.SVGSVG;
@@ -323,11 +325,13 @@ public class PixelList implements Iterable<Pixel> {
 		return isCycle;
 	}
 
-	public Real2Array getReal2Array() {
-		points = new Real2Array();
-		for (Pixel pixel : list) {
-			Real2 point = new Real2(pixel.getInt2());
-			points.add(point);
+	public Real2Array getOrCreateReal2Array() {
+		if (points == null) {
+			points = new Real2Array();
+			for (Pixel pixel : list) {
+				Real2 point = new Real2(pixel.getInt2());
+				points.addElement(point);
+			}
 		}
 		return points;
 	}
@@ -341,8 +345,12 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public PixelList getPixelsBefore(Pixel pixel) {
 		int mid = this.indexOf(pixel);
-		PixelList pixelList = getPixelList(mid, -1, -1);
+		PixelList pixelList = this.getPixelsBackToStartInclusive(mid);
 		return pixelList;
+	}
+
+	PixelList getPixelsBackToStartInclusive(int mid) {
+		return this.getPixelList(mid, -1, -1);
 	}
 
 	/** finds all pixels in list After pixel.
@@ -354,8 +362,12 @@ public class PixelList implements Iterable<Pixel> {
 	 */
 	public PixelList getPixelsAfter(Pixel pixel) {
 		int mid = this.indexOf(pixel);
-		PixelList pixelList = getPixelList(mid, size(), 1);
+		PixelList pixelList = getPixelsForwardToEndInclusive(mid);
 		return pixelList;
+	}
+
+	PixelList getPixelsForwardToEndInclusive(int mid) {
+		return getPixelList(mid, size(), 1);
 	}
 
 	private PixelList getPixelList(int start, int end, int delta) {
@@ -505,7 +517,7 @@ public class PixelList implements Iterable<Pixel> {
 	}
 
 	private Real2 getCentreCoordinate() {
-		return size() == 0 ? null : getReal2Array().getMean();
+		return size() == 0 ? null : getOrCreateReal2Array().getMean();
 	}
 
 
@@ -668,11 +680,72 @@ public class PixelList implements Iterable<Pixel> {
 		}
 	}
 
-//	public void removeAll(PixelList pixelList) {
-//		if (pixelList != null) {
-//			list.removeAll(pixelList.getList());
-//		}
-//	}
+	public void removeAll(PixelList pixels) {
+		for (Pixel pixel : pixels) {
+			remove(pixel);
+		}
+	}
+
+	public void removeAll(PixelSet pixels) {
+		Iterator<Pixel> pixelIterator = pixels.iterator();
+		while (pixelIterator.hasNext()) {
+			remove(pixelIterator.next());
+		}
+	}
+	
+	/** curvature is radians per pixel.
+	 * 
+	 * @return
+	 */
+	public RealArray calculateCurvatureRadiansPerPixel() {		
+		getOrCreateReal2Array();
+		RealArray curvature = points.calculateDeviationsRadiansPerElement();
+		return curvature;
+	}
+
+	
+
+	/** direction (essentially a bearing) defined by polar angle between points i and i+1.
+	 * direction j = point(i) -> point(i+1)
+	 * direction 0 = point0 -> point1 // offset by half a point
+	 * RealArray is therefore of size size-1
+	 * 
+	 * @return
+	 */
+	public List<Real2> calculateDirectionInRadians() {
+//		RealArray directions = new RealArray(size() - 1); 
+		List<Real2> angleList =  new ArrayList<Real2>(size() - 1);
+		for (int i = 0; i < size() - 1; i++) {
+			Int2 i0 = get(i).getInt2();
+			Int2 i1 = get(i + 1).getInt2();
+			Real2 delta = new Real2(i1.subtract(i0));
+			if (i > 0) {
+//				Real2 
+			}
+			angleList.add(delta);
+		}
+		return angleList;
+	}
+
+	public Pixel getLast() {
+		return list == null || list.size() == 0 ? null : list.get(list.size() - 1);
+	}
+
+	public boolean remove(int i) {
+		Pixel pixel = this.get(i);
+		if (pixel != null) {
+			return remove(pixel);
+		}
+		return false;
+	}
+
+	public boolean removeLast() {
+		Pixel pixel = this.get(size() - 1);
+		if (pixel != null) {
+			return remove(pixel);
+		}
+		return false;
+	}
 
 
 }

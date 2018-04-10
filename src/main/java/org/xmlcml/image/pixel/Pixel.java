@@ -16,7 +16,6 @@ import org.xmlcml.euclid.Real2Array;
 import org.xmlcml.graphics.svg.SVGRect;
 
 public class Pixel {
-
 	private final static Logger LOG = Logger.getLogger(Pixel.class);
 	
 	enum Marked {
@@ -472,4 +471,18 @@ public class Pixel {
 		return listOfNeighboursOfNeighbours;
 	}
 
+	public Int2 subtract(Pixel pixel) {
+		return this.getInt2().subtract(pixel.getInt2());
+	}
+
+	/**
+	 * 
+	 * @return true if coordinates are equal
+	 */
+	public boolean hasEqualCoordinates(Pixel pixel) {
+		if (pixel == null) {
+			return false;
+		}
+		return pixel.getInt2().equals(this.getInt2());
+	}
 }
